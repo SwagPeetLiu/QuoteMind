@@ -5,10 +5,11 @@ This project is dedicated to my hardworking mother who is running an advertismen
 Front-end development:  
   - React library with Next.js framework 
   - Tailwind css with customised css where needed
-  - ContextProvider for efficient statement management across UI components
+  - ESLint tool to minize coding errors in Typescripts
+  - axios library for REST API calling
 
 Back-end development:
-  - Flask Framework given the non-concurrent interaction nature
+  - Flask Framework given the non-concurrent interaction nature (running within an Virturla Environment)
   - MYSQL database
 
 # Drafted features
