@@ -1,0 +1,14 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:16-alpine # thin container
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: liuaoshuai131124
+      POSTGRES_USER: lulu_admin
+      POSTGRES_DB: webapp_dev
+    volumes:
+      - postgres:/var/lib/postgresql/data
+volumes:
+ postgres: # persistent data across container restarts & removals

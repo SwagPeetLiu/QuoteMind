@@ -16,5 +16,11 @@ const config: Config = {
     },
   },
   plugins: [],
+  variants: { // enabling multiple conditioning on inline-tailwind style
+    extend: {
+      backgroundColor: ['hover'], 
+      textColor: ['hover'],
+    },
+  },
 };
 export default config;
