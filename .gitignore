@@ -1,0 +1,9 @@
+# express server file
+Express-Server/node_modules
+Express-Server/.env
+
+# VUE front-end app file
+
+# General OS generated files
+.DS_Store
+Thumbs.db
