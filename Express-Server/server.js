@@ -37,6 +37,9 @@ app.use("/profile", profileRouter);
 const companyRouter = require('./Routes/companies')(db);
 app.use("/companies", companyRouter);
 
+const clientrouter = require('./Routes/clients')(db);
+app.use("/clients", clientrouter);
+
 // testing branch for authroisations
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/home.html');
