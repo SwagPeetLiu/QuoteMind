@@ -136,6 +136,22 @@ function validateGenericID(id, target){
     return { valid: true };
 }
 
+async function validateEmployeePosition(position, db) {
+    if (!position || !validator.isUUID(position)) {
+        return { valid: false, message: 'Invalid ID of Position ID' };
+    }
+    try{
+        const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
+        if (!positionRecord) {
+            return { valid: false, message: 'Invalid ID of Position ID' };
+        }
+    }
+    catch(err){
+        return { valid: false, message: 'Invalid ID of Position ID' };
+    }
+    return { valid: true };
+}
+
 module.exports = {
     validateAddresses,
     validateEmail,
@@ -144,5 +160,6 @@ module.exports = {
     validateTaxNumber,
     validateGenericID,
     validateSocialContacts,
-    validateClients
+    validateClients,
+    validateEmployeePosition
 };
