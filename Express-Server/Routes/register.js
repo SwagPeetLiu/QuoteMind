@@ -1,37 +1,33 @@
 require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const { 
+    validateEmail,
+    validateName,
+    validatePassword
+} = require('../utils/Validator');
 
 module.exports = (db) => {
     router.route("/")
     .post(
         async (req, res) => {
+            // validate register information
             const { email, username, password } = req.body;
             if (!username || !password || !email) {
                 return res.status(400).json({ message: 'Username and password are required' });
             }
-            if (!validator.isEmail(email)) {
-                return res.status(400).json({ message: 'Invalid email address' });
+            const validations = [
+                validateEmail(email),
+                validateName(username),
+                validatePassword(password),
+            ];
+            for (const validation of validations) {
+                if (!validation.valid) return res.status(400).json({ message: validation.message });
             }
-            if (!validator.isLength(email, { min: process.env.Min_Email_Length, max: process.env.Max_Email_Length })) {
-                return res.status(400).json({ message: 'Invalid email address' });
-            }
-            if (!validator.isAlphanumeric(username.replace(' ', ''))) {
-                return res.status(400).json({ message: 'Username contains invalid characters' });
-            }
-            if (!validator.isLength(username, { min: process.env.Min_Username_Length, max: process.env.Max_Username_Length })) {
-                return res.status(400).json({ 
-                    message: `{Username must be between ${process.env.Min_Username_Length} and ${process.env.Max_Username_Length} characters}` 
-                });
-            }
-            if (!validator.isLength(password, { min: process.env.Min_Password_Length, max: process.env.Max_Password_Length })) {
-                return res.status(400).json({ 
-                    message: `{Password must be between ${process.env.Min_Password_Length} and ${process.env.Max_Password_Length} characters}` 
-                });
-            }
+
+            // create an user if no previous email was registered here:
             try {
                 const user = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [email]);
                 if (user) {

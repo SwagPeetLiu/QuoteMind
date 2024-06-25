@@ -86,11 +86,15 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
             try {
-                // remove all referneces in the transaction table:
-                await db.none(`
-                    UPDATE public.transactions
-                    SET employee = array_remove(employee, $1) WHERE created_by = $2`, [id, owner]);
-                await db.none('DELETE FROM public.employees WHERE id = $1 AND created_by = $2', [id, owner]);
+                db.tx(async (transaction) => {
+                    // remove all referneces in the transaction table:
+                    await transaction.none(` 
+                        UPDATE public.transactions
+                        SET employee = array_remove(employee, $1) WHERE created_by = $2`, [id, owner]);
+                    
+                    // delete the employee record
+                    await transaction.none('DELETE FROM public.employees WHERE id = $1 AND created_by = $2', [id, owner]);
+                })
                 return res.status(200).json({ message: "employee deleted successfully" });
             }
             catch (err) {

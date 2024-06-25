@@ -1,5 +1,7 @@
 require('dotenv').config();
 const validator = require('validator');
+const { getConfiguration } = require('./Configurator');
+const config = getConfiguration();
 
 // Function to validate an array of addresses
 async function validateAddresses(addresses, owner, id, target, db, req) {
@@ -17,11 +19,11 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                 !(address.message === "add" || address.message === "update" || address.message === "delete")) {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
-            if (!validator.isLength(address.street, { min: process.env.Min_Street_Length, max: process.env.Max_Street_Length }) ||
-                !validator.isLength(address.city, { min: process.env.Min_City_Length, max: process.env.Max_City_Length }) ||
-                !validator.isLength(address.state, { min: process.env.Min_State_Length, max: process.env.Max_State_Length }) ||
-                !validator.isLength(address.country, { min: process.env.Min_Country_Length, max: process.env.Max_Country_Length }) ||
-                !validator.isLength(address.postal, { min: process.env.Min_Postal_Length, max: process.env.Max_Postal_Length })) {
+            if (!validator.isLength(address.street, { min: config.limitations.Min_Street_Length, max: config.limitations.Max_Street_Length }) ||
+                !validator.isLength(address.city, { min: config.limitations.Min_City_Length, max: config.limitations.Max_City_Length }) ||
+                !validator.isLength(address.state, { min: config.limitations.Min_State_Length, max: config.limitations.Max_State_Length }) ||
+                !validator.isLength(address.country, { min: config.limitations.Min_Country_Length, max: config.limitations.Max_Country_Length }) ||
+                !validator.isLength(address.postal, { min: config.limitations.Min_Postal_Length, max: config.limitations.Max_Postal_Length })) {
                 return { valid: false, message: 'Invalid Length of Address information' };
             }
             if (address.message !== "add" && req.method !== "POST") {
@@ -81,8 +83,15 @@ async function validateClients(clients, owner, db) {
 function validateName(name){
     if (!name ||
         !validator.isAlphanumeric(name.replaceAll(' ', '')) ||
-        !validator.isLength(name, { min: process.env.Min_Name_Length, max: process.env.Max_Name_Length })) {
+        !validator.isLength(name, { min: config.limitations.Min_Name_Length, max: config.limitations.Max_Name_Length })) {
         return ({ valid: false, message: 'Invalid name provided' });
+    }
+    return { valid: true };
+}
+
+function validatePassword(password){
+    if (!validator.isLength(password, { min: config.limitations.Min_Password_Length, max: config.limitations.Max_Password_Length })) {
+        return { valid: false, message: 'Invalid password' };
     }
     return { valid: true };
 }
@@ -90,7 +99,7 @@ function validateName(name){
 function validateEmail(email){
     if (email){
         if (!validator.isEmail(email) ||
-        !validator.isLength(email, { min: process.env.Min_Email_Length, max: process.env.Max_Email_Length })) {
+        !validator.isLength(email, { min: config.limitations.Min_Email_Length, max: config.limitations.Max_Email_Length })) {
         return ({ valid: false, message: 'Invalid email' });
     }
     }
@@ -99,7 +108,7 @@ function validateEmail(email){
 
 function validatePhone(phone){
     if (phone){
-        if (!validator.isLength(phone, { min: process.env.Min_Phone_Length, max: process.env.Max_Phone_Length }) ||
+        if (!validator.isLength(phone, { min: config.limitations.Min_Phone_Length, max: config.limitations.Max_Phone_Length }) ||
             !validator.isNumeric(phone.replaceAll('+', ''))) {
             return ({ valid: false, message: 'Invalid phone number' });
         }
@@ -109,7 +118,7 @@ function validatePhone(phone){
 
 function validateTaxNumber(taxNumber){
     if (taxNumber){
-        if (!validator.isLength(taxNumber, { min: process.env.Min_Tax_Length, max: process.env.Max_Tax_Length }) ||
+        if (!validator.isLength(taxNumber, { min: config.limitations.Min_Tax_Length, max: config.limitations.Max_Tax_Length }) ||
         !validator.isAlphanumeric(taxNumber.replaceAll(' ', ''))) {
         return ({ valid: false, message: 'Invalid tax number' });
     }
@@ -119,7 +128,7 @@ function validateTaxNumber(taxNumber){
 
 function validateSocialContacts(contacts, target){
     if (contacts){
-        if (!validator.isLength(contacts, { min: process.env.Min_Social_Contact_Length, max: process.env.Max_Social_Contact_Length })) {
+        if (!validator.isLength(contacts, { min: config.limitations.Min_Social_Contact_Length, max: config.limitations.Max_Social_Contact_Length })) {
             return { valid: false, message: `invalid ${target} contact` };
         }
     }
@@ -152,6 +161,15 @@ async function validateEmployeePosition(position, db) {
     return { valid: true };
 }
 
+function validateDescriptions(descriptions){
+    if (descriptions){
+        if (!validator.isLength(descriptions, { min: config.limitations.Min_Descriptions_Length, max: config.limitations.Max_Descriptions_Length })) {
+            return { valid: false, message: 'Invalid descriptions' };
+        }
+    }
+    return { valid: true };
+}
+
 module.exports = {
     validateAddresses,
     validateEmail,
@@ -161,5 +179,7 @@ module.exports = {
     validateGenericID,
     validateSocialContacts,
     validateClients,
-    validateEmployeePosition
+    validateEmployeePosition,
+    validatePassword,
+    validateDescriptions
 };

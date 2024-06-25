@@ -1,10 +1,14 @@
-// Creating the Express server:
 require('dotenv').config();
+const { getConfiguration } = require('./utils/Configurator');
+const config = getConfiguration();
+const port = config.port;
+
+// Creating the Express server:
 const express = require('express');
 const app = express(); // creating an instance of express app that runs the entire server
 const jwt = require('jsonwebtoken');
 const pgp = require('pg-promise')()
-const port = 3000;
+
 
 // generla setups:
 app.use(express.static('public')); // keeping all the static files in the public folder
@@ -43,6 +47,9 @@ app.use("/clients", clientRouter);
 const employeeRouter = require('./Routes/employees')(db);
 app.use("/employees", employeeRouter);
 
+const positionRouter = require('./Routes/positions')(db);
+app.use("/positions", positionRouter);
+
 // testing branch for authroisations
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/home.html');
@@ -77,4 +84,4 @@ function isTokenExpired(token){
     }
 }
 // initialise the portal that listences for requests
-app.listen(port, () => console.log('Server started'));
+app.listen(port, () => console.log('Server started at port ' + port));
