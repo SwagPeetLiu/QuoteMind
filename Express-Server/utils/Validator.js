@@ -2,6 +2,7 @@ require('dotenv').config();
 const validator = require('validator');
 const { getConfiguration } = require('./Configurator');
 const config = getConfiguration();
+const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u; // Regular expression to check for Unicode letters, numbers, and spaces
 
 // Function to validate an array of addresses
 async function validateAddresses(addresses, owner, id, target, db, req) {
@@ -11,11 +12,11 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                 !address.postal || !address.category || !address.id || !address.message) {
                 return { valid: false, message: 'Incomplete Address information' };
             }
-            if (!validator.isAlphanumeric(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !validator.isAlphanumeric(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !validator.isAlphanumeric(address.state.replace(/ /g, '')) ||
-                !validator.isAlphanumeric(address.country.replace(/ /g, '')) ||
-                !validator.isAlphanumeric(address.postal.replace(/ /g, '')) ||
+            if (!unicodeRegex.test(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
+                !unicodeRegex.test(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
+                !unicodeRegex.test(address.state.replace(/ /g, '')) ||
+                !unicodeRegex.test(address.country.replace(/ /g, '')) ||
+                !unicodeRegex.test(address.postal.replace(/ /g, '')) ||
                 !(address.message === "add" || address.message === "update" || address.message === "delete")) {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
@@ -82,7 +83,7 @@ async function validateClients(clients, owner, db) {
 
 function validateName(name){
     if (!name ||
-        !validator.isAlphanumeric(name.replaceAll(' ', '')) ||
+        !unicodeRegex.test(name) ||
         !validator.isLength(name, { min: config.limitations.Min_Name_Length, max: config.limitations.Max_Name_Length })) {
         return ({ valid: false, message: 'Invalid name provided' });
     }
@@ -163,7 +164,8 @@ async function validateEmployeePosition(position, db) {
 
 function validateDescriptions(descriptions){
     if (descriptions){
-        if (!validator.isLength(descriptions, { min: config.limitations.Min_Descriptions_Length, max: config.limitations.Max_Descriptions_Length })) {
+        if (!validator.isLength(descriptions, { min: config.limitations.Min_Descriptions_Length, max: config.limitations.Max_Descriptions_Length }) ||
+            !unicodeRegex.test(descriptions)) {
             return { valid: false, message: 'Invalid descriptions' };
         }
     }

@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require('express');
-const validator = require('validator');
 const router = express.Router();
 const { validateAddresses,
         validateEmail,

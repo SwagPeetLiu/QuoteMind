@@ -1,0 +1,1 @@
+// scripts used to manage all the search functionalities of the platform

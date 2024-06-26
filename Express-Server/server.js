@@ -50,10 +50,11 @@ app.use("/employees", employeeRouter);
 const positionRouter = require('./Routes/positions')(db);
 app.use("/positions", positionRouter);
 
-// testing branch for authroisations
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/home.html');
-});
+const materialRouter = require('./Routes/materials')(db);
+app.use("/materials", materialRouter);
+
+const productRouter = require('./Routes/products')(db);
+app.use("/products", productRouter);
 
 function AuthenticationLogger(req, res, next) {
     // token validations
