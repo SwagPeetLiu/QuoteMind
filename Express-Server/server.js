@@ -56,6 +56,9 @@ app.use("/materials", materialRouter);
 const productRouter = require('./Routes/products')(db);
 app.use("/products", productRouter);
 
+const transactionsRouter = require('./Routes/transactions')(db);
+app.use("/transactions", transactionsRouter);
+
 function AuthenticationLogger(req, res, next) {
     // token validations
     const token = req.headers['session-token'];

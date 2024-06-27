@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { 
-    validateGenericID,
+    validateInstances,
     validateName,
     validateDescriptions
 } = require ('../utils/Validator');
@@ -89,15 +89,8 @@ module.exports = (db) => {
     // middleware on user inputs for products
     router.param("id", async (req, res, next, id) => {
         if (id != "new"){
-            const idValidation = validateGenericID(id);
-            if (!idValidation.valid) return res.status(400).json({ error: idValidation.message });
-        }
-
-        // check if a product exists for manipulation:
-        if (req.method === "PUT" || req.method === "DELETE") {
-            const owner = req.sessionEmail;
-            const product = await db.oneOrNone('SELECT * FROM public.products WHERE id = $1 and created_by = $2', [id, owner]);
-            if (!product) return res.status(404).json({ error: "product does not exist" });
+            const existenceValidation = await validateInstances([id], req.sessionEmail ,"products", db);
+            if (!existenceValidation.valid) return res.status(400).json({ error: existenceValidation.message });
         }
 
         // check if for the payload for the product details:

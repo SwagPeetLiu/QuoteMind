@@ -6,7 +6,7 @@ const {
     validateName,
     validatePhone,
     validateSocialContacts,
-    validateGenericID,
+    validateInstances,
     validateEmployeePosition
 } = require ('../utils/Validator');
 
@@ -104,26 +104,10 @@ module.exports = (db) => {
     
     // Middleware on validating the user inputted employee information
     router.param("id", async (req, res, next, id) => {
-        if (id !== "new"){
-            const idValidation = validateGenericID(id, "employee");
-            if (!idValidation.valid) {
-                return res.status(400).json({ message: idValidation.message });
-            }
-        }
-
-        // check for existing employee
         const owner = req.sessionEmail;
-        if (req.method === "PUT" || req.method === "DELETE") {
-            try {
-                const employee = await db.oneOrNone('SELECT * FROM public.employees WHERE id = $1 AND created_by = $2', [id, owner]);
-                if (!employee) {
-                    return res.status(400).json({ message: "invalid employee ID" });
-                }
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ message: "Invalid employee ID" });
-            }
+        if (id !== "new"){
+            const existenceValidation = await validateInstances([id], owner, "employees", db);
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
         }
         
         // check for employee informations:

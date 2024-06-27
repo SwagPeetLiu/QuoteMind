@@ -1,13 +1,12 @@
 require("dotenv").config();
 const express = require('express');
-const validator = require('validator');
 const router = express.Router();
 const { validateAddresses,
     validateEmail,
     validateName,
     validatePhone,
     validateSocialContacts,
-    validateGenericID
+    validateInstances
     } = require ('../utils/Validator');
 
 module.exports = (db) => {
@@ -160,33 +159,18 @@ module.exports = (db) => {
     // Middleware on user input of client id
     router.param("id", async (req, res, next, id) => {
         // validate client id
-        if (id !== "new"){
-            let idValidation = validateGenericID(id, "client");
-            if (!idValidation.valid) return res.status(400).json({ message: idValidation.message });
-        }
-        
-        // validate if the client exists
-        let existingClient;
         const owner = req.sessionEmail;
-        if (req.method === 'PUT' || req.method ==='DELETE') {
-            try {
-                existingClient = db.oneOrNone('SELECT * FROM public.clients WHERE id = $1 AND created_by = $2', [id, owner]);
-                if (!existingClient) {
-                    return res.status(400).json({ message: 'Company does not exist' });
-                }
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ message: "Company does not exist" });
-            }
+        if (id !== "new"){
+            const existenceValidation = await validateInstances([id], owner, "clients", db);
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
         }
 
         // validate for updating the complete information of the client
         if ((req.method === 'PUT' || req.method === 'POST') && (!req.url.includes('addresses'))) {
             const { company, full_name, email, phone, wechat_contact, qq_contact, addresses } = req.body;
             if (company){
-                const companyIDValidation = validateGenericID(company, "company");
-            if (!companyIDValidation.valid) return res.status(400).json({ message: companyIDValidation.message });
+                const existenceValidation = await validateInstances([company], owner, "companies", db);
+                if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
             }
 
             let validations = [

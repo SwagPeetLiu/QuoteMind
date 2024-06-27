@@ -7,7 +7,7 @@ const { validateAddresses,
         validatePhone,
         validateTaxNumber,
         validateClients,
-        validateGenericID
+        validateInstances
     } = require ('../utils/Validator');
 
 module.exports = (db) => {
@@ -153,19 +153,10 @@ module.exports = (db) => {
     // establish the middleware used for validate input of company ID:
     router.param("id", async (req, res, next, id) => {
         // validate company id
-        if (id !== "new") {
-            const idValidation = validateGenericID(id, "company");
-            if (!idValidation.valid) return res.status(400).json({ message: idValidation.message });
-        }
-        
-        // validate the existence of the company:
         const owner = req.sessionEmail;
-        let existingCompany;
-        if (req.method === "PUT" || req.method === "DELETE") {
-            existingCompany = await db.oneOrNone('SELECT * FROM public.companies WHERE id = $1 AND created_by = $2', [id, owner]);
-            if (!existingCompany) {
-                return res.status(400).json({ message: 'Company does not exist' });
-            }
+        if (id !== "new") {
+            const existenceValidation = await validateInstances([id], owner, "companies", db);
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
         }
 
         // Validation for company record updates and creations:

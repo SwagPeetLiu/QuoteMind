@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require('express');
 const router = express.Router();
 const {
-    validateGenericID,
+    validateInstances,
     validateName,
     validateDescriptions
 } = require('../utils/Validator');
@@ -85,14 +85,8 @@ module.exports = (db) => {
     // middleware on validating user inputs on materials:
     router.param("id", async (req, res, next, id) => {
         if (id !== "new") {
-            const idValidation = validateGenericID(id);
-            if (!idValidation.valid) return res.status(400).json({ error: idValidation.message });
-        }
-
-        // validate existing material:
-        if (req.method === "PUT" || req.method === "DELETE") {
-            const material = await db.oneOrNone('SELECT * FROM public.materials WHERE id = $1 AND created_by = $2', [id, req.sessionEmail]);
-            if (!material) return res.status(404).json({ error: "material does not exist" });
+            const existenceValidation = await validateInstances([id], req.sessionEmail, "materials", db);
+            if (!existenceValidation.valid) return res.status(400).json({ error: existenceValidation.message });
         }
 
         // validate the payload on the definition of such material:

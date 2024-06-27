@@ -172,6 +172,55 @@ function validateDescriptions(descriptions){
     return { valid: true };
 }
 
+function validateNumeric(value, target){
+    if (value) {
+        // validate whether the value is a number
+        if (typeof value !== "number"){
+            return { valid: false, message: `invalid ${target}` };
+        }
+        const regex = /^\d{1,10}(\.\d+)?$/;
+        if (!regex.test(value.toString())) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+    }
+    return { valid: true };
+}
+
+function validateTransactionStatus(status){
+    if (!status || !validator.isAlpha(status)) {
+        return { valid: false, message: 'Invalid Transaction Status' };
+    }
+    if (status !== "created" && status !== "quoted" && status !== "invoiced" && status !== "paid") {
+        return { valid: false, message: 'Invalid Transaction Status' };
+    }
+    return { valid: true };
+}
+
+//generic validation function for the existence of a list of instance id
+async function validateInstances(instances, owner, target, db){
+    if (Array.isArray(instances) && instances.length > 0) {
+        // validate whether all attachments are UUIDs
+        const uuidValidations = instances.map((id) => validateGenericID(id, target));
+        if (uuidValidations.some((validation) => !validation.valid)) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+
+        // validate whether all attachments exist in the database
+        try{
+            const existingRecords = await Promise.all(instances.map((id) => 
+                db.oneOrNone(`SELECT id FROM public.${target} WHERE id = $1 AND created_by = $2`, [id, owner])));
+            if (existingRecords.some((record) => !record)) {
+                return { valid: false, message: `invalid ${target}` };
+            }
+        }
+        catch(err){
+            console.log(err);
+            return { valid: false, message: `invalid ${target}` };
+        }
+    }
+    return { valid: true };
+}
+
 module.exports = {
     validateAddresses,
     validateEmail,
@@ -183,5 +232,8 @@ module.exports = {
     validateClients,
     validateEmployeePosition,
     validatePassword,
-    validateDescriptions
+    validateDescriptions,
+    validateNumeric,
+    validateTransactionStatus,
+    validateInstances
 };
