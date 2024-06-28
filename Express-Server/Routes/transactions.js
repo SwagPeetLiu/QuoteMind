@@ -14,7 +14,20 @@ module.exports = (db) => {
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             try {
-                const transactions = await db.any('SELECT * FROM public.transactions WHERE created_by = $1 ORDER BY modified_date DESC', [owner]);
+                const transactions = await db.any(`SELECT t.*, p.en_name as product_en_name, p.ch_name as product_ch_name,
+                    co.full_name as company_name, c.full_name as client_name
+                    FROM public.transactions as t 
+                    LEFT JOIN public.products as p ON t.product = p.id
+                    LEFT JOIN public.companies as co ON t.company = co.id
+                    LEFT JOIN public.clients as c ON t.client = c.id
+                    WHERE t.created_by = $1 ORDER BY t.modified_date DESC`, [owner]);
+
+                // joing the basic details of the transactions:
+                const materialQueries = await Promise.all(transactions.map(transaction => db.any('SELECT id, ch_name, en_name FROM public.materials WHERE created_by = $1 AND id = ANY($2::uuid[])', 
+                    [owner, transaction.materials])));
+                for (let i = 0; i < transactions.length; i++) {
+                    transactions[i].materials = materialQueries[i];
+                }
                 return res.status(200).json({ transactions: transactions });
             }
             catch {
@@ -32,7 +45,6 @@ module.exports = (db) => {
             try {
                 const transaction = await db.oneOrNone('SELECT * FROM public.transactions WHERE id = $1 AND created_by = $2', 
                     [id, owner]);
-                if (!transaction) return res.status(404).json({ error: "Transaction not found" });
 
                 // Preparing queries to run concurrently
                 const productQuery = db.oneOrNone('SELECT id, ch_name, en_name FROM public.products WHERE id = $1 AND created_by = $2', 
@@ -128,10 +140,93 @@ module.exports = (db) => {
             }
         })
         .post(async (req, res) => {
-
+            try{
+                await db.none(`INSERT INTO public.transactions (
+                    creation_date,
+                    created_by,
+                    modified_date,
+                    name,
+                    status,
+                    quantity,
+                    price_per_unit,
+                    amount,
+                    note,
+                    colour,
+                    width,
+                    height,
+                    length,
+                    size,
+                    en_unit,
+                    ch_unit,
+                    product,
+                    materials,
+                    company,
+                    client,
+                    employee,
+                    addresses
+                    ) VALUES (
+                    NOW(),
+                    $1,
+                    NOW(),
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7,
+                    $8,
+                    $9,
+                    $10,
+                    $11,
+                    $12,
+                    $13,
+                    $14,
+                    $15::uuid,
+                    $16::uuid[],
+                    $17::uuid,
+                    $18::uuid,
+                    $19::uuid[],
+                    $20::uuid[]
+                    )`, [
+                        req.sessionEmail,
+                        req.body.name,
+                        req.body.status,
+                        req.body.quantity,
+                        req.body.price_per_unit,
+                        req.body.amount,
+                        req.body.note,
+                        req.body.colour,
+                        req.body.width,
+                        req.body.height,
+                        req.body.length,
+                        req.body.size,
+                        req.body.en_unit,
+                        req.body.ch_unit,
+                        req.body.product,
+                        req.body.materials,
+                        req.body.company,
+                        req.body.client,
+                        req.body.employee,
+                        req.body.addresses
+                    ]);
+                return res.status(200).json({ message: "transaction created successfully" });
+            }
+            catch(error) {
+                console.log(error);
+                return res.status(500).json({ message: "failed to create transaction" });
+            }
         })
         .delete(async (req, res) => {
-
+            const owner = req.sessionEmail;
+            const id = req.params.id;
+            try{
+                await db.none(`DELETE FROM public.transactions WHERE id = $1 AND created_by = $2`, [id, owner]);
+                return res.status(200).json({ message: "transaction deleted successfully" });
+            }
+            catch(error) {
+                console.log(error);
+                return res.status(500).json({ message: "failed to delete transaction" });
+            }
         });
     
     // middleare for user input validations:
@@ -180,11 +275,3 @@ module.exports = (db) => {
 
     return router;
 }
-
-
-
-
-
-
-
-// Mind to set up validation checks on the inputs of multiple addresses, employees and materials (existing ones)
