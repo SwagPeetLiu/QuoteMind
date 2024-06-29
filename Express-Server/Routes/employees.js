@@ -70,15 +70,16 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const { name, email, wechat_contact, qq_contact, phone, position } = req.body;
             try {
-                await db.none(`
+                const newEmployee = await db.oneOrNone(`
                     INSERT INTO public.employees (name, email, wechat_contact, qq_contact, phone, position, created_by)
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING id
                 `, [name, email, wechat_contact, qq_contact, phone, position, owner]);
-                return res.status(200).json({ message: "employee created successfully" });
+                return res.status(200).json({ id : newEmployee.id, message: "employee created successfully" });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ message: "failed to create employee" });
+                return res.status(500).json({ id : null, message: "failed to create employee" });
             }
         })
         .delete(async (req, res) => {

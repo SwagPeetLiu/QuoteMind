@@ -17,7 +17,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, products: null });
+                    console.error(error);
+                    return res.status(500).json({ message: error, products: null });
                 }
             }
         })
@@ -33,7 +34,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, product: null });
+                    console.error(error);
+                    return res.status(500).json({ message: error, product: null });
                 }
             }
         })
@@ -48,7 +50,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, message: "failed to update product" });
+                    console.error(error);
+                    return res.status(500).json({ message: error, message: "failed to update product" });
                 }
             }
         })
@@ -56,13 +59,14 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const { en_name, ch_name, description } = req.body;
             try {
-                await db.none('INSERT INTO public.products (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4)', 
+                const newProduct = await db.oneOrNone('INSERT INTO public.products (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4) RETURNING id', 
                     [en_name, ch_name, description, owner]);
-                return res.status(200).json({ message: "product created successfully" });
+                return res.status(200).json({ id : newProduct.id, message: "product created successfully" });
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, message: "failed to create product" });
+                    console.error(error);
+                    return res.status(500).json({ id: null, message: error, message: "failed to create product" });
                 }
             }
         })
@@ -81,7 +85,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, message: "failed to delete product" });
+                    console.error(error);
+                    return res.status(500).json({ message: error, message: "failed to delete product" });
                 }
             }
         });
@@ -90,7 +95,7 @@ module.exports = (db) => {
     router.param("id", async (req, res, next, id) => {
         if (id != "new"){
             const existenceValidation = await validateInstances([id], req.sessionEmail ,"products", db);
-            if (!existenceValidation.valid) return res.status(400).json({ error: existenceValidation.message });
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
         }
 
         // check if for the payload for the product details:
@@ -102,7 +107,7 @@ module.exports = (db) => {
                 validateDescriptions(description)
             ];
             for (const validation of validations) {
-                if (!validation.valid) return res.status(400).json({ error: validation.message });
+                if (!validation.valid) return res.status(400).json({ message: validation.message });
             }
         }
         next();

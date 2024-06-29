@@ -37,7 +37,8 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                         return { valid: false, message: 'Invalid ID of Address information' };
                     }
                 }
-                catch(err){
+                catch(error){
+                    console.error(error);
                     return { valid: false, message: 'Invalid ID of Address information' };
                 }
             }
@@ -72,7 +73,8 @@ async function validateClients(clients, owner, db) {
                         return { valid: false, message: 'Invalid Client ID' };
                     }
                 }
-                catch(err){
+                catch(error){
+                    console.error(error);
                     return { valid: false, message: 'Invalid Client ID' };
                 }
             }
@@ -166,7 +168,8 @@ async function validateEmployeePosition(position, db) {
             return { valid: false, message: 'Invalid ID of Position ID' };
         }
     }
-    catch(err){
+    catch(error){
+        console.error(error);
         return { valid: false, message: 'Invalid ID of Position ID' };
     }
     return { valid: true };
@@ -223,8 +226,8 @@ async function validateInstances(instances, owner, target, db){
                 return { valid: false, message: `invalid ${target}` };
             }
         }
-        catch(err){
-            console.log(err);
+        catch(error){
+            console.error(error);
             return { valid: false, message: `invalid ${target}` };
         }
     }

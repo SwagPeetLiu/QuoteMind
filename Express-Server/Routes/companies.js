@@ -115,7 +115,7 @@ module.exports = (db) => {
                 })
                 return res.status(200).json({ message: 'Information Updated Successfully' });
             } catch (err) {
-                console.log(err);
+                console.error(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
         })
@@ -126,7 +126,7 @@ module.exports = (db) => {
             const { basic_info, addresses, clients } = req.body;
             try{
                 await db.tx(async transaction => {
-                    const newCompany = await transaction.one(
+                    const newCompany = await transaction.oneOrNone(
                         'INSERT INTO public.companies (full_name, email, phone, tax_number, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING id',
                         [basic_info.full_name, basic_info.email, basic_info.phone, basic_info.tax_number, owner]
                     );
@@ -146,11 +146,11 @@ module.exports = (db) => {
                         }
                     }
                 });
-                return res.status(200).json({ message: 'Information Updated Successfully' });
+                return res.status(200).json({ id : newCompany.id, message: 'Information Updated Successfully' });
             }
             catch (err) {
-                console.log(err);
-                return res.status(500).json({ message: 'Internal server error' });
+                console.error(error);
+                return res.status(500).json({ id : null, message: 'Internal server error' });
             }
         })
         // deleting an existing company
@@ -167,7 +167,7 @@ module.exports = (db) => {
                 return res.status(200).json({ message: 'Information Updated Successfully' });
             }
             catch (err) {
-                console.log(err);
+                console.error(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
         });

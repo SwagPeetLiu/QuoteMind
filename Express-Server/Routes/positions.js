@@ -17,7 +17,8 @@ module.exports = (db) => {
             return res.status(200).json({ positions: positions });
         }
         catch{(error) => {
-            return res.status(500).json({ error: error, positions: null });
+            console.error(error);
+            return res.status(500).json({ message: error, positions: null });
         }}
     });
 
@@ -30,7 +31,8 @@ module.exports = (db) => {
             return res.status(200).json({ position: position });
         }
         catch{(error) => {
-            return res.status(500).json({ error: error, position: null });
+            console.error(error);
+            return res.status(500).json({ message: error, position: null });
         }};
     })
     .put(async (req, res) => {
@@ -41,17 +43,19 @@ module.exports = (db) => {
             return res.status(200).json({ message: 'Position updated successfully' });
         }
         catch{(error) => {
+            console.error(error);
             return res.status(500).json({ message: error });
         }}
     })
     .post(async (req, res) => {
         const { name, descriptions } = req.body;
         try{
-            await db.none('INSERT INTO public.positions (name, descriptions) VALUES ($1, $2)', [name, descriptions]);
-            return res.status(201).json({ message: 'Position created successfully' });
+            const newPosition = await db.oneOrNone('INSERT INTO public.positions (name, descriptions) VALUES ($1, $2) RETURNING id', [name, descriptions]);
+            return res.status(201).json({ id: newPosition.id, message: 'Position created successfully' });
         }
         catch{(error) => {
-            return res.status(500).json({ message: error });
+            console.error(error);
+            return res.status(500).json({ id : null, message: error });
         }}
     })
     .delete(async (req, res) => {
@@ -61,6 +65,7 @@ module.exports = (db) => {
             return res.status(200).json({ message: 'Position deleted successfully' });
         }
         catch{(error) => {
+            console.error(error);
             return res.status(500).json({ message: error });
         }}
     });
@@ -74,7 +79,8 @@ module.exports = (db) => {
             return res.status(200).json({ employees: employees });
         }
         catch{(error) => {
-            return res.status(500).json({ error: error, employees: null });
+            console.error(error);
+            return res.status(500).json({ message: error, employees: null });
         }}
     });
 

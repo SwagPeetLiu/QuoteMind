@@ -144,11 +144,11 @@ module.exports = (db) => {
                         }
                     }
                 })
-                return res.status(200).json({ message: "client created successfully" });
+                return res.status(200).json({ id: client.id, message: "client created successfully" });
             }
             catch(err) {
                 console.error(err);
-                return res.status(500).json({ message: "failed to create client" });
+                return res.status(500).json({id: null, message: "failed to create client" });
             }
         })
         .delete(async (req, res) => {

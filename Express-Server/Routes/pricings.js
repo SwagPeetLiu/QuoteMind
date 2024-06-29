@@ -70,6 +70,7 @@ module.exports = (db) => {
                 `, [owner]);                
                 return res.status(200).json({ pricing_conditions: pricing });
             } catch (error) {
+                console.error(error);
                 return res.status(500).json({ message: error });
             }
         });
@@ -135,6 +136,7 @@ module.exports = (db) => {
                 `, [owner]);
                 return res.status(200).json({ pricing_rules: rules });
             } catch (error) { 
+                console.error(error);
                 return res.status(500).json({ message: error });
             }
         });
@@ -174,17 +176,18 @@ module.exports = (db) => {
             const id = req.params.id;
             const {quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company} = req.body;
             try{
-                await db.none(`
+                const condition = await db.oneOrNone(`
                     INSERT INTO public.pricing_conditions
                     (quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company, created_by)
                     VALUES
                     ($1, $2, $3, $4, $5, $6, $7::uuid[], $8::uuid, $9::uuid, $10::uuid, $11)
+                    RETURNING id
                 `, [quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company, owner]);
-                return res.status(200).json({ message: "condition created successfully" });
+                return res.status(200).json({ id: condition.id, message: "condition created successfully" });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ message: err });
+                return res.status(500).json({ id: null, message: err });
             }
         })
         .delete(async (req, res) => {
@@ -233,17 +236,18 @@ module.exports = (db) => {
             const id = req.params.id;
             const {price_per_unit, conditions} = req.body;
             try{
-                await db.none(`
+                const rule = await db.oneOrNone(`
                     INSERT INTO public.pricing_rules
                     (price_per_unit, conditions, created_by)
                     VALUES
                     ($1, $2::UUID[], $3)
+                    RETURNING id
                 `, [price_per_unit, conditions, owner]);
-                return res.status(200).json({ message: "rule created successfully" });
+                return res.status(200).json({ id : rule.id, message: "rule created successfully" });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ message: err });
+                return res.status(500).json({ id: null, message: err });
             }
         })
         .delete(async (req, res) => {

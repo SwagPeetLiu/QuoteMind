@@ -18,7 +18,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, materials: null });
+                    console.error(error);
+                    return res.status(500).json({ message: error, materials: null });
                 }
             }
         });
@@ -34,7 +35,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, material: null });
+                    console.error(error);
+                    return res.status(500).json({ message: error, material: null });
                 }
             }
         })
@@ -48,6 +50,7 @@ module.exports = (db) => {
                 return res.status(200).json({ message: "material updated successfully" });
             }
             catch(error) {
+                console.error(error);
                 return res.status(500).json({ message: "failed to update material" });
             }
         })
@@ -55,12 +58,13 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const { en_name, ch_name, description } = req.body;
             try{
-                await db.none('INSERT INTO public.materials (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4)'
+                const newMaterial = await db.oneOrNone('INSERT INTO public.materials (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4) RETURNING id'
                     , [en_name, ch_name, description, owner]);
-                return res.status(200).json({ message: "material created successfully" });
+                return res.status(200).json({ id: newMaterial.id, message: "material created successfully" });
             }
             catch(error) {
-                return res.status(500).json({ message: "failed to create material" });
+                console.error(error);
+                return res.status(500).json({ id: null, message: "failed to create material" });
             }
         })
         .delete(async (req, res) => {
@@ -78,6 +82,7 @@ module.exports = (db) => {
                 return res.status(200).json({ message: "material deleted successfully" });
             }
             catch(error) {
+                console.error(error);
                 return res.status(500).json({ message: "failed to delete material" });
             }
         });
@@ -86,7 +91,7 @@ module.exports = (db) => {
     router.param("id", async (req, res, next, id) => {
         if (id !== "new") {
             const existenceValidation = await validateInstances([id], req.sessionEmail, "materials", db);
-            if (!existenceValidation.valid) return res.status(400).json({ error: existenceValidation.message });
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
         }
 
         // validate the payload on the definition of such material:
@@ -97,7 +102,7 @@ module.exports = (db) => {
                 validateName(ch_name),
                 validateDescriptions(description)];
             for (const validation of validations) {
-                if (!validation.valid) return res.status(400).json({ error: validation.message });
+                if (!validation.valid) return res.status(400).json({ message: validation.message });
             }
         }
         next();

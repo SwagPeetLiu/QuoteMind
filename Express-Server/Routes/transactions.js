@@ -33,7 +33,8 @@ module.exports = (db) => {
             }
             catch {
                 (error) => {
-                    return res.status(500).json({ error: error, transactions: null });
+                    console.error(error);
+                    return res.status(500).json({ message: error, transactions: null });
                 }
             }
         });
@@ -109,6 +110,7 @@ module.exports = (db) => {
 
                 return res.status(200).json({ transaction: transaction });
             } catch (error) {
+                console.error(error);
                 return res.status(500).json({ message: "failed to fetch transaction" });
             }
         })
@@ -140,25 +142,27 @@ module.exports = (db) => {
         })
         .post(async (req, res) => {
             try{
-                await db.none(`INSERT INTO public.transactions (
+                const newTransaction = await db.oneOrNone(`INSERT INTO public.transactions (
                     creation_date, created_by, modified_date, name, status, quantity, price_per_unit, amount,
                     note, colour, width, height, length, size, en_unit, ch_unit, product, materials, company,
                     client, employee, addresses, quantity_unit
                     ) VALUES (
                     NOW(), $1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
                     $15::uuid, $16::uuid[], $17::uuid, $18::uuid, $19::uuid[], $20::uuid[], $21
-                    )`, [
+                    ) 
+                    RETURNING id`, 
+                    [
                         req.sessionEmail, req.body.name, req.body.status, req.body.quantity, req.body.price_per_unit,
                         req.body.amount, req.body.note, req.body.colour, req.body.width, req.body.height,
                         req.body.length, req.body.size, req.body.en_unit, req.body.ch_unit, req.body.product,
                         req.body.materials, req.body.company, req.body.client, req.body.employee, req.body.addresses,
                         req.body.quantity_unit
                     ]);
-                return res.status(200).json({ message: "transaction created successfully" });
+                return res.status(200).json({ id: newTransaction.id, message: "transaction created successfully" });
             }
             catch(error) {
                 console.log(error);
-                return res.status(500).json({ message: "failed to create transaction" });
+                return res.status(500).json({ id : null, message: "failed to create transaction" });
             }
         })
         .delete(async (req, res) => {
