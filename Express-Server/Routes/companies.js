@@ -145,10 +145,10 @@ module.exports = (db) => {
                             }
                         }
                     }
+                    return res.status(200).json({ id : newCompany.id, message: 'Information Updated Successfully' });
                 });
-                return res.status(200).json({ id : newCompany.id, message: 'Information Updated Successfully' });
             }
-            catch (err) {
+            catch (error) {
                 console.error(error);
                 return res.status(500).json({ id : null, message: 'Internal server error' });
             }
@@ -159,12 +159,26 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 await db.tx(async transaction => {
-                    await transaction.none('UPDATE public.clients SET company = NULL WHERE company = $1 AND created_by = $2', [id, owner]);
-                    await transaction.none('DELETE FROM public.addresses WHERE company = $1 AND created_by = $2', [id, owner]);
-                    await transaction.none('DELETE FROM public.transactions WHERE company = $1 AND created_by = $2', [id, owner]);
-                    await transaction.none('DELETE FROM public.companies WHERE id = $1 AND created_by = $2', [id, owner]);
+                    transaction.none('UPDATE public.clients SET company = NULL WHERE company = $1 AND created_by = $2', [id, owner]);
+                    transaction.none('DELETE FROM public.addresses WHERE company = $1 AND created_by = $2', [id, owner]);
+                    transaction.none('DELETE FROM public.transactions WHERE company = $1 AND created_by = $2', [id, owner]);
+
+                    // update the related pricing issues
+                    const conditions = await transaction.any(`DELETE FROM public.pricing_conditions WHERE created_by = $1 AND company = $2
+                        RETURNING id;`, [owner, id]);
+                    const deletedIDs = conditions.map((condition) => condition.id);
+                    transaction.none(`DELETE FROM public.pricing_rules
+                                        WHERE created_by = $1
+                                        AND EXISTS (
+                                            SELECT 1
+                                            FROM unnest(conditions) AS condition_id
+                                            WHERE condition_id = ANY($2::UUID[])
+                                        );`, [owner, deletedIDs]);
+
+                    // delete the company
+                    transaction.none('DELETE FROM public.companies WHERE id = $1 AND created_by = $2', [id, owner]);
                 })
-                return res.status(200).json({ message: 'Information Updated Successfully' });
+                return res.status(200).json({ message: 'Client Deleted Successfully' });
             }
             catch (err) {
                 console.error(error);

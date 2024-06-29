@@ -43,8 +43,7 @@ module.exports = (db) => {
                         email: newUser.email,
                         role: newUser.role
                     }
-                 });
-
+                });
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ message: 'Internal server error' });

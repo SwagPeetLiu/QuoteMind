@@ -196,10 +196,16 @@ module.exports = (db) => {
             try{
                 await db.tx(async (transaction) => {
                     // deleting the condition from the pricing rules:
-                    await transaction.none('UPDATE public.pricing_rules SET conditions = array_remove(conditions, $1) WHERE created_by = $2', [id, owner]);
-
+                    transaction.none(`DELETE FROM public.pricing_rules
+                        WHERE created_by = $1
+                        AND EXISTS (
+                            SELECT 1
+                            FROM unnest(conditions) AS condition_id
+                            WHERE condition_id = $2::UUID
+                        );`, [owner, id]);
+                        
                     // deleting the condition itself:
-                    await transaction.none('DELETE FROM public.pricing_conditions WHERE id = $1 AND created_by = $2', [id, owner]);
+                    transaction.none('DELETE FROM public.pricing_conditions WHERE id = $1 AND created_by = $2', [id, owner]);
                 })
                 return res.status(200).json({ message: "condition deleted successfully" });
             }

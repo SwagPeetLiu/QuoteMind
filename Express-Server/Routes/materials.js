@@ -72,12 +72,23 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             try{
                 db.tx(async (transaction) => {
-                    // deleting the related transactions:
+                    // remove the references of material in transactions:
                     transaction.none(`UPDATE public.transactions SET materials = array_remove(materials, $1) WHERE created_by = $2`, [id, owner]);
+
+                    // deleting any pricing references to the material:
+                    const conditions = await transaction.any(`DELETE FROM public.pricing_conditions WHERE created_by = $1 AND $2 = ANY(materials)
+                        RETURNING id;`, [owner, id]);
+                    const deletedIDs = conditions.map((condition) => condition.id);
+                    transaction.none(`DELETE FROM public.pricing_rules
+                                        WHERE created_by = $1
+                                        AND EXISTS (
+                                            SELECT 1
+                                            FROM unnest(conditions) AS condition_id
+                                            WHERE condition_id = ANY($2::UUID[])
+                                        );`, [owner, deletedIDs]);
 
                     // deleting the material itself:
                     transaction.none('DELETE FROM public.materials WHERE id = $1 AND created_by = $2', [id, owner]);
-
                 });
                 return res.status(200).json({ message: "material deleted successfully" });
             }

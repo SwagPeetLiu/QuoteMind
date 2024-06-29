@@ -87,7 +87,7 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 db.tx(async (transaction) => {
-                    // remove all referneces in the transaction table:
+                    // remove all referneces in the transaction table (not deleting the transaction)
                     await transaction.none(` 
                         UPDATE public.transactions
                         SET employee = array_remove(employee, $1) WHERE created_by = $2`, [id, owner]);
