@@ -90,6 +90,16 @@ function validateName(name){
     return { valid: true };
 }
 
+// Acceptable for null inputs
+function validateString(string){
+    if (string){
+        if (!unicodeRegex.test(string) ||
+            !validator.isLength(string, { min: config.limitations.Min_String_Length, max: config.limitations.Max_String_Length })) {
+            return ({ valid: false, message: 'Invalid string provided' });
+        }
+    }
+    return { valid: true };
+}
 function validatePassword(password){
     if (!validator.isLength(password, { min: config.limitations.Min_Password_Length, max: config.limitations.Max_Password_Length })) {
         return { valid: false, message: 'Invalid password' };
@@ -221,6 +231,56 @@ async function validateInstances(instances, owner, target, db){
     return { valid: true };
 }
 
+function validatePricingThreshold(quantity, size, en_unit, ch_unit, threshold){
+    // if numeric limitations are specified, then threshold operator should be there
+    if (quantity || size) {
+
+        // numeric validations on quantity and size
+        const numericValidations = [validateNumeric(quantity, 'quantity'), validateNumeric(size, 'size')];
+        if (numericValidations.some((validation) => !validation.valid)) {
+            return { valid: false, message: 'Invalid Pricing Threshold' };
+        }
+        if (quantity && quantity <= 0) return { valid: false, message: "Invalid Pricing Threshold" };
+        if (size && size <= 0) return { valid: false, message: "Invalid Pricing Threshold" };
+
+        // validate the threshold operator
+        if (!threshold) return { valid: false, message: 'Invalid Pricing Threshold' };
+        if (!validator.isAlpha(threshold)) return { valid: false, message: 'Invalid Pricing Threshold' };
+        if (threshold !== "eq" && threshold !== "gt" && threshold !== "ge" && threshold !== "lt" && threshold !== "le") {
+            return { valid: false, message: 'Invalid Pricing Threshold' };
+        }
+
+        // validate units
+        if (size){
+            const stringValidations = [validateName(en_unit), validateName(ch_unit)];
+            if (stringValidations.some((validation) => !validation.valid)) {
+                return { valid: false, message: 'Invalid Pricing Threshold' };
+            }
+        }
+    }
+    return { valid: true };
+}
+
+async function validateTableExistence(tableName, db){
+    try {
+        const result = await db.one(`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = $1
+            );
+        `, [tableName]);
+        if (!result.exists) {
+            return { valid: false, message: `Table does not exist` };
+        }
+        return { valid: true };
+    } catch (error) {
+        console.error('Error checking table existence:', error);
+        return { valid: false, message: `Table does not exist` };
+    }
+}
+
 module.exports = {
     validateAddresses,
     validateEmail,
@@ -235,5 +295,8 @@ module.exports = {
     validateDescriptions,
     validateNumeric,
     validateTransactionStatus,
-    validateInstances
+    validateInstances,
+    validateString,
+    validatePricingThreshold,
+    validateTableExistence
 };

@@ -16,7 +16,8 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             try {
                 const clients = await db.any(`
-                    SELECT c.*, co.full_name AS company_name
+                    SELECT c.id, c.full_name, c.email, c.phone, c.wechat_contact, c.qq_contact, 
+                    co.full_name AS company_name
                     FROM public.clients c
                     LEFT JOIN public.companies co ON c.company = co.id
                     WHERE c.created_by = $1
@@ -37,10 +38,39 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const client = await db.oneOrNone(`
-                    SELECT c.*, co.full_name AS company_name
-                    FROM public.clients AS c 
-                    LEFT JOIN public.companies AS co ON c.company = co.id
-                    WHERE c.id = $1 AND c.created_by = $2;
+                    SELECT c.id, 
+                    c.full_name, 
+                    c.email, 
+                    c.phone, 
+                    c.wechat_contact, 
+                    c.qq_contact, 
+                    CASE WHEN c.company IS NULL THEN NULL
+                            ELSE jsonb_build_object(
+                                'id', co.id,
+                                'full_name', co.full_name
+                                )
+                    END AS company,
+                    CASE WHEN (SELECT count(id) FROM public.addresses WHERE client = c.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', a.id, 
+                                        'street', a.street_address, 
+                                        'city', a.city, 
+                                        'state', a.state, 
+                                        'country', a.country, 
+                                        'postal', a.postal_code, 
+                                        'category', a.category
+                                    )
+                                )
+                                FROM public.addresses a
+                                WHERE a.client = c.id
+                            )
+                    END AS addresses
+                FROM public.clients AS c 
+                LEFT JOIN public.companies AS co ON c.company = co.id
+                WHERE c.id = $1 AND c.created_by = $2
+                GROUP BY c.id, co.id, co.full_name;
                 `, [id, owner]);
                 return res.status(200).json({ client: client });
             } catch (err) {
@@ -140,22 +170,6 @@ module.exports = (db) => {
             }
         });
 
-
-    // route on fetching a specific client's addressese
-    router.route("/:id/addresses")
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            const id = req.params.id;
-            try {
-                const addresses = await db.any('SELECT * FROM public.addresses WHERE client = $1 AND created_by = $2 ORDER BY id ASC', [id, owner]);
-                return res.status(200).json({ client: id, addresses: addresses });
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ client: id, addresses: null, message: "failed to fetch address" });
-            }
-        })
-
     // Middleware on user input of client id
     router.param("id", async (req, res, next, id) => {
         // validate client id
@@ -166,7 +180,7 @@ module.exports = (db) => {
         }
 
         // validate for updating the complete information of the client
-        if ((req.method === 'PUT' || req.method === 'POST') && (!req.url.includes('addresses'))) {
+        if ((req.method === 'PUT' || req.method === 'POST')) {
             const { company, full_name, email, phone, wechat_contact, qq_contact, addresses } = req.body;
             if (company){
                 const existenceValidation = await validateInstances([company], owner, "companies", db);

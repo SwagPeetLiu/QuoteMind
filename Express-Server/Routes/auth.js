@@ -40,6 +40,7 @@ module.exports = (db) => {
                 }
                 
                 const token = jwt.sign({ email }, process.env.JWT_token, { expiresIn: '1h' });
+                await db.none('UPDATE public.user SET last_session = $1 WHERE email = $2', [token, email]);
                 res.status(200).json({ 
                     message: 'Sucessfullly Logged in', 
                     session: token, 
@@ -52,5 +53,33 @@ module.exports = (db) => {
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+    
+    // Route used to logg out an user:
+    router.route("/logout")
+        .post( async (req, res) => {
+            const { email, token } = req.body;
+            if (!token || typeof token !== 'string') {
+                return res.status(401).json({ message: 'Unauthorized access' });
+            }
+            try{
+                const emailValidation = validateEmail(email);
+                if (!emailValidation.valid) return res.status(400).json({ message: 'Unauthorized access' });
+                
+                // validate the existence of an user:
+                const user = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [email]);
+                if (!user) {
+                    return res.status(401).json({ message: 'Unauthorized access' });
+                }
+                if (token !== user.last_session) {
+                    return res.status(401).json({ message: 'Unauthorized access' });
+                }
+                await db.none('UPDATE public.user SET last_session = $1 WHERE email = $2', [null, email]);
+                res.status(200).json({ message: 'Successfully logged out' });
+            }
+            catch(error){
+                console.error(error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        })
     return router;
 }

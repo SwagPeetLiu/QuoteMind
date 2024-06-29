@@ -59,16 +59,36 @@ app.use("/products", productRouter);
 const transactionsRouter = require('./Routes/transactions')(db);
 app.use("/transactions", transactionsRouter);
 
-function AuthenticationLogger(req, res, next) {
+const pricingRouter = require('./Routes/pricings')(db);
+app.use("/pricings", pricingRouter);
+
+const counterRouter = require('./utils/counter')(db);
+app.use("/counter", counterRouter);
+
+async function AuthenticationLogger(req, res, next) {
     // token validations
     const token = req.headers['session-token'];
     if (!token || typeof token !== 'string') {
         return res.status(401).json({ message: 'Unauthorized access' });
     }
-    jwt.verify(token, process.env.JWT_token, (err, session) => {
+    jwt.verify(token, process.env.JWT_token, async (err, session) => {
         if (err) return res.status(401).json({ message: 'Unauthorized access' });
-        if(isTokenExpired(token)) return res.status(401).json({ message: 'Unauthorized access' });
         if (!session.email) return res.status(401).json({ message: 'Unauthorized access' });
+        
+        // validate the existence of the associated user
+        const existingUser = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [session.email]);
+        if (!existingUser) return res.status(401).json({ message: 'Unauthorized access' });
+
+        // validate if token is invalid
+        if (existingUser.last_session !== token){
+            return res.status(401).json({ message: 'Unauthorized access' });
+        }
+
+        // validate if token is expired
+        if(isTokenExpired(token)){
+            await db.none('UPDATE public.user SET last_session = NULL WHERE email = $1', [session.email]);
+            return res.status(401).json({ message: 'Unauthorized access' });
+        }
         req.sessionEmail = session.email;
         next();
     });

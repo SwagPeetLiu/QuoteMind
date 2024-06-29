@@ -17,7 +17,7 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             try {
                 const companies 
-                = await db.any('SELECT id, full_name, email, phone, tax_number FROM public.companies WHERE created_by = $1 ORDER BY full_name ASC'
+                = await db.any('SELECT id, full_name, email, phone FROM public.companies WHERE created_by = $1 ORDER BY full_name ASC'
                     , [owner]);
                 return res.status(200).json({ companies: companies });
             }
@@ -33,23 +33,45 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
             try {
-                const addressQuery = `
-            SELECT id, street_address AS street, city, state, country, postal_code AS postal, category
-            FROM public.addresses
-            WHERE company = $1 AND created_by = $2`;
-                const clientsQuery = `SELECT id, full_name AS name
-            FROM public.clients
-            WHERE company = $1 AND created_by = $2`;
-                const address = db.any(addressQuery, [id, owner]);
-                const clients = db.any(clientsQuery, [id, owner]);
-
-                // execute quries conceurrently for better performance:
-                const [addressResult, clientsResult] = await Promise.all([address, clients]);
-                return res.status(200).json({ addresses: addressResult, clients: clientsResult });
+                const company = await db.oneOrNone(`
+                    SELECT co.id, co.full_name, co.email, co.phone, co.tax_number,
+                    CASE WHEN (SELECT count(id) FROM public.addresses WHERE company = co.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', a.id, 
+                                        'street', a.street_address, 
+                                        'city', a.city, 
+                                        'state', a.state, 
+                                        'country', a.country, 
+                                        'postal', a.postal_code, 
+                                        'category', a.category
+                                    )
+                                )
+                                FROM public.addresses a
+                                WHERE a.company = co.id
+                            )
+                    END AS addresses,
+                    CASE WHEN (SELECT count(id) FROM public.clients WHERE company = co.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', c.id, 
+                                        'full_name', c.full_name
+                                    )
+                                )
+                                FROM public.clients c
+                                WHERE c.company = co.id
+                            )
+                    END AS clients
+                    FROM public.companies as co
+                    WHERE id = $1 AND created_by = $2
+                    `, [id, owner]);
+                return res.status(200).json({ company: company });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ addresses: null, clients: null, message: "failed to fetch company" });
+                return res.status(500).json({ company: null , message: "failed to fetch company" });
             }
         })
 
