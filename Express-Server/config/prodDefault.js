@@ -27,5 +27,8 @@ module.exports = {
         Max_Social_Contact_Length: 60,
         Min_Descriptions_Length: 1,
         Max_Descriptions_Length: 300
+    },
+    search:{
+        pageSize: 10
     }
 };

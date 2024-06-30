@@ -6,14 +6,29 @@ const { validateAddresses,
     validateName,
     validatePhone,
     validateSocialContacts,
-    validateInstances
+    validateInstances,
+    validateInteger
     } = require ('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     // endpoint on fetching all the clients created by the user
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+            
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
                 const clients = await db.any(`
                     SELECT c.id, c.full_name, c.email, c.phone, c.wechat_contact, c.qq_contact, 
@@ -21,13 +36,14 @@ module.exports = (db) => {
                     FROM public.clients c
                     LEFT JOIN public.companies co ON c.company = co.id
                     WHERE c.created_by = $1
-                    ORDER BY c.full_name ASC;
-                `, [owner]);
-                return res.status(200).json({ clients: clients });
+                    ORDER BY c.full_name ASC
+                    LIMIT $2 OFFSET $3;
+                `, [owner, limit, offset]);
+                return res.status(200).json({ page: page, clients: clients });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ clients: null, message: "failed to fetch clients" });
+                return res.status(500).json({ page: page, clients: null, message: "failed to fetch clients" });
             }
         })
 

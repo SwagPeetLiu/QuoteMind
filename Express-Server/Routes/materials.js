@@ -4,22 +4,43 @@ const router = express.Router();
 const {
     validateInstances,
     validateName,
-    validateDescriptions
+    validateDescriptions,
+    validateInteger
 } = require('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     // fetching all the materials
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
-                const materials = await db.any('SELECT * FROM public.materials WHERE created_by = $1 ORDER BY ch_name ASC', [owner]);
-                return res.status(200).json({ materials: materials });
+                const materials = await db.any(`
+                    SELECT id, en_name, ch_name 
+                    FROM public.materials 
+                    WHERE created_by = $1 
+                    ORDER BY ch_name ASC
+                    LIMIT $2 OFFSET $3`
+                    , [owner, limit, offset]);
+                return res.status(200).json({ page: page, materials: materials });
             }
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, materials: null });
+                    return res.status(500).json({ page: page, message: error, materials: null });
                 }
             }
         });
@@ -30,7 +51,11 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
             try {
-                const material = await db.oneOrNone('SELECT * FROM public.materials WHERE id = $1 and created_by = $2', [id, owner]);
+                const material = await db.oneOrNone(`
+                    SELECT id, en_name, ch_name, description 
+                    FROM public.materials 
+                    WHERE id = $1 and created_by = $2`, 
+                    [id, owner]);
                 return res.status(200).json({ material: material });
             }
             catch {

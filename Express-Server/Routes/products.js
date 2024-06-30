@@ -3,23 +3,42 @@ const router = express.Router();
 const { 
     validateInstances,
     validateName,
-    validateDescriptions
+    validateDescriptions,
+    validateInteger
 } = require ('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     // endpoints for fetching all the products
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
-                const products = await db.any('SELECT * FROM public.products WHERE created_by = $1 ORDER BY ch_name ASC', [owner]);
-                return res.status(200).json({ products: products });
+                const products = await db.any(`
+                    SELECT id, en_name, ch_name
+                    FROM public.products 
+                    WHERE created_by = $1 
+                    ORDER BY ch_name ASC
+                    LIMIT $2 OFFSET $3`, 
+                    [owner, limit, offset]);
+                return res.status(200).json({ page: page, products: products });
             }
-            catch {
-                (error) => {
-                    console.error(error);
-                    return res.status(500).json({ message: error, products: null });
-                }
+            catch (error){
+                console.error(error);
+                return res.status(500).json({ page: page, message: error, products: null });
             }
         })
 
@@ -29,7 +48,11 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
             try {
-                const product = await db.oneOrNone('SELECT * FROM public.products WHERE id = $1 and created_by = $2', [id, owner]);
+                const product = await db.oneOrNone(`
+                    SELECT id, en_name, ch_name, description 
+                    FROM public.products 
+                    WHERE id = $1 and created_by = $2`, 
+                    [id, owner]);
                 return res.status(200).json({ product: product });
             }
             catch {

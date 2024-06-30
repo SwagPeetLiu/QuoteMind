@@ -6,35 +6,68 @@ const {
     validateNumeric,
     validateDescriptions,
     validateInstances,
-    validateString
+    validateString,
+    validateInteger
 } = require('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     // route on obtaining all the transactions
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
-            try {
-                const transactions = await db.any(`SELECT t.*, p.en_name as product_en_name, p.ch_name as product_ch_name,
-                    co.full_name as company_name, c.full_name as client_name
-                    FROM public.transactions as t 
-                    LEFT JOIN public.products as p ON t.product = p.id
-                    LEFT JOIN public.companies as co ON t.company = co.id
-                    LEFT JOIN public.clients as c ON t.client = c.id
-                    WHERE t.created_by = $1 ORDER BY t.modified_date DESC`, [owner]);
 
-                // joing the basic details of the transactions:
-                const materialQueries = await Promise.all(transactions.map(transaction => db.any('SELECT id, ch_name, en_name FROM public.materials WHERE created_by = $1 AND id = ANY($2::uuid[])', 
-                    [owner, transaction.materials])));
-                for (let i = 0; i < transactions.length; i++) {
-                    transactions[i].materials = materialQueries[i];
-                }
-                return res.status(200).json({ transactions: transactions });
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
+            try {
+                const transactions = await db.any(`
+                    SELECT 
+                        t.creation_date, t.modified_date, t.status, t.id, t.name, t.quantity, 
+                        t.price_per_unit, t.amount, t.note, t.colour, t.en_unit, t.ch_unit,
+                        t.width, t.height, t.length, t.size, t.quantity_unit, 
+                        CASE WHEN t.materials IS NULL OR array_length(t.materials, 1) = 0 THEN NULL
+                        ELSE (
+                            SELECT jsonb_agg(
+                                jsonb_build_object(
+                                    'en_name', m.en_name,
+                                    'ch_name', m.ch_name
+                                )
+                            )
+                            FROM public.materials m
+                            WHERE m.id = ANY(t.materials)
+                        ) END as materials,
+                        jsonb_build_object(
+                            'id', p.id,
+                            'en_name', p.en_name,
+                            'ch_name', p.ch_name
+                        ) as product,
+                        co.full_name as company_name, 
+                        c.full_name as client_name
+                    FROM public.transactions t 
+                    LEFT JOIN public.products p ON t.product = p.id
+                    LEFT JOIN public.companies co ON t.company = co.id
+                    LEFT JOIN public.clients c ON t.client = c.id
+                    WHERE t.created_by = $1 
+                    ORDER BY t.modified_date DESC
+                    LIMIT $2 OFFSET $3;
+                `, [owner, limit, offset]);
+                
+                return res.status(200).json({ page: page, transactions: transactions });
             }
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, transactions: null });
+                    return res.status(500).json({ page: page, message: error, transactions: null });
                 }
             }
         });

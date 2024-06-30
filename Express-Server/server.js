@@ -65,6 +65,9 @@ app.use("/pricings", pricingRouter);
 const counterRouter = require('./utils/counter')(db);
 app.use("/counter", counterRouter);
 
+const searchRouter = require('./utils/search')(db);
+app.use("/search", searchRouter);
+
 async function AuthenticationLogger(req, res, next) {
     // token validations
     const token = req.headers['session-token'];

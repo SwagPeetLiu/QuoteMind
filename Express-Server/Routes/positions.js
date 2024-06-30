@@ -1,24 +1,42 @@
 require("dotenv").config();
 const express = require('express');
-const validator = require('validator');
 const router = express.Router();
 const { 
     validateEmployeePosition,
     validateName,
-    validateDescriptions
+    validateDescriptions,
+    validateInteger
 } = require ('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     // fetch all positions on employee creations
     router.route("/")
     .get(async (req, res) => {
+
+        // validate page number
+        const pageValidation = validateInteger(req.query.page, "page number");
+        if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+        const page = req.query.page || 1;
+
+        // set up the limits:
+        const limit = pageSize * page;
+        const offset = (page - 1) * pageSize;
+
         try{
-            const positions = await db.any('SELECT * FROM public.positions ORDER BY name ASC');
-            return res.status(200).json({ positions: positions });
+            const positions = await db.any(`
+                SELECT * 
+                FROM public.positions 
+                ORDER BY name ASC
+                LIMIT $1 OFFSET $2;`, [limit, offset]);
+            return res.status(200).json({ page: page, positions: positions });
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ message: error, positions: null });
+            return res.status(500).json({ page: page, message: error, positions: null });
         }}
     });
 

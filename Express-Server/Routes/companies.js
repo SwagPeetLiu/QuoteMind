@@ -7,23 +7,41 @@ const { validateAddresses,
         validatePhone,
         validateTaxNumber,
         validateClients,
-        validateInstances
+        validateInstances,
+        validateInteger
     } = require ('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     router.route("/")
         // route on getting all the companies created by the user
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
-                const companies 
-                = await db.any('SELECT id, full_name, email, phone FROM public.companies WHERE created_by = $1 ORDER BY full_name ASC'
-                    , [owner]);
-                return res.status(200).json({ companies: companies });
+                const companies = await db.any(
+                    `SELECT id, full_name, email, phone 
+                    FROM public.companies 
+                    WHERE created_by = $1 ORDER BY full_name ASC
+                    LIMIT $2 OFFSET $3;`
+                    , [owner, limit, offset]);
+                return res.status(200).json({ page: page, companies: companies });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ companies: null, message: "failed to fetch companies" });
+                return res.status(500).json({ page: page, companies: null, message: "failed to fetch companies" });
             }
         });
 

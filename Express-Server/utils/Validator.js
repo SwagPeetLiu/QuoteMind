@@ -193,6 +193,27 @@ function validateDescriptions(descriptions) {
     return { valid: true };
 }
 
+//validate integer values
+function validateInteger(value, target) {
+    if (value) {
+        // Check if the value is of type 'number'
+        if (typeof value !== "number" || !Number.isInteger(value)) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+
+        // assuming positive inputs
+        if (value < 0) return { valid: false, message: `invalid ${target}` };
+        
+        // Check if the integer is within the range of 1 to 10 digits
+        const regex = /^\d{1,5}$/;
+        if (!regex.test(value.toString())) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+    }
+    return { valid: true };
+}
+
+// function used to validate numeric float values (10 digits with 2 digits behind decimals)
 function validateNumeric(value, target) {
     if (value) {
         // validate whether the value is a number
@@ -247,7 +268,7 @@ function validatePricingThreshold(quantity, size, en_unit, ch_unit, threshold) {
     if (quantity || size) {
 
         // numeric validations on quantity and size
-        const numericValidations = [validateNumeric(quantity, 'quantity'), validateNumeric(size, 'size')];
+        const numericValidations = [validateInteger(quantity, 'quantity'), validateNumeric(size, 'size')];
         if (numericValidations.some((validation) => !validation.valid)) {
             return { valid: false, message: 'Invalid Pricing Threshold' };
         }
@@ -292,6 +313,58 @@ async function validateTableExistence(tableName, db) {
     }
 }
 
+async function valdiateTable(tableName, db) {
+    // validate strings
+    const stringValdiation = validateName(tableName);
+    if (!stringValdiation.valid) return { valid: false, message: "invalid target" };
+
+    // prevent malicious attempts on grabing the details for user table
+    if (tableName.toLowerCase() === "user" || tableName.toLowerCase() === "pricing_rules") return { valid: false, message: "invalid target" };
+
+    // validate the existence of a table:
+    try{
+        const validTargets = await db.any(`SELECT EXISTS (
+            SELECT 1 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public' AND 
+            table_name = $1
+            )`, [tableName]);
+        if (!validTargets[0].exists){
+            return { valid: false, message: "invalid target" };
+        }
+    }
+    catch(error){
+        console.error(error);
+        return { valid: false, message: "invalid target" };
+    }
+    return { valid: true };
+}
+
+function validateColumnName(columnName, tableName, db) {
+    if (typeof columnName !== "string") return { valid: false, message: "invalid target" };
+
+    // validate strings
+    const stringValdiation = validateName(columnName);
+    if (!stringValdiation.valid) return { valid: false, message: "invalid target" };
+
+    // prevent malicious attempts on grabbing details:
+    if (columnName.toLowerCase() === "created_by") return { valid: false, message: "invalid target" };
+    if (columnName.toLowerCase() === "last_session") return { valid: false, message: "invalid target" };
+    return { valid: true };
+}
+
+function validateSearchKey(key, type){
+    // validate for each type of search keyword
+    if (type.includes("character") || type == "uuid" || type == "timestamp" || type == "USER-DEFINED" || type == "ARRAY"){
+        if (typeof key !== "string") return { valid: false, message: "invalid target" };
+    }
+
+    if (type == "numeric" || type == "integer"){
+        if (typeof key !== "number") return { valid: false, message: "invalid target" };
+    }
+    return { valid: true };
+}
+
 module.exports = {
     validateAddresses,
     validateEmail,
@@ -305,9 +378,13 @@ module.exports = {
     validatePassword,
     validateDescriptions,
     validateNumeric,
+    validateInteger,
     validateTransactionStatus,
     validateInstances,
     validateString,
     validatePricingThreshold,
-    validateTableExistence
+    validateTableExistence,
+    valdiateTable,
+    validateColumnName,
+    validateSearchKey
 };

@@ -4,9 +4,13 @@ const {
     validatePricingThreshold,
     validateInstances,
     validateString,
-    validateNumeric
+    validateNumeric,
+    validateInteger
 } = require('../utils/Validator');
 
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 // scripts for determining and managing the pricing strategies to improve
 // the user experience on pricing automations
@@ -14,6 +18,16 @@ module.exports = (db) => {
     router.route("/conditions")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
                 const pricing = await db.any(`
                     SELECT 
@@ -67,11 +81,12 @@ module.exports = (db) => {
                     WHERE cond.created_by = $1
                     GROUP BY cond.id, p.id, c.id, co.id
                     ORDER BY cond.id ASC
-                `, [owner]);                
-                return res.status(200).json({ pricing_conditions: pricing });
+                    LIMIT $2 OFFSET $3
+                `, [owner, limit, offset]);                
+                return res.status(200).json({ page: page, pricing_conditions: pricing });
             } catch (error) {
                 console.error(error);
-                return res.status(500).json({ message: error });
+                return res.status(500).json({ page: page, message: error });
             }
         });
 
@@ -79,6 +94,16 @@ module.exports = (db) => {
         router.route("/rules")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
                 const rules = await db.any(`
                     SELECT
@@ -133,11 +158,12 @@ module.exports = (db) => {
                     WHERE r.created_by = $1
                     GROUP BY r.id
                     ORDER BY r.id ASC
-                `, [owner]);
-                return res.status(200).json({ pricing_rules: rules });
+                    LIMIT $2 OFFSET $3;
+                `, [owner, limit, offset]);
+                return res.status(200).json({ page: page, pricing_rules: rules });
             } catch (error) { 
                 console.error(error);
-                return res.status(500).json({ message: error });
+                return res.status(500).json({ page: page, message: error });
             }
         });
     

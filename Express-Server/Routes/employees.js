@@ -7,26 +7,43 @@ const {
     validatePhone,
     validateSocialContacts,
     validateInstances,
-    validateEmployeePosition
+    validateEmployeePosition,
+    validateInteger
 } = require ('../utils/Validator');
+
+const { getConfiguration } = require("../utils/Configurator");
+const config = getConfiguration();
+const pageSize = config.search.pageSize;
 
 module.exports = (db) => {
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+
+            // validate page number
+            const pageValidation = validateInteger(req.query.page, "page number");
+            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
+            const page = req.query.page || 1;
+
+            // set up the limits:
+            const limit = pageSize * page;
+            const offset = (page - 1) * pageSize;
+
             try {
                 const employees = await db.any(`
-                    SELECT e.*, p.name AS position_name, p.descriptions AS position_description
+                    SELECT e.id, e.name, e.phone, e.wechat_contact, e.qq_contact,
+                    p.name AS position_name
                     FROM public.employees e
                     LEFT JOIN public.positions p ON e.position = p.id
                     WHERE e.created_by = $1
-                    ORDER BY e.name ASC;
-                `, [owner]);
-                return res.status(200).json({ employees: employees });
+                    ORDER BY e.name ASC
+                    LIMIT $2 OFFSET $3;
+                `, [owner, limit, offset]);
+                return res.status(200).json({ page: page, employees: employees });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ employees: null, message: "failed to fetch employees" });
+                return res.status(500).json({ page: page, employees: null, message: "failed to fetch employees" });
             }
         });
 
@@ -36,7 +53,8 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const employee = await db.oneOrNone(`
-                    SELECT e.*, p.name AS position_name, p.descriptions AS position_description
+                    SELECT e.id, e.name, e.email, e.phone, e.wechat_contact, e.qq_contact,
+                    p.name AS position_name, p.descriptions AS position_description
                     FROM public.employees e
                     LEFT JOIN public.positions p ON e.position = p.id
                     WHERE e.created_by = $1 AND e.id = $2
