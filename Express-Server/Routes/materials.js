@@ -5,9 +5,10 @@ const {
     validateInstances,
     validateName,
     validateDescriptions,
-    validateInteger
+    validateInteger,
+    validateColumnName
 } = require('../utils/Validator');
-
+const { getSearchTerm } = require('../utils/formatter');
 const { getConfiguration } = require("../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
@@ -17,25 +18,47 @@ module.exports = (db) => {
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+            let { searched, target, keyword, page } = req.body;
+            let searchQuery;
+            const response = {};
 
             // validate page number
             const pageValidation = validateInteger(req.query.page, "page number");
             if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            const page = req.query.page || 1;
+            page = req.query.page || 1;
 
             // set up the limits:
             const limit = pageSize * page;
             const offset = (page - 1) * pageSize;
 
             try {
+                // setting up the potential search query setting:
+                if (searched) {
+                    // validate search query format:
+                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                    const targetValidation = await validateColumnName(target, "materials", keyword, db);
+                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                    const type = targetValidation.type;
+
+                    searchQuery = getSearchTerm("materials",target, keyword, type);
+                    if (page == 1){
+                        const count = await db.oneOrNone(`
+                            SELECT COUNT(m.*) AS count 
+                            FROM public.materials AS m
+                            WHERE m.created_by = $1 AND ${searchQuery};
+                        `, [owner]);
+                        response.count = parseInt(count.count);
+                    }
+                }
+
                 const materials = await db.any(`
-                    SELECT id, en_name, ch_name 
-                    FROM public.materials 
-                    WHERE created_by = $1 
-                    ORDER BY ch_name ASC
+                    SELECT m.id, m.en_name, m.ch_name 
+                    FROM public.materials AS m
+                    WHERE m.created_by = $1 ${searched ? `AND ${searchQuery}` : ""}
+                    ORDER BY m.ch_name ASC
                     LIMIT $2 OFFSET $3`
                     , [owner, limit, offset]);
-                return res.status(200).json({ page: page, materials: materials });
+                return res.status(200).json({ ...response, page: page, materials: materials });
             }
             catch {
                 (error) => {

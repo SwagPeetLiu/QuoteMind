@@ -2,6 +2,7 @@ require('dotenv').config();
 const validator = require('validator');
 const { getConfiguration } = require('./Configurator');
 const config = getConfiguration();
+const forbiddenTargets = config.search.forbiddenTargets;
 const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u; // Regular expression to check for Unicode letters, numbers, and spaces
 
 // Function to validate an array of addresses
@@ -263,7 +264,7 @@ async function validateInstances(instances, owner, target, db) {
     return { valid: true };
 }
 
-function validatePricingThreshold(quantity, size, en_unit, ch_unit, threshold) {
+function validatePricingThreshold(quantity, size, size_unit, threshold) {
     // if numeric limitations are specified, then threshold operator should be there
     if (quantity || size) {
 
@@ -282,12 +283,10 @@ function validatePricingThreshold(quantity, size, en_unit, ch_unit, threshold) {
             return { valid: false, message: 'Invalid Pricing Threshold' };
         }
 
-        // validate units
+        // validate unit
         if (size) {
-            const stringValidations = [validateName(en_unit), validateName(ch_unit)];
-            if (stringValidations.some((validation) => !validation.valid)) {
-                return { valid: false, message: 'Invalid Pricing Threshold' };
-            }
+            const stringValidation = validateName(size_unit);
+            if (!stringValidation.valid) return { valid: false, message: 'Invalid Pricing Threshold' };
         }
     }
     return { valid: true };
@@ -313,44 +312,39 @@ async function validateTableExistence(tableName, db) {
     }
 }
 
-async function valdiateTable(tableName, db) {
-    // validate strings
-    const stringValdiation = validateName(tableName);
-    if (!stringValdiation.valid) return { valid: false, message: "invalid target" };
-
-    // prevent malicious attempts on grabing the details for user table
-    if (tableName.toLowerCase() === "user" || tableName.toLowerCase() === "pricing_rules") return { valid: false, message: "invalid target" };
-
-    // validate the existence of a table:
-    try{
-        const validTargets = await db.any(`SELECT EXISTS (
-            SELECT 1 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public' AND 
-            table_name = $1
-            )`, [tableName]);
-        if (!validTargets[0].exists){
-            return { valid: false, message: "invalid target" };
-        }
-    }
-    catch(error){
-        console.error(error);
-        return { valid: false, message: "invalid target" };
-    }
-    return { valid: true };
-}
-
-function validateColumnName(columnName, tableName, db) {
-    if (typeof columnName !== "string") return { valid: false, message: "invalid target" };
+async function validateColumnName(columnName, tableName, keyword, db) {
+    if (typeof columnName !== "string" || typeof tableName !== "string") return { valid: false, message: "invalid target" };
 
     // validate strings
     const stringValdiation = validateName(columnName);
     if (!stringValdiation.valid) return { valid: false, message: "invalid target" };
 
     // prevent malicious attempts on grabbing details:
-    if (columnName.toLowerCase() === "created_by") return { valid: false, message: "invalid target" };
-    if (columnName.toLowerCase() === "last_session") return { valid: false, message: "invalid target" };
-    return { valid: true };
+    if (forbiddenTargets.includes(columnName.toLowerCase())) {
+        return { valid: false, message: "invalid target" }
+    };
+
+    // Validate target:
+    try{
+        const targetDetail = await db.any(`
+            SELECT column_name as target, data_type as type
+            FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2;
+            `, [tableName, columnName]);
+        if (!targetDetail) return { valid: false, message: "invalid target" };
+        
+        const type = targetDetail[0].type;
+        if (!type) return { valid: false, message: "invalid target" };
+
+        // validate the serach keyword based on it:
+        const keywordValidation = validateSearchKey(keyword, type);
+        if (!keywordValidation.valid) return { valid: false, message: "invalid keyword" };
+        return { valid: true , type: type};
+    }
+    catch(error){
+        console.error(error);
+        return { valid: false, message: "invalid target" };
+    }
 }
 
 function validateSearchKey(key, type){
@@ -359,8 +353,11 @@ function validateSearchKey(key, type){
         if (typeof key !== "string") return { valid: false, message: "invalid target" };
     }
 
+    // allowing inputs of both quantiy & quantity units
     if (type == "numeric" || type == "integer"){
-        if (typeof key !== "number") return { valid: false, message: "invalid target" };
+        if (!unicodeRegex.test(key.toString().replace(".",""))) {
+            return { valid: false, message: "invalid target" };
+        }
     }
     return { valid: true };
 }
@@ -384,7 +381,6 @@ module.exports = {
     validateString,
     validatePricingThreshold,
     validateTableExistence,
-    valdiateTable,
     validateColumnName,
     validateSearchKey
 };

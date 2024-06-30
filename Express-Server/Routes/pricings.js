@@ -5,9 +5,10 @@ const {
     validateInstances,
     validateString,
     validateNumeric,
-    validateInteger
+    validateInteger,
+    validateColumnName
 } = require('../utils/Validator');
-
+const { getSearchTerm } = require('../utils/formatter');
 const { getConfiguration } = require("../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
@@ -18,24 +19,46 @@ module.exports = (db) => {
     router.route("/conditions")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+            let { searched, target, keyword, page } = req.body;
+            let searchQuery;
+            const response = {};
 
             // validate page number
             const pageValidation = validateInteger(req.query.page, "page number");
             if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            const page = req.query.page || 1;
+            page = req.query.page || 1;
 
             // set up the limits:
             const limit = pageSize * page;
             const offset = (page - 1) * pageSize;
 
             try {
+                // setting up the potential search query setting:
+                if (searched) {
+                    // validate search query format:
+                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                    const targetValidation = await validateColumnName(target, "pricing_conditions", keyword, db);
+                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                    const type = targetValidation.type;
+
+                    searchQuery = getSearchTerm("pricing_conditions",target, keyword, type);
+                    if (page == 1){
+                        const count = await db.oneOrNone(`
+                            SELECT COUNT(cond.*) AS count 
+                            FROM public.pricing_conditions as cond
+                            WHERE cond.created_by = $1 AND ${searchQuery};
+                        `, [owner]);
+                        response.count = parseInt(count.count);
+                    }
+                }
+
                 const pricing = await db.any(`
                     SELECT 
                         cond.id, 
                         cond.quantity, 
                         cond.size, 
-                        cond.en_unit, 
-                        cond.ch_unit,
+                        cond.size_unit,
+                        cond.quantity_unit,
                         cond.colour, 
                         cond.threshold,
                         CASE
@@ -78,12 +101,12 @@ module.exports = (db) => {
                     LEFT JOIN public.products as p ON p.id = cond.product
                     LEFT JOIN public.clients as c ON c.id = cond.client
                     LEFT JOIN public.companies as co ON co.id = cond.company
-                    WHERE cond.created_by = $1
+                    WHERE cond.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
                     GROUP BY cond.id, p.id, c.id, co.id
                     ORDER BY cond.id ASC
                     LIMIT $2 OFFSET $3
                 `, [owner, limit, offset]);                
-                return res.status(200).json({ page: page, pricing_conditions: pricing });
+                return res.status(200).json({ ...response, page: page, pricing_conditions: pricing });
             } catch (error) {
                 console.error(error);
                 return res.status(500).json({ page: page, message: error });
@@ -94,17 +117,39 @@ module.exports = (db) => {
         router.route("/rules")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+            let { searched, target, keyword, page } = req.body;
+            let searchQuery;
+            const response = {};
 
             // validate page number
             const pageValidation = validateInteger(req.query.page, "page number");
             if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            const page = req.query.page || 1;
+            page = req.query.page || 1;
 
             // set up the limits:
             const limit = pageSize * page;
             const offset = (page - 1) * pageSize;
 
             try {
+                // setting up the potential search query setting:
+                if (searched) {
+                    // validate search query format:
+                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                    const targetValidation = await validateColumnName(target, "pricing_rules", keyword, db);
+                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                    const type = targetValidation.type;
+
+                    searchQuery = getSearchTerm("pricing_rules", target, keyword, type);
+                    if (page == 1){
+                        const count = await db.oneOrNone(`
+                            SELECT COUNT(r.*) AS count 
+                            FROM public.pricing_rules as r
+                            WHERE r.created_by = $1 AND ${searchQuery};
+                        `, [owner]);
+                        response.count = parseInt(count.count);
+                    }
+                }
+
                 const rules = await db.any(`
                     SELECT
                         r.id, r.price_per_unit,
@@ -113,8 +158,8 @@ module.exports = (db) => {
                                 'id', cond.id,
                                 'quantity', cond.quantity,
                                 'size', cond.size,
-                                'en_unit', cond.en_unit,
-                                'ch_unit', cond.ch_unit,
+                                'size_unit', cond.size_unit,
+                                'quantity_unit', cond.quantity_unit,
                                 'colour', cond.colour,
                                 'threshold', cond.threshold,
                                 'product', jsonb_build_object(
@@ -155,12 +200,12 @@ module.exports = (db) => {
                     LEFT JOIN public.products as p ON p.id = cond.product
                     LEFT JOIN public.clients as c ON c.id = cond.client
                     LEFT JOIN public.companies as co ON co.id = cond.company
-                    WHERE r.created_by = $1
+                    WHERE r.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
                     GROUP BY r.id
                     ORDER BY r.id ASC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);
-                return res.status(200).json({ page: page, pricing_rules: rules });
+                return res.status(200).json({ ...response, page: page, pricing_rules: rules });
             } catch (error) { 
                 console.error(error);
                 return res.status(500).json({ page: page, message: error });
@@ -172,15 +217,15 @@ module.exports = (db) => {
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
-            const {quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company} = req.body;
+            const {quantity, size, size_unit, quantity_unit,colour, threshold, materials, product, client, company} = req.body;
             try{
                 await db.none(`
                     UPDATE public.pricing_conditions
                     SET
                         quantity = $1,
                         size = $2,
-                        en_unit = $3,
-                        ch_unit = $4,
+                        size_unit = $3,
+                        quantity_unit = $4,
                         colour = $5,
                         threshold = $6,
                         materials = $7::uuid[],
@@ -189,7 +234,7 @@ module.exports = (db) => {
                         company = $10::uuid
                     WHERE id = $11
                     AND created_by = $12
-                `, [quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company, id, owner]);
+                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, id, owner]);
                 return res.status(200).json({ message: "condition updated successfully" });
             }
             catch (err) {
@@ -200,15 +245,15 @@ module.exports = (db) => {
         .post(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
-            const {quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company} = req.body;
+            const {quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company} = req.body;
             try{
                 const condition = await db.oneOrNone(`
                     INSERT INTO public.pricing_conditions
-                    (quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company, created_by)
+                    (quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, created_by)
                     VALUES
                     ($1, $2, $3, $4, $5, $6, $7::uuid[], $8::uuid, $9::uuid, $10::uuid, $11)
                     RETURNING id
-                `, [quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company, owner]);
+                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, owner]);
                 return res.status(200).json({ id: condition.id, message: "condition created successfully" });
             }
             catch (err) {
@@ -312,10 +357,10 @@ module.exports = (db) => {
         // validate the payloads:
         if (req.method === "POST" || req.method === "PUT") {
             if (target === "pricing_conditions") {
-                const {quantity, size, en_unit, ch_unit, colour, threshold, materials, product, client, company} = req.body;
+                const {quantity, size, size_unit, colour, threshold, materials, product, client, company} = req.body;
                 if (!product) return res.status(400).json({ message: "product is required" });
                 const validations = [
-                    validatePricingThreshold(quantity, size, en_unit, ch_unit, threshold),
+                    validatePricingThreshold(quantity, size, size_unit, threshold),
                     await validateInstances(materials, owner, "materials", db),
                     await validateInstances([product], owner, "products", db),
                     await validateInstances(client ? [client] : null, owner, "clients", db),

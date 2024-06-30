@@ -8,7 +8,13 @@ const express = require('express');
 const app = express(); // creating an instance of express app that runs the entire server
 const jwt = require('jsonwebtoken');
 const pgp = require('pg-promise')()
+const { types } = pgp.pg;
 
+// Configure the numeric parser to return numbers
+const NUMERIC_OID = 1700;
+types.setTypeParser(NUMERIC_OID, (val) => {
+    return parseFloat(val);
+});
 
 // generla setups:
 app.use(express.static('public')); // keeping all the static files in the public folder

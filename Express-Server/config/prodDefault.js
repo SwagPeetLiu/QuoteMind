@@ -29,6 +29,23 @@ module.exports = {
         Max_Descriptions_Length: 300
     },
     search:{
-        pageSize: 10
+        pageSize: 10,
+        forbiddenTargets: [
+            "created_by", 
+            "last_session", 
+            "password", 
+            "tax_number", 
+            "description", 
+            "descriptions",
+            "conditions",
+            "creation_date",
+            "modified_date",
+            "addresses",
+            "en_unit",
+            "ch_unit",
+            "quantity_unit",
+            "size_uit",
+            "threshold",
+        ]
     }
 };

@@ -5,9 +5,10 @@ const {
     validateEmployeePosition,
     validateName,
     validateDescriptions,
-    validateInteger
+    validateInteger,
+    validateColumnName
 } = require ('../utils/Validator');
-
+const { getSearchTerm } = require('../utils/formatter');
 const { getConfiguration } = require("../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
@@ -16,23 +17,46 @@ module.exports = (db) => {
     // fetch all positions on employee creations
     router.route("/")
     .get(async (req, res) => {
+        let { searched, target, keyword, page } = req.body;
+        let searchQuery;
+        const response = {};
 
         // validate page number
         const pageValidation = validateInteger(req.query.page, "page number");
         if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-        const page = req.query.page || 1;
+        page = req.query.page || 1;
 
         // set up the limits:
         const limit = pageSize * page;
         const offset = (page - 1) * pageSize;
 
         try{
+            // setting up the potential search query setting:
+            if (searched) {
+                // validate search query format:
+                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                const targetValidation = await validateColumnName(target, "positions", keyword, db);
+                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                const type = targetValidation.type;
+
+                searchQuery = getSearchTerm("positions", target, keyword, type);
+                if (page == 1){
+                    const count = await db.oneOrNone(`
+                        SELECT COUNT(p.*) AS count 
+                        FROM public.positions AS p
+                        WHERE ${searchQuery};
+                    `);
+                    response.count = parseInt(count.count);
+                }
+            }
+
             const positions = await db.any(`
-                SELECT * 
-                FROM public.positions 
-                ORDER BY name ASC
+                SELECT p.* 
+                FROM public.positions AS p
+                ${searched?`WHERE ${searchQuery}`:''}
+                ORDER BY p.name ASC
                 LIMIT $1 OFFSET $2;`, [limit, offset]);
-            return res.status(200).json({ page: page, positions: positions });
+            return res.status(200).json({ ...response, page: page, positions: positions });
         }
         catch{(error) => {
             console.error(error);

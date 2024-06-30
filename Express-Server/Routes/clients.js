@@ -7,9 +7,10 @@ const { validateAddresses,
     validatePhone,
     validateSocialContacts,
     validateInstances,
-    validateInteger
+    validateInteger,
+    validateColumnName
     } = require ('../utils/Validator');
-
+const { getSearchTerm } = require('../utils/formatter');
 const { getConfiguration } = require("../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
@@ -19,33 +20,56 @@ module.exports = (db) => {
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
+            let { searched, target, keyword, page } = req.body;
+            let searchQuery;
+            const response = {};
             
             // validate page number
             const pageValidation = validateInteger(req.query.page, "page number");
             if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            const page = req.query.page || 1;
+            page = req.query.page || 1;
 
             // set up the limits:
             const limit = pageSize * page;
             const offset = (page - 1) * pageSize;
 
             try {
+                // setting up the potential search query setting:
+                if (searched) {
+                    // validate search query format:
+                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                    const targetValidation = await validateColumnName(target, "clients", keyword, db);
+                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                    const type = targetValidation.type;
+
+                    searchQuery = getSearchTerm("clients",target, keyword, type);
+                    if (page == 1){
+                        const count = await db.oneOrNone(`
+                            SELECT COUNT(c.*) AS count 
+                            FROM public.clients as c
+                            WHERE c.created_by = $1 AND ${searchQuery};
+                        `, [owner]);
+                        response.count = parseInt(count.count);
+                    }
+                }
+
                 const clients = await db.any(`
                     SELECT c.id, c.full_name, c.email, c.phone, c.wechat_contact, c.qq_contact, 
-                    co.full_name AS company_name
+                    co.full_name AS company
                     FROM public.clients c
                     LEFT JOIN public.companies co ON c.company = co.id
-                    WHERE c.created_by = $1
+                    WHERE c.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
                     ORDER BY c.full_name ASC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);
-                return res.status(200).json({ page: page, clients: clients });
+                
+                return res.status(200).json({ ...response, page: page, clients: clients });
             }
             catch (err) {
                 console.error(err);
                 return res.status(500).json({ page: page, clients: null, message: "failed to fetch clients" });
             }
-        })
+        });
 
     router.route("/:id")
         // fetching a specific client 
