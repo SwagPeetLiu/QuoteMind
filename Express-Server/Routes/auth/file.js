@@ -1,4 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({
+    path: process.env.NODE_ENV === 'development' ? '.env.test' : '.env.prod'
+});
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,7 +9,7 @@ const router = express.Router();
 // getting the configurations for validations:
 const { validateEmail 
     , validatePassword
-} = require('../utils/Validator');
+} = require('../../utils/Validator');
 
 // Route used to login user into the platform, and assigning session token accordingly
 module.exports = (db) => {
@@ -58,12 +60,12 @@ module.exports = (db) => {
     router.route("/logout")
         .post( async (req, res) => {
             const { email, token } = req.body;
-            if (!token || typeof token !== 'string') {
+            if (!email || !token || typeof token !== 'string' || typeof email !== 'string') {
                 return res.status(401).json({ message: 'Unauthorized access' });
             }
             try{
                 const emailValidation = validateEmail(email);
-                if (!emailValidation.valid) return res.status(400).json({ message: 'Unauthorized access' });
+                if (!emailValidation.valid) return res.status(401).json({ message: 'Unauthorized access' });
                 
                 // validate the existence of an user:
                 const user = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [email]);

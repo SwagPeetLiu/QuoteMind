@@ -11,7 +11,7 @@ const {
     validateInteger,
     validateColumnName
 } = require ('../utils/Validator');
-const { getSearchTerm } = require('../utils/formatter');
+const { getSearchTerm } = require('../utils/Formatter');
 const { getConfiguration } = require("../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;

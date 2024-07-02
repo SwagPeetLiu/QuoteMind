@@ -1,7 +1,8 @@
 # express server file
 Express-Server/node_modules
 Express-Server/config
-Express-Server/.env
+Express-Server/.env.test
+Express-Server/.env.prod
 
 # VUE front-end app file
 

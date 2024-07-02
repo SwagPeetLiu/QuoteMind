@@ -1,4 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({
+    path: process.env.NODE_ENV === 'development' ? '.env.test' : '.env.prod'
+});
 const validator = require('validator');
 const { getConfiguration } = require('./Configurator');
 const config = getConfiguration();
@@ -108,9 +110,41 @@ function validateString(string) {
     }
     return { valid: true };
 }
+
+function validateUserName(username) {
+    if (!validator.isLength(username, { min: config.limitations.Min_Username_Length, max: config.limitations.Max_Username_Length })) {
+        return { valid: false, message: 'Invalid username' };
+    }
+    return { valid: true };
+}
+
 function validatePassword(password) {
     if (!validator.isLength(password, { min: config.limitations.Min_Password_Length, max: config.limitations.Max_Password_Length })) {
         return { valid: false, message: 'Invalid password' };
+    }
+
+    // Check if the password contains at least 3 digits
+    const digits = password.match(/\d/g);
+    if (!digits || digits.length < 3) {
+        return { valid: false, message: 'Password must contain at least 3 digits' };
+    }
+
+    // Check if the password contains at least 3 letters
+    const letters = password.match(/[a-zA-Z]/g);
+    if (!letters || letters.length < 3) {
+        return { valid: false, message: 'Password must contain at least 3 letters' };
+    }
+
+    // Check if the password contains at least 1 uppercase letter
+    const uppercase = password.match(/[A-Z]/g);
+    if (!uppercase || uppercase.length < 1) {
+        return { valid: false, message: 'Password must contain at least 1 uppercase letter' };
+    }
+
+    // Check if the password contains at least 1 special character
+    const specialCharacters = password.match(/[^a-zA-Z0-9]/g);
+    if (!specialCharacters || specialCharacters.length < 1) {
+        return { valid: false, message: 'Password must contain at least 1 special character' };
     }
     return { valid: true };
 }
@@ -204,7 +238,7 @@ function validateInteger(value, target) {
 
         // assuming positive inputs
         if (value < 0) return { valid: false, message: `invalid ${target}` };
-        
+
         // Check if the integer is within the range of 1 to 10 digits
         const regex = /^\d{1,5}$/;
         if (!regex.test(value.toString())) {
@@ -325,40 +359,46 @@ async function validateColumnName(columnName, tableName, keyword, db) {
     };
 
     // Validate target:
-    try{
+    try {
         const targetDetail = await db.any(`
             SELECT column_name as target, data_type as type
             FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2;
             `, [tableName, columnName]);
         if (!targetDetail) return { valid: false, message: "invalid target" };
-        
+
         const type = targetDetail[0].type;
         if (!type) return { valid: false, message: "invalid target" };
 
         // validate the serach keyword based on it:
         const keywordValidation = validateSearchKey(keyword, type);
         if (!keywordValidation.valid) return { valid: false, message: "invalid keyword" };
-        return { valid: true , type: type};
+        return { valid: true, type: type };
     }
-    catch(error){
+    catch (error) {
         console.error(error);
         return { valid: false, message: "invalid target" };
     }
 }
 
-function validateSearchKey(key, type){
+function validateSearchKey(key, type) {
     // validate for each type of search keyword
-    if (type.includes("character") || type == "uuid" || type == "timestamp" || type == "USER-DEFINED" || type == "ARRAY"){
+    if (type.includes("character") || type == "uuid" || type == "timestamp" || type == "USER-DEFINED" || type == "ARRAY") {
         if (typeof key !== "string") return { valid: false, message: "invalid target" };
     }
 
     // allowing inputs of both quantiy & quantity units
-    if (type == "numeric" || type == "integer"){
-        if (!unicodeRegex.test(key.toString().replace(".",""))) {
+    if (type == "numeric" || type == "integer") {
+        if (!unicodeRegex.test(key.toString().replace(".", ""))) {
             return { valid: false, message: "invalid target" };
         }
     }
+    return { valid: true };
+}
+
+function validateToken(token) {
+    if (typeof token !== "string") return { valid: false, message: "invalid token" };
+    if (!validator.isLength(token, { min: config.limitations.Min_Token_Length, max: config.limitations.Max_Token_Length })) return { valid: false, message: "invalid token" };
     return { valid: true };
 }
 
@@ -372,6 +412,7 @@ module.exports = {
     validateSocialContacts,
     validateClients,
     validateEmployeePosition,
+    validateUserName,
     validatePassword,
     validateDescriptions,
     validateNumeric,
@@ -382,5 +423,6 @@ module.exports = {
     validatePricingThreshold,
     validateTableExistence,
     validateColumnName,
-    validateSearchKey
+    validateSearchKey,
+    validateToken
 };

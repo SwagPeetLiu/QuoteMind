@@ -16,6 +16,7 @@ back-end
   - Postgresql -- relational database used to keep track of all entities, using pg-promise client to establish DB connection
   - uuid-ossp -- enforcing universal & fixed long string (128 bits)
   - dot-env -- keep track of environmental settings of the express server
+  - Jest & Supertest -- to automate the testing and maintainence of the code quality in each endpoint
 
 # deployment
 AWS 

@@ -1,5 +1,7 @@
 // creating the routers for the users related
-require('dotenv').config();
+require('dotenv').config({
+    path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
+});
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
