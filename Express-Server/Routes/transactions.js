@@ -192,7 +192,7 @@ module.exports = (db) => {
                 return res.status(200).json({ message: "transaction updated successfully" });
             }
             catch(error) {
-                console.log(error);
+                console.error(error);
                 return res.status(500).json({ message: "failed to update transaction" });
             }
         })
@@ -217,7 +217,7 @@ module.exports = (db) => {
                 return res.status(200).json({ id: newTransaction.id, message: "transaction created successfully" });
             }
             catch(error) {
-                console.log(error);
+                console.error(error);
                 return res.status(500).json({ id : null, message: "failed to create transaction" });
             }
         })
@@ -229,7 +229,7 @@ module.exports = (db) => {
                 return res.status(200).json({ message: "transaction deleted successfully" });
             }
             catch(error) {
-                console.log(error);
+                console.error(error);
                 return res.status(500).json({ message: "failed to delete transaction" });
             }
         });

@@ -14,11 +14,10 @@ async function AuthenticationLogger(req, res, next) {
 
         const existingUser = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [session.email]);
         if (!existingUser) return res.status(401).json({ message: 'Unauthorized access' });
-
         if (existingUser.last_session !== token) {
             return res.status(401).json({ message: 'Unauthorized access' });
         }
-
+        
         if (isTokenExpired(token)) {
             await db.none('UPDATE public.user SET last_session = NULL WHERE email = $1', [session.email]);
             return res.status(401).json({ message: 'Unauthorized access' });

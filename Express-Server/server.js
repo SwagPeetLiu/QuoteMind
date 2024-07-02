@@ -29,7 +29,7 @@ app.use("/profile", profileRouter);
 const companyRouter = require('./Routes/Companies')(db);
 app.use("/companies", companyRouter);
 
-const clientRouter = require('./Routes/Clients')(db);
+const clientRouter = require('./Routes/clients/file')(db);
 app.use("/clients", clientRouter);
 
 const employeeRouter = require('./Routes/Employees')(db);

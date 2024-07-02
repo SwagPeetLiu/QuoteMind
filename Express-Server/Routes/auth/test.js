@@ -21,10 +21,6 @@ describe('Authentication Router', () => {
         app.use('/auth', authRouter);
     });
 
-    afterAll(async () => {
-        await closeDBConnection();
-    });
-
     // setting up invalid testing target:
     const invalidEmailSuffix = "@g.com";
     const validTestEmail = process.env.TEST_EMAIL;
@@ -147,6 +143,7 @@ describe('Authentication Router', () => {
             expect(response.statusCode).toBe(401);
         });
         it ("it should return status 200 if credentials are valid", async () => {
+            console.log("tested to logg out")
             const response = await request(app).post('/auth/logout').send({
                 email: validTestEmail,
                 token: validSession

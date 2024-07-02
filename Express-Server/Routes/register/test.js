@@ -17,10 +17,6 @@ describe('Register Router', () => {
         app.use('/register', registerRouter);
     });
 
-    afterAll(async () => {
-        await closeDBConnection;
-    });
-
     // setting up invalid testing target:
     const invalidEmailSuffix = "@g.com";
     const validTestUsername = "test Express";

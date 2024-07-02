@@ -237,9 +237,9 @@ function validateInteger(value, target) {
         }
 
         // assuming positive inputs
-        if (value < 0) return { valid: false, message: `invalid ${target}` };
+        if (value <= 0) return { valid: false, message: `invalid ${target}` };
 
-        // Check if the integer is within the range of 1 to 10 digits
+        // Check if the integer is within the range of 1 to 5 digits
         const regex = /^\d{1,5}$/;
         if (!regex.test(value.toString())) {
             return { valid: false, message: `invalid ${target}` };

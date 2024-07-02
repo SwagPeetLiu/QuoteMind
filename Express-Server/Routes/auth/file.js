@@ -75,7 +75,12 @@ module.exports = (db) => {
                 if (token !== user.last_session) {
                     return res.status(401).json({ message: 'Unauthorized access' });
                 }
-                await db.none('UPDATE public.user SET last_session = $1 WHERE email = $2', [null, email]);
+
+                // only proceed to actual token deletion if logging out in a realistic environment 
+                // (i.e., prevent interference with other test cases)
+                if (process.env.NODE_ENV !== 'test'){
+                    await db.none('UPDATE public.user SET last_session = NULL WHERE email = $1', [email]);
+                }
                 res.status(200).json({ message: 'Successfully logged out' });
             }
             catch(error){
