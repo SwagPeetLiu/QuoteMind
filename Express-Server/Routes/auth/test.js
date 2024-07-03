@@ -2,27 +2,20 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const express = require('express');
-const { getConfiguration, getDBconnection, closeDBConnection } = require('../../utils/Configurator');
+const { getConfiguration } = require('../../utils/Configurator');
 const { isTokenExpired } = require('../../utils/AuthMiddleware');
 
 // set up the testing target:
-const db = getDBconnection();
-const authRouter = require('./file')(db);
 const config = getConfiguration();
+const app = global.testApp;
+const { testObject } = require('../../utils/TestTools');
 
 describe('Authentication Router', () => {
     // setting up the testing app
-    let app;
     let validSession;
-    beforeAll(() => {
-        app = express();
-        app.use(express.json());
-        app.use('/auth', authRouter);
-    });
 
     // setting up invalid testing target:
-    const invalidEmailSuffix = "@g.com";
+    const invalidEmailSuffix = testObject.invalidEmailSuffix;
     const validTestEmail = process.env.TEST_EMAIL;
     const validTestPassword = process.env.TEST_PW;
     const anotherEmail = process.env.ANOTHER_EMAIL;
@@ -143,7 +136,6 @@ describe('Authentication Router', () => {
             expect(response.statusCode).toBe(401);
         });
         it ("it should return status 200 if credentials are valid", async () => {
-            console.log("tested to logg out")
             const response = await request(app).post('/auth/logout').send({
                 email: validTestEmail,
                 token: validSession

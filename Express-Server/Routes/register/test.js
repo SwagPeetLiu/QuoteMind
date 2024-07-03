@@ -2,27 +2,19 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.test'
 });
 const request = require('supertest');
-const express = require('express');
-const { getConfiguration, getDBconnection, closeDBConnection } = require('../../utils/Configurator');
-
-const db = getDBconnection();
-const registerRouter = require('./file')(db);
+const { getConfiguration, getDBconnection } = require('../../utils/Configurator');
 const config = getConfiguration();
+const { testObject } = require('../../utils/TestTools');
+const app = global.testApp;
 
 describe('Register Router', () => {
-    let app;
-    beforeAll(() => {
-        app = express();
-        app.use(express.json());
-        app.use('/register', registerRouter);
-    });
 
     // setting up invalid testing target:
-    const invalidEmailSuffix = "@g.com";
-    const validTestUsername = "test Express";
+    const invalidEmailSuffix = testObject.invalidEmailSuffix;
+    const validTestUsername = testObject.register.validTestUsername;
     const existingEmail = process.env.TEST_EMAIL;
-    const validTestEmail = "testExpress@gmail.com";
-    const validTestPassword = "testPassword%586";
+    const validTestEmail = testObject.register.validTestEmail;
+    const validTestPassword = testObject.register.validTestPassword;
     const validRegisterToken = process.env.REGISTER_TOKEN;
 
     describe("POST /", () => {
@@ -280,6 +272,7 @@ describe('Register Router', () => {
 
             // proceed to remove the testing user:
             try{
+                const db = getDBconnection();
                 await db.none('DELETE FROM public.user WHERE email = $1', [validTestEmail]);
             }
             catch(err){

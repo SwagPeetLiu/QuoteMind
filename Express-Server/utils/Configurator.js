@@ -2,7 +2,6 @@
 require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
-const request = require('supertest');
 
 // Configure the Database instance that uses the connection
 const pgp = require('pg-promise')();
@@ -44,17 +43,8 @@ function closeDBConnection() {
     return db.$pool.end();
 }
 
-async function getTestSession(app){
-    const response = await request(app).post('/auth').send({
-        email: process.env.TEST_EMAIL,
-        password: process.env.TEST_PW
-    });
-    return response.body.session;
-}
-
 module.exports = {
     getConfiguration,
     getDBconnection,
-    closeDBConnection,
-    getTestSession
+    closeDBConnection
 }

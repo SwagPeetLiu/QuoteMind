@@ -10,9 +10,9 @@ const { validateAddresses,
         validateInstances,
         validateInteger,
         validateColumnName
-    } = require ('../utils/Validator');
-const { getSearchTerm } = require('../utils/Formatter');
-const { getConfiguration } = require("../utils/Configurator");
+    } = require ('../../utils/Validator');
+const { getSearchTerm } = require('../../utils/Formatter');
+const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
 

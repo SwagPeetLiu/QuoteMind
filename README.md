@@ -30,6 +30,11 @@ AWS
   1. navigate to the folder of Express-Server to run npm install 
   2. run npm run devStart
 
+# Testing
+1. Please ensure you have Jest & Supertest installed
+2. npm test: allow you to run all the test cases across the application
+3. npx Jest -t "specific-test-block": Allow you to run a specific described testing block
+
 # Usage
   1. Manage and create companies/ clients/ addresses / employees/ products/ materials / transactions
   2. Ability of drag & drop of a folder with a specific naming convension for designs (i.e., folder name contains the product, materials, date, etc.)

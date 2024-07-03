@@ -26,7 +26,7 @@ app.use(AuthenticationLogger);
 const profileRouter = require('./Routes/Profile')(db);
 app.use("/profile", profileRouter);
 
-const companyRouter = require('./Routes/Companies')(db);
+const companyRouter = require('./Routes/companies/file')(db);
 app.use("/companies", companyRouter);
 
 const clientRouter = require('./Routes/clients/file')(db);

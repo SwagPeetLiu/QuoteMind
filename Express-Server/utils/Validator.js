@@ -9,11 +9,18 @@ const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u; // Regular expression to check f
 
 // Function to validate an array of addresses
 async function validateAddresses(addresses, owner, id, target, db, req) {
-    if (addresses && addresses.length > 0) {
+    if (addresses) {
+        if (!Array.isArray(addresses)) return { valid: false, message: 'Invalid Format of Address information' };
+        if (addresses.length === 0) return { valid: true }; // allow empty array
         for (let address of addresses) {
             if (!address || !address.street || !address.city || !address.state || !address.country ||
                 !address.postal || !address.category || !address.id || !address.message) {
                 return { valid: false, message: 'Incomplete Address information' };
+            }
+            if (typeof address.street !== "string" || typeof address.city !== "string" || typeof address.state !== "string" ||
+                typeof address.country !== "string" || typeof address.postal !== "string" || !Array.isArray(address.category) ||
+                typeof address.id !== "string" || typeof address.message !== "string") {
+                return { valid: false, message: 'Invalid Format of Address information' };
             }
             if (!unicodeRegex.test(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
                 !unicodeRegex.test(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
@@ -43,12 +50,11 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                     }
                 }
                 catch (error) {
-                    console.error(error);
                     return { valid: false, message: 'Invalid ID of Address information' };
                 }
             }
             // Validate address categories
-            if (address.category.length === 0) {
+            if (address.category.length === 0 || address.category.length > config.limitations.MAX_ADDRESS_CATEGORY_LENGTH) {
                 return { valid: false, message: 'Invalid Address Category' };
             }
             for (let category of address.category) {
@@ -83,7 +89,6 @@ async function validateClients(clients, owner, db) {
                 }
             }
             catch (error) {
-                console.error(error);
                 return { valid: false, message: 'Invalid Client ID' };
             }
         }
@@ -93,6 +98,7 @@ async function validateClients(clients, owner, db) {
 
 function validateName(name) {
     if (!name ||
+        typeof name !== "string" ||
         !unicodeRegex.test(name) ||
         !validator.isLength(name, { min: config.limitations.Min_Name_Length, max: config.limitations.Max_Name_Length })) {
         return ({ valid: false, message: 'Invalid name provided' });
@@ -103,6 +109,9 @@ function validateName(name) {
 // Acceptable for null inputs
 function validateString(string) {
     if (string) {
+        if (typeof string !== "string") {
+            return ({ valid: false, message: 'Invalid string provided' });
+        }
         if (!unicodeRegex.test(string) ||
             !validator.isLength(string, { min: config.limitations.Min_String_Length, max: config.limitations.Max_String_Length })) {
             return ({ valid: false, message: 'Invalid string provided' });
@@ -112,6 +121,9 @@ function validateString(string) {
 }
 
 function validateUserName(username) {
+    if (typeof username !== "string") { 
+        return { valid: false, message: 'Invalid username' };
+    }
     if (!validator.isLength(username, { min: config.limitations.Min_Username_Length, max: config.limitations.Max_Username_Length })) {
         return { valid: false, message: 'Invalid username' };
     }
@@ -119,6 +131,9 @@ function validateUserName(username) {
 }
 
 function validatePassword(password) {
+    if (typeof password !== "string") {
+        return { valid: false, message: 'Invalid password' };
+    }
     if (!validator.isLength(password, { min: config.limitations.Min_Password_Length, max: config.limitations.Max_Password_Length })) {
         return { valid: false, message: 'Invalid password' };
     }
@@ -151,6 +166,9 @@ function validatePassword(password) {
 
 function validateEmail(email) {
     if (email) {
+        if (typeof email !== "string") {
+            return ({ valid: false, message: 'Invalid email' });
+        }
         if (!validator.isEmail(email) ||
             !validator.isLength(email, { min: config.limitations.Min_Email_Length, max: config.limitations.Max_Email_Length })) {
             return ({ valid: false, message: 'Invalid email' });
@@ -161,8 +179,16 @@ function validateEmail(email) {
 
 function validatePhone(phone) {
     if (phone) {
-        if (!validator.isLength(phone, { min: config.limitations.Min_Phone_Length, max: config.limitations.Max_Phone_Length }) ||
-            !validator.isNumeric(phone.replaceAll('+', ''))) {
+        if (typeof phone !== "string") {
+            return ({ valid: false, message: 'Invalid phone number' });
+        }
+        if (!validator.isLength(phone, { min: config.limitations.Min_Phone_Length, max: config.limitations.Max_Phone_Length })){
+            return ({ valid: false, message: 'Invalid phone number' });
+        }
+        // if it does not satisfy both landline or mobile, it is invalid
+        const isNotMobile = !validator.isMobilePhone(phone, "any");
+        const isNotLandLine = !(/^[0-9]{2,4}-[0-9]{6,8}$/).test(phone);
+        if (isNotMobile && isNotLandLine) {
             return ({ valid: false, message: 'Invalid phone number' });
         }
     }
@@ -171,6 +197,9 @@ function validatePhone(phone) {
 
 function validateTaxNumber(taxNumber) {
     if (taxNumber) {
+        if (typeof taxNumber !== "string") {
+            return ({ valid: false, message: 'Invalid tax number' });
+        }
         if (!validator.isLength(taxNumber, { min: config.limitations.Min_Tax_Length, max: config.limitations.Max_Tax_Length }) ||
             !validator.isAlphanumeric(taxNumber.replaceAll(' ', ''))) {
             return ({ valid: false, message: 'Invalid tax number' });
@@ -181,8 +210,25 @@ function validateTaxNumber(taxNumber) {
 
 function validateSocialContacts(contacts, target) {
     if (contacts) {
+        if (typeof contacts !== "string") {
+            return { valid: false, message: `invalid ${target} contact` };
+        }
         if (!validator.isLength(contacts, { min: config.limitations.Min_Social_Contact_Length, max: config.limitations.Max_Social_Contact_Length })) {
             return { valid: false, message: `invalid ${target} contact` };
+        }
+        if (target == "qq"){
+            // must be numbers with an email suffice
+            const qqRegex = /^[1-9][0-9]*$/;
+            if (!qqRegex.test(contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, ''))){
+                return { valid: false, message: `invalid ${target} contact` };
+            }
+        }
+        if (target == "wechat"){
+            // must start with a letter, allows to contain contain letters, numbers, underscores, and hyphens
+            const weChatRegex = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+            if (!weChatRegex.test(contacts)){
+                return { valid: false, message: `invalid ${target} contact` };
+            }
         }
     }
     return { valid: true };
@@ -202,17 +248,18 @@ function validateGenericID(id, target) {
 }
 
 async function validateEmployeePosition(position, db) {
-    if (!position || !validator.isUUID(position)) {
-        return { valid: false, message: 'Invalid ID of Position ID' };
-    }
     try {
+        // validating id
+        if (!position || !validator.isUUID(position)) {
+            return { valid: false, message: 'Invalid ID of Position ID' };
+        }
+        // validating instance
         const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
         if (!positionRecord) {
             return { valid: false, message: 'Invalid ID of Position ID' };
         }
     }
     catch (error) {
-        console.error(error);
         return { valid: false, message: 'Invalid ID of Position ID' };
     }
     return { valid: true };
@@ -220,6 +267,9 @@ async function validateEmployeePosition(position, db) {
 
 function validateDescriptions(descriptions) {
     if (descriptions) {
+        if (typeof descriptions !== "string") {
+            return { valid: false, message: 'Invalid descriptions' };
+        }
         if (!validator.isLength(descriptions, { min: config.limitations.Min_Descriptions_Length, max: config.limitations.Max_Descriptions_Length }) ||
             !unicodeRegex.test(descriptions)) {
             return { valid: false, message: 'Invalid descriptions' };
@@ -264,6 +314,9 @@ function validateNumeric(value, target) {
 }
 
 function validateTransactionStatus(status) {
+    if (typeof status !== "string") {
+        return { valid: false, message: 'Invalid Transaction Status' };
+    }
     if (!status || !validator.isAlpha(status)) {
         return { valid: false, message: 'Invalid Transaction Status' };
     }
@@ -291,7 +344,6 @@ async function validateInstances(instances, owner, target, db) {
             }
         }
         catch (error) {
-            console.error(error);
             return { valid: false, message: `invalid ${target}` };
         }
     }
@@ -341,7 +393,6 @@ async function validateTableExistence(tableName, db) {
         }
         return { valid: true };
     } catch (error) {
-        console.error('Error checking table existence:', error);
         return { valid: false, message: `Table does not exist` };
     }
 }
@@ -376,7 +427,6 @@ async function validateColumnName(columnName, tableName, keyword, db) {
         return { valid: true, type: type };
     }
     catch (error) {
-        console.error(error);
         return { valid: false, message: "invalid target" };
     }
 }
