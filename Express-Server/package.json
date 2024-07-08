@@ -30,6 +30,7 @@
     "supertest": "^7.0.0"
   },
   "jest": {
-    "testEnvironment": "./utils/testEnvironment.js"
+    "testEnvironment": "./utils/testEnvironment.js",
+    "testTimeout": 10000
   }
 }

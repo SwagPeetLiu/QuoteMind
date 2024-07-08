@@ -7,9 +7,9 @@ const {
     validateDescriptions,
     validateInteger,
     validateColumnName
-} = require('../utils/Validator');
-const { getSearchTerm } = require('../utils/Formatter');
-const { getConfiguration } = require("../utils/Configurator");
+} = require('../../utils/Validator');
+const { getSearchTerm } = require('../../utils/Formatter');
+const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
 
@@ -18,39 +18,43 @@ module.exports = (db) => {
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
-            let { searched, target, keyword, page } = req.body;
+            let { target, keyword, page } = req.query;
             let searchQuery;
             const response = {};
 
-            // validate page number
-            const pageValidation = validateInteger(req.query.page, "page number");
-            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            page = req.query.page || 1;
-
-            // set up the limits:
-            const limit = pageSize * page;
-            const offset = (page - 1) * pageSize;
+            const searched = (!target && !keyword) ? false : true;
+            if (searched) {
+                // validate search query format:
+                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                const targetValidation = await validateColumnName(target, "materials", keyword, db);
+                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                const type = targetValidation.type;
+                searchQuery = getSearchTerm("materials",target, keyword, type);
+            }
 
             try {
-                // setting up the potential search query setting:
-                if (searched) {
-                    // validate search query format:
-                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                    const targetValidation = await validateColumnName(target, "materials", keyword, db);
-                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                    const type = targetValidation.type;
-
-                    searchQuery = getSearchTerm("materials",target, keyword, type);
-                    if (page == 1){
-                        const count = await db.oneOrNone(`
-                            SELECT COUNT(m.*) AS count 
-                            FROM public.materials AS m
-                            WHERE m.created_by = $1 AND ${searchQuery};
-                        `, [owner]);
-                        response.count = parseInt(count.count);
-                    }
+                // validate page number (if no page defined, then counts are required)
+                if (page){
+                    page = parseInt(page);
+                    if (!page) return res.status(400).json({ message: "page number is invalid" });
+                    const pageValidation = validateInteger(page, "page number");
+                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
                 }
+                else{
+                    page = 1;
+                    const count = await db.oneOrNone(`
+                        SELECT COUNT(m.*) AS count 
+                        FROM public.materials AS m
+                        WHERE m.created_by = $1 ${searched ? `AND ${searchQuery}` : ""};
+                    `, [owner]);
+                    response.count = parseInt(count.count);
+                }
+                response.searched = searched;
+                response.page = page;
+                const limit = pageSize * page;
+                const offset = (page - 1) * pageSize;
 
+                // fetching all the materials matching
                 const materials = await db.any(`
                     SELECT m.id, m.en_name, m.ch_name 
                     FROM public.materials AS m
@@ -58,12 +62,12 @@ module.exports = (db) => {
                     ORDER BY m.ch_name ASC
                     LIMIT $2 OFFSET $3`
                     , [owner, limit, offset]);
-                return res.status(200).json({ ...response, page: page, materials: materials });
+                return res.status(200).json({ ...response, materials: materials });
             }
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ page: page, message: error, materials: null });
+                    return res.status(500).json({ ...response, message: error });
                 }
             }
         });
@@ -75,7 +79,7 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const material = await db.oneOrNone(`
-                    SELECT id, en_name, ch_name, description 
+                    SELECT id, en_name, ch_name, descriptions 
                     FROM public.materials 
                     WHERE id = $1 and created_by = $2`, 
                     [id, owner]);
@@ -91,10 +95,10 @@ module.exports = (db) => {
         .put(async (req, res) => {
             const id = req.params.id;
             const owner = req.sessionEmail;
-            const { en_name, ch_name, description } = req.body;
+            const { en_name, ch_name, descriptions } = req.body;
             try{
-                await db.none('UPDATE public.materials SET en_name = $1, ch_name = $2, description = $3 WHERE id = $4 AND created_by = $5'
-                    , [en_name, ch_name, description, id, owner]);
+                await db.none('UPDATE public.materials SET en_name = $1, ch_name = $2, descriptions = $3 WHERE id = $4 AND created_by = $5'
+                    , [en_name, ch_name, descriptions, id, owner]);
                 return res.status(200).json({ message: "material updated successfully" });
             }
             catch(error) {
@@ -104,10 +108,10 @@ module.exports = (db) => {
         })
         .post(async (req, res) => {
             const owner = req.sessionEmail;
-            const { en_name, ch_name, description } = req.body;
+            const { en_name, ch_name, descriptions } = req.body;
             try{
-                const newMaterial = await db.oneOrNone('INSERT INTO public.materials (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4) RETURNING id'
-                    , [en_name, ch_name, description, owner]);
+                const newMaterial = await db.oneOrNone('INSERT INTO public.materials (en_name, ch_name, descriptions, created_by) VALUES ($1, $2, $3, $4) RETURNING id'
+                    , [en_name, ch_name, descriptions, owner]);
                 return res.status(200).json({ id: newMaterial.id, message: "material created successfully" });
             }
             catch(error) {
@@ -119,15 +123,21 @@ module.exports = (db) => {
             const id = req.params.id;
             const owner = req.sessionEmail;
             try{
-                db.tx(async (transaction) => {
+                await db.tx(async (transaction) => {
                     // remove the references of material in transactions:
-                    transaction.none(`UPDATE public.transactions SET materials = array_remove(materials, $1) WHERE created_by = $2`, [id, owner]);
+                    await transaction.none(`UPDATE public.transactions 
+                        SET materials = CASE 
+                            WHEN array_length(materials, 1) = 1 THEN NULL 
+                            ELSE array_remove(materials, $1) 
+                            END
+                        WHERE created_by = $2 AND $1 = ANY(materials)
+                    `, [id, owner]);
 
                     // deleting any pricing references to the material:
                     const conditions = await transaction.any(`DELETE FROM public.pricing_conditions WHERE created_by = $1 AND $2 = ANY(materials)
                         RETURNING id;`, [owner, id]);
                     const deletedIDs = conditions.map((condition) => condition.id);
-                    transaction.none(`DELETE FROM public.pricing_rules
+                    await transaction.none(`DELETE FROM public.pricing_rules
                                         WHERE created_by = $1
                                         AND EXISTS (
                                             SELECT 1
@@ -136,9 +146,9 @@ module.exports = (db) => {
                                         );`, [owner, deletedIDs]);
 
                     // deleting the material itself:
-                    transaction.none('DELETE FROM public.materials WHERE id = $1 AND created_by = $2', [id, owner]);
+                    await transaction.none('DELETE FROM public.materials WHERE id = $1 AND created_by = $2', [id, owner]);
+                    return res.status(200).json({ message: "material deleted successfully" });
                 });
-                return res.status(200).json({ message: "material deleted successfully" });
             }
             catch(error) {
                 console.error(error);
@@ -151,15 +161,16 @@ module.exports = (db) => {
         if (id !== "new") {
             const existenceValidation = await validateInstances([id], req.sessionEmail, "materials", db);
             if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
+            if (req.method === "POST") return res.status(400).json({ message: "Invalid ID" });
         }
 
         // validate the payload on the definition of such material:
         if (req.method === "POST" || req.method === "PUT") {
-            const { en_name, ch_name, description } = req.body;
+            const { en_name, ch_name, descriptions } = req.body;
             validations = [
                 validateName(en_name),
                 validateName(ch_name),
-                validateDescriptions(description)];
+                validateDescriptions(descriptions)];
             for (const validation of validations) {
                 if (!validation.valid) return res.status(400).json({ message: validation.message });
             }

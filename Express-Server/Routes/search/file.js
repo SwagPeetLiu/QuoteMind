@@ -2,8 +2,8 @@
 const router = require("express").Router();
 const {
     validateTableExistence
-} = require("./Validator");
-const { getConfiguration } = require("./Configurator");
+} = require("../../utils/Validator");
+const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 const forbiddenTargets = config.search.forbiddenTargets;
 

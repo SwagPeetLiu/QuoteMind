@@ -7,9 +7,9 @@ const {
     validateNumeric,
     validateInteger,
     validateColumnName
-} = require('../utils/Validator');
-const { getSearchTerm } = require('../utils/Formatter');
-const { getConfiguration } = require("../utils/Configurator");
+} = require('../../utils/Validator');
+const { getSearchTerm } = require('../../utils/Formatter');
+const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
 
@@ -19,39 +19,43 @@ module.exports = (db) => {
     router.route("/conditions")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
-            let { searched, target, keyword, page } = req.body;
+            let { target, keyword, page } = req.query;
             let searchQuery;
             const response = {};
 
+            // validate searches & generate the serach term
+            const searched = (!target && !keyword) ? false : true;
+            if (searched){
+                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                const targetValidation = await validateColumnName(target, "pricing_conditions", keyword, db);
+                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                const type = targetValidation.type;
+                searchQuery = getSearchTerm("pricing_conditions",target, keyword, type);
+            }
+
             // validate page number
-            const pageValidation = validateInteger(req.query.page, "page number");
-            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            page = req.query.page || 1;
-
-            // set up the limits:
-            const limit = pageSize * page;
-            const offset = (page - 1) * pageSize;
-
             try {
-                // setting up the potential search query setting:
-                if (searched) {
-                    // validate search query format:
-                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                    const targetValidation = await validateColumnName(target, "pricing_conditions", keyword, db);
-                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                    const type = targetValidation.type;
-
-                    searchQuery = getSearchTerm("pricing_conditions",target, keyword, type);
-                    if (page == 1){
-                        const count = await db.oneOrNone(`
-                            SELECT COUNT(cond.*) AS count 
-                            FROM public.pricing_conditions as cond
-                            WHERE cond.created_by = $1 AND ${searchQuery};
-                        `, [owner]);
-                        response.count = parseInt(count.count);
-                    }
+                if (page){
+                    page = parseInt(page);
+                    if (!page) return res.status(400).json({ message: "page number is invalid" });
+                    const pageValidation = validateInteger(page, "page number");
+                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
                 }
+                else{
+                    page = 1;
+                    const count = await db.oneOrNone(`
+                        SELECT COUNT(cond.*) AS count 
+                        FROM public.pricing_conditions as cond
+                        WHERE cond.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
+                    `, [owner]);
+                    response.count = parseInt(count.count);
+                }
+                response.searched = searched;
+                response.page = page;
+                const limit = pageSize * page;
+                const offset = (page - 1) * pageSize;
 
+                // fetch the pricing conditions
                 const pricing = await db.any(`
                     SELECT 
                         cond.id, 
@@ -106,10 +110,10 @@ module.exports = (db) => {
                     ORDER BY cond.id ASC
                     LIMIT $2 OFFSET $3
                 `, [owner, limit, offset]);                
-                return res.status(200).json({ ...response, page: page, pricing_conditions: pricing });
+                return res.status(200).json({ ...response, pricing_conditions: pricing });
             } catch (error) {
                 console.error(error);
-                return res.status(500).json({ page: page, message: error });
+                return res.status(500).json({ ...response, message: error });
             }
         });
 
@@ -117,39 +121,42 @@ module.exports = (db) => {
         router.route("/rules")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
-            let { searched, target, keyword, page } = req.body;
+            let { target, keyword, page } = req.query;
             let searchQuery;
             const response = {};
 
-            // validate page number
-            const pageValidation = validateInteger(req.query.page, "page number");
-            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            page = req.query.page || 1;
-
-            // set up the limits:
-            const limit = pageSize * page;
-            const offset = (page - 1) * pageSize;
+            // validate searches & generate the serach term
+            const searched = (!target && !keyword) ? false : true;
+            if (searched){
+                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                const targetValidation = await validateColumnName(target, "pricing_rules", keyword, db);
+                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                const type = targetValidation.type;
+                searchQuery = getSearchTerm("pricing_rules",target, keyword, type);
+            }
 
             try {
-                // setting up the potential search query setting:
-                if (searched) {
-                    // validate search query format:
-                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                    const targetValidation = await validateColumnName(target, "pricing_rules", keyword, db);
-                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                    const type = targetValidation.type;
-
-                    searchQuery = getSearchTerm("pricing_rules", target, keyword, type);
-                    if (page == 1){
-                        const count = await db.oneOrNone(`
-                            SELECT COUNT(r.*) AS count 
-                            FROM public.pricing_rules as r
-                            WHERE r.created_by = $1 AND ${searchQuery};
-                        `, [owner]);
-                        response.count = parseInt(count.count);
-                    }
+                if (page){
+                    page = parseInt(page);
+                    if (!page) return res.status(400).json({ message: "page number is invalid" });
+                    const pageValidation = validateInteger(page, "page number");
+                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
                 }
-
+                else{
+                    page = 1;
+                    const count = await db.oneOrNone(`
+                        SELECT COUNT(r.*) AS count 
+                        FROM public.pricing_rules as r
+                        WHERE r.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
+                    `, [owner]);
+                    response.count = parseInt(count.count);
+                }
+                response.searched = searched;
+                response.page = page;
+                const limit = pageSize * page;
+                const offset = (page - 1) * pageSize;
+                
+                // fetching all the pricing rules
                 const rules = await db.any(`
                     SELECT
                         r.id, r.price_per_unit,
@@ -205,10 +212,10 @@ module.exports = (db) => {
                     ORDER BY r.id ASC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);
-                return res.status(200).json({ ...response, page: page, pricing_rules: rules });
+                return res.status(200).json({ ...response, pricing_rules: rules });
             } catch (error) { 
                 console.error(error);
-                return res.status(500).json({ page: page, message: error });
+                return res.status(500).json({ ...response, message: error });
             }
         });
     
@@ -352,6 +359,7 @@ module.exports = (db) => {
         if (id !== "new") {
             const existanceValidation = await validateInstances([id], owner, target, db);
             if (!existanceValidation.valid) return res.status(400).json({ message: existanceValidation.message });
+            if (req.method === "POST") return res.status(400).json({ message: "Invalid ID" });
         }
 
         // validate the payloads:

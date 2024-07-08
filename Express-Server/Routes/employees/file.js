@@ -10,9 +10,9 @@ const {
     validateEmployeePosition,
     validateInteger,
     validateColumnName
-} = require ('../utils/Validator');
-const { getSearchTerm } = require('../utils/Formatter');
-const { getConfiguration } = require("../utils/Configurator");
+} = require ('../../utils/Validator');
+const { getSearchTerm } = require('../../utils/Formatter');
+const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 const pageSize = config.search.pageSize;
 
@@ -20,39 +20,43 @@ module.exports = (db) => {
     router.route("/")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
-            let { searched, target, keyword, page } = req.body;
+            let { target, keyword, page } = req.query;
             let searchQuery;
             const response = {};
 
-            // validate page number
-            const pageValidation = validateInteger(req.query.page, "page number");
-            if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-            page = req.query.page || 1;
-
-            // set up the limits:
-            const limit = pageSize * page;
-            const offset = (page - 1) * pageSize;
+            // validate searches & generate the serach term
+            const searched = (!target && !keyword) ? false : true;
+            if (searched){
+                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
+                const targetValidation = await validateColumnName(target, "employees", keyword, db);
+                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
+                const type = targetValidation.type;
+                searchQuery = getSearchTerm("employees", target, keyword, type);
+            }
 
             try {
-                // setting up the potential search query setting:
-                if (searched) {
-                    // validate search query format:
-                    if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                    const targetValidation = await validateColumnName(target, "employees", keyword, db);
-                    if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                    const type = targetValidation.type;
-
-                    searchQuery = getSearchTerm("employees",target, keyword, type);
-                    if (page == 1){
-                        const count = await db.oneOrNone(`
-                            SELECT COUNT(e.*) AS count 
-                            FROM public.employees AS e
-                            WHERE e.created_by = $1 AND ${searchQuery};
-                        `, [owner]);
-                        response.count = parseInt(count.count);
-                    }
+                // validate page number (if no page defined, then counts are required)
+                if (page){
+                    page = parseInt(page);
+                    if (!page) return res.status(400).json({ message: "page number is invalid" });
+                    const pageValidation = validateInteger(page, "page number");
+                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
                 }
+                else{
+                    page = 1;
+                    const count = await db.oneOrNone(`
+                        SELECT COUNT(e.*) AS count 
+                        FROM public.employees AS e
+                        WHERE e.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
+                    `, [owner]);
+                    response.count = parseInt(count.count);
+                }
+                response.searched = searched;
+                response.page = page;
+                const limit = pageSize * page;
+                const offset = (page - 1) * pageSize;
 
+                // fetch the employees
                 const employees = await db.any(`
                     SELECT e.id, e.name, e.phone, e.wechat_contact, e.qq_contact,
                     p.name AS position
@@ -62,11 +66,11 @@ module.exports = (db) => {
                     ORDER BY e.name ASC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);
-                return res.status(200).json({ ...response, page: page, employees: employees });
+                return res.status(200).json({ ...response, employees: employees });
             }
             catch (err) {
                 console.error(err);
-                return res.status(500).json({ page: page, employees: null, message: "failed to fetch employees" });
+                return res.status(500).json({ ...response, message: "failed to fetch employees" });
             }
         });
 
@@ -76,13 +80,26 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const employee = await db.oneOrNone(`
-                    SELECT e.id, e.name, e.email, e.phone, e.wechat_contact, e.qq_contact,
-                    p.name AS position_name, p.descriptions AS position_description
+                    SELECT 
+                        e.id, 
+                        e.name, 
+                        e.email, 
+                        e.phone, 
+                        e.wechat_contact, 
+                        e.qq_contact,
+                        (
+                            SELECT jsonb_build_object(
+                                'id', p.id, 
+                                'name', p.name, 
+                                'descriptions', p.descriptions
+                            ) 
+                            FROM public.positions p 
+                            WHERE p.id = e.position
+                        ) AS position
                     FROM public.employees e
-                    LEFT JOIN public.positions p ON e.position = p.id
                     WHERE e.created_by = $1 AND e.id = $2
                     ORDER BY e.name ASC;
-                `, [owner, id]);
+                `, [owner, id]);                
                 return res.status(200).json({ employee: employee });
             }
             catch (err) {
@@ -131,7 +148,11 @@ module.exports = (db) => {
                     // remove all referneces in the transaction table (not deleting the transaction)
                     await transaction.none(` 
                         UPDATE public.transactions
-                        SET employee = array_remove(employee, $1) WHERE created_by = $2`, [id, owner]);
+                        SET employee = CASE 
+                            WHEN array_length(array_remove(employee, $1),1) = 0 THEN NULL
+                            ELSE array_remove(employee, $1)
+                            END
+                        WHERE created_by = $2`, [id, owner]);
                     
                     // delete the employee record
                     await transaction.none('DELETE FROM public.employees WHERE id = $1 AND created_by = $2', [id, owner]);
@@ -150,6 +171,7 @@ module.exports = (db) => {
         if (id !== "new"){
             const existenceValidation = await validateInstances([id], owner, "employees", db);
             if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
+            if (req.method === "POST") return res.status(400).json({ message: "Invalid ID" });
         }
         
         // check for employee informations:
@@ -159,8 +181,8 @@ module.exports = (db) => {
                 validateName(name),
                 validateEmail(email),
                 validatePhone(phone),
-                validateSocialContacts(wechat_contact),
-                validateSocialContacts(qq_contact),
+                validateSocialContacts(wechat_contact, "wechat"),
+                validateSocialContacts(qq_contact, "qq"),
                 await validateEmployeePosition(position, db)
             ];
             for (const validation of validations) {

@@ -70,8 +70,8 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
 async function validateClients(clients, owner, db) {
     if (clients && clients.length > 0) {
         for (const client of clients) {
-            if (!client || !client.id ||
-                (client.message !== "add" && client.message !== "delete" && client.message !== "update")) {
+            if (!client || !client.id || typeof client.message !== "string" ||
+                (client.message !== "add" && client.message !== "delete")) {
                 return { valid: false, message: 'Incomplete Client information' };
             }
 
@@ -121,7 +121,7 @@ function validateString(string) {
 }
 
 function validateUserName(username) {
-    if (typeof username !== "string") { 
+    if (typeof username !== "string") {
         return { valid: false, message: 'Invalid username' };
     }
     if (!validator.isLength(username, { min: config.limitations.Min_Username_Length, max: config.limitations.Max_Username_Length })) {
@@ -182,7 +182,7 @@ function validatePhone(phone) {
         if (typeof phone !== "string") {
             return ({ valid: false, message: 'Invalid phone number' });
         }
-        if (!validator.isLength(phone, { min: config.limitations.Min_Phone_Length, max: config.limitations.Max_Phone_Length })){
+        if (!validator.isLength(phone, { min: config.limitations.Min_Phone_Length, max: config.limitations.Max_Phone_Length })) {
             return ({ valid: false, message: 'Invalid phone number' });
         }
         // if it does not satisfy both landline or mobile, it is invalid
@@ -216,17 +216,17 @@ function validateSocialContacts(contacts, target) {
         if (!validator.isLength(contacts, { min: config.limitations.Min_Social_Contact_Length, max: config.limitations.Max_Social_Contact_Length })) {
             return { valid: false, message: `invalid ${target} contact` };
         }
-        if (target == "qq"){
+        if (target == "qq") {
             // must be numbers with an email suffice
             const qqRegex = /^[1-9][0-9]*$/;
-            if (!qqRegex.test(contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, ''))){
+            if (!qqRegex.test(contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, ''))) {
                 return { valid: false, message: `invalid ${target} contact` };
             }
         }
-        if (target == "wechat"){
+        if (target == "wechat") {
             // must start with a letter, allows to contain contain letters, numbers, underscores, and hyphens
             const weChatRegex = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
-            if (!weChatRegex.test(contacts)){
+            if (!weChatRegex.test(contacts)) {
                 return { valid: false, message: `invalid ${target} contact` };
             }
         }
@@ -248,19 +248,21 @@ function validateGenericID(id, target) {
 }
 
 async function validateEmployeePosition(position, db) {
-    try {
-        // validating id
-        if (!position || !validator.isUUID(position)) {
+    if (position) {
+        try {
+            // validating id
+            if (!validator.isUUID(position)) {
+                return { valid: false, message: 'Invalid ID of Position ID' };
+            }
+            // validating instance
+            const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
+            if (!positionRecord) {
+                return { valid: false, message: 'Invalid ID of Position ID' };
+            }
+        }
+        catch (error) {
             return { valid: false, message: 'Invalid ID of Position ID' };
         }
-        // validating instance
-        const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
-        if (!positionRecord) {
-            return { valid: false, message: 'Invalid ID of Position ID' };
-        }
-    }
-    catch (error) {
-        return { valid: false, message: 'Invalid ID of Position ID' };
     }
     return { valid: true };
 }

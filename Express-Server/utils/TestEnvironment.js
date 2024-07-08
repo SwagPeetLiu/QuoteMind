@@ -26,7 +26,7 @@ class ExpressEnvironment extends NodeEnvironment {
         // cover all remaining routes with Authentication middleware
         app.use(AuthenticationLogger);
 
-        const profileRouter = require('../Routes/Profile')(db);
+        const profileRouter = require('../Routes/profile/file')(db);
         app.use("/profile", profileRouter);
 
         const companyRouter = require('../Routes/companies/file')(db);
@@ -35,35 +35,35 @@ class ExpressEnvironment extends NodeEnvironment {
         const clientRouter = require('../Routes/clients/file')(db);
         app.use("/clients", clientRouter);
 
-        const employeeRouter = require('../Routes/Employees')(db);
+        const employeeRouter = require('../Routes/employees/file')(db);
         app.use("/employees", employeeRouter);
 
-        const positionRouter = require('../Routes/Positions')(db);
+        const positionRouter = require('../Routes/positions/file')(db);
         app.use("/positions", positionRouter);
 
-        const materialRouter = require('../Routes/Materials')(db);
+        const materialRouter = require('../Routes/materials/file')(db);
         app.use("/materials", materialRouter);
 
-        const productRouter = require('../Routes/Products')(db);
+        const productRouter = require('../Routes/products/file')(db);
         app.use("/products", productRouter);
 
-        const transactionsRouter = require('../Routes/Transactions')(db);
+        const transactionsRouter = require('../Routes/transactions/file')(db);
         app.use("/transactions", transactionsRouter);
 
-        const pricingRouter = require('../Routes/Pricings')(db);
+        const pricingRouter = require('../Routes/pricings/file')(db);
         app.use("/pricings", pricingRouter);
 
-        const counterRouter = require('./Counter')(db);
+        const counterRouter = require('../Routes/counter/file')(db);
         app.use("/counter", counterRouter);
 
-        const searchRouter = require('./Search')(db);
+        const searchRouter = require('../Routes/search/file')(db);
         app.use("/search", searchRouter);
 
         // initialise the portal that listences for requests
         this.global.testApp = app;
     }
 
-    async teardown() { // automatic teardown
+    async teardown() {
         await super.teardown();
     }
 

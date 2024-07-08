@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { validateString, validateTableExistence} = require('./Validator');
+const { validateString, validateTableExistence} = require('../../utils/Validator');
 
 module.exports = (db) => {
     router.route("/:target")

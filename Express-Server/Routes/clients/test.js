@@ -17,7 +17,7 @@ const config = getConfiguration();
 const app = global.testApp;
 
 describe('Clients Router', () => {
-    // setting up the testing app
+    // setting up the testing instances
     let validSession;
     let validCompany;
     //  sett up the testing cases needed
@@ -26,7 +26,7 @@ describe('Clients Router', () => {
     const validNewAddress = testObject.client.validNewAddress;
     let validTestingObject = testObject.client.validTestingObject;
     const updateTestingObject = testObject.client.updateTestingObject;
-    const invalidEmialSuffix = testObject.invalidEmialSuffix;
+    const invalidEmailSuffix = testObject.invalidEmailSuffix;
 
     beforeAll(async () => {
         // setting up valid session
@@ -118,7 +118,7 @@ describe('Clients Router', () => {
                 .query({
                     target: "full_name",
                     keyword: validSearchObject.full_name,
-                    page: invalidEmialSuffix
+                    page: invalidEmailSuffix
                 });
             expect(response.statusCode).toBe(400);
         });
@@ -359,7 +359,7 @@ describe('Clients Router', () => {
                 if (situation === "missing") { // remove the property
                     delete invalidObject.full_name;
                 }
-                it (`it should not create a client if full name is${situation}`, async () => {
+                it (`it should not create a client if full name is ${situation}`, async () => {
                     const response = await request(app)
                         .post('/clients/new')
                         .set("session-token", validSession)
@@ -387,8 +387,8 @@ describe('Clients Router', () => {
         describe ("Client email validation tests", () => {
             const situations = {
                 "invalid format" : invalidSearchObject.email,
-                "too short" : invalidEmialSuffix,
-                "too long" : `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmialSuffix}`,
+                "too short" : invalidEmailSuffix,
+                "too long" : `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmailSuffix}`,
             }
             Object.keys(situations).forEach(situation => {
                 it (`should not create a client if ${situation}`, async () => {
@@ -512,38 +512,7 @@ describe('Clients Router', () => {
             });
 
             // validity of each property
-            const lengthTests = {
-                "street" : {
-                    "empty String" : "",
-                    "too short" : `${"t".repeat(config.limitations.Min_Address_Length - 1)}`,
-                    "too long" : `${"t".repeat(config.limitations.Max_Address_Length + 1)}`,
-                },
-                "city" : {
-                    "empty String" : "",
-                    "too short" : `${"t".repeat(config.limitations.Min_City_Length - 1)}`,
-                    "too long" : `${"t".repeat(config.limitations.Max_City_Length + 1)}`,
-                },
-                "state" : {
-                    "empty String" : "",
-                    "too short" : `${"t".repeat(config.limitations.Min_State_Length - 1)}`,
-                    "too long" : `${"t".repeat(config.limitations.Max_State_Length + 1)}`,
-                },
-                "country" : {
-                    "empty String" : "",
-                    "too short" : `${"t".repeat(config.limitations.Min_Country_Length - 1)}`,
-                    "too long" : `${"t".repeat(config.limitations.Max_Country_Length + 1)}`,
-                },
-                "postal" : {
-                    "empty String" : "",
-                    "too short" : `${"t".repeat(config.limitations.Min_Postal_Length - 1)}`,
-                    "too long" : `${"t".repeat(config.limitations.Max_Postal_Length + 1)}`,
-                },
-                "category" : {
-                    "empty Array" : [],
-                    "invalid type" : ["test", "run"]
-                }
-            };
-
+            const lengthTests = testObject.addresses.lengthTests;
             Object.keys(lengthTests).forEach(property => {
                 Object.keys(lengthTests[property]).forEach(situation => {
                     it (`should not create a client address if its ${property} is ${situation}`, async () => {

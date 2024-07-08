@@ -9,7 +9,7 @@ const {
     validateEmail,
     validateName,
     validatePassword
-} = require('../utils/Validator');
+} = require('../../utils/Validator');
 
 // managing the endpoints on updating the user profile updates
 module.exports = (db) => {

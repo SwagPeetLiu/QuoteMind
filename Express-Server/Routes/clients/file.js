@@ -31,7 +31,7 @@ module.exports = (db) => {
                 const targetValidation = await validateColumnName(target, "clients", keyword, db);
                 if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
                 const type = targetValidation.type;
-                searchQuery = getSearchTerm("clients",target, keyword, type)
+                searchQuery = getSearchTerm("clients",target, keyword, type);
             }
 
             try {
@@ -235,6 +235,7 @@ module.exports = (db) => {
         if (id !== "new"){
             const existenceValidation = await validateInstances([id], owner, "clients", db);
             if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
+            if (req.method === "POST") return res.status(400).json({ message: "Invalid ID" });
         }
 
         // validate for updating the complete information of the client
