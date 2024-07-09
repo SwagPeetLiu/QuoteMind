@@ -365,10 +365,10 @@ module.exports = (db) => {
         // validate the payloads:
         if (req.method === "POST" || req.method === "PUT") {
             if (target === "pricing_conditions") {
-                const {quantity, size, size_unit, colour, threshold, materials, product, client, company} = req.body;
+                const {quantity, quantity_unit, size, size_unit, colour, threshold, materials, product, client, company} = req.body;
                 if (!product) return res.status(400).json({ message: "product is required" });
                 const validations = [
-                    validatePricingThreshold(quantity, size, size_unit, threshold),
+                    validatePricingThreshold(quantity, quantity_unit, size, size_unit, threshold),
                     await validateInstances(materials, owner, "materials", db),
                     await validateInstances([product], owner, "products", db),
                     await validateInstances(client ? [client] : null, owner, "clients", db),
@@ -380,11 +380,13 @@ module.exports = (db) => {
             else if (target === "pricing_rules") {
                 const {price_per_unit, conditions} = req.body;
                 if (!price_per_unit) return res.status(400).json({ message: "price per unit is required" });
+                if (!conditions || conditions.length === 0) return res.status(400).json({ message: "conditions are required" });
                 const validations = [
                     await validateInstances(conditions, owner, "pricing_conditions", db),
                     validateNumeric(price_per_unit, "price_per_unit")
                 ];
                 for (const validation of validations) if (!validation.valid) return res.status(400).json({ message: validation.message });
+                if (price_per_unit <= 0) return res.status(400).json({ message: "price per unit must be positive" });
             }
         }
         next();

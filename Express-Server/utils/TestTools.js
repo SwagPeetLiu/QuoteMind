@@ -19,6 +19,16 @@ const validNewAddress =  {
 
 const testObject = {
     invalidEmailSuffix : "@g.com",
+    invalidSearchTargets: {
+        "invalid target" : "invalid target",
+        "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET,
+        "missing target" : undefined,
+        "empty target" : ""
+    },
+    invalidSearchKeywords : {
+        "missing keyword" : undefined,
+        "empty keyword" : "",
+    },
     register : {
         validTestUsername: "test Express",
         validTestEmail: "testExpress@gmail.com",
@@ -202,6 +212,92 @@ const testObject = {
             ch_name: "Express 材料更新",
             descriptions: "Testing updates with descriptions"
         }
+    },
+    product : {
+        validSearchObject : {
+            id: "d5770",
+            en_name: "seal",
+            ch_name: "公章"
+        },
+        invalidSearchObject : {
+            id : "!@#$%^&*",
+            en_name : "!@#$%^&*",
+            ch_name : "!@#$%^&*"
+        },
+        validTestingObject : { 
+            en_name: "Express Product",
+            ch_name: "Express 产品",
+            descriptions: "Testing tools with descriptions"
+        },
+        updateTestingObject : {
+            en_name: "Express Product Updated",
+            ch_name: "Express 产品更新",
+            descriptions: "Testing updates with descriptions"
+        }
+    },
+    pricing_condition : {
+        validSearchObject : {
+            id: "2ad7",
+            quantity: "250个", // allow searches by numbe & units
+            size: "5", // allow searches by number
+            colour: "blue",
+            product: "宣传",
+            materials: "Acrylic",
+            client: "two",
+            company: "CUNTY"
+        },
+        invalidSearchObject : {
+            id : "!@#$%^&*",
+            quantity : "9999",
+            size : "9999",
+            colour : "!@#$%^&*",
+            product : "!@#$%^&*",
+            materials : "!@#$%^&*",
+            client : "!@#$%^&*",
+            company : "!@#$%^&*"
+        },
+        validTestingObject : {
+            quantity: 500,
+            quantity_unit: "个",
+            size: 5,
+            size_unit: "平米",
+            colour: "red",
+            product: null, // to be attached
+            material: null, // to be attached
+            client: null, // to be attached
+            company: null, // to be attached
+            threshold: "gt"
+        },
+        updateTestingObject : {
+            quantity: 600,
+            quantity_unit: "张",
+            size: 10,
+            size_unit: "平",
+            colour: "blue",
+            product: null, // to be attached
+            material: null, // to be attached
+            client: null, // to be attached
+            company: null, // to be attached
+            threshold: "lt"
+        }
+    },
+    pricing_rule : {
+        validSearchObject : {
+            id: "c7a7c",
+            price_per_unit: "50.1"
+        },
+        invalidSearchObject : {
+            id : "!@#$%^&*",
+            price_per_unit : "999"
+        },
+        validTestingObject : {
+            price_per_unit: 95,
+            conditions: null // to be attached
+        },
+        updateTestingObject : {
+            price_per_unit: 70,
+            conditions: null // to be attached
+        }
     }
 }
 
@@ -328,6 +424,90 @@ function isSpecificMaterialValid(material) {
     }
     return false;
 }
+function isProductValid(product) {
+    if ('id' in product &&
+        'en_name' in product &&
+        'ch_name' in product
+    ){
+        return true;
+    }
+    return false;
+}
+function isSpecificProductValid(product) {
+    if ('id' in product &&
+        'en_name' in product &&
+        'ch_name' in product &&
+        'descriptions' in product
+    ){
+        return true;
+    }
+    return false;
+}
+function isConditionValid(condition) {
+    if ('id' in condition &&
+        'quantity' in condition &&
+        'size' in condition &&
+        'size_unit' in condition &&
+        'quantity_unit' in condition &&
+        'colour' in condition &&
+        'threshold' in condition &&
+        'product' in condition &&
+        'materials' in condition &&
+        'client' in condition && 
+        'company' in condition
+    ){
+        const isProductValid = 
+            'id' in condition.product && 
+            'en_name' in condition.product && 
+            'ch_name' in condition.product;
+
+        function isMaterialValid() {
+            if (condition.materials == null) return true;
+            if ('id' in condition.materials[0] &&
+                'en_name' in condition.materials[0] &&
+                'ch_name' in condition.materials[0]
+            ){
+                return true;
+            }
+            return false;
+        }
+
+        function isClientValid() {
+            if (condition.client == null) return true;
+            if ('id' in condition.client &&
+                'full_name' in condition.client
+            ){
+                return true;
+            }
+            return false;
+        }
+
+        function isCompanyValid() {
+            if (condition.company == null) return true;
+            if ('id' in condition.company &&
+                'full_name' in condition.company
+            ){
+                return true;
+            }
+            return false;
+        }
+
+        if (isProductValid && isMaterialValid() && isClientValid() && isCompanyValid()){
+            return true;
+        }
+    }
+    return false;
+}
+
+function isRuleValid(rule) {
+    if ('id' in rule &&
+        'price_per_unit' in rule){
+        const isValidCondition = isConditionValid(rule.conditions[0]);
+        if (isValidCondition) return true;
+    }
+    return false;
+}
+
 
 /**
  * Section of functions used to manage the valid testing cases 
@@ -381,6 +561,20 @@ async function getTestProduct(app, session){
         .set('page', 1);
     return response.body.products[0];
 }
+async function getTestPricingCondition(app, session){
+    const response = await request(app)
+        .get('/pricings/conditions')
+        .set('session-token', session)
+        .set('page', 1);
+    return response.body.pricing_conditions[0];
+}
+async function getTestPricingRule(app, session){
+    const response = await request(app)
+        .get('/pricings/rules')
+        .set('session-token', session)
+        .set('page', 1);
+    return response.body.pricing_rules[0];
+}
 
 
 module.exports = {
@@ -391,6 +585,8 @@ module.exports = {
     getTestPosition,
     getTestMaterial,
     getTestProduct,
+    getTestPricingCondition,
+    getTestPricingRule,
     testObject,
     isClientValid,
     isSpecificClientValid,
@@ -401,5 +597,9 @@ module.exports = {
     isSpecificEmployeeValid,
     isPositionValid,
     isMaterialValid,
-    isSpecificMaterialValid
+    isSpecificMaterialValid,
+    isProductValid,
+    isSpecificProductValid,
+    isConditionValid,
+    isRuleValid
 }

@@ -65,12 +65,7 @@ describe("Materials Route Testing", () => {
             });
 
             describe("SearchTarget Validation", () => {
-                const invalidTargets = {
-                    "invalid target" : "invalid target",
-                    "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET,
-                    "missing target" : undefined,
-                    "empty target" : ""
-                }
+                const invalidTargets = testObject.invalidSearchTargets;
                 Object.keys(invalidTargets).forEach((target) => {
                     it (`it should not faithfully return if searching target is ${target}`, async () => {
                         const response = await request(app)
@@ -86,10 +81,7 @@ describe("Materials Route Testing", () => {
             });
 
             describe("SearchKeyword Validation", () => {
-                const invalidKeywords = {
-                    "missing keyword" : undefined,
-                    "empty keyword" : "",
-                }
+                const invalidKeywords = testObject.invalidSearchKeywords;
                 Object.keys(invalidKeywords).forEach((keyword) => {
                     it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
                         const response = await request(app)

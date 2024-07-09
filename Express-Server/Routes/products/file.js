@@ -75,7 +75,7 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const product = await db.oneOrNone(`
-                    SELECT id, en_name, ch_name, description 
+                    SELECT id, en_name, ch_name, descriptions 
                     FROM public.products 
                     WHERE id = $1 and created_by = $2`, 
                     [id, owner]);
@@ -91,10 +91,10 @@ module.exports = (db) => {
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
-            const { en_name, ch_name, description } = req.body;
+            const { en_name, ch_name, descriptions } = req.body;
             try {
-                await db.none('UPDATE public.products SET en_name = $1, ch_name = $2, description = $3 WHERE id = $4 and created_by = $5', 
-                    [en_name, ch_name, description, id, owner]);
+                await db.none('UPDATE public.products SET en_name = $1, ch_name = $2, descriptions = $3 WHERE id = $4 and created_by = $5', 
+                    [en_name, ch_name, descriptions, id, owner]);
                 return res.status(200).json({ message: "product updated successfully" });
             }
             catch {
@@ -106,10 +106,10 @@ module.exports = (db) => {
         })
         .post(async (req, res) => {
             const owner = req.sessionEmail;
-            const { en_name, ch_name, description } = req.body;
+            const { en_name, ch_name, descriptions } = req.body;
             try {
-                const newProduct = await db.oneOrNone('INSERT INTO public.products (en_name, ch_name, description, created_by) VALUES ($1, $2, $3, $4) RETURNING id', 
-                    [en_name, ch_name, description, owner]);
+                const newProduct = await db.oneOrNone('INSERT INTO public.products (en_name, ch_name, descriptions, created_by) VALUES ($1, $2, $3, $4) RETURNING id', 
+                    [en_name, ch_name, descriptions, owner]);
                 return res.status(200).json({ id : newProduct.id, message: "product created successfully" });
             }
             catch {
@@ -162,11 +162,11 @@ module.exports = (db) => {
 
         // check if for the payload for the product details:
         if (req.method === "POST" || req.method === "PUT") {
-            const {en_name, ch_name, description} = req.body;
+            const {en_name, ch_name, descriptions} = req.body;
             validations = [
                 validateName(en_name),
                 validateName(ch_name),
-                validateDescriptions(description)
+                validateDescriptions(descriptions)
             ];
             for (const validation of validations) {
                 if (!validation.valid) return res.status(400).json({ message: validation.message });

@@ -30,17 +30,21 @@ function getSearchTerm(table, target, keyword, type){
     }
     // deals with numeric searchings with units
     else if (type.toLowerCase() == "numeric" || type.toLowerCase() == "integer"){
+        const containsUnit = /\D/.test(keyword);
         if (target.toLowerCase() == "quantity"){
-            whereClause = `LOWER(CONCAT(${mapQueryPrefix(table)}.${target},${mapQueryPrefix(table)}.quantity_unit)) LIKE '%${keyword}%'`;
+            whereClause = `LOWER(CONCAT(${mapQueryPrefix(table)}.${target}, ${mapQueryPrefix(table)}.quantity_unit)) = LOWER('${keyword}')
+                           ${!containsUnit ? `OR ${mapQueryPrefix(table)}.${target} = ${parseInt(keyword)}` : ""}`; // account for quantity inputs only
         }
         else if (target.toLowerCase() == "size"){
-            whereClause = `LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.size_unit)) LIKE '%${keyword}%'`;
+            whereClause = `LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.size_unit)) = LOWER('${keyword}')
+                           ${!containsUnit ? `OR ${mapQueryPrefix(table)}.${target} = ${parseInt(keyword)}` : ""}`; // account for quantity inputs only
         }
         else if (target.toLowerCase() == "width" || target.toLowerCase() == "height" || target.toLowerCase() == "length"){
             whereClause = `(
-            LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.en_unit)) LIKE '%${keyword}%'
+            LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.en_unit)) = LOWER('${keyword}')
             OR
-            LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.ch_unit)) LIKE '%${keyword}%'
+            LOWER(CONCAT(TRIM(TRAILING '0' FROM ${mapQueryPrefix(table)}.${target}::text),${mapQueryPrefix(table)}.ch_unit)) = LOWER('%${keyword}')
+            ${!containsUnit ? `OR ${mapQueryPrefix(table)}.${target} = ${parseInt(keyword)}` : ""}
             )`;
         }
         else {whereClause = `${mapQueryPrefix(table)}.${target} = ${keyword}`;}

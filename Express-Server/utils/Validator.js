@@ -113,7 +113,7 @@ function validateString(string) {
             return ({ valid: false, message: 'Invalid string provided' });
         }
         if (!unicodeRegex.test(string) ||
-            !validator.isLength(string, { min: config.limitations.Min_String_Length, max: config.limitations.Max_String_Length })) {
+            !validator.isLength(string, { min: config.limitations.Min_Name_Length, max: config.limitations.Max_Name_Length })) {
             return ({ valid: false, message: 'Invalid string provided' });
         }
     }
@@ -349,23 +349,27 @@ async function validateInstances(instances, owner, target, db) {
             return { valid: false, message: `invalid ${target}` };
         }
     }
+    if (instances && !Array.isArray(instances)) return { valid: false, message: `invalid ${target}` };
     return { valid: true };
 }
 
-function validatePricingThreshold(quantity, size, size_unit, threshold) {
+function validatePricingThreshold(quantity, quantity_unit, size, size_unit, threshold) {
     // if numeric limitations are specified, then threshold operator should be there
     if (quantity || size) {
+
+        // cannot post two numeric conditions at the same time:
+        if (quantity && size) return { valid: false, message: 'Invalid Pricing Threshold' };
 
         // numeric validations on quantity and size
         const numericValidations = [validateInteger(quantity, 'quantity'), validateNumeric(size, 'size')];
         if (numericValidations.some((validation) => !validation.valid)) {
             return { valid: false, message: 'Invalid Pricing Threshold' };
         }
-        if (quantity && quantity <= 0) return { valid: false, message: "Invalid Pricing Threshold" };
-        if (size && size <= 0) return { valid: false, message: "Invalid Pricing Threshold" };
+        if (quantity && quantity <= 0) return { valid: false, message: "Invalid Pricing Quantity" };
+        if (size && size <= 0) return { valid: false, message: "Invalid Pricing Size" };
 
         // validate the threshold operator
-        if (!threshold) return { valid: false, message: 'Invalid Pricing Threshold' };
+        if (!threshold || typeof threshold !== "string") return { valid: false, message: 'Invalid Pricing Threshold' };
         if (!validator.isAlpha(threshold)) return { valid: false, message: 'Invalid Pricing Threshold' };
         if (threshold !== "eq" && threshold !== "gt" && threshold !== "ge" && threshold !== "lt" && threshold !== "le") {
             return { valid: false, message: 'Invalid Pricing Threshold' };
@@ -376,7 +380,14 @@ function validatePricingThreshold(quantity, size, size_unit, threshold) {
             const stringValidation = validateName(size_unit);
             if (!stringValidation.valid) return { valid: false, message: 'Invalid Pricing Threshold' };
         }
+        if (quantity) {
+            const stringValidation = validateName(quantity_unit);
+            if (!stringValidation.valid) return { valid: false, message: 'Invalid Pricing Threshold' };
+        }
     }
+    if (threshold && !quantity && !size) return { valid: false, message: 'Invalid Pricing Threshold for size or quantity' };
+    if (quantity_unit && !quantity) return { valid: false, message: "Invalid Pricing Quantity" };
+    if (size_unit && !size) return { valid: false, message: "Invalid Pricing Size" };
     return { valid: true };
 }
 
