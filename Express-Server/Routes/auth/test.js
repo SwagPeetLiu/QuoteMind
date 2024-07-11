@@ -2,81 +2,48 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration } = require('../../utils/Configurator');
 const { isTokenExpired } = require('../../utils/AuthMiddleware');
 
 // set up the testing target:
-const config = getConfiguration();
 const app = global.testApp;
-const { testObject } = require('../../utils/TestTools');
+const { 
+    invalidTestingRange
+} = require('../../utils/TestTools');
 
 describe('Authentication Router', () => {
     // setting up the testing app
     let validSession;
 
     // setting up invalid testing target:
-    const invalidEmailSuffix = testObject.invalidEmailSuffix;
     const validTestEmail = process.env.TEST_EMAIL;
     const validTestPassword = process.env.TEST_PW;
-    const anotherEmail = process.env.ANOTHER_EMAIL;
 
     // testing the login route
     describe("POST /", () => {
-        it ("it should return status 400 if credentials are missing", async () => {
-            const response = await request(app).post('/auth').send({
-                email: validTestEmail
+        describe("Validation for email input", () => {
+            Object.keys(invalidTestingRange.email).forEach((situation) => {
+                it (`it should not login if email is ${situation}`, async () => {
+                    const response = await request(app).post('/auth').send({
+                        email: invalidTestingRange.email[situation],
+                        password: validTestPassword
+                    });
+                    expect(response.statusCode).toBe(400);
+                });
             });
-            expect(response.statusCode).toBe(400);
         });
-        it ("it should return status 400 if credentials are empty strings", async () => {
-            const response = await request(app).post('/auth').send({
-                email: '',
-                password: ''
+
+        describe("Validation for password input", () => {
+            Object.keys(invalidTestingRange.password).forEach((situation) => {
+                it (`it should not login if password is ${situation}`, async () => {
+                    const response = await request(app).post('/auth').send({
+                        email: validTestEmail,
+                        password: invalidTestingRange.password[situation]
+                    });
+                    expect(response.statusCode).toBe(400);
+                });
             });
-            expect(response.statusCode).toBe(400);
         });
-        it ("it should return status 400 if email has invalid formatted", async () => {
-            const response = await request(app).post('/auth').send({
-                email: 't',
-                password: validTestPassword
-            });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if email length is less than minimum", async () => {
-            const response = await request(app).post('/auth').send({
-                email: `t${invalidEmailSuffix}`,
-                password: validTestPassword
-            });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if email length is exceeds the maximum", async () => {
-            const response = await request(app).post('/auth').send({
-                email: `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmailSuffix}`,
-                password: validTestPassword
-            });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if the password length is less than minimum", async () => {
-            const response = await request(app).post('/auth').send({
-                email: validTestEmail,
-                password: `${"t".repeat(config.limitations.Min_Password_Length - 1)}`
-            });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if the password length is greater than maximum", async () => {
-            const response = await request(app).post('/auth').send({
-                email: validTestEmail,
-                password: `${"t".repeat(config.limitations.Max_Password_Length + 1)}`
-            });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 401 if credentials are invalid", async () => {
-            const response = await request(app).post('/auth').send({
-                email: validTestEmail,
-                password: `${validTestPassword}test`
-            });
-            expect(response.statusCode).toBe(401);
-        });
+
         it ("it should return status 200 if credentials are valid", async () => {
             const response = await request(app).post('/auth').send({
                 email: validTestEmail,
@@ -95,45 +62,28 @@ describe('Authentication Router', () => {
 
     //vlidate the loggout route
     describe("POST /logout", () => {
-        it ("it should return status 401 if email is missing", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                session: validSession
+        describe("Validation for email input", () => {
+            Object.keys(invalidTestingRange.email).forEach((situation) => {
+                it (`it should not logout if email is ${situation}`, async () => {
+                    const response = await request(app).post('/auth/logout').send({
+                        email: invalidTestingRange.email[situation],
+                        token: validSession
+                    });
+                    expect(response.statusCode).toBe(400);
+                });
             });
-            expect(response.statusCode).toBe(401);
         });
-        it ("it should return status 401 if email is an empty string", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                email: '',
-                token: validSession
+
+        describe("Validation for token input", () => {
+            Object.keys(invalidTestingRange.loggOutToken).forEach((situation) => {
+                it (`it should not logout if token is ${situation}`, async () => {
+                    const response = await request(app).post('/auth/logout').send({
+                        email: validTestEmail,
+                        token: invalidTestingRange.loggOutToken[situation]
+                    });
+                    expect(response.statusCode).toBe(400);
+                });
             });
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 401 if email is not matching the token", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                email: anotherEmail,
-                token: validSession
-            });
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 401 if token is missing", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                email: validTestEmail
-            });
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 401 if token is an empty string", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                email: validTestEmail,
-                token: ''
-            });
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 401 if token is not the current type", async () => {
-            const response = await request(app).post('/auth/logout').send({
-                email: validTestEmail,
-                token: 999
-            });
-            expect(response.statusCode).toBe(401);
         });
         it ("it should return status 200 if credentials are valid", async () => {
             const response = await request(app).post('/auth/logout').send({

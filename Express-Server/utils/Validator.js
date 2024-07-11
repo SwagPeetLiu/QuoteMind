@@ -219,7 +219,11 @@ function validateSocialContacts(contacts, target) {
         if (target == "qq") {
             // must be numbers with an email suffice
             const qqRegex = /^[1-9][0-9]*$/;
-            if (!qqRegex.test(contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, ''))) {
+            const accountid = contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, '');
+            if (!qqRegex.test(accountid)) {
+                return { valid: false, message: `invalid ${target} contact` };
+            }
+            if (accountid.length < config.limitations.Min_Social_Contact_Length){
                 return { valid: false, message: `invalid ${target} contact` };
             }
         }
@@ -282,7 +286,7 @@ function validateDescriptions(descriptions) {
 
 //validate integer values
 function validateInteger(value, target) {
-    if (value) {
+    if (value || value == 0) {
         // Check if the value is of type 'number'
         if (typeof value !== "number" || !Number.isInteger(value)) {
             return { valid: false, message: `invalid ${target}` };
@@ -291,8 +295,8 @@ function validateInteger(value, target) {
         // assuming positive inputs
         if (value <= 0) return { valid: false, message: `invalid ${target}` };
 
-        // Check if the integer is within the range of 1 to 5 digits
-        const regex = /^\d{1,5}$/;
+        // Check if the integer is within the range of 1 to 10 digits
+        const regex = /^\d{1,10}$/;
         if (!regex.test(value.toString())) {
             return { valid: false, message: `invalid ${target}` };
         }
@@ -302,12 +306,13 @@ function validateInteger(value, target) {
 
 // function used to validate numeric float values (10 digits with 2 digits behind decimals)
 function validateNumeric(value, target) {
-    if (value) {
+    if (value || value == 0) {
         // validate whether the value is a number
         if (typeof value !== "number") {
             return { valid: false, message: `invalid ${target}` };
         }
-        const regex = /^\d{1,10}(\.\d+)?$/;
+        if (value <= 0) return { valid: false, message: `invalid ${target}` }; 
+        const regex = /^\d{1,10}(\.\d{1,2})?$/;
         if (!regex.test(value.toString())) {
             return { valid: false, message: `invalid ${target}` };
         }
@@ -324,6 +329,33 @@ function validateTransactionStatus(status) {
     }
     if (status !== "created" && status !== "quoted" && status !== "invoiced" && status !== "paid") {
         return { valid: false, message: 'Invalid Transaction Status' };
+    }
+    return { valid: true };
+}
+
+function validateTransactionDate(date){
+    if (date) {
+        if (typeof date !== "string") {
+            return { valid: false, message: 'Invalid Transaction Date' };
+        }
+        if (!validator.isISO8601(date)) {
+            return { valid: false, message: 'Invalid Transaction Date' };
+        }
+        // Check if the date includes timezone information
+        if (!date.endsWith('Z') && !date.match(/[+-]\d{2}:\d{2}$/)) {
+            return { valid: false, message: 'Transaction Date must include timezone information' };
+        }
+        try {
+            const transactionDate = new Date(date);
+            const currentUTCDate = new Date().toISOString();
+            if (transactionDate > new Date(currentUTCDate)) {
+                return { valid: false, message: 'Transaction Date must be in the past' };
+            }
+        }
+        catch (error) {
+            console.error(error);
+            return { valid: false, message: 'Invalid Transaction Date' };
+        }
     }
     return { valid: true };
 }
@@ -453,7 +485,10 @@ function validateSearchKey(key, type) {
     // allowing inputs of both quantiy & quantity units
     if (type == "numeric" || type == "integer") {
         if (!unicodeRegex.test(key.toString().replace(".", ""))) {
-            return { valid: false, message: "invalid target" };
+            return { valid: false, message: "invalid search" };
+        }
+        if (!(/^[1-9]/.test(key))) { // if the numerical search does not begin with a valid positive number, it is invalid
+            return { valid: false, message: "invalid search" };
         }
     }
     return { valid: true };
@@ -481,6 +516,7 @@ module.exports = {
     validateNumeric,
     validateInteger,
     validateTransactionStatus,
+    validateTransactionDate,
     validateInstances,
     validateString,
     validatePricingThreshold,

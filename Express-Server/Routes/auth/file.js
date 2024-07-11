@@ -33,12 +33,12 @@ module.exports = (db) => {
             try {
                 const user = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [email]);
                 if (!user) {
-                    return res.status(401).json({ message: 'Invalid credentials: email or password' });
+                    return res.status(400).json({ message: 'Invalid credentials: email or password' });
                 }
 
                 const match = await bcrypt.compare(password, user.password);
                 if (!match) {
-                    return res.status(401).json({ message: 'Invalid credentials: email or password' });
+                    return res.status(400).json({ message: 'Invalid credentials: email or password' });
                 }
                 
                 const token = jwt.sign({ email }, process.env.JWT_token, { expiresIn: '1h' });
@@ -61,19 +61,19 @@ module.exports = (db) => {
         .post( async (req, res) => {
             const { email, token } = req.body;
             if (!email || !token || typeof token !== 'string' || typeof email !== 'string') {
-                return res.status(401).json({ message: 'Unauthorized access' });
+                return res.status(400).json({ message: 'Unauthorized access' });
             }
             try{
                 const emailValidation = validateEmail(email);
-                if (!emailValidation.valid) return res.status(401).json({ message: 'Unauthorized access' });
+                if (!emailValidation.valid) return res.status(400).json({ message: 'Unauthorized access' });
                 
                 // validate the existence of an user:
                 const user = await db.oneOrNone('SELECT * FROM public.user WHERE email = $1', [email]);
                 if (!user) {
-                    return res.status(401).json({ message: 'Unauthorized access' });
+                    return res.status(400).json({ message: 'Unauthorized access' });
                 }
                 if (token !== user.last_session) {
-                    return res.status(401).json({ message: 'Unauthorized access' });
+                    return res.status(400).json({ message: 'Unauthorized access' });
                 }
 
                 // only proceed to actual token deletion if logging out in a realistic environment 

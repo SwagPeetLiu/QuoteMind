@@ -2,13 +2,12 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration} = require('../../utils/Configurator');
-const config = getConfiguration();
 const app = global.testApp;
 
 // importing the testing tools:
 const {
     testObject,
+    invalidTestingRange,
     getTestSession,
     getTestEmployee,
     getTestPosition,
@@ -64,62 +63,44 @@ describe('Employees Router', () => {
         });
 
         describe("Testing Search Target Validations", () => {
-            const invalidTargets = {
-                "invalid target" : "invalid target",
-                "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET
-            };
-            Object.keys(invalidTargets).forEach((target) => {
+            Object.keys(invalidTestingRange.invalidSearchTargets).forEach((target) => {
                 it ("it should not faithfully return if searching target is " + target, async () => {
                     const response = await request(app)
                         .get('/employees')
                         .set('session-token', validSession)
                         .query({ 
-                            target: invalidTargets[target],
-                            keyword: validSearchObject.name
+                            target: invalidTestingRange.invalidSearchTargets[target],
+                            keyword: validSearchObject[Object.keys(validSearchObject)[0]],
                         });
                     expect(response.statusCode).toBe(400);
                 });
             });
         });
         describe("Testing for search information validations, on required params", () => {
-            it ("it should not faithfully return if searching keyword is missing", async () => {
-                const response = await request(app)
-                    .get('/employees')
-                    .set('session-token', validSession)
-                    .query({ 
-                        target: Object.keys(validSearchObject)[0],
-                    });
-                expect(response.statusCode).toBe(400);
+            Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((target) => {
+                it ("it should not faithfully return if searching keyword is " + target, async () => {
+                    const response = await request(app)
+                        .get('/employees')
+                        .set('session-token', validSession)
+                        .query({ 
+                            target: Object.keys(validSearchObject)[0],
+                            keyword: invalidTestingRange.invalidSearchKeywords[target],
+                        });
+                    expect(response.statusCode).toBe(400);
+                });
             });
-            it ("it should not faithfully return if the searching target is missing", async () => {
-                const response = await request(app)
-                    .get('/employees')
-                    .set('session-token', validSession)
-                    .query({ 
-                        keyword: validSearchObject.name
-                    });
-                expect(response.statusCode).toBe(400);
-            });
-            it ("it should not faithfully return if the searching keyword is an empty string", async () => {
-                const response = await request(app)
-                    .get('/employees')
-                    .set('session-token', validSession)
-                    .query({ 
-                        target: Object.keys(validSearchObject)[0],
-                        keyword: ""
-                    });
-                expect(response.statusCode).toBe(400);
-            });
-            it ("it should not faithfully return if the searching page is an empty string", async () => {
-                const response = await request(app)
-                    .get('/employees')
-                    .set('session-token', validSession)
-                    .query({ 
-                        target: "name",
-                        keyword: validSearchObject.name,
-                        page: invalidEmailSuffix
-                    });
-                expect(response.statusCode).toBe(400);
+        });
+        describe("testing for page validation", () => {
+            Object.keys(invalidTestingRange.page).forEach((situation) => {
+                it (`it should not faithfully if page is ${situation}`, async () => {
+                    const response = await request(app)
+                        .get('/employees')
+                        .set('session-token', validSession)
+                        .query({ 
+                            page: invalidTestingRange.page[situation],
+                        });
+                    expect(response.statusCode).toBe(400);
+                });
             });
         });
 
@@ -159,7 +140,7 @@ describe('Employees Router', () => {
                     expect(isEmployeeValid(response.body.employees[0])).toBe(true);
                 });
             });
-            it ("it should test with the behaviour of the returning of the count value", async () => {
+            it ("it shoud not returning of the count value with page indication", async () => {
                 const response = await request(app)
                     .get('/employees')
                     .set('session-token', validSession)
@@ -193,53 +174,21 @@ describe('Employees Router', () => {
                 expect(response.statusCode).toBe(400);
             });
             describe("Employee creation validation tests", () => {
-                Object.keys(validTestingObject).forEach((property) => {
-                    it (`it should not post an employee if ${property} has an invalid value`, async () => {
-                        const invalidObject = { ...validTestingObject, [property]: invalidSearchObject[property] };
-                        const response = await request(app)
-                            .post('/employees/new')
-                            .set('session-token', validSession)
-                            .send(invalidObject);
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-
-                const invalidTestingRange = {
-                    name:{
-                        "empty" : "",
-                        "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                        "missing": undefined,
-                        "invalid type": 1
-                    },
-                    email:{
-                        "too short": invalidEmailSuffix,
-                        "too long": `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmailSuffix}`,
-                        "invalid type": 1
-                    },
-                    phone:{
-                        "too short": `${"1".repeat(config.limitations.Min_Phone_Length - 1)}`,
-                        "too long": `${"1".repeat(config.limitations.Max_Phone_Length + 1)}`,
-                        "invalid type": 1
-                    },
-                    wechat_contact : {
-                        "too short": `${"t".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
-                        "too long": `${"t".repeat(config.limitations.Max_Social_Contact_Length + 1)}`,
-                        "invalid type": 1
-                    },
-                    qq_contact : {
-                        "too short": `${"1".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
-                        "too long": `${"1".repeat(config.limitations.Max_Social_Contact_Length)}@qq.com`,
-                        "invalid type": 1
-                    },
-                    position : { // allow nullable
-                        "invalid type": 1
-                    }
+                const testRange = {
+                    name: invalidTestingRange.full_name,
+                    email: Object.fromEntries(
+                        Object.entries(invalidTestingRange.email).slice(0,-1)
+                    ),
+                    phone: invalidTestingRange.phone,
+                    wechat_contact : invalidTestingRange.wechat_contact,
+                    qq_contact : invalidTestingRange.qq_contact,
+                    position : invalidTestingRange.position
                 }
 
-                Object.keys(invalidTestingRange).forEach((property) => {
-                    Object.keys(invalidTestingRange[property]).forEach((situation) => {
+                Object.keys(testRange).forEach((property) => {
+                    Object.keys(testRange[property]).forEach((situation) => {
                         it (`it should not post an employee if ${property} is ${situation}`, async () => {
-                            const invalidObject = { ...validTestingObject, [property] : invalidTestingRange[property][situation] };
+                            const invalidObject = { ...validTestingObject, [property] : testRange[property][situation] };
                             const response = await request(app)
                                 .post('/employees/new')
                                 .set('session-token', validSession)

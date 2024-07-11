@@ -13,6 +13,7 @@ const {
     getTestMaterial,
     getTestClient,
     testObject,
+    invalidTestingRange,
     isProductValid,
     isSpecificProductValid
 } = require('../../utils/TestTools');
@@ -67,7 +68,7 @@ describe("Product Router", () => {
             });
 
             describe ("Search target validation", () => {
-                const invalidTargets = testObject.invalidSearchTargets;
+                const invalidTargets = invalidTestingRange.invalidSearchTargets;
                 Object.keys(invalidTargets).forEach((target) => {
                     it (`it should not faithfully return if searching target is ${target}`, async () => {
                         const response = await request(app)
@@ -83,7 +84,7 @@ describe("Product Router", () => {
             });
 
             describe("Search keyword validation", () => {
-                const invalidKeywords = testObject.invalidSearchKeywords;
+                const invalidKeywords = invalidTestingRange.invalidSearchKeywords;
                 Object.keys(invalidKeywords).forEach((keyword) => {
                     it (`it should not faithfully return if search keyword is ${keyword}`, async () => {
                         const response = await request(app)
@@ -92,6 +93,21 @@ describe("Product Router", () => {
                             .query({ 
                                 target: Object.keys(validSearchObject)[0],
                                 keyword: invalidKeywords[keyword]
+                            });
+                        expect(response.statusCode).toBe(400);
+                    });
+                });
+            });
+
+            describe("Page validation", () => {
+                const invalidPages = invalidTestingRange.page;
+                Object.keys(invalidPages).forEach((page) => {
+                    it (`it should not faithfully return if page is ${page}`, async () => {
+                        const response = await request(app)
+                            .get('/products')
+                            .set('session-token', validSession)
+                            .query({ 
+                                page: invalidPages[page]
                             });
                         expect(response.statusCode).toBe(400);
                     });
@@ -169,28 +185,15 @@ describe("Product Router", () => {
         });
 
         describe("Product creation input validation", () => {
-            const invalidTestingRange = {
-                en_name : {
-                    "missing" : undefined,
-                    "empty" : "",
-                    "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    "invalid type" : 1
-                },
-                ch_name : {
-                    "missing" : undefined,
-                    "empty" : "",
-                    "too long" : `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    "invalid type" : 1
-                },
-                descriptions : {
-                    "too long": `${"测".repeat(config.limitations.Max_Descriptions_Length + 1)}`,
-                    "invalid type": 1
-                }
+            const testRange = {
+                en_name : invalidTestingRange.en_name,
+                ch_name : invalidTestingRange.ch_name,
+                descriptions : invalidTestingRange.descriptions
             };
-            Object.keys(invalidTestingRange).forEach((property) => {
-                Object.keys(invalidTestingRange[property]).forEach((situation) => {
+            Object.keys(testRange).forEach((property) => {
+                Object.keys(testRange[property]).forEach((situation) => {
                     it (`it should not create a product if ${property} is ${situation}`, async () => {
-                        const invalidObject = { ...validTestingObject, [property] : invalidTestingRange[property][situation] };
+                        const invalidObject = { ...validTestingObject, [property] : testRange[property][situation] };
                         const response = await request(app)
                             .post('/products/new')
                             .set('session-token', validSession)
@@ -270,6 +273,7 @@ describe("Product Router", () => {
                         client: existingClient.id,
                         product: testProductID,
                         quantity: 1,
+                        quantity_unit: "pcs",
                         materials: [exsitingMaterial.id]
                     });
                 expect(response.statusCode).toBe(200);
@@ -359,7 +363,6 @@ describe("Product Router", () => {
                         target: 'id',
                         keyword: testTransactionID
                     });
-                console.log(transactionResponse.body);
                 expect(transactionResponse.statusCode).toBe(200);
                 expect(transactionResponse.body.transactions.length).toBe(0);
 

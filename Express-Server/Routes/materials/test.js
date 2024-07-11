@@ -2,8 +2,6 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration} = require('../../utils/Configurator');
-const config = getConfiguration();
 const app = global.testApp;
 
 // importing the testing tools:
@@ -13,6 +11,7 @@ const {
     getTestProduct,
     getTestClient,
     testObject,
+    invalidTestingRange,
     isMaterialValid,
     isSpecificMaterialValid
 } = require('../../utils/TestTools');
@@ -65,7 +64,7 @@ describe("Materials Route Testing", () => {
             });
 
             describe("SearchTarget Validation", () => {
-                const invalidTargets = testObject.invalidSearchTargets;
+                const invalidTargets = invalidTestingRange.invalidSearchTargets;
                 Object.keys(invalidTargets).forEach((target) => {
                     it (`it should not faithfully return if searching target is ${target}`, async () => {
                         const response = await request(app)
@@ -81,7 +80,7 @@ describe("Materials Route Testing", () => {
             });
 
             describe("SearchKeyword Validation", () => {
-                const invalidKeywords = testObject.invalidSearchKeywords;
+                const invalidKeywords = invalidTestingRange.invalidSearchKeywords;
                 Object.keys(invalidKeywords).forEach((keyword) => {
                     it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
                         const response = await request(app)
@@ -90,6 +89,20 @@ describe("Materials Route Testing", () => {
                             .query({ 
                                 target: Object.keys(validSearchObject)[0],
                                 keyword: invalidKeywords[keyword]
+                            });
+                        expect(response.statusCode).toBe(400);
+                    });
+                });
+            });
+            describe("Page Validation", () => {
+                const invalidPages = invalidTestingRange.page;
+                Object.keys(invalidPages).forEach((page) => {
+                    it (`it should not faithfully return if page is ${page}`, async () => {
+                        const response = await request(app)
+                            .get('/materials')
+                            .set('session-token', validSession)
+                            .query({ 
+                                page: invalidPages[page]
                             });
                         expect(response.statusCode).toBe(400);
                     });
@@ -167,28 +180,15 @@ describe("Materials Route Testing", () => {
             expect(response.statusCode).toBe(400);
         });
         describe ("Material creation input Validation", () => {
-            const invalidTestingRange = {
-                en_name : {
-                    "missing" : undefined,
-                    "empty" : "",
-                    "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    "invalid type" : 1
-                },
-                ch_name : {
-                    "missing" : undefined,
-                    "empty" : "",
-                    "too long" : `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    "invalid type" : 1
-                },
-                descriptions : {
-                    "too long": `${"测".repeat(config.limitations.Max_Descriptions_Length + 1)}`,
-                    "invalid type": 1
-                }
+            const testRange = {
+                en_name : invalidTestingRange.en_name,
+                ch_name : invalidTestingRange.ch_name,
+                descriptions : invalidTestingRange.descriptions
             };
-            Object.keys(invalidTestingRange).forEach((property) => {
-                Object.keys(invalidTestingRange[property]).forEach((situation) => {
+            Object.keys(testRange).forEach((property) => {
+                Object.keys(testRange[property]).forEach((situation) => {
                     it (`it should not create a material if ${property} is ${situation}`, async () => {
-                        const invalidObject = { ...validTestingObject, [property] : invalidTestingRange[property][situation] };
+                        const invalidObject = { ...validTestingObject, [property] : testRange[property][situation] };
                         const response = await request(app)
                             .post('/materials/new')
                             .set('session-token', validSession)

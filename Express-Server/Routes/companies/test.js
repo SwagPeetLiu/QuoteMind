@@ -9,6 +9,7 @@ const {
     getTestSession,
     getTestClient,
     testObject,
+    invalidTestingRange,
     isCompanyValid,
     isSpecificCompanyValid,
     isSpecificAddressValid
@@ -20,6 +21,7 @@ describe ("Companies Router", () => {
     // setting up the testing instances:
     let validSession;
     let validClient;
+    let testingCompanyID;
     const validSearchObject = testObject.company.validSearchObject;
     const invalidSearchObject = testObject.company.invalidSearchObject;
     const validNewAddress = testObject.company.validNewAddress;
@@ -70,62 +72,44 @@ describe ("Companies Router", () => {
                 expect(isCompanyValid(response.body.companies[0])).toBe(true);
             });
             describe("Search Target Validation Testings", () => {
-                const invalidTargets = {
-                    "invalid target" : "invalid target",
-                    "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET
-                };
-                Object.keys(invalidTargets).forEach((target) => {
+                Object.keys(invalidTestingRange.invalidSearchTargets).forEach((target) => {
                     it (`it should not faithfully if searching target is ${target}`, async () => {
                         const response = await request(app)
                             .get('/companies')
                             .set('session-token', validSession)
                             .query({ 
-                                target: invalidTargets[target],
-                                keyword: validSearchObject.full_name,
+                                target: invalidTestingRange.invalidSearchTargets[target],
+                                keyword: validSearchObject[Object.keys(validSearchObject)[0]],
                              });
                         expect(response.statusCode).toBe(400);
                     });
                 });
             });
-            describe("Testing for missing searching information", () => {
-                it (`it should not faithfully if searching target is missing`, async () => {
-                    const response = await request(app)
-                        .get('/companies')
-                        .set('session-token', validSession)
-                        .query({ 
-                            keyword: validSearchObject.full_name
-                        });
-                    expect(response.statusCode).toBe(400);
+            describe("Search Keyword Validation Testings", () => {
+                Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((keyword) => {
+                    it (`it should not faithfully if searching keyword is ${keyword}`, async () => {
+                        const response = await request(app)
+                            .get('/companies')
+                            .set('session-token', validSession)
+                            .query({ 
+                                target: Object.keys(validSearchObject)[0],
+                                keyword: invalidTestingRange.invalidSearchKeywords[keyword],
+                             });
+                        expect(response.statusCode).toBe(400);
+                    });
                 });
-                it (`it should not faithfully if searching keyword is missing`, async () => {
-                    const response = await request(app)
-                        .get('/companies')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-                it (`it should not faithfully if searching keyword is an empty string`, async () => {
-                    const response = await request(app)
-                        .get('/companies')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                            keyword: ""
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-                it ("it should not faithfully if page number is wrongly formatted", async () => {
-                    const response = await request(app)
-                        .get('/companies')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: "full_name",
-                            keyword: validSearchObject.full_name,
-                            page: invalidEmailSuffix
-                        });
-                    expect(response.statusCode).toBe(400);
+            });
+            describe("testing for page validation", () => {
+                Object.keys(invalidTestingRange.page).forEach((situation) => {
+                    it (`it should not faithfully if page is ${situation}`, async () => {
+                        const response = await request(app)
+                            .get('/companies')
+                            .set('session-token', validSession)
+                            .query({ 
+                                page: invalidTestingRange.page[situation],
+                             });
+                        expect(response.statusCode).toBe(400);
+                    });
                 });
             });
             describe("Testing for searches for non-existence records", () => {
@@ -169,35 +153,14 @@ describe ("Companies Router", () => {
     });
 
     describe("Testing specific company /:id", () => {
-        let testingCompanyID;
-        const invalidTestingRange = {
-            full_name : {
-                "empty" : "",
-                "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                "missing": undefined,
-                "invalid type": 1,
-                "invlaid input": invalidSearchObject.full_name
-            },
-            email : {
-                "too short": invalidEmailSuffix,
-                "too long": `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmailSuffix}`,
-                "invalid type": 1
-            },
-            phone : {
-                "invalid format": invalidSearchObject.phone,
-                "too short": `${"1".repeat(config.limitations.Min_Phone_Length - 1)}`,
-                "too long": `${"1".repeat(config.limitations.Max_Phone_Length + 1)}`,
-                "invalid type": 1
-            },
-            tax_number : {
-                "invalid format": invalidEmailSuffix,
-                "too short": `${"1".repeat(config.limitations.Min_Tax_Length - 1)}`,
-                "too long": `${"1".repeat(config.limitations.Max_Tax_Length + 1)}`,
-                "invalid type": 1
-            },
-            addresses : {
-                "invalid type": 1
-            }
+        const testingRange = {
+            full_name : invalidTestingRange.full_name,
+            email: Object.fromEntries(
+                Object.entries(invalidTestingRange.email).slice(0,-1)
+            ),
+            phone : invalidTestingRange.phone,
+            tax_number : invalidTestingRange.tax_number,
+            addresses : invalidTestingRange.addresses
         };
         describe("POST: Testing on creating a new instance", () => {
             it ("it should not post an company if the id indicated is not new", async () => {
@@ -209,58 +172,10 @@ describe ("Companies Router", () => {
             });
 
             describe("Testing for validation situations", () => {
-                Object.keys(invalidTestingRange).forEach((property) => {
-                    Object.keys(invalidTestingRange[property]).forEach((situation) => {
+                Object.keys(testingRange).forEach((property) => {
+                    Object.keys(testingRange[property]).forEach((situation) => {
                         it (`it should not create a company if ${property} is ${situation}`, async () => {
-                            const invalidObject = { ...validTestingObject, [property] : invalidTestingRange[property][situation] };
-                            const response = await request(app)
-                                .post('/companies/new')
-                                .set("session-token", validSession)
-                                .send(invalidObject);
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-            });
-
-            describe("Testing for validation of addresses", () => {
-                const nonNullproperties = Object.keys(validNewAddress);
-                nonNullproperties.forEach(property => {
-                    it (`should not create a company if its address ${property} is null`, async () => {
-                        const invalidObject = { ...validTestingObject, addresses : [{
-                            ...validNewAddress,
-                            [property] : null
-                        }] };
-                        const response = await request(app)
-                            .post('/companies/new')
-                            .set("session-token", validSession)
-                            .send(invalidObject);
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-                nonNullproperties.forEach(property => {
-                    it (`should not create a company if its address ${property} is not in the correct format`, async () => {
-                        const invalidObject = { ...validTestingObject, addresses : [{
-                            ...validNewAddress,
-                            [property] : 1
-                        }] };
-                        const response = await request(app)
-                            .post('/companies/new')
-                            .set("session-token", validSession)
-                            .send(invalidObject);
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-
-                // validate for each property of the address:
-                const lengthTests = testObject.addresses.lengthTests;
-                Object.keys(lengthTests).forEach(property => {
-                    Object.keys(lengthTests[property]).forEach(situation => {
-                        it (`should not create a company if its address ${property} is ${situation}`, async () => {
-                            const invalidObject = { ...validTestingObject, addresses : [{
-                                ...validNewAddress,
-                                [property] : lengthTests[property][situation]
-                            }] };
+                            const invalidObject = { ...validTestingObject, [property] : testingRange[property][situation] };
                             const response = await request(app)
                                 .post('/companies/new')
                                 .set("session-token", validSession)
@@ -351,17 +266,12 @@ describe ("Companies Router", () => {
 
         // testing the ability to update the company
         describe("Testing for updating newly created company", () => {
-            const invalidMessages = {
-                "invalid type": 1,
-                "invalid input": "invalid",
-                "forbidden type": "update"
-            };
-            Object.keys(invalidMessages).forEach((situation) => {
+            Object.keys(invalidTestingRange.clientOpMessage).forEach((situation) => {
                 it (`it should not update that newly created company if ${situation}`, async () => {
                     const response = await request(app)
                         .put(`/companies/${testingCompanyId}`)
                         .set("session-token", validSession)
-                        .send({ ...validTestingObject, clients: [{ ...validClient, message: invalidMessages[situation] }] });
+                        .send({ ...validTestingObject, clients: [{ ...validClient, message: invalidTestingRange.clientOpMessage[situation] }] });
                     expect(response.statusCode).toBe(400);
                 });
             });

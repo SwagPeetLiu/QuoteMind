@@ -67,7 +67,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ ...response, message: error });
+                    return res.status(500).json({ ...response, message: "failed to fetch" });
                 }
             }
         });
@@ -88,7 +88,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, material: null });
+                    return res.status(500).json({ message: "failed to count", material: null });
                 }
             }
         })

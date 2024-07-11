@@ -2,8 +2,6 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration} = require('../../utils/Configurator');
-const config = getConfiguration();
 const app = global.testApp;
 
 // importing the testing tools:
@@ -11,6 +9,7 @@ const {
     getTestSession,
     getTestPosition,
     testObject,
+    invalidTestingRange,
     isPositionValid
 } = require('../../utils/TestTools');
 
@@ -57,63 +56,46 @@ describe("Positions Router", () => {
             });
 
             describe("testing search Target", () => {
-                const invalidTargets = {
-                    "invalid target" : "invalid target",
-                    "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET
-                };
-                Object.keys(invalidTargets).forEach((target) => {
+                Object.keys(invalidTestingRange.invalidSearchTargets).forEach((target) => {
                     it (`it should not faithfully return if searching target is ${target}`, async () => {
                         const response = await request(app)
                             .get('/positions')
                             .set('session-token', validSession)
                             .query({ 
-                                target: invalidTargets[target],
-                                keyword: validSearchObject.name
+                                target: invalidTestingRange.invalidSearchTargets[target],
+                                keyword: validSearchObject[Object.keys(validSearchObject)[0]]
                             });
                         expect(response.statusCode).toBe(400);
                     });
                 });
             });
 
-            describe("testing search info missing", () => {
-                it ("it should not return if searching keyword is empty", async () => {
-                    const response = await request(app)
-                        .get('/positions')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                        });
-                    expect(response.statusCode).toBe(400);
+            describe("testing search keyword", () => {
+                Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((keyword) => {
+                    it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
+                        const response = await request(app)
+                            .get('/positions')
+                            .set('session-token', validSession)
+                            .query({ 
+                                target: Object.keys(validSearchObject)[0],
+                                keyword: invalidTestingRange.invalidSearchKeywords[keyword],
+                            });
+                        expect(response.statusCode).toBe(400);
+                    });
                 });
-                it ("it should not return if searching target is null", async () => {
-                    const response = await request(app)
-                        .get('/positions')
-                        .set('session-token', validSession)
-                        .query({ 
-                            keyword: validSearchObject.name
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-                it ("it should not return if searching target is empty", async () => {
-                    const response = await request(app)
-                        .get('/positions')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                            keyword: ""
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-                it ("it should not return if searching page is not valid", async () => {
-                    const response = await request(app)
-                        .get('/positions')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                            keyword: validSearchObject.name,
-                            page: "test"
-                        });
-                    expect(response.statusCode).toBe(400);
+            });
+
+            describe("testing page number", () => {
+                Object.keys(invalidTestingRange.page).forEach((page) => {
+                    it (`it should not faithfully return if page is ${page}`, async () => {
+                        const response = await request(app)
+                            .get('/positions')
+                            .set('session-token', validSession)
+                            .query({ 
+                                page: invalidTestingRange.page[page],
+                            });
+                        expect(response.statusCode).toBe(400);
+                    });
                 });
             });
 
@@ -189,22 +171,14 @@ describe("Positions Router", () => {
         });
 
         describe("input validation Testings", () => {
-            const invalidTestingRange = {
-                name : {
-                    "empty" : "",
-                    "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    "missing": undefined,
-                    "invalid type": 1
-                },
-                descriptions : {
-                    "too long": `${"t".repeat(config.limitations.Max_Descriptions_Length + 1)}`,
-                    "invalid type": 1
-                }
+            const testRange = {
+                name : invalidTestingRange.full_name,
+                descriptions : invalidTestingRange.descriptions
             }
-            Object.keys(invalidTestingRange).forEach((property) => {
-                Object.keys(invalidTestingRange[property]).forEach((situation) => {
+            Object.keys(testRange).forEach((property) => {
+                Object.keys(testRange[property]).forEach((situation) => {
                     it (`it should not post an position if ${property} is ${situation}`, async () => {
-                        const invalidObject = { ...validTestingObject, [property] : invalidTestingRange[property][situation] };
+                        const invalidObject = { ...validTestingObject, [property] : testRange[property][situation] };
                         const response = await request(app)
                             .post('/positions/new')
                             .set('session-token', validSession)

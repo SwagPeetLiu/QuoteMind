@@ -2,31 +2,31 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { 
-    getConfiguration, 
-} = require('../../utils/Configurator');
 const {
     getTestSession,
     getTestCompany,
+    getTestClient,
     testObject,
+    invalidTestingRange,
     isClientValid,
     isSpecificClientValid,
     isSpecificAddressValid
 } = require('../../utils/TestTools');
-const config = getConfiguration();
 const app = global.testApp;
 
 describe('Clients Router', () => {
     // setting up the testing instances
     let validSession;
     let validCompany;
+    let testingClientId;
+    let existingClient;
+
     //  sett up the testing cases needed
     const validSearchObject = testObject.client.validSearchObject;
     const invalidSearchObject = testObject.client.invalidSearchObject;
     const validNewAddress = testObject.client.validNewAddress;
     let validTestingObject = testObject.client.validTestingObject;
     const updateTestingObject = testObject.client.updateTestingObject;
-    const invalidEmailSuffix = testObject.invalidEmailSuffix;
 
     beforeAll(async () => {
         // setting up valid session
@@ -35,24 +35,27 @@ describe('Clients Router', () => {
         //creating a testing reference to an associated company
         validCompany = await getTestCompany(app, validSession);
         validTestingObject = {...testObject.client.validTestingObject, company : validCompany.id};
+
+        // get an existing client for testing on references:
+        existingClient = await getTestClient(app, validSession);
     });
     
     // Test cases for manipulating all client instances:
     describe('GET /', () => {
         it ("it should return status 401 if no session-token is provided", async () => {
             const response = await request(app)
-                .get('/clients/');
+                .get('/clients');
             expect(response.statusCode).toBe(401);
         });
         it ("it should return status 401 if invalid is provided", async () => {
             const response = await request(app)
-                .get('/clients/')
+                .get('/clients')
                 .set("session-token", "invalid-test-token");
             expect(response.statusCode).toBe(401);
         });
         it ("it should return status 200 for get all if session-token is valid and no query parameters are specified", async () => {
             const response = await request(app)
-                .get('/clients/')
+                .get('/clients')
                 .set("session-token", validSession);
             expect(response.statusCode).toBe(200);
             expect(response.body).toHaveProperty('count');
@@ -62,7 +65,7 @@ describe('Clients Router', () => {
         });
         it ("it should return status 200 for get all if session-token is valid and page parameter is provided", async () => {
             const response = await request(app)
-                .get('/clients/')
+                .get('/clients')
                 .set("session-token", validSession)
                 .query({
                     page: 1
@@ -73,268 +76,89 @@ describe('Clients Router', () => {
             expect(response.body.clients.length).toBeGreaterThan(0);
             expect(isClientValid(response.body.clients[0])).toBe(true);
         });
-        it ("it should return status 400 if serached target is not valid", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "testTarget", // invlaid column
-                    keyword: validSearchObject.full_name
+        describe("search target validation", () => {
+            Object.keys(invalidTestingRange.invalidSearchTargets).forEach((situation) => {
+                it (`it should return status 400 if search target is ${situation}`, async () => {
+                    const response = await request(app)
+                        .get('/clients')
+                        .set("session-token", validSession)
+                        .query({
+                            target: invalidTestingRange.invalidSearchTargets[situation],
+                            keyword: validSearchObject[Object.keys(validSearchObject)[0]]
+                        });
+                    expect(response.statusCode).toBe(400);
                 });
-            expect(response.statusCode).toBe(400);
+            });
         });
-        it ("it should return status 400 if serached target is missing", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    keyword: validSearchObject.full_name
+        describe("search keyword validation", () => {
+            Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((situation) => {
+                it (`it should return status 400 if search keyword is ${situation}`, async () => {
+                    const response = await request(app)
+                        .get('/clients')
+                        .set("session-token", validSession)
+                        .query({
+                            target: Object.keys(validSearchObject)[0],
+                            keyword: invalidTestingRange.invalidSearchKeywords[situation]
+                        });
+                    expect(response.statusCode).toBe(400);
                 });
-            expect(response.statusCode).toBe(400);
+            });
         });
-        it ("it should return status 400 if search keyword is missing", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
+        describe("page validation", () => {
+            Object.keys(invalidTestingRange.page).forEach((situation) => {
+                it (`it should return status 400 if page is ${situation}`, async () => {
+                    const response = await request(app)
+                        .get('/clients')
+                        .set("session-token", validSession)
+                        .query({
+                            page: invalidTestingRange.page[situation]
+                        });
+                    expect(response.statusCode).toBe(400);
                 });
-            expect(response.statusCode).toBe(400);
+            });
         });
-        it ("it should return status 400 if search keyword is an empty string", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
-                    keyword: ""
+        describe("Valid result display testings", () => {
+            Object.keys(validSearchObject).forEach((target) => {
+                it (`it should return status 200 for a valid ${target} search`, async () => {
+                    const response = await request(app)
+                        .get('/clients/')
+                        .set("session-token", validSession)
+                        .query({
+                            target: target,
+                            keyword: validSearchObject[target],
+                        });
+                    expect(response.statusCode).toBe(200);
+                    expect(response.body.searched).toBe(true);
+                    expect(response.body.count).toBeGreaterThan(0);
+                    expect(response.body.page).toBeTruthy();
+                    expect(response.body.clients.length).toBeGreaterThan(0);
+                    expect(isClientValid(response.body.clients[0])).toBe(true);
                 });
-            expect(response.statusCode).toBe(400);
+            });
         });
-        it ("it should return status 400 if page is not valid", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
-                    keyword: validSearchObject.full_name,
-                    page: invalidEmailSuffix
+        
+        describe("Non-matching result displaying", () => {
+            Object.keys(invalidSearchObject).forEach((target) => {
+                it (`it should return status 200 for a non-matching ${target} search`, async () => {
+                    const response = await request(app)
+                        .get('/clients/')
+                        .set("session-token", validSession)
+                        .query({
+                            target: target,
+                            keyword: invalidSearchObject[target],
+                        });
+                    expect(response.statusCode).toBe(200);
+                    expect(response.body.searched).toBe(true);
+                    expect(response.body.count).toBe(0);
+                    expect(response.body.page).toBeTruthy();
+                    expect(response.body.clients.length).toBe(0);
                 });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if page is a negative number", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
-                    keyword: validSearchObject.full_name,
-                    page: -1
-                });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 400 if page equals to 0", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
-                    keyword: validSearchObject.full_name,
-                    page: 0
-                });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return status 200 for a valid id (partial ID allowed) search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "id",
-                    keyword: validSearchObject.id,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for a valid email search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    searched: true,
-                    target: "email",
-                    keyword: validSearchObject.email,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for a valid phone search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "phone",
-                    keyword: validSearchObject.phone,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for a valid wechat_contact search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "wechat_contact",
-                    keyword: validSearchObject.wechat_contact,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for a valid qq_contact search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "qq_contact",
-                    keyword: validSearchObject.qq_contact,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for a valid company name search", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "company",
-                    keyword: validSearchObject.company,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBeGreaterThan(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return 400 if searched target is forbidden", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: process.env.FORBIDDEN_SEARCH_TARGET,
-                    keyword: validSearchObject.full_name
-                });
-            expect(response.statusCode).toBe(400);
-        });
-        it ("it should return 200 even if the valid search target has no results (full_name)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "id",
-                    keyword: invalidSearchObject.id,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no results (full_name)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "full_name",
-                    keyword: invalidSearchObject.full_name,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no (email)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "email",
-                    keyword: invalidSearchObject.email,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no (phone)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "phone",
-                    keyword: invalidSearchObject.phone,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no (wechat)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "wechat_contact",
-                    keyword: invalidSearchObject.wechat_contact,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no (qq)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "qq_contact",
-                    keyword: invalidSearchObject.qq_contact,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
-        });
-        it ("it should return 200 even if the valid search target has no (company)", async () => {
-            const response = await request(app)
-                .get('/clients/')
-                .set("session-token", validSession)
-                .query({
-                    target: "company",
-                    keyword: invalidSearchObject.company,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.count).toBe(0);
-            expect(response.body.page).toBeTruthy();
-            expect(response.body.clients.length).toBe(0);
+            });
         });
     });
 
     // Test case for manipulating a specific client instance
     describe("specific client ;/clients/:id", () => {
-        let testingClientId;
 
         //  post sections with a testing instance:
         it ("it should not post an instance if the id indicated is not new", async () => {
@@ -346,180 +170,31 @@ describe('Clients Router', () => {
                 });
             expect(response.statusCode).toBe(400);
         });
-
-        describe("Invalid client name tests", () => {
-            const invalidFullName = {
-                "empty" : "",
-                "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                "missing": undefined
-            };
-            const situations = Object.keys(invalidFullName);
-            situations.forEach(situation => {
-                const invalidObject = { ...validTestingObject, full_name : invalidFullName[situation] };
-                if (situation === "missing") { // remove the property
-                    delete invalidObject.full_name;
-                }
-                it (`it should not create a client if full name is ${situation}`, async () => {
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
+        it ("it should not post an instance if id indicated already exists", async () => {
+            const response = await request(app)
+                .post(`/clients/${existingClient.id}`)
+                .set("session-token", validSession)
+                .send({
+                    ...validTestingObject
                 });
-            });
+            expect(response.statusCode).toBe(400);
         });
-
-        describe("Client creation type validation tests", () => {
-            const propertiesToTest = Object.keys(validTestingObject);
-            propertiesToTest.forEach(property => {
-                it(`should not create a client if ${property} has an invalid type`, async () => {
-                    const invalidObject = { ...validTestingObject, [property]: 1 };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-        
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-
-        describe ("Client email validation tests", () => {
-            const situations = {
-                "invalid format" : invalidSearchObject.email,
-                "too short" : invalidEmailSuffix,
-                "too long" : `${"t".repeat(config.limitations.Max_Email_Length)}${invalidEmailSuffix}`,
+        describe("Input validation on each input field", () => {
+            const testingRange = {
+                full_name: invalidTestingRange.full_name,
+                email: Object.fromEntries(
+                            Object.entries(invalidTestingRange.email).slice(0,-1)
+                        ),
+                phone: invalidTestingRange.phone,
+                wechat_contact: invalidTestingRange.wechat_contact,
+                qq_contact: invalidTestingRange.qq_contact,
+                company: invalidTestingRange.company,
+                addresses: invalidTestingRange.addresses
             }
-            Object.keys(situations).forEach(situation => {
-                it (`should not create a client if ${situation}`, async () => {
-                    const invalidObject = { ...validTestingObject, email : situations[situation] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-
-        describe ("Client phone validation tests", () => {
-            const situations = {
-                "invalid format" : invalidSearchObject.phone,
-                "too short" : `${validTestingObject.phone.substring(0, config.limitations.Min_Phone_Length - 1)}`,
-                "too long" : `${"1".repeat(config.limitations.Max_Phone_Length + 1)}`,
-            }
-            Object.keys(situations).forEach(situation => {
-                it (`should not create a client if ${situation}`, async () => {
-                    const invalidObject = { ...validTestingObject, phone : situations[situation] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-
-        describe ("Client wechat validation tests", () => {
-            const situations = {
-                "invalid format" : invalidSearchObject.wechat_contact,
-                "too short" : `${"t".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
-                "too long" : `${"t".repeat(config.limitations.Max_Social_Contact_Length + 1)}`,
-            }
-            Object.keys(situations).forEach(situation => {
-                it (`should not create a client if ${situation}`, async () => {
-                    const invalidObject = { ...validTestingObject, wechat_contact : situations[situation] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-        
-        describe ("Client qq validation tests", () => {
-            const situations = {
-                "invalid format" : invalidSearchObject.qq_contact,
-                "too short" : `${"1".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
-                "too long" : `${"1".repeat(config.limitations.Max_Social_Contact_Length + 1)}`,
-            }
-            expect (Object.keys(situations).length).toBe(3);
-            Object.keys(situations).forEach(situation => {
-                it (`should not create a client if ${situation}`, async () => {
-                    const invalidObject = { ...validTestingObject, qq_contact : situations[situation] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-
-        describe ("Client company validation tests", () => {
-            const situations = {
-                "non-UUID" : invalidSearchObject.company,
-                "non-exsitence ID": process.env.TEST_CLIENT_ID, // passing client id as company id
-            };
-            Object.keys(situations).forEach(situation => {
-                it (`should not create a client if ${situation}`, async () => {
-                    const invalidObject = { ...validTestingObject, company : situations[situation] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-
-        describe ("Client Address validation tests", () => {
-            it ("should not create a client if address is not an array", async () => {
-                const invalidObject = { ...validTestingObject, addresses : "testString" };
-                const response = await request(app)
-                    .post('/clients/new')
-                    .set("session-token", validSession)
-                    .send(invalidObject);
-                expect(response.statusCode).toBe(400);
-            });
-            const nonNullproperties = Object.keys(validNewAddress);
-            nonNullproperties.forEach(property => {
-                it (`should not create a client if its address ${property} is null`, async () => {
-                    const invalidObject = { ...validTestingObject, addresses : [{
-                        ...validNewAddress,
-                        [property] : null
-                    }] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-            nonNullproperties.forEach(property => {
-                it (`should not create a client address if its ${property} is not in the correct format`, async () => {
-                    const invalidObject = { ...validTestingObject, addresses : [{
-                        ...validNewAddress,
-                        [property] : 1
-                    }] };
-                    const response = await request(app)
-                        .post('/clients/new')
-                        .set("session-token", validSession)
-                        .send(invalidObject);
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-
-            // validity of each property
-            const lengthTests = testObject.addresses.lengthTests;
-            Object.keys(lengthTests).forEach(property => {
-                Object.keys(lengthTests[property]).forEach(situation => {
-                    it (`should not create a client address if its ${property} is ${situation}`, async () => {
-                        const invalidObject = { ...validTestingObject, addresses : [{
-                            ...validNewAddress,
-                            [property] : lengthTests[property][situation]
-                        }] };
+            Object.keys(testingRange).forEach((property) => {
+                Object.keys(testingRange[property]).forEach((situation) => {
+                    it (`it should not create a client if ${property} is ${situation}`, async () => {
+                        const invalidObject = { ...validTestingObject, [property] : testingRange[property][situation] };
                         const response = await request(app)
                             .post('/clients/new')
                             .set("session-token", validSession)
@@ -529,6 +204,7 @@ describe('Clients Router', () => {
                 });
             });
         });
+        
         // testing the ability to create a new testing instances with nullable property:
         describe ("Client creation with nullable properties", () => {
             const nullableProperties = Object.keys(validTestingObject).filter(property => property !== "full_name");

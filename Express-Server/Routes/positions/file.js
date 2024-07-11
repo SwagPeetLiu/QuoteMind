@@ -80,7 +80,7 @@ module.exports = (db) => {
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ message: error, position: null });
+            return res.status(500).json({ message: "failed to fetch position", position: null });
         }};
     })
     .put(async (req, res) => {
@@ -94,7 +94,7 @@ module.exports = (db) => {
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ message: error });
+            return res.status(500).json({ message: "failed to update position" });
         }}
     })
     .post(async (req, res) => {
@@ -106,7 +106,7 @@ module.exports = (db) => {
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ id : null, message: error });
+            return res.status(500).json({ id : null, message: "failed to create position" });
         }}
     })
     .delete(async (req, res) => {
@@ -119,7 +119,7 @@ module.exports = (db) => {
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ message: error });
+            return res.status(500).json({ message: "failed to delete position" });
         }}
     });
 
@@ -138,7 +138,7 @@ module.exports = (db) => {
         }
         catch{(error) => {
             console.error(error);
-            return res.status(500).json({ message: error, employees: null });
+            return res.status(500).json({ message: "failed to fetch employees based on position", employees: null });
         }}
     });
 

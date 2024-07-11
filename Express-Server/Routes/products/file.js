@@ -64,7 +64,7 @@ module.exports = (db) => {
             }
             catch (error){
                 console.error(error);
-                return res.status(500).json({ ...response, message: error });
+                return res.status(500).json({ ...response, message: "failed to fetch products" });
             }
         })
 
@@ -84,7 +84,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, product: null });
+                    return res.status(500).json({ message: "failed to fetch this product" });
                 }
             }
         })
@@ -100,7 +100,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, message: "failed to update product" });
+                    return res.status(500).json({ message: "failed to update product" });
                 }
             }
         })
@@ -115,7 +115,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ id: null, message: error, message: "failed to create product" });
+                    return res.status(500).json({ message: "failed to create product" });
                 }
             }
         })
@@ -147,7 +147,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ message: error, message: "failed to delete product" });
+                    return res.status(500).json({ message: "failed to delete product" });
                 }
             }
         });

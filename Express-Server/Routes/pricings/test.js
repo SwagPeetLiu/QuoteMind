@@ -2,8 +2,6 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration } = require('../../utils/Configurator');
-const config = getConfiguration();
 const app = global.testApp;
 
 // importing the testing tools:
@@ -16,6 +14,7 @@ const {
     getTestPricingCondition,
     getTestPricingRule,
     testObject,
+    invalidTestingRange,
     isConditionValid,
     isRuleValid
 } = require('../../utils/TestTools');
@@ -121,7 +120,7 @@ describe("/pricings testing", () => {
                 });
 
                 describe("Search Target Validations", () => {
-                    const invalidSearchTargets = testObject.invalidSearchTargets;
+                    const invalidSearchTargets = invalidTestingRange.invalidSearchTargets;
                     Object.keys(invalidSearchTargets).forEach((target) => {
                         it(`it should not faithfully return if searching target is ${target}`, async () => {
                             const response = await request(app)
@@ -137,7 +136,7 @@ describe("/pricings testing", () => {
                 });
 
                 describe("Search keyword validations", () => {
-                    const invalidSearchKeywords = testObject.invalidSearchKeywords;
+                    const invalidSearchKeywords = invalidTestingRange.invalidSearchKeywords;
                     Object.keys(invalidSearchKeywords).forEach((keyword) => {
                         it(`it should not faithfully return if searching keyword is ${keyword}`, async () => {
                             const response = await request(app)
@@ -151,6 +150,22 @@ describe("/pricings testing", () => {
                         });
                     });
                 });
+
+                describe("page validation", () => {
+                    const invalidPages = invalidTestingRange.page;
+                    Object.keys(invalidPages).forEach((page) => {
+                        it (`it should not faithfully return if page is ${page}`, async () => {
+                            const response = await request(app)
+                                .get('/pricings/conditions')
+                                .set('session-token', validSession)
+                                .query({
+                                    page: invalidPages[page]
+                                });
+                            expect(response.statusCode).toBe(400);
+                        });
+                    });
+                });
+
                 describe("Search Results validations", () => {
                     Object.keys(pricingConditionObject.invalidSearchObject).forEach((target) => {
                         it(`it should return even no matching records on ${target} are provided`, async () => {
@@ -225,7 +240,7 @@ describe("/pricings testing", () => {
                     expect(isRuleValid(response.body.pricing_rules[0])).toBe(true);
                 });
                 describe("Search Target Validations", () => {
-                    const invalidSearchTargets = testObject.invalidSearchTargets;
+                    const invalidSearchTargets = invalidTestingRange.invalidSearchTargets;
                     Object.keys(invalidSearchTargets).forEach((target) => {
                         it(`it should not faithfully return if searching target is ${target}`, async () => {
                             const response = await request(app)
@@ -240,7 +255,7 @@ describe("/pricings testing", () => {
                     });
                 });
                 describe("Search Keyword Validations", () => {
-                    const invalidSearchKeywords = testObject.invalidSearchKeywords;
+                    const invalidSearchKeywords = invalidTestingRange.invalidSearchKeywords;
                     Object.keys(invalidSearchKeywords).forEach((keyword) => {
                         it(`it should not faithfully return if searching keyword is ${keyword}`, async () => {
                             const response = await request(app)
@@ -249,6 +264,19 @@ describe("/pricings testing", () => {
                                 .query({
                                     target: Object.keys(pricingRuleObject.validSearchObject)[0],
                                     keyword: invalidSearchKeywords[keyword]
+                                });
+                            expect(response.statusCode).toBe(400);
+                        });
+                    });
+                });
+                describe("Page Validations", () => {
+                    Object.keys(invalidTestingRange.page).forEach((page) => {
+                        it(`it should not faithfully return if page is ${page}`, async () => {
+                            const response = await request(app)
+                                .get('/pricings/rules')
+                                .set('session-token', validSession)
+                                .query({
+                                    page: invalidTestingRange.page[page]
                                 });
                             expect(response.statusCode).toBe(400);
                         });
@@ -352,60 +380,27 @@ describe("/pricings testing", () => {
                 });
 
                 // testing for the validity of each field:
-                const invalidTestingRange = {
-                    quantity: {
-                        "invalid type": "string",
-                        "invalid value": 0
-                    },
-                    size: {
-                        "invalid type": "5",
-                        "invalid value": -1,
-                    },
-                    colour: {
-                        "invalid value": "!@#$%^&*",
-                        "invalid type": 9,
-                        "too long": `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-                    },
-                    product: {
-                        "invalid value": "string",
-                        "invalid type": 9,
-                        "missing": undefined
-                    },
-                    materials: {
-                        "invalid value": ["string"],
-                        "invalid type": [9],
-                        "none-array": "string"
-                    },
-                    client: {
-                        "invalid type": 9,
-                        "invalid value": "string"
-                    },
-                    company: {
-                        "invalid type": 9,
-                        "invalid value": "string"
-                    },
-                    threshold: {
-                        "invalid type": 9,
-                        "invalid value": "string",
-                    },
-                    quantity_unit: {
-                        "invalid type": 9,
-                        "invalid value": "!@#$%^&*"
-                    },
-                    size_unit: {
-                        "invalid type": 9,
-                        "invalid value": "!@#$%^&*"
-                    }
+                const testingRange = {
+                    quantity: invalidTestingRange.quantity,
+                    size: invalidTestingRange.size,
+                    colour: invalidTestingRange.colour,
+                    product: invalidTestingRange.product,
+                    materials: invalidTestingRange.materials,
+                    client: invalidTestingRange.client,
+                    company: invalidTestingRange.company,
+                    threshold: invalidTestingRange.threshold,
+                    quantity_unit: invalidTestingRange.quantity_unit,
+                    size_unit: invalidTestingRange.size_unit
                 };
 
                 // validating for the quantity based
-                Object.keys(invalidTestingRange)
+                Object.keys(testingRange)
                     .filter((key) => key !== "size" && key !== "size_unit")
                     .forEach((key) => {
-                        Object.keys(invalidTestingRange[key])
+                        Object.keys(testingRange[key])
                             .forEach((situation) => {
                                 it(`it should not create a condition if ${key} is ${situation}`, async () => {
-                                    const invalidObject = { ...validQuantityCondition, [key]: invalidTestingRange[key][situation] };
+                                    const invalidObject = { ...validQuantityCondition, [key]: testingRange[key][situation] };
                                     const response = await request(app)
                                         .post("/pricings/conditions/new")
                                         .set('session-token', validSession)
@@ -416,13 +411,13 @@ describe("/pricings testing", () => {
                     });
 
                 // validating for the size based
-                Object.keys(invalidTestingRange)
+                Object.keys(testingRange)
                     .filter((key) => key !== "quantity" && key !== "quantity_unit")
                     .forEach((key) => {
-                        Object.keys(invalidTestingRange[key])
+                        Object.keys(testingRange[key])
                             .forEach((situation) => {
                                 it(`it should not create a condition if ${key} is ${situation}`, async () => {
-                                    const invalidObject = { ...validSizeCondition, [key]: invalidTestingRange[key][situation] };
+                                    const invalidObject = { ...validSizeCondition, [key]: testingRange[key][situation] };
                                     const response = await request(app)
                                         .post("/pricings/conditions/new")
                                         .set('session-token', validSession)
@@ -529,23 +524,14 @@ describe("/pricings testing", () => {
                 expect(response.statusCode).toBe(400);
             });
             describe("Rule creation Validation", () => {
-                const invalidTestingRange = {
-                    price_per_unit: {
-                        "less than 0": -1,
-                        "eual to 0": 0,
-                        "invalid type": "string",
-                        "missing": undefined
-                    },
-                    conditions: {
-                        "invalid type": [9],
-                        "none-array": "string",
-                        "missing": undefined
-                    }
+                const testRange = {
+                    price_per_unit: { ...invalidTestingRange.price_per_unit, "missing": undefined },
+                    conditions: invalidTestingRange.conditions
                 };
-                Object.keys(invalidTestingRange).forEach((property) => {
-                    Object.keys(invalidTestingRange[property]).forEach((situation) => {
+                Object.keys(testRange).forEach((property) => {
+                    Object.keys(testRange[property]).forEach((situation) => {
                         it(`it should not create a rule if ${property} is ${situation}`, async () => {
-                            const invalidObject = { ...pricingRuleObject.validTestingObject, [property]: invalidTestingRange[property][situation] };
+                            const invalidObject = { ...pricingRuleObject.validTestingObject, [property]: testRange[property][situation] };
                             const response = await request(app)
                                 .post("/pricings/rules/new")
                                 .set('session-token', validSession)

@@ -28,7 +28,7 @@ module.exports = (db) => {
             }
             catch (error){
                 console.error(error);
-                return res.status(500).json({ message: error, targets: null });
+                return res.status(500).json({ message: "failed to get search targets", targets: null });
             }
         });
 

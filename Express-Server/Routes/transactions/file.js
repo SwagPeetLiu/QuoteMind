@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     validateName,
     validateTransactionStatus,
+    validateTransactionDate,
     validateNumeric,
     validateDescriptions,
     validateInstances,
@@ -57,13 +58,14 @@ module.exports = (db) => {
 
                 const transactions = await db.any(`
                     SELECT 
-                        t.creation_date, t.modified_date, t.status, t.id, t.name, t.quantity, 
+                        t.transaction_date, t.creation_date, t.modified_date, t.status, t.id, t.name, t.quantity, 
                         t.price_per_unit, t.amount, t.note, t.colour, t.en_unit, t.ch_unit,
                         t.width, t.height, t.length, t.size, t.quantity_unit, t.size_unit,
                         CASE WHEN t.materials IS NULL OR array_length(t.materials, 1) = 0 THEN NULL
                         ELSE (
                             SELECT jsonb_agg(
                                 jsonb_build_object(
+                                    'id', m.id,
                                     'en_name', m.en_name,
                                     'ch_name', m.ch_name
                                 )
@@ -92,7 +94,7 @@ module.exports = (db) => {
             catch {
                 (error) => {
                     console.error(error);
-                    return res.status(500).json({ ...response, message: error});
+                    return res.status(500).json({ ...response, message: "failed to fetch transactions" });
                 }
             }
         });
@@ -104,7 +106,7 @@ module.exports = (db) => {
             const id = req.params.id;
             try {
                 const transaction = await db.oneOrNone(`
-                    SELECT t.id, t.creation_date, t.modified_date, t.status, t.name, t.quantity, t.price_per_unit, t.amount, t.note, t.colour, t.width,
+                    SELECT t.id, t.transaction_date, t.creation_date, t.modified_date, t.status, t.name, t.quantity, t.price_per_unit, t.amount, t.note, t.colour, t.width,
                     t.height, t.length, t.en_unit, t.ch_unit, t.size, t.quantity_unit, t.size_unit,
                     jsonb_build_object(
                         'id', p.id,
@@ -125,9 +127,7 @@ module.exports = (db) => {
                     CASE WHEN t.company IS NULL THEN NULL
                     ELSE jsonb_build_object(
                         'id', co.id,
-                        'full_name', co.full_name,
-                        'email', co.email,
-                        'tax_number', co.tax_number
+                        'full_name', co.full_name
                     ) END as company,
                     CASE WHEN t.client IS NULL THEN NULL
                     ELSE jsonb_build_object(
@@ -181,14 +181,14 @@ module.exports = (db) => {
                     colour = $7, width = $8, height = $9, length = $10, size = $11, en_unit = $12,
                     ch_unit = $13, product = $14::uuid, materials = $15::uuid[], company = $16::uuid,
                     client = $17::uuid, employee = $18::uuid[], addresses = $19::uuid[], quantity_unit = $20,
-                    size_unit = $21
-                    WHERE id = $22 AND created_by = $23`, 
+                    size_unit = $21, transaction_date = $22
+                    WHERE id = $23 AND created_by = $24`, 
                     [
                         req.body.name, req.body.status,req.body.quantity, req.body.price_per_unit,
                         req.body.amount, req.body.note, req.body.colour, req.body.width, req.body.height,
                         req.body.length, req.body.size, req.body.en_unit, req.body.ch_unit,
                         req.body.product, req.body.materials, req.body.company, req.body.client, req.body.employee,
-                        req.body.addresses, req.body.quantity_unit, req.body.size_unit,
+                        req.body.addresses, req.body.quantity_unit, req.body.size_unit, req.body.transaction_date,
                         id,owner
                     ]);
                 return res.status(200).json({ message: "transaction updated successfully" });
@@ -203,10 +203,10 @@ module.exports = (db) => {
                 const newTransaction = await db.oneOrNone(`INSERT INTO public.transactions (
                     creation_date, created_by, modified_date, name, status, quantity, price_per_unit, amount,
                     note, colour, width, height, length, size, en_unit, ch_unit, product, materials, company,
-                    client, employee, addresses, quantity_unit, size_unit
+                    client, employee, addresses, quantity_unit, size_unit, transaction_date
                     ) VALUES (
                     NOW(), $1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-                    $15::uuid, $16::uuid[], $17::uuid, $18::uuid, $19::uuid[], $20::uuid[], $21, $22
+                    $15::uuid, $16::uuid[], $17::uuid, $18::uuid, $19::uuid[], $20::uuid[], $21, $22, $23
                     ) 
                     RETURNING id`, 
                     [
@@ -214,7 +214,7 @@ module.exports = (db) => {
                         req.body.amount, req.body.note, req.body.colour, req.body.width, req.body.height,
                         req.body.length, req.body.size, req.body.en_unit, req.body.ch_unit, req.body.product,
                         req.body.materials, req.body.company, req.body.client, req.body.employee, req.body.addresses,
-                        req.body.quantity_unit, req.body.size_unit
+                        req.body.quantity_unit, req.body.size_unit, req.body.transaction_date
                     ]);
                 return res.status(200).json({ id: newTransaction.id, message: "transaction created successfully" });
             }
@@ -241,7 +241,7 @@ module.exports = (db) => {
         const owner = req.sessionEmail;
         if (id !== "new") {
             const existenceValidation = await validateInstances([id], owner, "transactions", db);
-            if (!existenceValidation.valid) return res.status(404).json({ message: existenceValidation.message });
+            if (!existenceValidation.valid) return res.status(400).json({ message: existenceValidation.message });
             if (req.method === "POST") return res.status(400).json({ message: "Invalid ID" });
         }
 
@@ -253,18 +253,20 @@ module.exports = (db) => {
                 return res.status(400).json({ message: "Basic information are required" });
             }
             if (req.body.width || req.body.height || req.body.length) {
-                if (!en_unit || !ch_unit) {
+                if (!req.body.en_unit || !req.body.ch_unit) {
                     return res.status(400).json({ message: "units are required" });
                 }
             }
             if (!req.body.size_unit && req.body.size) return res.status(400).json({ message: "size unit is required" });
+            if (req.body.size_unit && !req.body.size) return res.status(400).json({ message: "size is required" });
             if (!req.body.quantity) return res.status(400).json({ message: "quantity is required" });
+            if (!req.body.quantity_unit) return res.status(400).json({ message: "quantity unit is required" });
 
             const validations = [
                 validateName(req.body.name),
                 validateTransactionStatus(req.body.status),
-                validateNumeric(req.body.quantity, "quantity"),
-                validateNumeric(req.body.price_per_unit, "price per unit"),
+                validateInteger(req.body.quantity, "quantity"),
+                validateNumeric(req.body.price_per_unit, "price_per_unit"),
                 validateNumeric(req.body.amount, "amount"),
                 validateNumeric(req.body.width, "width"),
                 validateNumeric(req.body.height, "height"),
@@ -276,6 +278,7 @@ module.exports = (db) => {
                 validateString(req.body.en_unit),
                 validateString(req.body.ch_unit),
                 validateString(req.body.size_unit),
+                validateTransactionDate(req.body.transaction_date), // nullable transaction date
                 await validateInstances([req.body.product], owner, "products", db),
                 await validateInstances(req.body.materials, owner, "materials", db), // assume list input
                 await validateInstances(req.body.company ? [req.body.company] : null, owner, "companies", db),

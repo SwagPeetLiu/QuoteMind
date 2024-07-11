@@ -113,7 +113,7 @@ module.exports = (db) => {
                 return res.status(200).json({ ...response, pricing_conditions: pricing });
             } catch (error) {
                 console.error(error);
-                return res.status(500).json({ ...response, message: error });
+                return res.status(500).json({ ...response, message: "failed to fetch pricing conditions" });
             }
         });
 
@@ -215,7 +215,7 @@ module.exports = (db) => {
                 return res.status(200).json({ ...response, pricing_rules: rules });
             } catch (error) { 
                 console.error(error);
-                return res.status(500).json({ ...response, message: error });
+                return res.status(500).json({ ...response, message: "failed to fetch pricing rules" });
             }
         });
     
