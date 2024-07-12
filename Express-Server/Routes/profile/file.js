@@ -29,7 +29,7 @@ module.exports = (db) => {
             }
             try{
                 const hashedPassword = bcrypt.hashSync(password, 10);
-                db.none('UPDATE public.user SET username = $1, password = $2 WHERE email = $3', [username, hashedPassword, email]);
+                db.none('UPDATE public.user SET username = $1, password = $2 WHERE email = $3', [username, hashedPassword, req.sessionEmail]);
                 res.status(200).json({ message: 'Profile updated successfully' });
             }
             catch (err) {

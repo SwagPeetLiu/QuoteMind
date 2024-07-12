@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { validateString, validateTableExistence} = require('../../utils/Validator');
+const { getConfiguration } = require("../../utils/Configurator");
+const config = getConfiguration();
 
 module.exports = (db) => {
     router.route("/:target")
@@ -9,11 +11,11 @@ module.exports = (db) => {
             const owner = req.sessionEmail;
             try{
                 const counts = await db.oneOrNone(`SELECT COUNT(*) FROM public.${target} WHERE created_by = $1`, [owner]);
-                return res.status(200).json({ counts: counts.count });
+                return res.status(200).json({ counts: parseInt(counts.count) });
             }
             catch(error){
                 console.error(error);
-                return res.status(500).json({ counts: null, message: "failed to fetch counts" });
+                return res.status(500).json({ message: "failed to fetch counts" });
             }
 
         });
@@ -24,7 +26,9 @@ module.exports = (db) => {
         if (!stringValdiation.valid) return res.status(400).json({ message: "invalid target" });
 
         // prevent malicious attempts on grabing the count of the users
-        if (target.toLowerCase() === "user") return res.status(400).json({ message: "invalid target" });
+        if (config.counter.forbiddenTargets.includes(target.toLowerCase())) {
+            return res.status(400).json({ message: "invalid target" });
+        }
 
         // check if the target exsits:
         validTargets = await validateTableExistence(target, db);

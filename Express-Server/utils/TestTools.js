@@ -339,6 +339,22 @@ const testObject = {
             quantity_unit: "个总和",
             addresses: null // to be attached
         }
+    },
+    profile: {
+        validTestingObject : {
+            email: process.env.TEST_EMAIL,
+            username: "Test Account",
+            password: process.env.TEST_PW
+        },
+        updateTestingObject : {
+            email: process.env.TEST_EMAIL,
+            username: "Test Account updated",
+            password: `${process.env.TEST_PW}test`
+        }
+    },
+    counter: {
+        validSearchObject : config.counter.availableTargets,
+        invalidSearchObject : config.counter.forbiddenTargets
     }
 }
 
@@ -358,6 +374,11 @@ const invalidTestingRange = {
         "invalid value": "test",
         "negative": -1,
         "zero": 0
+    },
+    invalidCounterTargets : {
+        "invalid target" : "invalid target",
+        "forbidden counter target": testObject.counter.invalidSearchObject[0],
+        "missing target" : undefined
     },
     email: {
         "invalid value": "!@#$%^&*",
@@ -847,7 +868,16 @@ function isTransactionValid(transaction, granularity) {
     }
     return false;
 }
+function isSearchTargetValid(targets) {
+    if (!Array.isArray(targets)) return false;
+    for (const target of targets) {
+        if (!("target" in target) || !("type" in target)) return false;
+        if (config.search.forbiddenTargets.includes(target.target.toLowerCase())) return false;
+    }
+    return true;
+}
 
+// utility functions
 function getFutureDate(daysInFuture) {
     const now = new Date();
     now.setDate(now.getDate() + daysInFuture);
@@ -973,5 +1003,6 @@ module.exports = {
     isSpecificProductValid,
     isConditionValid,
     isRuleValid,
-    isTransactionValid
+    isTransactionValid,
+    isSearchTargetValid
 }
