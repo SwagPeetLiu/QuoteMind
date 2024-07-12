@@ -65,7 +65,9 @@ describe('Authentication Router', () => {
         describe("Validation for email input", () => {
             Object.keys(invalidTestingRange.email).forEach((situation) => {
                 it (`it should not logout if email is ${situation}`, async () => {
-                    const response = await request(app).post('/auth/logout').send({
+                    const response = await request(app).post('/auth/logout')
+                    .set('session-token', validSession)
+                    .send({
                         email: invalidTestingRange.email[situation],
                         token: validSession
                     });
@@ -77,7 +79,9 @@ describe('Authentication Router', () => {
         describe("Validation for token input", () => {
             Object.keys(invalidTestingRange.loggOutToken).forEach((situation) => {
                 it (`it should not logout if token is ${situation}`, async () => {
-                    const response = await request(app).post('/auth/logout').send({
+                    const response = await request(app).post('/auth/logout')
+                    .set('session-token', validSession)
+                    .send({
                         email: validTestEmail,
                         token: invalidTestingRange.loggOutToken[situation]
                     });
@@ -86,7 +90,9 @@ describe('Authentication Router', () => {
             });
         });
         it ("it should return status 200 if credentials are valid", async () => {
-            const response = await request(app).post('/auth/logout').send({
+            const response = await request(app).post('/auth/logout')
+            .set('session-token', validSession)
+            .send({
                 email: validTestEmail,
                 token: validSession
             });

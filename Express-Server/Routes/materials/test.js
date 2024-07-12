@@ -266,6 +266,7 @@ describe("Materials Route Testing", () => {
                         client: existingClient.id,
                         product: existingProduct.id,
                         quantity: 1,
+                        quantity_unit: "pcs",
                         materials: [testMaterialID] // testing for material association
                     });
                 expect(response.statusCode).toBe(200);

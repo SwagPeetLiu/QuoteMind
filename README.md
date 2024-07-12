@@ -31,9 +31,12 @@ AWS
   2. run npm run devStart
 
 # Testing
+Currently, there are nearly 700 test cases, reaching an overall 72% of coverage over all files (accounting lines relying on production env), 90%+ of the functions are covered.
+
 1. Please ensure you have Jest & Supertest installed
 2. npm test: allow you to run all the test cases across the application
 3. npx Jest -t "specific-test-block": Allow you to run a specific described testing block
+4. npm test:coverage: allow you to check the overall coverage on the server files
 
 # Usage
   1. Manage and create companies/ clients/ addresses / employees/ products/ materials / transactions
