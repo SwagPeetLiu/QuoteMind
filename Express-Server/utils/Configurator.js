@@ -2,6 +2,8 @@
 require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
+const fs = require('fs');
+const path = require('path');
 
 // Configure the Database instance that uses the connection
 const pgp = require('pg-promise')();
@@ -43,8 +45,17 @@ function closeDBConnection() {
     return db.$pool.end();
 }
 
+function getSSLCredentials(){
+    const privateKeyPath = path.join(__dirname, '../ssl/server.key');
+    const certificatePath = path.join(__dirname, '../ssl/server.cert');
+    const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+    const certificate = fs.readFileSync(certificatePath, 'utf8');
+    return { key: privateKey, cert: certificate };
+}
+
 module.exports = {
     getConfiguration,
     getDBconnection,
-    closeDBConnection
+    closeDBConnection,
+    getSSLCredentials
 }

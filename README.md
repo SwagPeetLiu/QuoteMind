@@ -12,6 +12,7 @@ back-end
   - node.js -- running express as the backend server
   - jwt -- jsonwebtoken for authorisation purposes with session expiration settings
   - bcrypt -- bcryptjs for storing the hashed user passwords
+  - HTTPS -- enforcing secured HTTP connections to the back-end server
   - validator - user input safety checks for both validity and length
   - Postgresql -- relational database used to keep track of all entities, using pg-promise client to establish DB connection
   - uuid-ossp -- enforcing universal & fixed long string (128 bits)
@@ -20,7 +21,8 @@ back-end
 
 # deployment
 AWS 
-  - RDS, EC2
+  - RDS -- hosting the postgresql instances
+  - EC2 -- hosting the server deployments on Ubuntu VM
 
 # project management
   - Jira - used to track development progress and the business requirements analysis on QuoteMind

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "devStart": "NODE_ENV=development nodemon server.js",
-    "prodStart": "NODE_ENV=production nodemon server.js",
+    "prodStart": "NODE_ENV=production node server.js",
     "test": "NODE_ENV=test jest",
     "test:watch": "NODE_ENV=test jest --watch",
     "test:coverage": "NODE_ENV=test jest --coverage",

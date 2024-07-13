@@ -1,4 +1,4 @@
-const { getConfiguration, getDBconnection} = require('./utils/Configurator');
+const { getConfiguration, getDBconnection, getSSLCredentials} = require('./utils/Configurator');
 const config = getConfiguration();
 const port = config.port;
 
@@ -12,6 +12,8 @@ app.use(express.urlencoded({ extended: false })); // tools for parsing the body 
 app.use(express.json());
 const db = getDBconnection();
 const { AuthenticationLogger } = require('./utils/AuthMiddleware');
+const https = require('https');
+const credentials = getSSLCredentials();
 
 // Open endpoints
 const authRouter = require('./Routes/auth/file')(db);
@@ -57,4 +59,7 @@ const searchRouter = require('./Routes/search/file')(db);
 app.use("/search", searchRouter);
 
 // initialise the portal that listences for requests
-app.listen(port, () => console.log('Server started at port ' + port));
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(port, () => {
+    console.log(`Express server listening on port ${port}`);
+});
