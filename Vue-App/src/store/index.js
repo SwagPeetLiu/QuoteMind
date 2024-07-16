@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
+import { setToken, clearToken } from "../utils/apiSetter";
 
 // centralised state management over the application
 export default createStore({
@@ -68,15 +69,17 @@ export default createStore({
       state.language = lang;
       localStorage.setItem("language", lang);
     },
-    // set up the user info:
+    // set up the user info & allow authorised queries
     setUser(state, payload) {
       state.user = payload;
       state.isAuthenticated = true;
+      setToken(payload.session);
     },
-    // clear the user info
+    // clear the user info & session association;
     clearUser(state) {
       state.user = { username: "", email: "", role: "", session: ""};
       state.isAuthenticated = false;
+      clearToken();
     },
   },
   actions: {

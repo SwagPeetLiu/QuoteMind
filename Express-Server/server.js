@@ -11,52 +11,52 @@ const db = getDBconnection();
 const { AuthenticationLogger } = require('./utils/AuthMiddleware');
 
 // Open endpoints
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
     return res.status(200).send({
         message: "Server is up and running for Quotemind APP",
     });
 });
 const authRouter = require('./Routes/auth/file')(db);
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 const registerRouter = require('./Routes/register/file')(db);
-app.use("/register", registerRouter);
+app.use("/api/register", registerRouter);
 
 // cover all remaining routes with Authentication middleware
 app.use(AuthenticationLogger);
 
 const profileRouter = require('./Routes/profile/file')(db);
-app.use("/profile", profileRouter);
+app.use("/api/profile", profileRouter);
 
 const companyRouter = require('./Routes/companies/file')(db);
-app.use("/companies", companyRouter);
+app.use("/api/companies", companyRouter);
 
 const clientRouter = require('./Routes/clients/file')(db);
-app.use("/clients", clientRouter);
+app.use("/api/clients", clientRouter);
 
 const employeeRouter = require('./Routes/employees/file')(db);
-app.use("/employees", employeeRouter);
+app.use("/api/employees", employeeRouter);
 
 const positionRouter = require('./Routes/positions/file')(db);
-app.use("/positions", positionRouter);
+app.use("/api/positions", positionRouter);
 
 const materialRouter = require('./Routes/materials/file')(db);
-app.use("/materials", materialRouter);
+app.use("/api/materials", materialRouter);
 
 const productRouter = require('./Routes/products/file')(db);
-app.use("/products", productRouter);
+app.use("/api/products", productRouter);
 
 const transactionsRouter = require('./Routes/transactions/file')(db);
-app.use("/transactions", transactionsRouter);
+app.use("/api/transactions", transactionsRouter);
 
 const pricingRouter = require('./Routes/pricings/file')(db);
-app.use("/pricings", pricingRouter);
+app.use("/api/pricings", pricingRouter);
 
 const counterRouter = require('./Routes/counter/file')(db);
-app.use("/counter", counterRouter);
+app.use("/api/counter", counterRouter);
 
 const searchRouter = require('./Routes/search/file')(db);
-app.use("/search", searchRouter);
+app.use("/api/search", searchRouter);
 
 // initialise the portal that listences for requests
 app.listen(3000, () => {

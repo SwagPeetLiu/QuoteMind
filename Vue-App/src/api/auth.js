@@ -1,7 +1,8 @@
 import axios from 'axios';
+import store from '../store';
 
 // Authentication used to update access of a user
-export default {
+const auth = {
     login: (data) => {
         if (!data || !data.email || !data.password){
             console.warn("Incomplete information");
@@ -9,13 +10,13 @@ export default {
         }
         return axios.post('/auth', data)
         .then((response) => {
-            this.$store.commit('setUser', {
+            store.commit('setUser', {
                 username: response.data.username,
                 email: response.data.email,
                 role: response.data.role,
                 session: response.data.session
             });
-            return false;
+            return true;
         })
         .catch((error) => {
             console.error("failed to login", error.message);
@@ -23,20 +24,20 @@ export default {
         });
     },
     logout: () => {
-        const currentUser = this.$store.getters.getUser;
+        const currentUser = store.getters.getUser;
+        console.log(store.getters.getUser);
         if (!currentUser || 
             !currentUser.session || 
             !currentUser.email) {
             console.warn("Cannot loggout if not logged in");
-            return true;
+            return false;
         }
-        return axios.post('/logout', {
+        return axios.post('/auth/logout', {
             email: currentUser.email,
             token: currentUser.session
         })
-        .then((response) => {
-            console.log("logged out", response.data.message);
-            this.$store.commit('clearUser');
+        .then(() => {
+            store.commit('clearUser');
             return true;
         })
         .catch((error) => {
@@ -44,4 +45,6 @@ export default {
             return false;
         });
     }
-}
+};
+
+export default auth;

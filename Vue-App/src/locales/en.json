@@ -5,7 +5,7 @@
         "Email": "Email",
         "Password": "Password",
         "Sign In": "SIGN IN",
-        "Don't have an account?": "Don't have an account?",
+        "noAccountQuestion": "Don't have an account?",
         "Sign Up": "Sign Up"
     },
     "configurator": {
