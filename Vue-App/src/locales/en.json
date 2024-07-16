@@ -1,0 +1,40 @@
+{
+    "signIn": {
+        "Title": "Welcome back",
+        "Subtitle": "Enter your email and password to sign in",
+        "Email": "Email",
+        "Password": "Password",
+        "Sign In": "SIGN IN",
+        "Don't have an account?": "Don't have an account?",
+        "Sign Up": "Sign Up"
+    },
+    "configurator": {
+        "Title": "Settings",
+        "Subtitle": "See your dashboard options.",
+        "SideBar Colours": "Sidebar Colors",
+        "SideNav Type": "Sidenav Colors",
+        "Sidenav Type Description": "Choose between different sidenav types.",
+        "Sidenav Type Limitation": "You can only change the sidenav type just on desktop view.",
+        "Transparent": "Transparent",
+        "White": "White",
+        "Navbar Fixed": "Navbar Fixed",
+        "Language": "Language",
+        "English": "English",
+        "Chinese": "Chinese",
+        "Contribution Interest": "Express your Interest?",
+        "Logout": "Logout",
+        "View documentation": "View documentation"
+    },
+    "apiMessage":{
+        "login":{
+          "success": "Sucessfullly Logged in",
+          "fail": "Failed to Login",
+          "failWrong": "Email or Password is wrong",
+          "incomplete infomration": "Incomplete information"
+        },
+        "logout":{
+          "success": "Sucessfullly Logged out",
+          "fail": "Failed to Logout"
+        }
+      }
+}

@@ -3,10 +3,26 @@ Express-Server/node_modules
 Express-Server/config
 Express-Server/.env.test
 Express-Server/.env.prod
-Express-Server/ssl
+Express-Server/
 
-# VUE front-end app file
+# Front-end files:
+Vue-App/node_modules
+Vue-App/package-lock.json
+Vue-App/yarn.lock
+Vue-App/npm-debug.log*
+Vue-App/yarn-debug.log*
+Vue-App/yarn-error.log*
+Vue-App/pnpm-debug.log*
+
+
 
 # General OS generated files
 .DS_Store
 Thumbs.db
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

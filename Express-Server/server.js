@@ -1,7 +1,4 @@
-const { getConfiguration, getDBconnection, getSSLCredentials} = require('./utils/Configurator');
-const config = getConfiguration();
-const port = config.port;
-
+const { getDBconnection } = require('./utils/Configurator');
 // Creating the Express server:
 const express = require('express');
 const app = express(); // creating an instance of express app that runs the entire server
@@ -12,10 +9,13 @@ app.use(express.urlencoded({ extended: false })); // tools for parsing the body 
 app.use(express.json());
 const db = getDBconnection();
 const { AuthenticationLogger } = require('./utils/AuthMiddleware');
-const https = require('https');
-const credentials = getSSLCredentials();
 
 // Open endpoints
+app.get("/", (req, res) => {
+    return res.status(200).send({
+        message: "Server is up and running for Quotemind APP",
+    });
+});
 const authRouter = require('./Routes/auth/file')(db);
 app.use("/auth", authRouter);
 
@@ -59,7 +59,6 @@ const searchRouter = require('./Routes/search/file')(db);
 app.use("/search", searchRouter);
 
 // initialise the portal that listences for requests
-const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(port, () => {
-    console.log(`Express server listening on port ${port}`);
+app.listen(3000, () => {
+    console.log(`Server listening on port 3000`);
 });

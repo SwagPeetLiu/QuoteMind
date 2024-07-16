@@ -5,19 +5,20 @@ This projct is dedicated to my hardworking mother who needs to manually do price
 # Prerequisites
 front-end
   - Vue -- framework for interact with the end-users (await to be developed)
-  - Tailwind -- utilty first CSS
   - Bootstrap5 -- for pre-made components
+  - VueI18n -- for supporting both the Chinese and English Languages for this application
+  - Axios -- for API endpoint calls to perform CRUD operations
 
 back-end
   - node.js -- running express as the backend server
   - jwt -- jsonwebtoken for authorisation purposes with session expiration settings
   - bcrypt -- bcryptjs for storing the hashed user passwords
-  - HTTPS -- enforcing secured HTTP connections to the back-end server
   - validator - user input safety checks for both validity and length
   - Postgresql -- relational database used to keep track of all entities, using pg-promise client to establish DB connection
   - uuid-ossp -- enforcing universal & fixed long string (128 bits)
   - dot-env -- keep track of environmental settings of the express server
   - Jest & Supertest -- to automate the testing and maintainence of the code quality in each endpoint
+  - Cerbot & Nginx - Web Server hostings purposes by acting as the Reverse proxy and enforcing SSL terminations early to relieves computational burdens of SSL Encryption and decryption on the web server
 
 # deployment
 AWS 
