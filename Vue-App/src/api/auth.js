@@ -25,7 +25,6 @@ const auth = {
     },
     logout: () => {
         const currentUser = store.getters.getUser;
-        console.log(store.getters.getUser);
         if (!currentUser || 
             !currentUser.session || 
             !currentUser.email) {

@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed-plugin">
-    <a class="px-3 py-2 fixed-plugin-button text-dark position-fixed" @click="toggle">
+  <div class="fixed-plugin" ref="configuratorContainer">
+    <a class="px-3 py-2 fixed-plugin-button text-dark position-fixed" @click.prevent="toggleConfig">
       <i class="py-2 fa fa-cog"> </i>
     </a>
     <div class="shadow-lg card blur">
@@ -67,8 +67,8 @@
           <h6 class="mb-1">{{ t("configurator.Language") }}</h6>
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
             data-bs-toggle="dropdown" aria-expanded="false">
-            {{ this.$store.state.language == "en" ? 
-                t("configurator.English") : t("configurator.Chinese") 
+            {{ this.$store.state.language == "en" ?
+              t("configurator.English") : t("configurator.Chinese")
             }}
             <span class="arrow-right ms-2"></span>
           </button>
@@ -80,21 +80,31 @@
           </ul>
         </div>
 
-      <hr class="horizontal dark my-sm-4" />
-      <a class="btn bg-gradient-info w-100"
-        href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro">
-        {{ t("configurator.Contribution Interest") }}
-      </a>
-      <button class="btn bg-gradient-dark w-100" 
-        @click="logout">
-        {{ t("configurator.Logout") }}
-      </button>
-      <a class="btn btn-outline-dark w-100"
-        href="https://535051192liu.atlassian.net/wiki/spaces/KAN">
-        {{ t("configurator.View documentation") }}
-      </a>
+        <!-- config buttons-->
+        <hr class="horizontal dark my-sm-4" />
+        <a class="btn bg-gradient-info w-100" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro">
+          {{ t("configurator.Contribution Interest") }}
+        </a>
+
+        <button v-if="this.$store.getters.getIsAuthenticated" 
+          class="btn bg-gradient-dark w-100" @click="logout">
+          {{ t("configurator.Logout") }}
+        </button>
+        <router-link v-else :to="{ name: 'Sign Up' }" class="btn bg-gradient-dark w-100">{{
+          t('signIn.sign up') }}
+        </router-link>
+        
+        <a class="btn btn-outline-dark w-100" 
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://535051192liu.atlassian.net/wiki/spaces/KAN">
+          {{ t("configurator.View documentation") }}
+        </a>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -145,21 +155,47 @@ export default {
     },
 
     setLanguage(language) {
-      if(language === this.$i18n.locale){
+      if (language === this.$i18n.locale) {
         return;
       }
       this.$i18n.locale = language;
       this.$store.commit("setLanguage", language);
       this.$refs["language-select"].blur(); // remove the focus on the selection:
     },
-    // async logout(){
-    //   try{
-
-    //   }
-    //   catch{
-
-    //   }
-    // }
+    toggleConfig(event){
+      if (event){
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      this.toggle();
+    },
+    // functions used to handle configurator closure:
+    handleClickOutside(event) {
+      if (this.$store.state.showConfig === true &&
+        this.$refs.configuratorContainer &&
+        !this.$refs.configuratorContainer.contains(event.target)) {
+        this.$store.state.showConfig = false;
+        document.removeEventListener('click', this.handleClickOutside, true);
+      }
+    },
+    addOutsideClickListener() {
+      setTimeout(() => {
+        document.addEventListener('click', this.handleClickOutside, true);
+      }, 100);
+    },
+  },
+  watch: {
+    '$store.state.showConfig': {
+      handler(newValue) {
+        console.log("new value", newValue)
+        if (newValue) {
+          // ensure attachment of listener occurs after DOM updates
+          this.$nextTick(() => {
+            this.addOutsideClickListener();
+          });
+        }
+      }
+    }
   },
   computed: {
     ifTransparent() {
@@ -174,6 +210,9 @@ export default {
     // Deactivate sidenav type buttons on resize and small screens
     window.addEventListener("resize", this.sidenavTypeOnResize);
     window.addEventListener("load", this.sidenavTypeOnResize);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside, true);
   },
 };
 </script>

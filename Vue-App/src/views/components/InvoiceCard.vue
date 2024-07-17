@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import SoftButton from "@/components/SoftButton.vue";
+import SoftButton from "@/components/soft-components/SoftButton.vue";
 
 export default {
   name: "InvoiceCard",

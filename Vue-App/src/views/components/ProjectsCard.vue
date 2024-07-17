@@ -433,8 +433,8 @@
 
 <script>
 import setTooltip from "@/assets/js/tooltip.js";
-import SoftAvatar from "@/components/SoftAvatar.vue";
-import SoftProgress from "@/components/SoftProgress.vue";
+import SoftAvatar from "@/components/soft-components/SoftAvatar.vue";
+import SoftProgress from "@/components/soft-components/SoftProgress.vue";
 import img1 from "../../assets/img/small-logos/logo-xd.svg";
 import img2 from "../../assets/img/team-1.jpg";
 import img3 from "@/assets/img/team-2.jpg";

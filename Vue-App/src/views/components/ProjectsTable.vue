@@ -294,7 +294,7 @@
 </template>
 
 <script>
-import SoftProgress from "@/components/SoftProgress";
+import SoftProgress from "@/components/soft-components/SoftProgress";
 
 export default {
   name: "projects-table",

@@ -8,6 +8,9 @@ front-end
   - Bootstrap5 -- for pre-made components
   - VueI18n -- for supporting both the Chinese and English Languages for this application
   - Axios -- for API endpoint calls to perform CRUD operations
+  - scss -- preprocessor scripting language to boost the functionality of css and organising styling codes
+  - fontawsome -- efficient font & icon toolkits that are based on pure css
+  
 
 back-end
   - node.js -- running express as the backend server

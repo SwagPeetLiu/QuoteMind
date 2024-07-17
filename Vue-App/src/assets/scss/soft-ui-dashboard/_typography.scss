@@ -295,3 +295,48 @@ p {
 .text-9xl {
   font-size: $font-size-9xl;
 }
+.text-10xl{
+  font-size: $font-size-10xl;
+}
+.text-11xl{
+  font-size: $font-size-11xl;
+}
+.text-12xl{
+  font-size: $font-size-12xl;
+}
+
+// font glow
+.text-glow {
+  color: $white;
+  text-shadow:
+    0 0 6px rgba($white, 0.8),
+    0 0 10px rgba($white, 0.6),
+    0 0 11px rgba($gray-100, 0.4),
+    0 0 12px rgba($gray-100, 0.2);
+}
+
+.large-title {
+  @media (min-width: 768px) {
+    font-size: clamp(2rem, calc(2rem + 2.8vw), 6rem);
+    text-align: end;
+    white-space: normal;
+    line-height: 10vh;
+    width: 30%;
+    margin-right: -20%;
+  }
+  @media (min-width: 1000px) {
+    font-size: clamp(2rem, calc(2rem + 4vw), 6rem);
+    text-align: center;
+    white-space: normal;
+    line-height: 15vh;
+    margin-left: -10%;
+    width: 50%;
+  }
+  @media (min-width: 1980px) {
+    font-size: clamp(6rem, calc(1rem + 6vw), 11rem);
+    text-align: center;
+    white-space: normal;
+    line-height: 20vh;
+    width: 50%;
+  }
+}

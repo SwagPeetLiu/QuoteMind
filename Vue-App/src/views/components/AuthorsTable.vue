@@ -304,8 +304,8 @@
 </template>
 
 <script>
-import SoftAvatar from "@/components/SoftAvatar.vue";
-import SoftBadge from "@/components/SoftBadge.vue";
+import SoftAvatar from "@/components/soft-components/SoftAvatar.vue";
+import SoftBadge from "@/components/soft-components/SoftBadge.vue";
 import img1 from "../../assets/img/team-2.jpg";
 import img2 from "../../assets/img/team-3.jpg";
 import img3 from "../../assets/img/team-4.jpg";

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import SoftAvatar from "@/components/SoftAvatar.vue";
+import SoftAvatar from "@/components/soft-components/SoftAvatar.vue";
 import img from "@/assets/img/curved-images/curved14.jpg";
 import img1 from "@/assets/img/logos/mastercard.png";
 

@@ -24,15 +24,13 @@ import "./assets/css/nucleo-svg.css";
 import SoftUIDashboard from "./soft-ui-dashboard";
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-// function used to load the locale strings
-const i18n = createCustomisedI18n();
-
 // set up the baseURL for the back-end Restful API:
 setBaseURL();
 
 // instantiate the app
 const appInstance = createApp(App);
 appInstance.use(store);
+const i18n = createCustomisedI18n();
 appInstance.use(router);
 appInstance.use(i18n);
 appInstance.use(SoftUIDashboard);

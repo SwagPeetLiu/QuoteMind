@@ -2,12 +2,16 @@
   "signIn": {
     "title": "欢迎使用QuoteMind",
     "subtitle": "输入邮箱密码登陆：",
-    "Email": "邮箱",
-    "Password": "密码",
-    "Sign in": "登录",
-    "Forgot password?": "忘记密码?",
+    "email": "邮箱",
+    "password": "密码",
+    "sign in": "登录",
+    "forgot password?": "忘记密码?",
     "noAccountQuestion": "没有账号?",
-    "Sign up": "注册"
+    "sign up": "注册",
+    "invliad credentials": "登陆邮箱或密码错误",
+    "require valid email": "邮箱格式错误",
+    "require valid password": "请输入密码",
+    "imageTitle": "燕地鹏扬"
   },
   "configurator": {
     "Title": "设置",
@@ -26,16 +30,26 @@
     "Logout": "退出登录",
     "View documentation": "查看文档"
   },
-  "apiMessage":{
-    "login":{
+  "apiMessage": {
+    "login": {
       "success": "登录成功",
       "fail": "登录失败",
       "failWrong": "用户名或密码错误",
       "incomplete infomration": "请填写完整信息"
     },
-    "logout":{
+    "logout": {
       "success": "退出登录成功",
       "fail": "退出登录失败"
     }
+  },
+  "footer": {
+    "Author": "作者",
+    "About Us": "关于我们",
+    "Docs": "档案",
+    "Contact Us": "联系我们",
+    "License": "开源",
+    "Privacy": "隐私政策",
+    "Copyright": "版权所有",
+    "Created By": "由Peter Liu提供"
   }
 }

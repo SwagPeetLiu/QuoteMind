@@ -76,6 +76,8 @@ $theme-colors: (
 ) !default;
 // scss-docs-end theme-colors-map
 
+// animation settings:
+$animate-speed: 2s !default;
 
 // Gradient colors
 $primary-gradient:            #7928CA !default;
@@ -471,6 +473,9 @@ $font-size-6xl:               $font-size-base * 3 !default;
 $font-size-7xl:               $font-size-base * 3.75 !default;
 $font-size-8xl:               $font-size-base * 4 !default;
 $font-size-9xl:               $font-size-base * 5 !default;
+$font-size-10xl:               $font-size-base * 6 !default;
+$font-size-11xl:               $font-size-base * 7 !default;
+$font-size-12xl:               $font-size-base * 8 !default;
 
 $font-weight-lighter:         lighter !default;
 $font-weight-light:           300 !default;

@@ -1,83 +1,80 @@
 <template>
-  <div class="container top-0 position-sticky z-index-sticky">
-    <div class="row">
-      <div class="col-12">
-        <navbar
-          is-blur="blur blur-rounded my-3 py-2 start-0 end-0 mx-4 shadow"
-          btn-background="bg-gradient-success"
-          :dark-mode="true"
-        />
-      </div>
-    </div>
-  </div>
   <main class="mt-0 main-content main-content-bg">
     <section>
-      <div class="page-header min-vh-75">
+      <div class="page-header min-vh-75 relative">
         <div class="container">
           <div class="row">
-            <div class="mx-auto col-xl-4 col-lg-5 col-md-6 d-flex flex-column">
+            <div class="mx-auto col-md-6 col-lg-5 col-xl-4 d-flex flex-column">
               <div class="mt-8 card card-plain">
                 <div class="pb-0 card-header text-start">
                   <h3 class="font-weight-bolder text-success text-gradient">
-                    Welcome back
+                    {{ t('signIn.title') }}
                   </h3>
-                  <p class="mb-0">Enter your email and password to sign in</p>
+                  <p class="mb-0">{{ t('signIn.subtitle') }}</p>
                 </div>
                 <div class="card-body">
-                  <form role="form" class="text-start">
-                    <label>Email</label>
-                    <soft-input
-                      id="email"
-                      type="email"
-                      placeholder="Email"
-                      name="email"
-                    />
-                    <label>Password</label>
-                    <soft-input
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      name="password"
-                    />
-                    <soft-switch id="rememberMe" name="rememberMe" checked>
-                      Remember me
-                    </soft-switch>
+
+                  <!--Submission Form-->
+                  <form @submit.prevent="handleSubmission" class="text-start needs-validation d-flex flex-column gap-2"
+                    name="form" novalidate>
+
+                    <!--Message for failing of login-->
+                    <p class="text-danger fs-6" v-if="submitted && !validity && !isLoading">
+                      {{ t('signIn.invliad credentials') }}
+                    </p>
+
+                    <!--Inputs-->
+                    <div class="position-relative">
+                      <label for="email" class="fs-6">{{ t('signIn.email') }}</label>
+                      <input class="form-control" :class="{ 'is-invalid': submitted && !isEmailValid }" type="email"
+                        id="email" :placeholder="t('signIn.email')" v-model="email" required />
+                      <div class="invalid-tooltip fs-7">
+                        {{ t('signIn.require valid email') }}
+                      </div>
+                    </div>
+                    <div class="position-relative">
+                      <label for="password" class="fs-6">{{ t('signIn.password') }}</label>
+                      <input class="form-control" :class="{ 'is-invalid': submitted && !isPasswordValid }" id="password"
+                        type="password" :placeholder="t('signIn.password')" v-model="password" required />
+                      <div class="invalid-tooltip fs-7">
+                        {{ t('signIn.require valid password') }}
+                      </div>
+                    </div>
+
+                    <!--Sign in button-->
                     <div class="text-center">
-                      <soft-button
-                        class="my-4 mb-2"
-                        variant="gradient"
-                        color="success"
-                        full-width
-                        >Sign in
-                      </soft-button>
+                      <button class="my-4 mb-2 btn bg-gradient-success w-100" :disabled="isLoading" type="submit">
+                        <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;"
+                          role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span v-else class="fs-6">{{ t('signIn.sign in') }}</span>
+                      </button>
                     </div>
                   </form>
                 </div>
+
+                <!--Option to redirect to sign up-->
                 <div class="px-1 pt-0 text-center card-footer px-lg-2">
                   <p class="mx-auto mb-4 text-sm">
-                    Don't have an account?
-                    <router-link
-                      :to="{ name: 'Sign Up' }"
-                      class="text-success text-gradient font-weight-bold"
-                      >Sign up</router-link
-                    >
+                    {{ t('signIn.noAccountQuestion') }}
+                    <router-link :to="{ name: 'Sign Up' }" class="text-success text-gradient font-weight-bold">{{
+                      t('signIn.sign up') }}</router-link>
                   </p>
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div
-                class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8"
-              >
-                <div
-                  class="bg-cover oblique-image position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6"
-                  :style="{
-                    backgroundImage:
-                      'url(' +
-                      require('@/assets/img/curved-images/curved9.jpg') +
-                      ')',
-                  }"
-                ></div>
+
+            <!--decoration takes 6 units of the 12 units grids on medium and larger screens-->
+            <div class="col-md-6 col-lg-7 col-xl-8">
+              <div class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8">
+                <div class="bg-cover oblique-image position-absolute fixed-top ms-auto w-100 h-100 z-index-0 ms-md-n10
+                            d-flex justify-content-center align-items-center"   
+                  :style="{ backgroundImage: 'url(' + require('@/assets/img/curved-images/curved9.jpg') + ')' }">
+                  <p class="large-title text-glow fw-bold text-white">
+                    {{ t('signIn.imageTitle') }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -89,35 +86,86 @@
 </template>
 
 <script>
-import Navbar from "@/examples/PageLayout/Navbar.vue";
-import AppFooter from "@/examples/PageLayout/Footer.vue";
-import SoftInput from "@/components/SoftInput.vue";
-import SoftSwitch from "@/components/SoftSwitch.vue";
-import SoftButton from "@/components/SoftButton.vue";
+import AppFooter from "@/components/page-layouts/Footer.vue";
 const body = document.getElementsByTagName("body")[0];
 import { mapMutations } from "vuex";
+import { useI18n } from "vue-i18n";
+import { ref, computed } from "vue";
+import auth from "../api/auth";
+import { useRouter } from 'vue-router';
 
 export default {
   name: "SignIn",
   components: {
-    Navbar,
     AppFooter,
-    SoftInput,
-    SoftSwitch,
-    SoftButton,
+  },
+  setup() {
+    const router = useRouter();
+    const { t } = useI18n();
+    const email = ref("");
+    const password = ref("");
+    const submitted = ref(false);
+    const validity = ref(true);
+    const isLoading = ref(false);
+
+    // computed properties:
+    const isEmailValid = computed(() => {
+      if (!submitted.value) return true;
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+      if (!email.value || !email.value.trim() || !regex.test(email.value)) return false
+      return true
+    });
+    const isPasswordValid = computed(() => {
+      if (!submitted.value) return true;
+      if (!password.value || !password.value.trim()) return false
+      return true;
+    });
+
+    const handleSubmission = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // setting the validation states of the form
+      submitted.value = true;
+      document.getElementsByName("form")[0].classList.add("was-validated");
+
+      // proceed to attempt login
+      if (isEmailValid.value && isPasswordValid.value) {
+        isLoading.value = true;
+        setTimeout(() => {
+          auth.login({ email: email.value, password: password.value })
+            .then((isLoggedIn) => {
+              isLoading.value = false;
+              if (isLoggedIn) {
+                validity.value = true;
+                router.push({ name: "/" });
+              }
+              else {
+                validity.value = false;
+              }
+            })
+            .catch((err) => {
+              validity.value = false;
+              isLoading.value = false;
+              console.error(err);
+            });
+        }, 800);
+      } else {
+        validity.value = true;
+      }
+    };
+    return { t, email, password, submitted, validity, isLoading, isEmailValid, isPasswordValid, handleSubmission };
   },
   created() {
     this.toggleEveryDisplay();
-    this.toggleHideConfig();
     body.classList.remove("bg-gray-100");
   },
   beforeUnmount() {
     this.toggleEveryDisplay();
-    this.toggleHideConfig();
     body.classList.add("bg-gray-100");
   },
   methods: {
-    ...mapMutations(["toggleEveryDisplay", "toggleHideConfig"]),
-  },
+    ...mapMutations(["toggleEveryDisplay"]),
+  }
 };
 </script>

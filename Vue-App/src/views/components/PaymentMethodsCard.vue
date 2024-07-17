@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import SoftButton from "@/components/SoftButton.vue";
+import SoftButton from "@/components/soft-components/SoftButton.vue";
 import img1 from "@/assets/img/logos/mastercard.png";
 import img2 from "@/assets/img/logos/visa.png";
 

@@ -540,9 +540,9 @@
 </template>
 
 <script>
-import SoftSwitch from "@/components/SoftSwitch.vue";
+import SoftSwitch from "@/components/soft-components/SoftSwitch.vue";
 import ProfileInfoCard from "./components/ProfileInfoCard.vue";
-import SoftAvatar from "@/components/SoftAvatar.vue";
+import SoftAvatar from "@/components/soft-components/SoftAvatar.vue";
 import sophie from "@/assets/img/kal-visuals-square.jpg";
 import marie from "@/assets/img/marie.jpg";
 import ivana from "@/assets/img/ivana-square.jpg";

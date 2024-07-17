@@ -202,10 +202,10 @@
 
 <script>
 import Navbar from "@/examples/PageLayout/Navbar.vue";
-import AppFooter from "@/examples/PageLayout/Footer.vue";
-import SoftInput from "@/components/SoftInput.vue";
-import SoftCheckbox from "@/components/SoftCheckbox.vue";
-import SoftButton from "@/components/SoftButton.vue";
+import AppFooter from "@/components/page-layouts/Footer.vue";
+import SoftInput from "@/components/soft-components/SoftInput.vue";
+import SoftCheckbox from "@/components/soft-components/SoftCheckbox.vue";
+import SoftButton from "@/components/soft-components/SoftButton.vue";
 
 import { mapMutations } from "vuex";
 
