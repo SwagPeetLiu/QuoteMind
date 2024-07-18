@@ -1,3 +1,4 @@
+<!-- This component controls the bacground of the  -->
 <template>
   <div
     id="sidenavCard"
@@ -38,7 +39,7 @@
   </div>
 </template>
 <script>
-import imgWhiteCurved from "../../assets/img/curved-images/white-curved.jpeg";
+import imgWhiteCurved from "../../../assets/img/curved-images/white-curved.jpeg";
 export default {
   name: "SidenavCard",
   props: {

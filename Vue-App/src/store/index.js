@@ -27,9 +27,13 @@ export default createStore({
     showNavbar: true,
     showFooter: true,
     showMain: true,
+
+    // display settings:
     navbarFixed: "position-sticky blur shadow-blur left-auto top-1 z-index-sticky px-0 mx-4",
     absolute: "position-absolute px-4 mx-0 w-100 z-index-2",
     bootstrap,
+    loadingDelay: 800,
+    errorMessage: ""
   },
   mutations: {
     // function to toggle the config button at the right bottom of the screen
@@ -95,6 +99,9 @@ export default createStore({
       state.isAuthenticated = false;
       clearToken();
     },
+    setErrorMessage(state, payload) {
+      state.errorMessage = payload;
+    }
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
@@ -107,6 +114,7 @@ export default createStore({
   getters: {
     getIsAuthenticated: (state) => state.isAuthenticated,
     getLanguage: (state) => state.language,
-    getUser: (state) => state.user
+    getUser: (state) => state.user,
+    haveNoDialogs: (state) => state.errorMessage === "",
   },
 });

@@ -1,5 +1,5 @@
 <template>
-  <navbar btn-background="bg-gradient-primary" />
+  <!-- background Image -->
   <div
     class="pt-5 m-3 page-header align-items-start min-vh-50 pb-11 border-radius-lg"
     :style="{
@@ -201,7 +201,6 @@
 </template>
 
 <script>
-import Navbar from "@/examples/PageLayout/Navbar.vue";
 import AppFooter from "@/components/page-layouts/Footer.vue";
 import SoftInput from "@/components/soft-components/SoftInput.vue";
 import SoftCheckbox from "@/components/soft-components/SoftCheckbox.vue";
@@ -212,7 +211,6 @@ import { mapMutations } from "vuex";
 export default {
   name: "SignupBasic",
   components: {
-    Navbar,
     AppFooter,
     SoftInput,
     SoftCheckbox,

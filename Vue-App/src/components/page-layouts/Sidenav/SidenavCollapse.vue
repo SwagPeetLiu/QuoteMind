@@ -1,3 +1,4 @@
+<!-- Controls displays of single directory item -->
 <template>
   <router-link class="nav-link" :to="to" v-bind="$attrs">
     <div

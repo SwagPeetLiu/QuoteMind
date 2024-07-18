@@ -26,8 +26,9 @@
                     <!--Inputs-->
                     <div class="position-relative">
                       <label for="email" class="fs-6">{{ t('signIn.email') }}</label>
-                      <input class="form-control" :class="{ 'is-invalid': submitted && !isEmailValid }" type="email"
-                        id="email" :placeholder="t('signIn.email')" v-model="email" required />
+                      <input class="form-control"
+                        :class="{ 'is-invalid': submitted && !isEmailValid, 'is-valid': submitted && isEmailValid && validity }"
+                        type="email" id="email" :placeholder="t('signIn.email')" v-model="email" required />
                       <div class="invalid-tooltip fs-7">
                         {{ t('signIn.require valid email') }}
                       </div>
@@ -42,15 +43,13 @@
                     </div>
 
                     <!--Sign in button-->
-                    <div class="text-center">
-                      <button class="my-4 mb-2 btn bg-gradient-success w-100" :disabled="isLoading" type="submit">
-                        <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;"
-                          role="status">
-                          <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <span v-else class="fs-6">{{ t('signIn.sign in') }}</span>
-                      </button>
-                    </div>
+                    <button class="text-center my-4 mb-2 btn bg-gradient-success w-100" :disabled="isLoading"
+                      type="submit">
+                      <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                      <span v-else class="fs-6">{{ t('signIn.sign in') }}</span>
+                    </button>
                   </form>
                 </div>
 
@@ -69,7 +68,7 @@
             <div class="col-md-6 col-lg-7 col-xl-8">
               <div class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8">
                 <div class="bg-cover oblique-image position-absolute fixed-top ms-auto w-100 h-100 z-index-0 ms-md-n10
-                            d-flex justify-content-center align-items-center"   
+                            d-flex justify-content-center align-items-center"
                   :style="{ backgroundImage: 'url(' + require('@/assets/img/curved-images/curved9.jpg') + ')' }">
                   <p class="large-title text-glow fw-bold text-white">
                     {{ t('signIn.imageTitle') }}
@@ -93,11 +92,12 @@ import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
 import auth from "../api/auth";
 import { useRouter } from 'vue-router';
+import store from "../store";
 
 export default {
   name: "SignIn",
   components: {
-    AppFooter,
+    AppFooter
   },
   setup() {
     const router = useRouter();
@@ -128,7 +128,6 @@ export default {
       // setting the validation states of the form
       submitted.value = true;
       document.getElementsByName("form")[0].classList.add("was-validated");
-
       // proceed to attempt login
       if (isEmailValid.value && isPasswordValid.value) {
         isLoading.value = true;
@@ -144,12 +143,12 @@ export default {
                 validity.value = false;
               }
             })
-            .catch((err) => {
+            .catch(() => {
               validity.value = false;
               isLoading.value = false;
-              console.error(err);
+              store.commit("setErrorMessage", t('apiMessage.failed'));
             });
-        }, 800);
+        }, store.state.loadingDelay);
       } else {
         validity.value = true;
       }

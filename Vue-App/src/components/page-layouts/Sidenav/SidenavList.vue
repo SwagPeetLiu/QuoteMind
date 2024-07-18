@@ -1,3 +1,4 @@
+<!-- this component controls the Listings of the navigation pages -->
 <template>
   <div
     class="w-auto h-auto collapse navbar-collapse max-height-vh-100 h-100"
@@ -74,6 +75,8 @@
       </li>
     </ul>
   </div>
+  
+  <!-- Sidenav Footer -->
   <div class="pt-3 mx-3 mt-3 sidenav-footer">
     <sidenav-card
       :class="cardBg"
@@ -94,14 +97,14 @@
 <script>
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
-import Shop from "../../components/Icon/Shop.vue";
-import Office from "../../components/Icon/Office.vue";
-import CreditCard from "../../components/Icon/CreditCard.vue";
-import Box3d from "../../components/Icon/Box3d.vue";
-import CustomerSupport from "../../components/Icon/CustomerSupport.vue";
-import Document from "../../components/Icon/Document.vue";
-import Spaceship from "../../components/Icon/Spaceship.vue";
-import Settings from "../../components/Icon/Settings.vue";
+import Shop from "../../Icon/Shop.vue";
+import Office from "../../Icon/Office.vue";
+import CreditCard from "../../Icon/CreditCard.vue";
+import Box3d from "../../Icon/Box3d.vue";
+import CustomerSupport from "../../Icon/CustomerSupport.vue";
+import Document from "../../Icon/Document.vue";
+import Spaceship from "../../Icon/Spaceship.vue";
+import Settings from "../../Icon/Settings.vue";
 
 export default {
   name: "SidenavList",

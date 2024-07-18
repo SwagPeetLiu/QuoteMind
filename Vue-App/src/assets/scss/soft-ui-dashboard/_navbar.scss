@@ -1,10 +1,14 @@
+// definition of the style of the nav bar on the top
 .navbar {
   box-shadow: $navbar-box-shadow;
 
+  // colours of the 
   .navbar-brand {
     color: $dark;
     @include font-size($font-size-sm);
   }
+
+  // colour of the nav link directories on the top
   .nav-link {
     color: $dark;
     padding: $navbar-nav-link-padding;
@@ -12,25 +16,24 @@
     font-size: $font-size-sm;
   }
 
+  // positions and spacing on the top
   &.navbar-absolute {
     position: absolute;
     width: 100%;
     z-index: 1;
   }
 
+  // colours of the top nav bar when setting is turned to be transparent mode
   &.navbar-transparent {
     .nav-link {
       &, i {
         color: $white;
       }
-
-
       &:hover,
       &:focus {
         color: rgba($white, .75);
       }
     }
-
     .navbar-toggler {
       .navbar-toggler-icon {
         .navbar-toggler-bar {
@@ -38,7 +41,6 @@
         }
       }
     }
-
     .navbar-collapse{
       border-radius: $border-radius-xl;
     }

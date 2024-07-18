@@ -32,13 +32,13 @@
   "apiMessage": {
     "login": {
       "success": "Sucessfullly Logged in",
-      "fail": "Failed to Login",
+      "failed": "Failed to Login",
       "failWrong": "Email or Password is wrong",
       "incomplete infomration": "Incomplete information"
     },
     "logout": {
       "success": "Sucessfullly Logged out",
-      "fail": "Failed to Logout"
+      "failed": "Failed to Logout"
     }
   },
   "footer": {
@@ -50,5 +50,12 @@
     "Privacy": "Privacy",
     "Copyright": "Copyright",
     "Created By": "Created by Peter Liu"
+  },
+  "dialog":{
+    "error title": "Please Note:",
+    "failed to logout": "Failed to logout",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close"
   }
 }

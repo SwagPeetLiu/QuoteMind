@@ -180,12 +180,12 @@
 .sidenav {
   transition: $transition-base;
 }
-//
-// Sidenav
-//
 
+//
+// Sidenav style definitions
+//
 .sidenav {
-  z-index: 9999;
+  z-index: 999; // always on top
 
   .navbar-brand,
   .navbar-heading {

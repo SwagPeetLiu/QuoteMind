@@ -1,3 +1,4 @@
+<!-- navbar on the top of the main container -->
 <template>
   <nav
     class="shadow-none navbar navbar-main navbar-expand-lg border-radius-xl"
@@ -97,7 +98,7 @@
                   <div class="py-1 d-flex">
                     <div class="my-auto">
                       <img
-                        src="../../assets/img/team-2.jpg"
+                        src="../../../assets/img/team-2.jpg"
                         class="avatar avatar-sm me-3"
                         alt="user image"
                       />
@@ -120,7 +121,7 @@
                   <div class="py-1 d-flex">
                     <div class="my-auto">
                       <img
-                        src="../../assets/img/small-logos/logo-spotify.svg"
+                        src="../../../assets/img/small-logos/logo-spotify.svg"
                         class="avatar avatar-sm bg-gradient-dark me-3"
                         alt="logo spotify"
                       />
@@ -201,7 +202,7 @@
   </nav>
 </template>
 <script>
-import Breadcrumbs from "../Breadcrumbs.vue";
+import Breadcrumbs from "./Breadcrumbs.vue";
 import { mapMutations, mapActions } from "vuex";
 
 export default {
@@ -232,10 +233,13 @@ export default {
       return this.$route.name;
     },
   },
+
+  // Controls the displays of the top nav bar (breadcrumbs displays based on
+  // scrolls & the setting on pendings)
   updated() {
     const navbar = document.getElementById("navbarBlur");
     window.addEventListener("scroll", () => {
-      if (window.scrollY > 10 && this.$store.state.isNavFixed) {
+      if (window.scrollY > 10 && this.$store.state.isNavFixed && navbar) {
         navbar.classList.add("blur");
         navbar.classList.add("position-sticky");
         navbar.classList.add("shadow-blur");

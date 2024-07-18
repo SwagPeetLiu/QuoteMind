@@ -1,4 +1,5 @@
 <template>
+  <div>
   <sidenav
     :custom_class="this.$store.state.mcolor"
     :class="[
@@ -11,7 +12,7 @@
     class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
     :style="this.$store.state.isRTL ? 'overflow-x: hidden' : ''"
   >
-    <!-- nav -->
+    <!-- nav bar on the top of the main container -->
     <navbar
       :class="[navClasses]"
       :textWhite="this.$store.state.isAbsolute ? 'text-white opacity-8' : ''"
@@ -28,14 +29,19 @@
       ]"
     />
   </main>
+  <error-dialog/>
+</div>
 </template>
 
 <script>
-import Sidenav from "./examples/Sidenav";
+import Sidenav from "./components/page-layouts/Sidenav";
 import Configurator from "@/components/page-layouts/Configurator.vue";
-import Navbar from "@/examples/Navbars/Navbar.vue";
+import Navbar from "./components/page-layouts/TopNav/Navbar.vue";
 import AppFooter from "@/examples/Footer.vue";
 import { mapMutations } from "vuex";
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
+import ErrorDialog from "./components/reuseable-components/ErrorDialog.vue";
+
 export default {
   name: "App",
   components: {
@@ -43,9 +49,16 @@ export default {
     Configurator,
     Navbar,
     AppFooter,
+    ErrorDialog
   },
   methods: {
     ...mapMutations(["toggleConfigurator", "navbarMinimize"]),
+    showModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+                keyboard: false
+            })
+            myModal.show()
+        }
   },
   computed: {
     navClasses() {

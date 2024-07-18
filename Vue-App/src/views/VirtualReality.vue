@@ -141,9 +141,9 @@
 </template>
 
 <script>
-import Sidenav from "@/examples/Sidenav";
-import AppFooter from "@/examples/Footer.vue";
-import Navbar from "@/examples/Navbars/Navbar.vue";
+import Sidenav from "../components/page-layouts/Sidenav";
+import AppFooter from "../components/page-layouts/Footer.vue";
+import Navbar from "../components/page-layouts/TopNav/Navbar.vue";
 import CalendarCard from "./components/CalendarCard.vue";
 import EmailCard from "./components/EmailCard.vue";
 import TodoCard from "./components/TodoCard.vue";

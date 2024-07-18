@@ -22,7 +22,8 @@ import router from "./router";
 import "./assets/css/nucleo-icons.css";
 import "./assets/css/nucleo-svg.css";
 import SoftUIDashboard from "./soft-ui-dashboard";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Bootstrap JS bundle
+import 'bootstrap'; // ensure both JS and CSS are included
 
 // set up the baseURL for the back-end Restful API:
 setBaseURL();

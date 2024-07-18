@@ -3,21 +3,25 @@
     <a class="px-3 py-2 fixed-plugin-button text-dark position-fixed" @click.prevent="toggleConfig">
       <i class="py-2 fa fa-cog"> </i>
     </a>
+
+    <!-- Configurator Card -->
     <div class="shadow-lg card blur">
       <div class="pt-3 pb-0 bg-transparent card-header">
         <div class="float-start">
           <h5 class="mt-3 mb-0">{{ t("configurator.Title") }}</h5>
           <p>{{ t("configurator.Subtitle") }}</p>
         </div>
+
+        <!-- toggle button -->
         <div class="mt-4 float-end" @click="toggle">
           <button class="p-0 btn btn-link text-dark fixed-plugin-close-button">
             <i class="fa fa-close"></i>
           </button>
         </div>
-        <!-- End Toggle Button -->
       </div>
       <hr class="my-1 horizontal dark" />
       <div class="pt-0 card-body pt-sm-3">
+
         <!-- Sidebar Backgrounds -->
         <div>
           <h6 class="mb-0">{{ t("configurator.SideBar Colours") }}</h6>
@@ -33,6 +37,7 @@
             <span class="badge filter bg-gradient-danger" data-color="danger" @click="sidebarColor('danger')"></span>
           </div>
         </a>
+
         <!-- Sidenav Type -->
         <div class="mt-3">
           <h6 class="mb-0">{{ t("configurator.SideNav Type") }}</h6>
@@ -80,29 +85,34 @@
           </ul>
         </div>
 
-        <!-- config buttons-->
+        <!-- contribution EOI-->
         <hr class="horizontal dark my-sm-4" />
-        <a class="btn bg-gradient-info w-100" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro">
+        <a class="btn bg-gradient-info w-100" target="_blank" rel="noopener noreferrer"
+          href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro">
           {{ t("configurator.Contribution Interest") }}
         </a>
 
-        <button v-if="this.$store.getters.getIsAuthenticated" 
-          class="btn bg-gradient-dark w-100" @click="logout">
-          {{ t("configurator.Logout") }}
+        <!-- allow logout if user is logged in-->
+        <button v-if="this.$store.getters.getIsAuthenticated" class="text-center btn bg-gradient-dark w-100"
+          :disabled="isLoading" @click.prevent="logout">
+          <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <span v-else>{{ t("configurator.Logout") }}</span>
         </button>
+
+        <!-- if not logged in use sign up-->
         <router-link v-else :to="{ name: 'Sign Up' }" class="btn bg-gradient-dark w-100">{{
           t('signIn.sign up') }}
         </router-link>
-        
-        <a class="btn btn-outline-dark w-100" 
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <!-- doc direction-->
+        <a class="btn btn-outline-dark w-100" target="_blank" rel="noopener noreferrer"
           href="https://535051192liu.atlassian.net/wiki/spaces/KAN">
           {{ t("configurator.View documentation") }}
         </a>
+        <button class="btn btn-outline-dark w-100" @click.prevent="toggle">clicked</button>
+
       </div>
     </div>
   </div>
@@ -111,12 +121,16 @@
 <script>
 import { mapMutations, mapActions } from "vuex";
 import { useI18n } from "vue-i18n";
+import { ref } from "vue";
+import auth from "../../api/auth";
+
 export default {
   name: "configurator",
   props: ["toggle"],
   setup() {
     const { t } = useI18n();
-    return { t };
+    const isLoading = ref(false);
+    return { t, isLoading };
   },
   data() {
     return {
@@ -162,8 +176,8 @@ export default {
       this.$store.commit("setLanguage", language);
       this.$refs["language-select"].blur(); // remove the focus on the selection:
     },
-    toggleConfig(event){
-      if (event){
+    toggleConfig(event) {
+      if (event) {
         event.preventDefault();
         event.stopPropagation();
       }
@@ -173,7 +187,9 @@ export default {
     handleClickOutside(event) {
       if (this.$store.state.showConfig === true &&
         this.$refs.configuratorContainer &&
-        !this.$refs.configuratorContainer.contains(event.target)) {
+        !this.$refs.configuratorContainer.contains(event.target) &&
+        this.$store.getters.haveNoDialogs === true
+      ) {
         this.$store.state.showConfig = false;
         document.removeEventListener('click', this.handleClickOutside, true);
       }
@@ -183,11 +199,37 @@ export default {
         document.addEventListener('click', this.handleClickOutside, true);
       }, 100);
     },
+
+    // function used to logout the user:
+    logout() {
+      if (this.$store.getters.getIsAuthenticated && this.$store.getters.getUser.session) {
+        this.isLoading = true;
+        setTimeout(() => {
+          auth.logout()
+            .then((isLoggedOut) => {
+              if (isLoggedOut) {
+                this.$store.state.showConfig = false;
+                document.removeEventListener('click', this.handleClickOutside, true);
+                this.$router.push({ name: "Sign In" });
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            })
+            .finally(() => {
+              this.isLoading = false;
+              // if you failed to logout (i.e., still logged in), set an error message
+              if (this.$store.getters.getIsAuthenticated) {
+                this.$store.commit("setErrorMessage", this.t('apiMessage.logout.failed'));
+              }
+            });
+        }, this.$store.state.loadingDelay);
+      }
+    }
   },
   watch: {
     '$store.state.showConfig': {
       handler(newValue) {
-        console.log("new value", newValue)
         if (newValue) {
           // ensure attachment of listener occurs after DOM updates
           this.$nextTick(() => {
