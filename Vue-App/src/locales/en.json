@@ -12,6 +12,20 @@
     "require valid password": "Require a valid Password",
     "imageTitle": "Quote Mind"
   },
+  "signUp":{
+    "title": "Welcome !",
+    "subtitle": "Awsome ERP features for your marketing quotations",
+    "register now": "Register Account",
+    "already have an account?": "Already have an account?",
+    "sign in": "Sign In",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "token": "Register Token",
+    "sign up": "Sign Up",
+    "agree": "I agree to the ",
+    "terms and conditions": "Terms and Conditions"
+  },
   "configurator": {
     "Title": "Settings",
     "Subtitle": "See your dashboard options.",
@@ -30,6 +44,7 @@
     "View documentation": "View documentation"
   },
   "apiMessage": {
+    "Internal server error": "Internal server error",
     "login": {
       "success": "Sucessfullly Logged in",
       "failed": "Failed to Login",
@@ -39,7 +54,17 @@
     "logout": {
       "success": "Sucessfullly Logged out",
       "failed": "Failed to Logout"
+    },
+    "register": {
+      "success": "Sucessfullly Registered",
+      "failed": "Failed to Register",
+      "incompleteness message": "Complete Registeration form is required",
+      "invalid token message": "Invalid Token Provided",
+      "already registered message": "Email already exists"
     }
+  },
+  "thinBar":{
+    "advertise": "Enable Your Marketing Quotation"
   },
   "footer": {
     "Author": "Author",
@@ -53,9 +78,22 @@
   },
   "dialog":{
     "error title": "Please Note:",
-    "failed to logout": "Failed to logout",
+    "failed to logout": "Failed to logout, please try again later.",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "close": "Close"
+  },
+  "validation":{
+    "cannot be empty": "cannot be empty",
+    "too short": "too short",
+    "too long": "too long",
+    
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "token": "Register Token",
+
+    "invalid email": "Email must be a valid email",
+    "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"
   }
 }

@@ -13,6 +13,20 @@
     "require valid password": "请输入密码",
     "imageTitle": "燕地鹏扬"
   },
+  "signUp":{
+    "title": "欢迎使用!",
+    "subtitle": "Quote Mind为您提供自动化的报价服务",
+    "register now": "注册账号",
+    "already have an account?": "已注册账号？",
+    "sign in": "登陆",
+    "name": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "token": "注册码",
+    "sign up": "注册",
+    "agree": "我已阅读并同意",
+    "terms and conditions": "协议和隐私政策"
+  },
   "configurator": {
     "Title": "设置",
     "Subtitle": "可调式的选项如下：",
@@ -31,6 +45,7 @@
     "View documentation": "查看文档"
   },
   "apiMessage": {
+    "Internal server error": "服务器内部错误",
     "login": {
       "success": "登录成功",
       "failed": "登录失败",
@@ -40,6 +55,13 @@
     "logout": {
       "success": "退出登录成功",
       "failed": "退出登录失败"
+    },
+    "register": {
+      "success": "注册成功",
+      "failed": "注册失败",
+      "incompleteness message": "注册信息不完整",
+      "invalid token message": "注册码无效",
+      "already registered message": "该邮箱已被注册"
     }
   },
   "footer": {
@@ -54,9 +76,22 @@
   },
   "dialog":{
     "error title": "请注意：",
-    "failed to logout": "退出登录失败",
+    "failed to logout": "退出登录失败，请重试",
     "confirm": "确认",
     "cancel": "取消",
     "close": "关闭"
+  },
+  "validation":{
+    "cannot be empty": "不能填空",
+    "too short": "过短",
+    "too long": "过长",
+    
+    "username": "用户名",
+    "email": "邮箱",
+    "password": "密码",
+    "token": "注册码",
+
+    "invalid email": "邮箱格式错误",
+    "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符"
   }
 }

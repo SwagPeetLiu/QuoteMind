@@ -37,7 +37,7 @@ module.exports = (db) => {
 
             // validate register token
             if (registerToken !== process.env.REGISTER_TOKEN) {
-                return res.status(401).json({ message: 'Invalid Information Provided' });
+                return res.status(401).json({ message: 'Invalid Token Provided' });
             }
 
             // create an user if no previous email was registered here:

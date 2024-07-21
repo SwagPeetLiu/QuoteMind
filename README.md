@@ -10,8 +10,8 @@ front-end
   - Axios -- for API endpoint calls to perform CRUD operations
   - scss -- preprocessor scripting language to boost the functionality of css and organising styling codes
   - fontawsome -- efficient font & icon toolkits that are based on pure css
+  - Dompurify - input sanitisations for preventing XSS attacks with html manipulations
   
-
 back-end
   - node.js -- running express as the backend server
   - jwt -- jsonwebtoken for authorisation purposes with session expiration settings

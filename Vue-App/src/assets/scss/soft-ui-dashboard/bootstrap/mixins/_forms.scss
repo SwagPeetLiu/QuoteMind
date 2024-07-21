@@ -77,12 +77,52 @@
           box-shadow: $focus-box-shadow;
         }
       }
-      // Styles for valid state (no visual changes)
+      // Styles for valid state (no visual changes - personal preference)
       @if $state == "valid" {
         border-color: $input-border-color;
         background-image: none;
         &:focus {
           border-color: inherit;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+
+  @keyframes validationAnimation {
+    // spinning for 99% of the duration
+    0%, 99% {
+      background-image: $form-validating-icon;
+      animation: spin 1s linear infinite;
+    }
+    // switch to a green tick
+    100% {
+      background-image: escape-svg($form-feedback-icon-valid);
+      animation: none;
+    }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+    // customised green tick in spcific forms' inputs
+  .input-green-tick {
+    @include form-validation-state-selector($state) {
+      @if $state == "valid" {
+        border-color: $input-border-color;
+
+        @if $enable-validation-icons {
+          padding-right: $input-height-inner;
+          background-repeat: no-repeat;
+          background-position: right $input-height-inner-quarter center;
+          background-size: $input-height-inner-half $input-height-inner-half;
+          animation: validationAnimation 0.8s linear forwards;
+        }
+
+        &:focus {
+          border-color: $input-border-color;
           box-shadow: none;
         }
       }
@@ -124,18 +164,46 @@
   // Styles for checkboxes and radio buttons
   .form-check-input {
     @include form-validation-state-selector($state) {
-      border-color: $color;
 
-      &:checked {
-        background-color: $color;
+      // if the checkbox or radio does not validate, then show warning styles
+      @if $state == "invalid"{
+        border-color: $color !important; 
+        
+        &:checked {
+          background-color: none;
+        }
+        &:focus {
+          box-shadow: inherit;
+        }
+        ~ .form-check-label,
+        ~ .form-check-label.span {
+          color: $color !important; 
+        }
       }
-
-      &:focus {
-        box-shadow: $focus-box-shadow;
+      // if validated, then do not show any additional css styles
+      @if $state == "valid"{
+        border-color: none;
+        &:checked {
+          background-color: none;
+        }
+        &:focus {
+          background-color: none;
+          box-shadow: none;
+        }
+        ~ .form-check-label {
+          color: inherit;
+        }
       }
-
-      ~ .form-check-label {
-        color: $color;
+      // account for transition state
+      &:not(.is-valid):not(.is-invalid) {
+        border-color: $input-border-color;
+        &:checked {
+          background-color: none;
+          border-color: inherit;
+        }
+        &:focus {
+          box-shadow: none;
+        }
       }
     }
   }

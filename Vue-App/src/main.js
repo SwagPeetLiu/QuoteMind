@@ -16,7 +16,7 @@ Coded by www.creative-tim.com
 import { createApp } from "vue";
 import App from "./App.vue";
 import store from "./store";
-import { createCustomisedI18n } from "./utils/I18n";
+import { useTranslation } from "./utils/I18n";
 import { setBaseURL } from "./utils/apiSetter";
 import router from "./router";
 import "./assets/css/nucleo-icons.css";
@@ -24,6 +24,7 @@ import "./assets/css/nucleo-svg.css";
 import SoftUIDashboard from "./soft-ui-dashboard";
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Bootstrap JS bundle
 import 'bootstrap'; // ensure both JS and CSS are included
+import DOMPurify from 'dompurify';
 
 // set up the baseURL for the back-end Restful API:
 setBaseURL();
@@ -31,8 +32,9 @@ setBaseURL();
 // instantiate the app
 const appInstance = createApp(App);
 appInstance.use(store);
-const i18n = createCustomisedI18n();
+const i18n = useTranslation();
 appInstance.use(router);
 appInstance.use(i18n);
 appInstance.use(SoftUIDashboard);
+appInstance.provide('$sanitize', (dirty) => DOMPurify.sanitize(dirty));
 appInstance.mount("#app");

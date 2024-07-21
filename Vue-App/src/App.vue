@@ -30,6 +30,7 @@
     />
   </main>
   <error-dialog/>
+  <slide-toast/>
 </div>
 </template>
 
@@ -41,6 +42,7 @@ import AppFooter from "@/examples/Footer.vue";
 import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 import ErrorDialog from "./components/reuseable-components/ErrorDialog.vue";
+import SlideToast from "./components/reuseable-components/SlideToast.vue";
 
 export default {
   name: "App",
@@ -49,7 +51,8 @@ export default {
     Configurator,
     Navbar,
     AppFooter,
-    ErrorDialog
+    ErrorDialog,
+    SlideToast
   },
   methods: {
     ...mapMutations(["toggleConfigurator", "navbarMinimize"]),

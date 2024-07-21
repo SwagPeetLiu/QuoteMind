@@ -88,31 +88,31 @@
         <!-- contribution EOI-->
         <hr class="horizontal dark my-sm-4" />
         <a class="btn bg-gradient-info w-100" target="_blank" rel="noopener noreferrer"
-          href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro">
+          href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro"
+          @click="closeConfig"
+          >
           {{ t("configurator.Contribution Interest") }}
         </a>
 
         <!-- allow logout if user is logged in-->
         <button v-if="this.$store.getters.getIsAuthenticated" class="text-center btn bg-gradient-dark w-100"
           :disabled="isLoading" @click.prevent="logout">
-          <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
+          <Spinner v-if="isLoading" class="spinner-border"/>
           <span v-else>{{ t("configurator.Logout") }}</span>
         </button>
 
         <!-- if not logged in use sign up-->
-        <router-link v-else :to="{ name: 'Sign Up' }" class="btn bg-gradient-dark w-100">{{
+        <router-link v-else @click="closeConfig" :to="{ name: 'Sign Up' }" class="btn bg-gradient-dark w-100">{{
           t('signIn.sign up') }}
         </router-link>
 
         <!-- doc direction-->
         <a class="btn btn-outline-dark w-100" target="_blank" rel="noopener noreferrer"
-          href="https://535051192liu.atlassian.net/wiki/spaces/KAN">
+          href="https://535051192liu.atlassian.net/wiki/spaces/KAN"
+          @click="closeConfig"
+          >
           {{ t("configurator.View documentation") }}
         </a>
-        <button class="btn btn-outline-dark w-100" @click.prevent="toggle">clicked</button>
-
       </div>
     </div>
   </div>
@@ -120,6 +120,7 @@
 
 <script>
 import { mapMutations, mapActions } from "vuex";
+import Spinner from "../reuseable-components/Spinner.vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import auth from "../../api/auth";
@@ -127,6 +128,9 @@ import auth from "../../api/auth";
 export default {
   name: "configurator",
   props: ["toggle"],
+  components:{
+    Spinner
+  },
   setup() {
     const { t } = useI18n();
     const isLoading = ref(false);
@@ -199,6 +203,10 @@ export default {
         document.addEventListener('click', this.handleClickOutside, true);
       }, 100);
     },
+    closeConfig() {
+      this.$store.state.showConfig = false;
+      document.removeEventListener('click', this.handleClickOutside, true);
+    },
 
     // function used to logout the user:
     logout() {
@@ -208,8 +216,7 @@ export default {
           auth.logout()
             .then((isLoggedOut) => {
               if (isLoggedOut) {
-                this.$store.state.showConfig = false;
-                document.removeEventListener('click', this.handleClickOutside, true);
+                this.closeConfig();
                 this.$router.push({ name: "Sign In" });
               }
             })

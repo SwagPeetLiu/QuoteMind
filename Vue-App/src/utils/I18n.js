@@ -1,5 +1,6 @@
 import { createI18n } from 'vue-i18n';
 import store from "../store";
+const i18n = createCustomisedI18n();
 
 // function used to load the locale strings
 function loadLocaleMessages() {
@@ -30,4 +31,7 @@ function createCustomisedI18n() {
   return i18n
 }
 
-export { createCustomisedI18n };
+function useTranslation(){
+  return i18n;
+}
+export { useTranslation };

@@ -1,14 +1,22 @@
 .toast {
-  width: $toast-max-width;
   max-width: 100%;
-  @include font-size($toast-font-size);
-  color: $toast-color;
   pointer-events: auto;
   background-color: $toast-background-color;
+
   background-clip: padding-box;
   border: $toast-border-width solid $toast-border-color;
   box-shadow: $toast-box-shadow;
   @include border-radius($toast-border-radius);
+
+  // default width definition and text sizes for small screens
+  width: $toast-max-width-md;
+  @include font-size($toast-font-size-sm);
+
+  // larger width and size definition for large screens
+  @media(min-width: 768px) {
+    width: $toast-max-width-lg;
+    @include font-size($toast-font-size-lg);
+  }
 
   &.showing {
     opacity: 0;
@@ -17,12 +25,31 @@
   &:not(.show) {
     display: none;
   }
+
+  // Semi-transparent background colors
+  &.bg-success {
+    background-color: rgba($success, 0.75) !important;
+  }
+
+  &.bg-danger {
+    background-color: rgba($danger, 0.75) !important;
+  }
+
+  &.bg-warning {
+    background-color: rgba($warning, 0.75) !important;
+  }
+
+  // maintain original text colour
+  color: $toast-color;
+
 }
 
 .toast-container {
+  z-index: 1000;
   width: max-content;
   max-width: 100%;
   pointer-events: none;
+  margin-bottom: $toast-margin-y;
 
   > :not(:last-child) {
     margin-bottom: $toast-spacing;
@@ -46,6 +73,17 @@
 }
 
 .toast-body {
-  padding: $toast-padding-x; // apply to both vertical and horizontal
-  word-wrap: break-word;
+  color: $gray-900;
+  font-weight: $toast-font-weight;
+  word-wrap: normal;
+  text-wrap: nowrap;
+  text-align: center;
+  color: $white;
+
+  .i,
+  .span {
+    color: $white;
+  }
+
+  max-lines: 1;
 }

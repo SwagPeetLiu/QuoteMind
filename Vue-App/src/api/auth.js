@@ -1,5 +1,7 @@
 import axios from 'axios';
 import store from '../store';
+import { useTranslation } from '../utils/I18n';
+const { global: { t } } = useTranslation(); // access the gloabal translation function
 
 // Authentication used to update access of a user
 const auth = {
@@ -16,9 +18,11 @@ const auth = {
                 role: response.data.role,
                 session: response.data.session
             });
+            store.commit("setToastMessage", { message: t("apiMessage.login.success"), type: "success" });
             return true;
         })
         .catch((error) => {
+            store.commit("setToastMessage", { message: t("apiMessage.login.failed"), type: "error" });
             console.error("failed to login", error.message);
             return false;
         });
@@ -36,10 +40,12 @@ const auth = {
             token: currentUser.session
         })
         .then(() => {
+            store.commit("setToastMessage", { message: t("apiMessage.logout.success"), type: "sucess" });
             store.commit('clearUser');
             return true;
         })
         .catch((error) => {
+            store.commit("setToastMessage", { message: t("apiMessage.logout.failed"), type: "error" });
             console.error("failed to logout", error);
             return false;
         });

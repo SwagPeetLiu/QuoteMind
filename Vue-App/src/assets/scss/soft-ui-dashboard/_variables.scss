@@ -1280,9 +1280,7 @@ $accordion-icon-transform:                rotate(180deg) !default;
 $accordion-button-icon:                   none !default;
 $accordion-button-active-icon:            none !default;
 
-
 // Tooltips
-
 $tooltip-font-size:                 $font-size-sm !default;
 $tooltip-max-width:                 200px !default;
 $tooltip-color:                     $white !default;
@@ -1334,17 +1332,20 @@ $popover-arrow-outer-color:         fade-in($popover-border-color, .05) !default
 
 
 // Toasts
-
-$toast-max-width:                   350px !default;
+$toast-max-width-md:                 300px !default;
+$toast-max-width-lg:                 450px !default;
 $toast-padding-x:                   .75rem !default;
 $toast-padding-y:                   .75rem !default;
-$toast-font-size:                   .875rem !default;
-$toast-color:                       null !default;
+$toast-margin-y:                    1.75rem !default;
+$toast-font-size-sm:                .75rem !default;
+$toast-font-size-lg:                1.1rem !default;
+$toast-font-weight:                 $font-weight-bold !default;
+$toast-color:                       $white !default;
 $toast-background-color:            rgba($white, .85) !default;
 $toast-border-width:                0 !default;
 $toast-border-color:                transparent !default;
 $toast-border-radius:               $border-radius-md !default;
-$toast-box-shadow:                  $box-shadow !default;
+$toast-box-shadow:                  $box-shadow-lg !default;
 
 $toast-header-color:                $h-color !default;
 $toast-header-background-color:     rgba($white, .85) !default;

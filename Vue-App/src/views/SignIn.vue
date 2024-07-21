@@ -1,5 +1,16 @@
 <template>
   <main class="mt-0 main-content main-content-bg">
+    <div class="container top-0 position-sticky z-index-sticky">
+      <div class="row">
+        <div class="col-12">
+          <ThinBar
+            is-blur="blur blur-rounded my-3 py-2 start-0 end-0 mx-4 shadow-lg"
+            btn-background="bg-gradient-success"
+            :dark-mode="false"
+          />
+        </div>
+      </div>
+    </div>
     <section>
       <div class="page-header min-vh-75 relative">
         <div class="container">
@@ -45,9 +56,7 @@
                     <!--Sign in button-->
                     <button class="text-center my-4 mb-2 btn bg-gradient-success w-100" :disabled="isLoading"
                       type="submit">
-                      <div v-if="isLoading" class="spinner-border" style="width: 1.5rem; height: 1.5rem;" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                      </div>
+                      <Spinner v-if="isLoading" />
                       <span v-else class="fs-6">{{ t('signIn.sign in') }}</span>
                     </button>
                   </form>
@@ -67,10 +76,18 @@
             <!--decoration takes 6 units of the 12 units grids on medium and larger screens-->
             <div class="col-md-6 col-lg-7 col-xl-8">
               <div class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8">
-                <div class="bg-cover oblique-image position-absolute fixed-top ms-auto w-100 h-100 z-index-0 ms-md-n10
-                            d-flex justify-content-center align-items-center"
-                  :style="{ backgroundImage: 'url(' + require('@/assets/img/curved-images/curved9.jpg') + ')' }">
-                  <p class="large-title text-glow fw-bold text-white">
+                <div class="bg-cover oblique-video position-absolute fixed-top ms-auto w-100 h-100 z-index-0 ms-md-n10
+                            d-flex justify-content-center align-items-center">
+                  <!-- :style="{ backgroundImage: 'url(' + require('@/assets/img/curved-images/curved9.jpg') + ')' }"> -->
+                  <video 
+                    autoplay loop muted playsinline 
+                    @loadedmetadata="onVideoLoaded"
+                    class="w-100 h-100 object-fit-cover position-absolute slow-motion-video"
+                  >
+                    <source ref="bg-vid":src="require('@/assets/vid/v1.mp4')" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                  <p class="large-title text-glow fw-bold text-white position-relative z-index-1">
                     {{ t('signIn.imageTitle') }}
                   </p>
                 </div>
@@ -86,6 +103,8 @@
 
 <script>
 import AppFooter from "@/components/page-layouts/Footer.vue";
+import ThinBar from "../components/page-layouts/ThinBar.vue";
+import Spinner from "../components/reuseable-components/Spinner.vue";
 const body = document.getElementsByTagName("body")[0];
 import { mapMutations } from "vuex";
 import { useI18n } from "vue-i18n";
@@ -93,11 +112,14 @@ import { ref, computed } from "vue";
 import auth from "../api/auth";
 import { useRouter } from 'vue-router';
 import store from "../store";
+import { inject } from 'vue';
 
 export default {
   name: "SignIn",
   components: {
-    AppFooter
+    AppFooter,
+    Spinner,
+    ThinBar
   },
   setup() {
     const router = useRouter();
@@ -107,13 +129,19 @@ export default {
     const submitted = ref(false);
     const validity = ref(true);
     const isLoading = ref(false);
+    const sanitize = inject('$sanitize');
 
     // computed properties:
     const isEmailValid = computed(() => {
       if (!submitted.value) return true;
-      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-      if (!email.value || !email.value.trim() || !regex.test(email.value)) return false
-      return true
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+      if (!email.value ||
+        !email.value.trim() ||
+        !regex.test(sanitize(email.value))
+      ) {
+        return false;
+      }
+      return true;
     });
     const isPasswordValid = computed(() => {
       if (!submitted.value) return true;
@@ -132,7 +160,7 @@ export default {
       if (isEmailValid.value && isPasswordValid.value) {
         isLoading.value = true;
         setTimeout(() => {
-          auth.login({ email: email.value, password: password.value })
+          auth.login({ email: sanitize(email.value), password: sanitize(password.value) })
             .then((isLoggedIn) => {
               isLoading.value = false;
               if (isLoggedIn) {
@@ -143,21 +171,19 @@ export default {
                 validity.value = false;
               }
             })
-            .catch(() => {
-              validity.value = false;
-              isLoading.value = false;
-              store.commit("setErrorMessage", t('apiMessage.failed'));
-            });
         }, store.state.loadingDelay);
       } else {
         validity.value = true;
       }
     };
-    return { t, email, password, submitted, validity, isLoading, isEmailValid, isPasswordValid, handleSubmission };
+    return { t, email, password, submitted, validity, isLoading, isEmailValid, isPasswordValid, handleSubmission, sanitize };
   },
   created() {
     this.toggleEveryDisplay();
     body.classList.remove("bg-gray-100");
+  },
+  onVideoLoaded(){
+    console.log("loaded");
   },
   beforeUnmount() {
     this.toggleEveryDisplay();

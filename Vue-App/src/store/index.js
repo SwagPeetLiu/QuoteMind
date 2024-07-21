@@ -33,7 +33,8 @@ export default createStore({
     absolute: "position-absolute px-4 mx-0 w-100 z-index-2",
     bootstrap,
     loadingDelay: 800,
-    errorMessage: ""
+    errorMessage: "",
+    toastMessage: { message: "", type: "" },
   },
   mutations: {
     // function to toggle the config button at the right bottom of the screen
@@ -101,7 +102,10 @@ export default createStore({
     },
     setErrorMessage(state, payload) {
       state.errorMessage = payload;
-    }
+    },
+    setToastMessage(state, payload) {
+      state.toastMessage = payload;
+    },
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {

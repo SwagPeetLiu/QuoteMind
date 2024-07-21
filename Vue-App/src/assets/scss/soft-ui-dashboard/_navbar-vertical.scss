@@ -96,6 +96,13 @@
           &.fixed-end {
             right: 0;
           }
+          // Navbar texts
+          &.p{
+            padding-top: $navbar-vertical-nav-link-padding-y;
+            padding-bottom: $navbar-vertical-nav-link-padding-y;
+            margin: 0 $navbar-vertical-nav-link-padding-x;
+          }
+
           // Navbar navigation
           .navbar-nav .nav-link {
             padding-top: $navbar-vertical-nav-link-padding-y;
@@ -178,6 +185,7 @@
 
 .main-content,
 .sidenav {
+  z-index: 999;
   transition: $transition-base;
 }
 
