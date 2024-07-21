@@ -4,9 +4,10 @@
       <div class="row">
         <div class="col-12">
           <ThinBar
-            is-blur="blur blur-rounded my-3 py-2 start-0 end-0 mx-4 shadow-lg"
-            btn-background="bg-gradient-success"
+            styles="blur blur-rounded my-3 py-2 start-0 end-0 mx-4 shadow-lg"
+            :isBlur="true"
             :dark-mode="false"
+            btnBackground="bg-gradient-dark"
           />
         </div>
       </div>
@@ -80,13 +81,13 @@
                             d-flex justify-content-center align-items-center">
                   <!-- :style="{ backgroundImage: 'url(' + require('@/assets/img/curved-images/curved9.jpg') + ')' }"> -->
                   <video 
-                    autoplay loop muted playsinline 
-                    @loadedmetadata="onVideoLoaded"
-                    class="w-100 h-100 object-fit-cover position-absolute slow-motion-video"
+                    autoplay loop muted playsinline @loadedmetadata="setSpeed" id="bg-video"
+                    class="w-100 h-100 object-fit-cover position-absolute sign-in-rotation"
                   >
-                    <source ref="bg-vid":src="require('@/assets/vid/v1.mp4')" type="video/mp4">
+                    <source :src="require('@/assets/vid/v2.mp4')" type="video/mp4">
                     Your browser does not support the video tag.
                   </video>
+
                   <p class="large-title text-glow fw-bold text-white position-relative z-index-1">
                     {{ t('signIn.imageTitle') }}
                   </p>
@@ -182,15 +183,16 @@ export default {
     this.toggleEveryDisplay();
     body.classList.remove("bg-gray-100");
   },
-  onVideoLoaded(){
-    console.log("loaded");
-  },
   beforeUnmount() {
     this.toggleEveryDisplay();
     body.classList.add("bg-gray-100");
   },
   methods: {
     ...mapMutations(["toggleEveryDisplay"]),
+    setSpeed() {
+      const video = document.getElementById("bg-video");
+      video.playbackRate = 0.77;
+    }
   }
 };
 </script>

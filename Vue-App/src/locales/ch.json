@@ -64,6 +64,16 @@
       "already registered message": "该邮箱已被注册"
     }
   },
+  "thinBar":{
+    "advertise": "提高您的报价效率",
+    "login": "登陆",
+    "register": "注册",
+    "source": "开源",
+    "us": "我们",
+    "privacy": "隐私声明",
+    "get started": "开启体验",
+    "resume": "继续体验"
+  },
   "footer": {
     "Author": "作者",
     "About Us": "关于我们",

@@ -64,7 +64,14 @@
     }
   },
   "thinBar":{
-    "advertise": "Enable Your Marketing Quotation"
+    "advertise": "Free your Mind from Quotations",
+    "login": "Log In",
+    "register": "Sign Up",
+    "source": "Open Source",
+    "us": "Who are we?",
+    "privacy": "Privacy Policy",
+    "get started": "Get Started",
+    "resume": "Resume Quoting"
   },
   "footer": {
     "Author": "Author",
@@ -88,10 +95,10 @@
     "too short": "too short",
     "too long": "too long",
     
-    "username": "Username",
-    "email": "Email",
-    "password": "Password",
-    "token": "Register Token",
+    "username": "Username ",
+    "email": "Email ",
+    "password": "Password ",
+    "token": "Register Token ",
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"

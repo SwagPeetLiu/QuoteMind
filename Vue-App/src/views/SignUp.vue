@@ -1,4 +1,17 @@
 <template>
+  <div class="z-index-sticky">
+    <div class="row">
+      <div class="col-12">
+        <Thinbar
+          :isBlur="false"
+          btnBackground="bg-gradient-success"
+          styles="w-100 my-3 navbar-transparent mt-4"
+          :dark-mode="false"
+        />
+       </div>
+    </div>
+  </div>
+
   <!-- background Image -->
   <div
     class="pt-5 m-3 page-header align-items-start min-vh-50 pb-11 border-radius-lg"
@@ -9,8 +22,6 @@
       backgroundPosition: 'center'
     }"
   >
-    <!-- <span class="mask bg-gradient-dark opacity-6"></span> -->
-
     <!-- Title -->
     <div class="container">
       <div class="row justify-content-center">
@@ -163,6 +174,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from "vue-i18n";
 import { useRouter } from 'vue-router';
 import AppFooter from "@/components/page-layouts/Footer.vue";
+import Thinbar from "../components/page-layouts/ThinBar.vue";
 import { mapMutations } from "vuex";
 import { useValidators } from "../utils/useValidators";
 import register from '../api/register';
@@ -173,7 +185,8 @@ export default {
   name: "SignupBasic",
   components: {
     AppFooter,
-    Spinner
+    Spinner,
+    Thinbar
   },
   setup() {
     const { t } = useI18n();
@@ -244,7 +257,7 @@ export default {
 
     const emailValidation = computed(() => {
       if (!email.value.touched) return {valid: true, message: ""};
-      return isEmailValid(sanitize(email.value.value, true));
+      return isEmailValid(sanitize(email.value.value), true);
     });
 
     const passwordValidation = computed(() => {

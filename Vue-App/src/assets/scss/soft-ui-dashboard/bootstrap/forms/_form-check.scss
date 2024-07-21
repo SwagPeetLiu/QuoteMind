@@ -11,6 +11,7 @@
   .form-check-input {
     float: left;
     margin-left: $form-check-padding-start * -1;
+    
   }
 }
 
@@ -19,7 +20,7 @@
   height: $form-check-input-width;
   margin-top: ($line-height-base - $form-check-input-width) * .5; // line-height minus check height
   vertical-align: top;
-  background-color: $form-check-input-bg;
+  background-color: inherit;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -45,6 +46,11 @@
     border-color: $form-check-input-focus-border;
     outline: 0;
     box-shadow: $form-check-input-focus-box-shadow;
+
+    // enforcing transparent colour here
+    &[type="checkbox"] {
+      background-color: $form-check-input-bg !important;
+    }
   }
 
   &:checked {
@@ -69,7 +75,7 @@
   }
 
   &[type="checkbox"]:indeterminate {
-    background-color: $form-check-input-indeterminate-bg-color;
+    background-color: $form-check-input-indeterminate-bg-color !important;
     border-color: $form-check-input-indeterminate-border-color;
 
     @if $enable-gradients {
@@ -134,7 +140,7 @@
 .form-check-inline {
   display: inline-block;
   margin-right: $form-check-inline-margin-end;
-}
+}a
 
 .btn-check {
   position: absolute;
