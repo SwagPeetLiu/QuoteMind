@@ -9,10 +9,14 @@
   >
     <div class="container">
       <router-link
-        class="navbar-brand font-weight-bolder ms-lg-0 ms-3"
+        class="navbar-brand font-weight-bolder ms-lg-0 ms-3 d-flex align-items-center"
         :class="isBlur ? 'text-dark' : 'text-white'"
         to="/"
         v-bind="$attrs"
+      >
+      <img 
+        :src="isBlur ? 'favicon-black.png' : 'favicon-white.png'" 
+        class="me-2" alt="Logo" style="width: 24px; height: 24px;"
       >
         {{ t('thinBar.advertise') }}
       </router-link>

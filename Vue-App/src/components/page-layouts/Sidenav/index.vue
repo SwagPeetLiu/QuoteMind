@@ -1,8 +1,7 @@
 <!-- Controller for the side name -->
 <template>
   <aside
-    class="my-3 overflow-auto border-0 sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
-    :class="isRTL ? 'me-3 rotate-caret' : 'ms-3'"
+    class="my-3 ms-3 overflow-auto border-0 sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
     id="sidenav-main"
   >
     <!-- side nav header -->
@@ -13,8 +12,8 @@
         id="iconSidenav"
       > sad</i>
       <a class="m-0 navbar-brand" href="/">
-        <img :src="logo" class="navbar-brand-img h-100" alt="main_logo" />
-        <span class="ms-1 font-weight-bold">Quote Mind Pro</span>
+        <img src="favicon-black.png" class="navbar-brand-img h-100" alt="main_logo" />
+        <span class="ms-1 font-weight-bolder">Quote Mind Pro</span>
       </a>
     </div>
 
@@ -25,27 +24,17 @@
 </template>
 <script>
 import SidenavList from "./SidenavList.vue";
-import logo from "@/assets/img/logo-ct.png";
-import { mapState } from "vuex";
 
 export default {
   name: "index",
   components: {
     SidenavList,
   },
-  data() {
-    return {
-      logo,
-    };
-  },
   props: {
     customClass: {
       type: String,
       default: "",
     },
-  },
-  computed: {
-    ...mapState(["isRTL"]),
-  },
+  }
 };
 </script>

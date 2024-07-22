@@ -4,7 +4,7 @@
     :custom_class="this.$store.state.mcolor"
     :class="[
       this.$store.state.isTransparent,
-      this.$store.state.isRTL ? 'fixed-end' : 'fixed-start',
+      'fixed-start'
     ]"
     v-if="this.$store.state.showSidenav"
   />
@@ -38,7 +38,7 @@
 import Sidenav from "./components/page-layouts/Sidenav";
 import Configurator from "@/components/page-layouts/Configurator.vue";
 import Navbar from "./components/page-layouts/TopNav/Navbar.vue";
-import AppFooter from "@/examples/Footer.vue";
+import AppFooter from "./components/page-layouts/AppFooter.vue";
 import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 import ErrorDialog from "./components/reuseable-components/ErrorDialog.vue";

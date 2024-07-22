@@ -127,7 +127,7 @@
               <div class="form-check">
                 <input 
                   type="checkbox" 
-                  class="form-check-input"
+                  class="form-check-input tickbox"
                   :class="{ 
                     'font-weight-bold': agreedToForm.unagreedWhileSubmitted && !agreedToForm.value,
                     'is-invalid': agreedToForm.unagreedWhileSubmitted && !agreedToForm.value
@@ -166,14 +166,14 @@
       </div>
     </div>
   </div>
-  <app-footer />
+  <IntroFooter />
 </template>
 
 <script>
 import { ref, computed } from 'vue';
 import { useI18n } from "vue-i18n";
 import { useRouter } from 'vue-router';
-import AppFooter from "@/components/page-layouts/Footer.vue";
+import IntroFooter from "../components/page-layouts/IntroFooter.vue";
 import Thinbar from "../components/page-layouts/ThinBar.vue";
 import { mapMutations } from "vuex";
 import { useValidators } from "../utils/useValidators";
@@ -184,7 +184,7 @@ import { inject } from 'vue';
 export default {
   name: "SignupBasic",
   components: {
-    AppFooter,
+    IntroFooter,
     Spinner,
     Thinbar
   },

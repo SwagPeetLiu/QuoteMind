@@ -82,7 +82,24 @@
     "License": "开源",
     "Privacy": "隐私政策",
     "Copyright": "版权所有",
-    "Created By": "由Peter Liu提供"
+    "Created By": "由Peter Liu提供",
+    "github": "Github",
+    "made with": "，由",
+    "by": "而生",
+    "for hard working mothers": "为辛苦工作的母亲们"
+  },
+  "routes":{
+    "pages": "主页",
+    "dashboard": "信息板",
+    "profile": "用户",
+    "companies": "企业客户",
+    "clients": "客户",
+    "employees": "员工",
+    "positions": "职位",
+    "pricings": "定价 ",
+    "conditions": "条件",
+    "rules": "规格",
+    "transactions": "交易"
   },
   "dialog":{
     "error title": "请注意：",

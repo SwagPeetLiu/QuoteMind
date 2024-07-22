@@ -40,7 +40,7 @@ const auth = {
             token: currentUser.session
         })
         .then(() => {
-            store.commit("setToastMessage", { message: t("apiMessage.logout.success"), type: "sucess" });
+            store.commit("setToastMessage", { message: t("apiMessage.logout.success"), type: "success" });
             store.commit('clearUser');
             return true;
         })

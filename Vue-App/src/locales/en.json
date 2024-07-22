@@ -40,7 +40,7 @@
     "English": "English",
     "Chinese": "Chinese",
     "Contribution Interest": "Express your Interest?",
-    "Logout": "Logout",
+    "Logout": "Log out",
     "View documentation": "View documentation"
   },
   "apiMessage": {
@@ -78,10 +78,27 @@
     "About Us": "About us",
     "Docs": "Docs",
     "Contact Us": "Contact us",
-    "License": "License",
+    "license": "License",
     "Privacy": "Privacy",
     "Copyright": "Copyright",
-    "Created By": "Created by Peter Liu"
+    "Created By": "Created by Peter Liu",
+    "github": "Github",
+    "made with": ", Made with",
+    "by": "by",
+    "for hard working mothers": "For hard working mothers"
+  },
+  "routes":{
+    "pages": "Pages",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "companies": "Companies",
+    "clients": "Clients",
+    "employees": "Employees",
+    "positions": "Positions",
+    "pricings": "Pricings",
+    "conditions": "Conditions",
+    "rules": "Rules",
+    "transactions": "Transactions"
   },
   "dialog":{
     "error title": "Please Note:",

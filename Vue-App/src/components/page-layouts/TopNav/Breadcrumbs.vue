@@ -1,20 +1,13 @@
 <!-- Breadcrumbe page navigations on the top of the main frame - naved directories -->
 <template>
   <nav aria-label="breadcrumb">
-    <ol
-      class="px-0 pt-1 pb-0 mb-0 bg-transparent breadcrumb"
-      :class="this.$store.state.isRTL ? '' : ' me-sm-6'"
-    >
+
+    <!-- page navs -->
+    <ol class="px-0 pt-1 pb-0 mb-0 bg-transparent breadcrumb" >
       <li class="text-sm breadcrumb-item" :class="textWhite">
-        <a
-          v-if="this.$store.state.isRTL"
-          :class="textWhite"
-          class="opacity-5 ps-2"
-          href="#"
-          >لوحات القيادة</a
-        >
-        <a v-else :class="textWhite" class="opacity-8" href="#">Pages</a>
+        <a :class="textWhite" class="opacity-8" href="#">{{ t('routes.pages') }}</a>
       </li>
+      
       <li
         class="text-sm breadcrumb-item active"
         :class="textWhite ? 'text-white' : 'text-dark'"
@@ -22,7 +15,12 @@
       >
         {{ currentPage }}
       </li>
+
+      <!-- adding in the instance specific routes later on -->
+       
     </ol>
+    
+    <!-- current page name determination -->
     <h6 class="mb-0 font-weight-bolder" :class="textWhite ? 'text-white' : ''">
       {{ currentPage }}
     </h6>
@@ -30,6 +28,8 @@
 </template>
 
 <script>
+import { useI18n } from "vue-i18n";
+
 export default {
   name: "breadcrumbs",
   props: {
@@ -40,5 +40,9 @@ export default {
       type: String,
     },
   },
+  setup(){
+    const { t } = useI18n();
+    return { t }
+  }
 };
 </script>

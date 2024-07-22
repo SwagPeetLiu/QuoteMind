@@ -47,9 +47,9 @@
     outline: 0;
     box-shadow: $form-check-input-focus-box-shadow;
 
-    // enforcing transparent colour here
-    &[type="checkbox"] {
-      background-color: $form-check-input-bg !important;
+    // enforcing transparent colour here for tickbox styles
+    &[type="checkbox"].tickbox{
+        background-color: $form-check-input-bg !important;
     }
   }
 

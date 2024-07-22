@@ -13,7 +13,7 @@
   @include font-size($toast-font-size-sm);
 
   // larger width and size definition for large screens
-  @media(min-width: 768px) {
+  @media (min-width: 768px) {
     width: $toast-max-width-lg;
     @include font-size($toast-font-size-lg);
   }
@@ -27,21 +27,20 @@
   }
 
   // Semi-transparent background colors
+  // Semi-transparent background colors with gradients
   &.bg-success {
-    background-color: rgba($success, 0.75) !important;
+    background: linear-gradient(to right, rgba($success, 0.95), rgba(lighten($success, 10%), 0.9)) !important;
   }
 
   &.bg-danger {
-    background-color: rgba($danger, 0.75) !important;
+    background: linear-gradient(to right, rgba($danger, 0.95), rgba(lighten($danger, 10%), 0.9)) !important;
   }
 
   &.bg-warning {
-    background-color: rgba($warning, 0.75) !important;
+    background: linear-gradient(to right, rgba($warning, 0.95), rgba(lighten($warning, 10%), 0.9)) !important;
   }
-
   // maintain original text colour
   color: $toast-color;
-
 }
 
 .toast-container {
@@ -67,7 +66,7 @@
   @include border-top-radius(subtract($toast-border-radius, $toast-border-width));
 
   .btn-close {
-    margin-right: $toast-padding-x * -.5;
+    margin-right: $toast-padding-x * -0.5;
     margin-left: $toast-padding-x;
   }
 }

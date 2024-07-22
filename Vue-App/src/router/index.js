@@ -15,13 +15,13 @@ const routes = [
     path: "/",
     name: "/",
     redirect: "/dashboard",
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: "/tables",

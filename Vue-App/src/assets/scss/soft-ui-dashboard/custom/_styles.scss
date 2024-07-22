@@ -1,0 +1,9 @@
+@media (prefers-color-scheme: light) {
+  #light-scheme-icon { display: inline; }
+  #dark-scheme-icon { display: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+  #light-scheme-icon { display: none; }
+  #dark-scheme-icon { display: inline; }
+}

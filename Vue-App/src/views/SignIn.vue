@@ -99,11 +99,11 @@
       </div>
     </section>
   </main>
-  <app-footer />
+  <IntroFooter />
 </template>
 
 <script>
-import AppFooter from "@/components/page-layouts/Footer.vue";
+import IntroFooter from "../components/page-layouts/IntroFooter.vue";
 import ThinBar from "../components/page-layouts/ThinBar.vue";
 import Spinner from "../components/reuseable-components/Spinner.vue";
 const body = document.getElementsByTagName("body")[0];
@@ -118,7 +118,7 @@ import { inject } from 'vue';
 export default {
   name: "SignIn",
   components: {
-    AppFooter,
+    IntroFooter,
     Spinner,
     ThinBar
   },

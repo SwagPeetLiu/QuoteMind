@@ -137,12 +137,10 @@
       </div>
     </main>
   </div>
-  <app-footer class="py-3 bg-white border-radius-lg" />
 </template>
 
 <script>
 import Sidenav from "../components/page-layouts/Sidenav";
-import AppFooter from "../components/page-layouts/Footer.vue";
 import Navbar from "../components/page-layouts/TopNav/Navbar.vue";
 import CalendarCard from "./components/CalendarCard.vue";
 import EmailCard from "./components/EmailCard.vue";
@@ -163,7 +161,6 @@ import { mapMutations, mapState } from "vuex";
 export default {
   name: "VrInfo",
   components: {
-    AppFooter,
     Sidenav,
     Navbar,
     CalendarCard,

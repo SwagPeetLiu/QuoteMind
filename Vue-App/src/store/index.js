@@ -22,16 +22,18 @@ export default createStore({
     isPinned: true,
     isRTL: false,
     isAbsolute: false,
-    showNavs: true, // by default, it should shows the navigations relatively
+
+    // app vue display settings
     showSidenav: true,
     showNavbar: true,
     showFooter: true,
-    showMain: true,
 
     // display settings:
     navbarFixed: "position-sticky blur shadow-blur left-auto top-1 z-index-sticky px-0 mx-4",
     absolute: "position-absolute px-4 mx-0 w-100 z-index-2",
     bootstrap,
+
+    // async loading handles
     loadingDelay: 800,
     errorMessage: "",
     toastMessage: { message: "", type: "" },

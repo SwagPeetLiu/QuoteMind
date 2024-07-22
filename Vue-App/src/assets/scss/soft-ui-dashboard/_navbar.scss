@@ -203,6 +203,8 @@
     }
   }
 }
+
+// using bootstrap's media-breakpoint-down mxim to style for stmall sized screens
 @include media-breakpoint-down(sm) {
   .navbar-nav {
     .nav-item {
