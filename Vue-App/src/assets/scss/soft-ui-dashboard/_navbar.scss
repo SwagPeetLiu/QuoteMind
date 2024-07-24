@@ -1,11 +1,28 @@
+// top navbar's animation on being fixed or not
+.navbar-main {
+  transition:
+    box-shadow $transition-base-time ease-in,
+    background-color $transition-base-time ease-in;
+}
+
 // definition of the style of the nav bar on the top
 .navbar {
   box-shadow: $navbar-box-shadow;
 
-  // colours of the 
+  // defines the colour and the size of text:
   .navbar-brand {
     color: $dark;
-    @include font-size($font-size-sm);
+    @include font-size($font-size-lg);
+
+    .navbar-brand-img {
+      width: 24px;
+      height: 24px;
+    }
+
+    // on white canvas, the black coloured icon should be slightly inverted
+    .inverted-img {
+      filter: invert(25%);
+    }
   }
 
   // colour of the nav link directories on the top

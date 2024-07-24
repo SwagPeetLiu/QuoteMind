@@ -55,18 +55,18 @@ export default {
     const { t } = useI18n();
     return { t };
   },
-  props: ["minNav", "textWhite"],
-  created() {
-    this.minNav;
-  },
+  props: ["textWhite"],
+  // created() {
+  //   this.minNav;
+  // },
   methods: {
-    ...mapMutations(["navbarMinimize", "toggleConfigurator"]),
+    ...mapMutations(["toggleMenuOnSmallScreens", "toggleConfigurator"]),
     ...mapActions(["toggleSidebarColor"]),
 
     // function used to open the menu to the left on small screens
     toggleSidebar() {
       this.toggleSidebarColor("bg-white");
-      this.navbarMinimize();
+      this.toggleMenuOnSmallScreens();
     },
     logout() {
       if (this.$store.getters.getIsAuthenticated && this.$store.getters.getUser.session) {

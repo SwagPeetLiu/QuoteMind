@@ -1,19 +1,19 @@
-<!-- Controller for the side name -->
+<!-- Controller for the side name (sidenav id for theme changes) -->
 <template>
   <aside
-    class="my-3 ms-3 overflow-auto border-0 sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
-    id="sidenav-main"
+    class="my-3 ms-3 overflow-auto border-0 
+    sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
+    id="sidenav-main" 
   >
     <!-- side nav header -->
     <div class="sidenav-header">
-      <i
-        class="top-0 p-3 cursor-pointer fas fa-times text-secondary opacity-5 position-absolute end-0 d-none d-xl-none"
-        aria-hidden="true"
-        id="iconSidenav"
-      > sad</i>
       <a class="m-0 navbar-brand" href="/">
-        <img src="favicon-black.png" class="navbar-brand-img h-100" alt="main_logo" />
-        <span class="ms-1 font-weight-bolder">Quote Mind Pro</span>
+        <img 
+          src="favicon-black.png" 
+          class="navbar-brand-img h-100" 
+          alt="main_logo"
+        />
+        <span class="ms-2 font-weight-bolder">{{ $t("sideNav.title") }}</span>
       </a>
     </div>
 
@@ -22,11 +22,17 @@
     <sidenav-list :cardBg="customClass" />
   </aside>
 </template>
+
 <script>
 import SidenavList from "./SidenavList.vue";
+import { useI18n } from "vue-i18n";
 
 export default {
   name: "index",
+  setup() {
+    const { t } = useI18n();
+    return { t };
+  },
   components: {
     SidenavList,
   },
@@ -35,6 +41,9 @@ export default {
       type: String,
       default: "",
     },
+  },
+  mounted() {
+    document.querySelector("#sidenav-main").setAttribute("data-color", "dark");
   }
 };
 </script>

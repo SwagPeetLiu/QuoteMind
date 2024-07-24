@@ -1,322 +1,135 @@
-//
-// Vertical navbar + Sidenav
-//
-
+// Vertical navbar (top level)
 .navbar-vertical {
-  .navbar-brand > img,
+
+  // side nav header
+  .sidenav-header {
+    height: $sidenav-header-height;
+
+    // brand logo paddings
+    .navbar-brand {
+      padding: 1.5rem 2rem;
+    }
+  }
+
+  // for images, invert the colour 20% to make it more compatible with the text colours
+  .navbar-brand>img,
   .navbar-brand-img {
+    filter: invert(20%);
     max-width: 100%;
     max-height: 2rem;
   }
-  // Navbar navigaton
-  .navbar-nav {
-    flex-direction: column !important;
-    // Navbar link
-    .nav-link {
-      padding-left: $navbar-padding-x;
-      padding-right: $navbar-padding-x;
-      font-weight: $navbar-nav-link-font-weight;
-      color: $font-color;
-      // Icon
-      > i {
-        min-width: $navbar-icon-min-width;
-        font-size: 0.9375rem;
-        line-height: ($font-size-base * $line-height-base);
-      }
-      // Dropdown
-      .dropdown-menu {
-        border: none;
 
-        .dropdown-menu {
-          margin-left: $dropdown-item-padding-x / 2;
+  //(SideNav List for the side menu - second level)
+  .navbar-collapse {
+    display: block;
+    overflow: auto;
+    height: $navbar-vertical-inner;
+
+    // Navbar navigation (third level)
+    .navbar-nav {
+      flex-direction: column !important;
+
+      // Navbar navigation (fourth level)
+      .nav-item {
+        width: 100%;
+        margin-top: 0.125rem;
+
+        // actual route link (fifth level)
+        .nav-link {
+          display: flex;
+          align-items: center;
+          white-space: nowrap;
+          padding-left: $navbar-padding-x;
+          padding-right: $navbar-padding-x;
+          font-weight: $navbar-nav-link-font-weight;
+          color: $font-color;
+          padding-top: $navbar-vertical-nav-link-padding-y;
+          padding-bottom: $navbar-vertical-nav-link-padding-y;
+          margin: 0 $navbar-vertical-nav-link-padding-x;
+
+          // Apply active styless:
+          transition: all $transition-base ease;
+
+          &.active {
+            transform: scale(1.2);
+            font-weight: 600;
+          }
+
+          .nav-link-text,
+          .sidenav-mini-icon,
+          .sidenav-normal,
+          i {
+            pointer-events: none;
+          }
+
+          // give icon a gradient grey
+          .icon {
+            @include gradient-directional(nth($light, 1) 0%, nth($light, -1) 100%, $deg: 310deg);
+
+            .ni {
+              top: 0;
+            }
+
+            svg {
+              .color-background {
+                fill: $dark-gradient-state;
+              }
+
+              .color-foreground {
+                fill: $dark-gradient;
+              }
+            }
+          }
         }
       }
-      .icon {
-        padding: 10px;
-      }
     }
+  }
 
-    .nav-sm {
-      .nav-link {
-        font-size: 0.8125rem;
-      }
-    }
-  }
-  // Navbar navigation
-  .navbar-nav .nav-link {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-  // Navbar heading
-  .navbar-heading {
-    padding-top: $nav-link-padding-y;
-    padding-bottom: $nav-link-padding-y;
-    font-size: $font-size-xs;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  // Expanded navbar specific styles
+  // Expanded navbar specific styles (applys to Thinbar and the sidenav menu)
+  // showing a fixed expanded state of the navbar
   &.navbar-expand {
     @each $breakpoint, $dimension in $grid-breakpoints {
       &-#{$breakpoint} {
         @include media-breakpoint-up(#{$breakpoint}) {
-          display: block;
-          position: fixed;
+          display: block; // displaying the contends on different lines with the same width
+          position: fixed; // fixed position
           top: 0;
           bottom: 0;
           width: 100%;
-          max-width: $navbar-vertical-open-width !important;
+          max-width: $navbar-vertical-open-width !important; // max width of a closure state
           overflow-y: auto;
           padding: 0;
           box-shadow: none;
-
-          .navbar-collapse {
-            display: block;
-            overflow: auto;
-            height: $navbar-vertical-inner;
-          }
-          // Container
-          > [class*="container"] {
-            flex-direction: column;
-            align-items: stretch;
-            min-height: 100%;
-            padding-left: 0;
-            padding-right: 0; // Target IE 10 & 11
-            @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-              min-height: none;
-              height: 100%;
-            }
-          }
-          // Fixes the vertical navbar to the left
-          &.fixed-start {
-            left: 0;
-          }
-          // Fixed the vertical navbar to the right
-          &.fixed-end {
-            right: 0;
-          }
-          // Navbar texts
-          &.p{
-            padding-top: $navbar-vertical-nav-link-padding-y;
-            padding-bottom: $navbar-vertical-nav-link-padding-y;
-            margin: 0 $navbar-vertical-nav-link-padding-x;
-          }
-
-          // Navbar navigation
-          .navbar-nav .nav-link {
-            padding-top: $navbar-vertical-nav-link-padding-y;
-            padding-bottom: $navbar-vertical-nav-link-padding-y;
-            margin: 0 $navbar-vertical-nav-link-padding-x;
-
-            .nav-link-text,
-            .sidenav-mini-icon,
-            .sidenav-normal,
-            i {
-              pointer-events: none;
-            }
-          }
-
-          .navbar-nav .nav-item {
-            width: 100%;
-          }
-
-          .navbar-nav > .nav-item {
-            margin-top: 0.125rem;
-
-            .icon {
-              .ni {
-                top: 0;
-              }
-            }
-
-            > .nav-link {
-              .icon {
-                svg {
-                  .color-background {
-                    fill: $dark-gradient-state;
-                  }
-
-                  .color-foreground {
-                    fill: $dark-gradient;
-                  }
-                }
-              }
-            }
-          }
-
-          .lavalamp-object {
-            width: calc(100% - 1rem) !important;
-            background: theme-color("primary");
-            color: color-yiq($primary);
-            margin-right: 0.5rem;
-            margin-left: 0.5rem;
-            padding-left: 1rem;
-            padding-right: 1rem;
-            border-radius: $border-radius-sm;
-          }
-          // Second level
-          .navbar-nav .nav .nav-link {
-            padding-top: $navbar-vertical-nav-link-padding-y / 1.5;
-            padding-bottom: $navbar-vertical-nav-link-padding-y / 1.5;
-            padding-left: 15px;
-
-            > span.sidenav-normal {
-              transition: all 0.1s ease 0s;
-            }
-          }
         }
       }
     }
   }
-}
 
-.sidenav {
-  // Define colors
-  @each $color, $value in $theme-colors {
-    &[data-color="#{$color}"] {
-      .navbar-nav > .nav-item > .nav-link.active .icon {
-        @include gradient-directional(nth(#{$value}, 1) 0%, nth(#{$value}, -1) 100%, $deg: 310deg);
+  // side nav footer cards will have a overlay effects for the img
+  .sidenav-footer {
+    .card {
+      &.card-background {
+        &:after {
+          opacity: $sidenav-card-opacity;
+        }
       }
     }
   }
-}
-// Sidenav + Main content transition
 
-.main-content,
-.sidenav {
-  z-index: 999;
-  transition: $transition-base;
-}
-
-//
-// Sidenav style definitions
-//
-.sidenav {
-  z-index: 999; // always on top
-
-  .navbar-brand,
-  .navbar-heading {
-    display: block;
-  }
-  @include media-breakpoint-up(xl) {
-    &:hover {
-      max-width: $navbar-vertical-open-width;
-    }
-
-    .sidenav-toggler {
-      padding: 1.5rem;
-    }
-
-    &.fixed-start ~ .main-content {
-      margin-left: $navbar-vertical-open-width + 1.5;
-    }
-
-    &.fixed-end ~ .main-content {
-      margin-right: $navbar-vertical-open-width + 1.5;
-    }
-  }
-
-  .navbar-heading .docs-mini {
-    padding-left: 3px;
-  }
-
-  .navbar-heading {
-    transition: all 0.1s ease;
-  }
-
-  .navbar-brand {
-    padding: 1.5rem 2rem;
-  }
-}
-
-.sidenav-header {
-  height: $sidenav-header-width;
-}
-
-.sidenav-footer {
-  .card {
-    &.card-background {
-      &:after {
-        opacity: $sidenav-card-opacity;
-      }
-    }
-  }
-}
-// Sidenav states
-
-.g-sidenav-show {
-  .sidenav {
-    .nav-item .collapse {
-      height: auto;
-      @include transition($transition-base);
-    }
-
-    .nav-link-text {
-      transition: 0.3s ease;
-      opacity: 1;
-    }
-  }
-}
-// Media fixes for iPhone 5 like resolutions
-@include media-breakpoint-down(xl) {
-  .g-sidenav-show {
-    &.rtl {
-      .sidenav {
-        transform: translateX($navbar-vertical-open-width + 1.5);
-      }
-    }
-
-    &:not(.rtl) {
-      .sidenav {
-        transform: translateX(-($navbar-vertical-open-width + 1.5));
-      }
-    }
-
-    .sidenav {
-      &.fixed-start~.main-content {
-        margin-left: 0 !important;
-      }
-    }
-
-    &.g-sidenav-pinned {
-      .sidenav {
-        transform: translateX(0);
-      }
-    }
-  }
-}
-
-.navbar-vertical {
+  // Styles based on background colours of the menu
   &.bg-white {
     box-shadow: $card-box-shadow;
-
-    .navbar-nav {
-      .nav-link {
-        &.active {
-          box-shadow: none;
-        }
-
-        .icon {
-          @include gradient-directional(nth($light, 1) 0%, nth($light, -1) 100%, $deg: 310deg);
-        }
-      }
-    }
   }
 
-  .navbar-nav .nav-link.active {
-    font-weight: $font-weight-bold;
-    box-shadow: $card-box-shadow;
-    border-radius: $border-radius-md;
+  //when the menu backgroun colour is transparent
+  &.bg-transparent {
+    box-shadow: none;
   }
 
-  .navbar-nav > .nav-item .nav-link.active {
+  // which the colour of the menu svg when being active
+  .navbar-nav>.nav-item .nav-link.active {
     color: $dark;
-    background-color: $white;
-
     .icon {
-      @include gradient-directional(nth($success, 1) 0%, nth($success, -1) 100%, $deg: 310deg);
-
       svg {
         .color-background,
         .color-foreground {
@@ -327,34 +140,300 @@
   }
 }
 
-.navbar-main {
-  transition: box-shadow $transition-base-time ease-in, background-color $transition-base-time ease-in;
 
-  &.fixed-top {
-    width: calc(100% - (#{$navbar-vertical-open-width} + #{$spacer * 1.5} * 3));
+// main content's container' cooperation with the side nav's expansion and collapsing
+.main-content,
+.sidenav {
+  transition: $transition-base;
+}
+
+.main-content {
+  z-index: 999;
+}
+
+// Sidenav (menu) specific style
+.sidenav {
+  z-index: 1000; // always on top
+
+  @each $color, $value in $theme-gradient-colors {
+
+    // if the user defined data-colour HTML attribute is matching, then apply the style of the nav colour
+    &[data-color="#{$color}"] {
+      .navbar-nav>.nav-item>.nav-link.active .icon {
+        @include gradient-directional(nth(#{$value}, 1) 0%, nth(#{$value}, -1) 100%, $deg: 40deg);
+      }
+    }
   }
 
-  &.fixed-top + [class*="container"] {
-    margin-top: 7.1875rem !important;
+  // Menu's brand takes up a new line
+  .navbar-brand {
+    display: block;
+  }
+
+  // Menu will slide open when user hover over the menu
+  @include media-breakpoint-up(md) {
+    &:hover {
+      max-width: $navbar-vertical-open-width;
+    }
+
+    // style of the toggler function for nested menu directory (UNUSED)
+    .sidenav-toggler {
+      padding: 1.5rem;
+    }
+
+    // with side nav on the left, main content has left margin
+    &.fixed-start~.main-content {
+      margin-left: $navbar-vertical-open-width + 1.5;
+    }
+
+    // disabled the fixed end style as sidenav show only show from the left
+    // &.fixed-end ~ .main-content {
+    //   margin-right: $navbar-vertical-open-width + 1.5;
+    // }
   }
 }
-// Navbar Vertical Extend
+
+
+// Sidenav states: manages the main container where the sidenav is shown
+// (main container on the index.html ROOT LEVEL)
+.g-sidenav-show {
+
+  // the sidenav (index.vue):
+  .sidenav {
+    .nav-item .collapse {
+      height: auto;
+      @include transition($transition-base);
+    }
+
+    // main nev directory
+    .nav-link {
+      transition: 0.3s ease;
+      opacity: 1;
+    }
+
+    // where to the put the nested nav-links:
+
+  }
+}
+
+// Small Screen handling (iphone 5 managements):
+@include media-breakpoint-down(md) {
+  .g-sidenav-show {
+
+    // from right to left (RTL) supports on the displays
+    // (move the container to the right to make more space for the nav)
+    &.rtl {
+      .sidenav {
+        transform: translateX($navbar-vertical-open-width + 1.5);
+      }
+    }
+
+    // from left to right (LTR) supports on the displays
+    // (move the container to the left to make more space for the nav)
+    &:not(.rtl) {
+      .sidenav {
+        transform: translateX(-($navbar-vertical-open-width + 1.5));
+      }
+    }
+
+    // when the side menu is pinned to the start (fixed-start)
+    .sidenav {
+      &.fixed-start~.main-content {
+        margin-left: 0 !important; // remove the margin from the start
+      }
+    }
+
+    // when pinning the side navbar, the transformation brings the
+    // sidenav back into the view
+    &.g-sidenav-pinned {
+      .sidenav {
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+
+// Transition styles
+.navbar-vertical {
+  .navbar-brand {
+
+    // animation on hiding the brand span
+    .navbar-brand-img,
+    span {
+      @include transition($transition-base);
+    }
+  }
+
+  // for the mini icons (UNUSED)
+  .nav-item {
+    .nav-link {
+      span.sidenav-mini-icon {
+        @include transition($transition-base);
+        text-align: center;
+        width: 0;
+      }
+    }
+  }
+
+  // transimition on opening the docs information on the side nav
+  .docs-info {
+    @include transition($transition-base);
+  }
+}
+
+// Controls the style when the Menu is hidden (the default 
+// style when user is logged in)
+@include media-breakpoint-up(md) {
+
+  .g-sidenav-hidden {
+    .navbar-vertical {
+      max-width: $navbar-vertical-hidden-width !important;
+
+      &.fixed-start~.main-content {
+        margin-left: $navbar-vertical-hidden-width + 1.5; // main content will always be 1.5px away from the side menu
+      }
+
+      // hide nav-brand's title & Enlarge the width of the image
+      .navbar-brand {
+        img {
+          width: auto !important;
+        }
+
+        span {
+          opacity: 0;
+        }
+      }
+
+      // show the nav link's icon only, hide the text, not
+      // showing a white background and shadow for such 
+      .nav-item {
+        .nav-link {
+          &.active {
+            box-shadow: none;
+            background-color: transparent;
+          }
+
+          .icon {
+            padding: 10px;
+          }
+
+          .nav-link-text,
+          .sidenav-normal {
+            opacity: 0;
+            width: 0;
+          }
+        }
+      }
+
+      // hide the texts the sidenav footerfor both card & button
+      .sidenav-footer .btn {
+        padding: auto;
+
+        .fa {
+          font-size: 1.2rem;
+          margin-left: 5px;
+        }
+
+        .docs-info {
+          display: none;
+        }
+      }
+
+      .card.card-background {
+        .icon-shape {
+          margin-bottom: 0 !important;
+        }
+
+        .docs-info {
+          display: none;
+        }
+      }
+
+      // On hovering, show all the information available in the menu
+      &:hover {
+        max-width: $navbar-vertical-open-width !important;
+
+        &.fixed-start~.main-content {
+          margin-left: $navbar-vertical-open-width + 1.5;
+        }
+
+        .navbar-brand {
+          span {
+            opacity: 1;
+          }
+        }
+
+        .nav-item {
+          .nav-link {
+
+            .nav-link-text,
+            .sidenav-normal {
+              opacity: 1;
+              width: auto;
+            }
+          }
+        }
+
+        &.bg-transparent {
+          .navbar-nav .nav-link.active{
+            background-color: $white;
+            box-shadow: $box-shadow-sm;
+            margin: 4px $navbar-vertical-nav-link-padding-x + 1;
+            border-radius: $navbar-nav-link-border-radius;
+          }
+        }
+
+        .sidenav-footer .btn {
+          .fa {
+            font-size: 1.2rem;
+            margin-left: 0;
+          }
+
+          .docs-info {
+            display: inline-block;
+            width: auto;
+            height: auto;
+          }
+        }
+
+        .card.card-background {
+          .icon-shape {
+            margin-bottom: 1rem !important;
+          }
+
+          .docs-info {
+            margin-left: 8px;
+            display: inline-block;
+            width: auto;
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Navbar Vertical Extend (for nesting elements)
 .navbar-vertical {
   .navbar-nav .nav-link[data-bs-toggle="collapse"] {
+
+    // style for the dropdown menu
     &:after {
       display: inline-block;
       font-style: normal;
       font-variant: normal;
       text-rendering: auto;
       -webkit-font-smoothing: antialiased;
-      font-family: 'Font Awesome 5 Free';
+      font-family: "Font Awesome 5 Free";
       font-weight: 700;
       content: "\f107";
       margin-left: auto;
-      color: rgba($dark-gradient-state,0.5);
+      color: rgba($dark-gradient-state, 0.5);
       @include transition($transition-base);
     }
-    // Expanded
+
+    // when toggling to be opened, then arrow svg will be pointing downward
     &[aria-expanded="true"] {
       &:after {
         color: $dark-gradient-state;
@@ -363,8 +442,10 @@
     }
   }
 
+  // style for nested dropdown menue items (collapse elements within each nav-item)
   .navbar-nav {
     .nav-item {
+
       .collapse,
       .collapsing {
         .nav {
@@ -375,7 +456,7 @@
               position: relative;
               background-color: transparent;
               box-shadow: none;
-              color: rgba($dark-gradient-state,0.5);
+              color: rgba($dark-gradient-state, 0.5);
               margin-left: $navbar-vertical-collapse-margin-left;
 
               &:before {
@@ -412,14 +493,6 @@
                 }
               }
             }
-            // Third level
-            .nav-item {
-              .nav-link {
-                &:before {
-                  content: none;
-                }
-              }
-            }
           }
         }
       }
@@ -427,220 +500,10 @@
   }
 
   &.blur {
-    .navbar-nav > .nav-item {
+    .navbar-nav>.nav-item {
       .nav-link {
         background-color: transparent;
         box-shadow: none;
-      }
-    }
-  }
-}
-// Styles for minimized sidenav
-.navbar-vertical {
-  .navbar-brand {
-    .navbar-brand-img,
-    span {
-      @include transition($transition-base);
-    }
-  }
-
-  .nav-item {
-    .nav-link {
-      span.sidenav-mini-icon {
-        @include transition($transition-base);
-        text-align: center;
-        width: 0;
-      }
-    }
-  }
-
-  .docs-info {
-    @include transition($transition-base);
-  }
-}
-
-.g-sidenav-show:not(.g-sidenav-hidden) {
-  .navbar-vertical {
-    .nav-item {
-      .nav-link {
-        span.sidenav-mini-icon {
-          opacity: 0;
-        }
-      }
-    }
-  }
-}
-@include media-breakpoint-up(xl) {
-  .g-sidenav-hidden {
-    &.rtl .main-content {
-      margin-right: $navbar-vertical-hidden-width !important;
-
-      .navbar-vertical {
-        &:hover {
-          max-width: $navbar-vertical-open-width !important;
-        }
-      }
-    }
-
-    &.rtl {
-      .sidenav:hover {
-        & + .main-content {
-          margin-right: $navbar-vertical-open-width + 1.5 !important;
-        }
-      }
-    }
-
-    .navbar-vertical {
-      max-width: $navbar-vertical-hidden-width !important;
-
-      &.fixed-start ~ .main-content {
-        margin-left: $navbar-vertical-hidden-width + 1.5;
-      }
-
-      .navbar-brand {
-        img {
-          width: auto !important;
-        }
-
-        span {
-          opacity: 0;
-        }
-      }
-
-      .nav-item {
-        .nav-link {
-          .icon {
-            padding: 10px;
-          }
-
-          .nav-link-text,
-          .sidenav-normal {
-            opacity: 0;
-            width: 0;
-          }
-
-          .sidenav-mini-icon {
-            min-width: $navbar-icon-min-width;
-            margin-left: $navbar-icon-margin-left;
-            opacity: 1;
-          }
-
-          &[data-bs-toggle="collapse"]:after {
-            content: "";
-          }
-        }
-
-        .collapse {
-          .nav {
-            margin-left: 0 !important;
-            padding-left: 0 !important;
-
-            .nav-item {
-              .nav-link {
-                margin-left: $navbar-vertical-nav-link-padding-x;
-
-                &:before {
-                  content: none;
-                }
-
-                &[data-bs-toggle="collapse"]:after {
-                  content: "\f107";
-                }
-              }
-            }
-          }
-        }
-      }
-
-      .card.card-background {
-        .icon-shape {
-          margin-bottom: 0 !important;
-        }
-
-        .docs-info {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-      }
-      // Hover style on sidenav minimized
-      &:hover {
-        max-width: $navbar-vertical-open-width !important;
-
-        &.fixed-start ~ .main-content {
-          margin-left: $navbar-vertical-open-width + 1.5;
-        }
-
-        .navbar-brand {
-          span {
-            opacity: 1;
-          }
-        }
-
-        .nav-item {
-          .nav-link {
-            .nav-link-text,
-            .sidenav-normal {
-              opacity: 1;
-              width: auto;
-            }
-
-            .sidenav-mini-icon {
-              opacity: 0;
-              width: 0;
-              min-width: 0;
-            }
-
-            &[data-bs-toggle="collapse"]:after {
-              content: "\f107";
-            }
-          }
-
-          .collapse {
-            .nav {
-              margin-left: 1.5rem !important;
-              padding-left: 1rem !important;
-
-              .nav-item {
-                .nav-link {
-                  margin-left: $navbar-vertical-collapse-margin-left;
-
-                  &:before {
-                    content: "";
-                  }
-                }
-
-                .collapse,
-                .collapsing {
-                  .nav {
-                    margin-left: 0 !important;
-                    padding-left: 0 !important;
-
-                    .nav-item {
-                      .nav-link {
-                        &:before {
-                          content: none;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        .card.card-background {
-          .icon-shape {
-            margin-bottom: 1rem !important;
-          }
-
-          .docs-info {
-            opacity: 1;
-            width: auto;
-            height: auto;
-          }
-        }
       }
     }
   }

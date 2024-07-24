@@ -4,7 +4,7 @@
       class="mt-4 page-header min-height-300 border-radius-xl"
       :style="{
         backgroundImage:
-          'url(' + require('@/assets/img/curved-images/curved14.jpg') + ')',
+          'url(' + require('@/assets/img/curved-images/curvedx3.jpg') + ')',
         backgroundPositionY: '50%',
       }"
     >

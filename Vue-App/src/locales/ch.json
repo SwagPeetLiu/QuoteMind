@@ -88,6 +88,16 @@
     "by": "而生",
     "for hard working mothers": "为辛苦工作的母亲们"
   },
+  "sideNav":{
+    "title": "燕地鹏扬",
+    "pages": "其他",
+    "dashboard": "信息板",
+    "resources": "公司资源",
+    "clients":"客户源",
+    "need help?": "需要帮助？",
+    "Please check Docs as well": "也可查阅文档",
+    "contact author": "联系我们"
+  },
   "routes":{
     "pages": "主页",
     "dashboard": "信息板",

@@ -16,8 +16,8 @@
       >
       <img 
         :src="isBlur ? 'favicon-black.png' : 'favicon-white.png'" 
-        class="me-2" alt="Logo" style="width: 24px; height: 24px;"
-      >
+        class="me-2 navbar-brand-img" :class="isBlur ? 'inverted-img' : ''" alt="Logo"
+      />
         {{ t('thinBar.advertise') }}
       </router-link>
 

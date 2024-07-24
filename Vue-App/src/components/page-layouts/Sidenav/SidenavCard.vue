@@ -1,17 +1,22 @@
-<!-- This component controls the bacground of the  -->
+<!-- Large cards for side nav menues  -->
 <template>
   <div
     id="sidenavCard"
-    class="shadow-none card card-background card-background-mask-secondary"
+    class="shadow card card-background card-background-mask-secondary"
   >
+    <!-- show with a nice background image -->
     <div
       class="full-background"
       :style="{ 'background-image': 'url(' + imgWhiteCurved + ')' }"
     ></div>
+    
+    <!-- using a card body to structure the content -->
     <div class="p-3 card-body text-start w-100">
-      <div
-        class="mb-3 text-center bg-white shadow icon icon-shape icon-sm d-flex align-items-center justify-content-center border-radius-md"
-      >
+
+      <!-- top icon with an white background -->
+      <div class="mb-3 text-center bg-white shadow 
+          icon icon-shape icon-sm d-flex align-items-center 
+          justify-content-center border-radius-md">
         <i
           id="sidenavCardIcon"
           class="top-0 text-lg text-dark text-gradient"
@@ -19,19 +24,16 @@
           :class="icon"
         ></i>
       </div>
-      <div v-if="this.$store.state.isRTL" class="docs-info">
-        <h6 class="mb-0 text-white up text-end">تحتاج مساعدة ؟</h6>
-        <p class="text-xs font-weight-bold text-end">
-          يرجى التحقق من مستنداتنا
-        </p>
-        <a :href="route" target="_blank" class="mb-0 btn btn-white btn-sm w-100"
-          >توثيق
-        </a>
-      </div>
-      <div v-else class="docs-info">
+
+      <!-- information regarding the card -->
+      <div class="docs-info">
         <h6 class="mb-0 text-white up">{{ textPrimary }}</h6>
         <p class="text-xs font-weight-bold">{{ textSecondary }}</p>
-        <a :href="route" target="_blank" class="mb-0 btn btn-white btn-sm w-100"
+        <a 
+          :href="route" 
+          target="_blank" 
+          rel="noreferrer noopener"
+          class="mb-0 btn btn-white btn-sm w-100"
           >{{ label }}
         </a>
       </div>
@@ -39,7 +41,8 @@
   </div>
 </template>
 <script>
-import imgWhiteCurved from "../../../assets/img/curved-images/white-curved.jpeg";
+import imgWhiteCurved from "../../../assets/img/curved-images/curvedx2.jpg";
+
 export default {
   name: "SidenavCard",
   props: {

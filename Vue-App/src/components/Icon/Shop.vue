@@ -1,4 +1,5 @@
 <template>
+  <!-- <i class="fa fa-home" aria-hidden="true"></i> -->
   <svg
     width="12px"
     height="12px"

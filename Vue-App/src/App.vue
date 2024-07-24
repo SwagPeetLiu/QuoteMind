@@ -1,22 +1,23 @@
 <template>
   <div>
+  <!-- passing donwn
+      -custom_class shows for the background of the nav cards items
+      -classes of the menu's background and position
+  -->
   <sidenav
-    :custom_class="this.$store.state.mcolor"
     :class="[
-      this.$store.state.isTransparent,
-      'fixed-start'
+      this.$store.state.isTransparent, // menu's background
+      'fixed-start' // menu's position
     ]"
     v-if="this.$store.state.showSidenav"
   />
   <main
     class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
-    :style="this.$store.state.isRTL ? 'overflow-x: hidden' : ''"
   >
     <!-- nav bar on the top of the main container -->
     <navbar
       :class="[navClasses]"
       :textWhite="this.$store.state.isAbsolute ? 'text-white opacity-8' : ''"
-      :minNav="navbarMinimize"
       v-if="this.$store.state.showNavbar"
     />
     <router-view />
@@ -55,7 +56,7 @@ export default {
     SlideToast
   },
   methods: {
-    ...mapMutations(["toggleConfigurator", "navbarMinimize"]),
+    ...mapMutations(["toggleConfigurator"]),
     showModal() {
             var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
                 keyboard: false
@@ -64,6 +65,7 @@ export default {
         }
   },
   computed: {
+    // function used to control the top nav bar's displays
     navClasses() {
       return {
         "position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky": this
@@ -73,9 +75,6 @@ export default {
         "px-0 mx-4 mt-4": !this.$store.state.isAbsolute,
       };
     },
-  },
-  beforeMount() {
-    this.$store.state.isTransparent = "bg-transparent";
-  },
+  }
 };
 </script>

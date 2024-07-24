@@ -2,16 +2,14 @@
 <template>
   <router-link class="nav-link" :to="to" v-bind="$attrs">
     <div
-      class="text-center bg-white shadow icon icon-shape icon-sm border-radius-md d-flex align-items-center justify-content-center"
-      :class="this.$store.state.isRTL ? ' ms-2' : 'me-2'"
+      class="text-center shadow icon icon-shape
+      icon-sm border-radius-md d-flex 
+      align-items-center justify-content-center me-2"
     >
+      <!-- creating a named slot that allow sidenav to insert the icons dynamically -->
       <slot name="icon"></slot>
     </div>
-    <span
-      class="nav-link-text"
-      :class="this.$store.state.isRTL ? ' me-1' : 'ms-1'"
-      >{{ navText }}</span
-    >
+    <span class="nav-link-text ms-1">{{ navText }}</span>
   </router-link>
 </template>
 <script>

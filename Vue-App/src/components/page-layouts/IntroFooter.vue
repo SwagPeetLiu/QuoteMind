@@ -49,7 +49,7 @@
             rel="noopener noreferrer"
             class="mb-2 text-secondary me-xl-5 me-3 mb-sm-0"
           >
-          {{ t('footer.License') }}
+          {{ t('footer.license') }}
           </a>
         </div>
 

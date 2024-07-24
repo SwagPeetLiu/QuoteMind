@@ -87,6 +87,15 @@
     "by": "by",
     "for hard working mothers": "For hard working mothers"
   },
+  "sideNav":{
+    "title": "Quote Mind Pro",
+    "pages": "Pages",
+    "dashboard": "Dashboard",
+    "resources": "Resources",
+    "need help?": "Need Help?",
+    "Please check Docs as well": "Please check Docs as well",
+    "contact author": "Contact Author"
+  },
   "routes":{
     "pages": "Pages",
     "dashboard": "Dashboard",

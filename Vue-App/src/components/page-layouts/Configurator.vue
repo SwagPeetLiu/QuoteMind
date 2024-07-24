@@ -28,9 +28,9 @@
         </div>
         <a href="#" class="switch-trigger background-color">
           <div class="my-2 badge-colors" :class="this.$store.state.isRTL ? 'text-end' : ' text-start'">
-            <span class="badge filter bg-gradient-primary active" data-color="primary"
+            <span class="badge filter bg-gradient-primary" data-color="primary"
               @click="sidebarColor('primary')"></span>
-            <span class="badge filter bg-gradient-dark" data-color="dark" @click="sidebarColor('dark')"></span>
+            <span class="badge filter bg-gradient-dark active" data-color="dark" @click="sidebarColor('dark')"></span>
             <span class="badge filter bg-gradient-info" data-color="info" @click="sidebarColor('info')"></span>
             <span class="badge filter bg-gradient-success" data-color="success" @click="sidebarColor('success')"></span>
             <span class="badge filter bg-gradient-warning" data-color="warning" @click="sidebarColor('warning')"></span>
@@ -62,7 +62,7 @@
           <h6 class="mb-0">{{ t("configurator.Navbar Fixed") }}</h6>
         </div>
         <div class="form-check form-switch ps-0">
-          <input class="mt-1 form-check-input" :class="this.$store.state.isRTL ? 'float-end  me-auto' : ' ms-auto'"
+          <input class="mt-1 form-check-input ms-auto" 
             type="checkbox" id="navbarFixed" :checked="this.$store.state.isNavFixed" @change="setNavbarFixed"
             v-model="fixedKey" />
         </div>
@@ -145,9 +145,9 @@ export default {
     ...mapMutations(["navbarMinimize", "sidebarType", "navbarFixed"]),
     ...mapActions(["toggleSidebarColor"]),
 
-    sidebarColor(color = "success") {
+    // funciton used to set the theme colours of the app
+    sidebarColor(color = "dark") {
       document.querySelector("#sidenav-main").setAttribute("data-color", color);
-      this.$store.state.mcolor = `card-background-mask-${color}`;
     },
 
     sidebarType(type) {
@@ -156,10 +156,13 @@ export default {
 
     setNavbarFixed() {
       if (this.$route.name !== "Profile") {
-        this.$store.state.isNavFixed = !this.$store.state.isNavFixed;
+        this.navbarFixed();
       }
     },
 
+    // function that watch outs for the changes of the screen sizes
+    // if the screen size is smaller than 1200px
+    // the side menu background colour cannot change
     sidenavTypeOnResize() {
       let transparent = document.querySelector("#btn-transparent");
       let white = document.querySelector("#btn-white");
@@ -247,15 +250,17 @@ export default {
     }
   },
   computed: {
+    // whether the current nav menu is transparent or not
     ifTransparent() {
       return this.$store.state.isTransparent;
     },
+
+    // call the function to enable and disable the nav menue bg changes
     sidenavResponsive() {
       return this.sidenavTypeOnResize;
     }
   },
   beforeMount() {
-    this.$store.state.isTransparent = "bg-transparent";
     // Deactivate sidenav type buttons on resize and small screens
     window.addEventListener("resize", this.sidenavTypeOnResize);
     window.addEventListener("load", this.sidenavTypeOnResize);

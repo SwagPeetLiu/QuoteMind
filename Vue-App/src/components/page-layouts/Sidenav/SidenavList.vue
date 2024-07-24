@@ -4,23 +4,24 @@
     class="w-auto h-auto collapse navbar-collapse max-height-vh-100 h-100"
     id="sidenav-collapse-main"
   >
+    <!-- Operations available when logged in -->
     <ul class="navbar-nav">
       <li class="nav-item">
-        <sidenav-collapse navText="Dashboard" :to="{ name: 'Dashboard' }">
-          <template #icon>
+        <sidenav-collapse :navText="t('sideNav.dashboard')" :to="{ name: 'Dashboard' }">
+          <template #icon> 
             <shop />
           </template>
         </sidenav-collapse>
       </li>
       <li class="nav-item">
-        <sidenav-collapse navText="Tables" :to="{ name: 'Tables' }">
+        <sidenav-collapse :navText="t('sideNav.resources')" :to="{ name: 'Tables' }">
           <template #icon>
             <office />
           </template>
         </sidenav-collapse>
       </li>
       <li class="nav-item">
-        <sidenav-collapse navText="Billing" :to="{ name: 'Billing' }">
+        <sidenav-collapse :navText="t('routes.transactions')" :to="{ name: 'Billing' }">
           <template #icon>
             <credit-card />
           </template>
@@ -37,39 +38,17 @@
           </template>
         </sidenav-collapse>
       </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="RTL" :to="{ name: 'Rtl' }">
-          <template #icon>
-            <settings />
-          </template>
-        </sidenav-collapse>
-      </li>
+
+      <!-- Pages available when logged in -->
       <li class="mt-3 nav-item">
-        <h6
-          class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6"
-          :class="this.$store.state.isRTL ? 'me-4' : 'ms-2'"
-        >
-          PAGES
+        <h6 class="text-xs ps-4 ms-2 text-uppercase font-weight-bolder opacity-6">
+          {{ t('sideNav.pages') }}
         </h6>
       </li>
       <li class="nav-item">
-        <sidenav-collapse navText="Profile" :to="{ name: 'Profile' }">
+        <sidenav-collapse :navText="t('routes.profile')" :to="{ name: 'Profile' }">
           <template #icon>
             <customer-support />
-          </template>
-        </sidenav-collapse>
-      </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Sign In" :to="{ name: 'Sign In' }">
-          <template #icon>
-            <document />
-          </template>
-        </sidenav-collapse>
-      </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Sign Up" :to="{ name: 'Sign Up' }">
-          <template #icon>
-            <spaceship />
           </template>
         </sidenav-collapse>
       </li>
@@ -77,15 +56,24 @@
   </div>
   
   <!-- Sidenav Footer -->
-  <div class="pt-3 mx-3 mt-3 sidenav-footer">
+  <div class="pt-3 mx-3 mt-8 sidenav-footer">
     <sidenav-card
-      :class="cardBg"
-      textPrimary="Need Help?"
-      textSecondary="Please check our docs"
-      route="https://www.creative-tim.com/learning-lab/vue/overview/soft-ui-dashboard/"
-      label="Documentation"
-      icon="ni ni-diamond"
+      :textPrimary="t('sideNav.need help?')"
+      :textSecondary="t('sideNav.Please check Docs as well')"
+      route="mailto:535051192liu@gmail.com"
+      :label="t('sideNav.contact author')"
+      icon="fa fa-info-circle"
     />
+    <a class="btn bg-gradient-success w-100 mt-3 d-flex align-items-center justify-content-center" 
+        href="https://535051192liu.atlassian.net/wiki/spaces/KAN"
+        target="_blank"
+        norel="noopener noreferrer"
+    >
+      <i class="fa fa-file-text text-white me-2" aria-hidden="true"></i>
+      <span class="text-white docs-info">
+        {{ t('sideNav.resources') }}
+      </span>
+    </a>
   </div>
 </template>
 <script>
@@ -96,21 +84,16 @@ import Office from "../../Icon/Office.vue";
 import CreditCard from "../../Icon/CreditCard.vue";
 import Box3d from "../../Icon/Box3d.vue";
 import CustomerSupport from "../../Icon/CustomerSupport.vue";
-import Document from "../../Icon/Document.vue";
-import Spaceship from "../../Icon/Spaceship.vue";
-import Settings from "../../Icon/Settings.vue";
+import { useI18n } from "vue-i18n";
 
 export default {
   name: "SidenavList",
   props: {
     cardBg: String,
   },
-  data() {
-    return {
-      title: "Soft UI Dashboard PRO",
-      controls: "dashboardsExamples",
-      isActive: "active",
-    };
+  setup() {
+    const { t } = useI18n();
+    return { t };
   },
   components: {
     SidenavCollapse,
@@ -120,9 +103,6 @@ export default {
     CreditCard,
     Box3d,
     CustomerSupport,
-    Document,
-    Spaceship,
-    Settings,
   },
   methods: {
     getRoute() {

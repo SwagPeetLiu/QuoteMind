@@ -15,8 +15,7 @@ export default createStore({
     showConfig: false,
 
     // control the display of the navbar
-    isTransparent: "", // transparent or white colour of side 
-    color: "",
+    isTransparent: "bg-transparent",
     isNavFixed: false, 
 
     isPinned: true,
@@ -43,9 +42,11 @@ export default createStore({
     toggleConfigurator(state) {
       state.showConfig = !state.showConfig;
     },
-    // function used to minimise the navbar:
-    navbarMinimize(state) {
+
+    // function used to minimise the navbar on small screens
+    toggleMenuOnSmallScreens(state) {
       const sidenav_show = document.querySelector(".g-sidenav-show");
+      
       if (sidenav_show.classList.contains("g-sidenav-hidden")) {
         sidenav_show.classList.remove("g-sidenav-hidden");
         sidenav_show.classList.add("g-sidenav-pinned");
@@ -56,12 +57,18 @@ export default createStore({
         state.isPinned = false;
       }
     },
+    
+    // Toggle the side menu's colour
     sidebarType(state, payload) {
       state.isTransparent = payload;
     },
+
+    // changing the theme colours of the app (navbar for now)
     cardBackground(state, payload) {
       state.color = payload;
     },
+
+    // Function to set the top navbar fixed:
     navbarFixed(state) {
       if (state.isNavFixed === false) {
         state.isNavFixed = true;

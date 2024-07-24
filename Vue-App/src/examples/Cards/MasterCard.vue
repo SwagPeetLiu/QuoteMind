@@ -4,7 +4,7 @@
       class="overflow-hidden position-relative border-radius-xl"
       :style="{
         backgroundImage:
-          'url(' + require('@/assets/img/curved-images/curved14.jpg') + ')',
+          'url(' + require('@/assets/img/curved-images/curvedx3.jpg') + ')',
       }"
     >
       <span class="mask" :class="`bg-gradient-${card.background}`"></span>
@@ -42,7 +42,7 @@
 
 <script>
 import SoftAvatar from "@/components/soft-components/SoftAvatar.vue";
-import img from "@/assets/img/curved-images/curved14.jpg";
+import img from "@/assets/img/curved-images/curvedx3.jpg";
 import img1 from "@/assets/img/logos/mastercard.png";
 
 export default {
