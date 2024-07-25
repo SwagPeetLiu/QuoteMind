@@ -121,12 +121,12 @@ export default {
       handler(newValue) {
 
         // for nested main link
-        console.log(newValue)
         if (this.hasChildren){
 
           // if other main links are currently active, then dactivate this main link:
           if (newValue.subLink == ""){
             this.isChildActive = false;
+            this.isOpened = false;
           }
 
           // regardless the activness, when the is menu is no longer hovered on
