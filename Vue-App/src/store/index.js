@@ -14,13 +14,16 @@ export default createStore({
     hideConfigButton: false,
     showConfig: false,
 
-    // control the display of the navbar
+    // control the display of the sidenav menu
     isTransparent: "bg-transparent",
-    isNavFixed: false, 
-
     isPinned: true,
-    isRTL: false,
+    menuAct: {hoverOver: false, mainLink: "", subLink: ""},
+
+    // top nav bar settings:
+    isNavFixed: false, 
     isAbsolute: false,
+
+    isRTL: false,
 
     // app vue display settings
     showSidenav: true,
@@ -109,12 +112,19 @@ export default createStore({
       state.isAuthenticated = false;
       clearToken();
     },
+
+    // menu action tracks:
+    setMenuAct(state, payload) {
+      state.menuAct = { ...payload };
+    },
+
+    // message commutes
     setErrorMessage(state, payload) {
       state.errorMessage = payload;
     },
     setToastMessage(state, payload) {
       state.toastMessage = payload;
-    },
+    }
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
@@ -128,6 +138,6 @@ export default createStore({
     getIsAuthenticated: (state) => state.isAuthenticated,
     getLanguage: (state) => state.language,
     getUser: (state) => state.user,
-    haveNoDialogs: (state) => state.errorMessage === "",
+    haveNoDialogs: (state) => state.errorMessage === "" && state.toastMessage.message === "",
   },
 });

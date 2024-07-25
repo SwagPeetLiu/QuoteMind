@@ -6,6 +6,8 @@
   >
     <!-- Operations available when logged in -->
     <ul class="navbar-nav">
+
+      <!-- Dashboard -->
       <li class="nav-item">
         <sidenav-collapse :navText="t('sideNav.dashboard')" :to="{ name: 'Dashboard' }">
           <template #icon> 
@@ -13,28 +15,29 @@
           </template>
         </sidenav-collapse>
       </li>
+
+      <!-- Company Resources -->
       <li class="nav-item">
-        <sidenav-collapse :navText="t('sideNav.resources')" :to="{ name: 'Tables' }">
+        <sidenav-collapse 
+          :navText="t('sideNav.resources')" 
+          :to="{ name: 'Tables' }"
+          :hasChildren="true"
+          :nestedChildren="{
+            'tables': 'Tables',
+            'test': 'test'
+          }"
+        >
           <template #icon>
             <office />
           </template>
         </sidenav-collapse>
       </li>
+
+      <!-- Transactions -->
       <li class="nav-item">
         <sidenav-collapse :navText="t('routes.transactions')" :to="{ name: 'Billing' }">
           <template #icon>
             <credit-card />
-          </template>
-        </sidenav-collapse>
-      </li>
-
-      <li class="nav-item">
-        <sidenav-collapse
-          navText="Virtual Reality"
-          :to="{ name: 'Virtual Reality' }"
-        >
-          <template #icon>
-            <box3d />
           </template>
         </sidenav-collapse>
       </li>
@@ -82,7 +85,6 @@ import SidenavCard from "./SidenavCard.vue";
 import Shop from "../../Icon/Shop.vue";
 import Office from "../../Icon/Office.vue";
 import CreditCard from "../../Icon/CreditCard.vue";
-import Box3d from "../../Icon/Box3d.vue";
 import CustomerSupport from "../../Icon/CustomerSupport.vue";
 import { useI18n } from "vue-i18n";
 
@@ -101,7 +103,6 @@ export default {
     Shop,
     Office,
     CreditCard,
-    Box3d,
     CustomerSupport,
   },
   methods: {

@@ -28,6 +28,7 @@
     // Navbar navigation (third level)
     .navbar-nav {
       flex-direction: column !important;
+      padding-bottom: 1rem;
 
       // Navbar navigation (fourth level)
       .nav-item {
@@ -39,6 +40,7 @@
           display: flex;
           align-items: center;
           white-space: nowrap;
+          cursor: pointer;
           padding-left: $navbar-padding-x;
           padding-right: $navbar-padding-x;
           font-weight: $navbar-nav-link-font-weight;
@@ -50,13 +52,22 @@
           // Apply active styless:
           transition: all $transition-base ease;
 
+          // when the dropdown menu is opened, then toggle it down
+          .dropdown-arrow {
+            transition: transform .5s ease;
+
+            &.open {
+              transform: rotate(180deg);
+            }
+          }
+
           &.active {
+            margin-left: $navbar-vertical-nav-link-padding-x;
             transform: scale(1.2);
             font-weight: 600;
           }
 
           .nav-link-text,
-          .sidenav-mini-icon,
           .sidenav-normal,
           i {
             pointer-events: none;
@@ -77,6 +88,58 @@
 
               .color-foreground {
                 fill: $dark-gradient;
+              }
+            }
+          }
+        }
+
+        .dropdown-links {
+          opacity: 0;
+          max-height: 0;
+          overflow: hidden;
+          margin-left: $navbar-vertical-nav-link-padding-x + 1.8rem;
+          margin-right: $navbar-vertical-nav-link-padding-x + 1.8rem;
+          transition: max-height 0.4s ease, opacity 0.3s ease 0.1s, margin-top 0.4s ease, margin-bottom 0.4s ease; // transition on closing the container 
+          margin-top: 0;
+          margin-bottom: 0;
+        
+          &.open {
+            opacity: 1;
+            max-height: 1000px; // Adjust this value based on your content
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            cursor: pointer;
+            gap: .5rem;
+            margin-top: 1rem;
+            margin-bottom: .6rem;
+            transition: max-height 0.4s ease, opacity 0.3s ease 0.1s, margin-top 0.4s ease, margin-bottom 0.4s ease; // on opening the container
+  
+          }
+        
+          .dropdown-link-item {
+            font-weight: $navbar-nav-link-font-weight;
+            font-size: $font-size-base;
+            transition: transform 0.1s;
+
+            i {
+              opacity: 1;
+              font-size: $navbar-vertical-collapse-dot-size;
+              margin-right: 28px;
+            }
+        
+            &:hover {
+              transform: scale(1.05) translateX(8px);
+              transition: transform 0.1s;
+              font-weight: bold;
+            }
+        
+            &.active {
+              font-weight: bold;
+        
+              i {
+                font-size: $navbar-vertical-collapse-dot-size-active;
+                margin-right: 15px;
               }
             }
           }
@@ -129,8 +192,12 @@
   // which the colour of the menu svg when being active
   .navbar-nav>.nav-item .nav-link.active {
     color: $dark;
+
     .icon {
+
+      // margin-left: .8rem; (Needs to dynamically call if user needs to stablise the navbar)
       svg {
+
         .color-background,
         .color-foreground {
           fill: $white;
@@ -185,11 +252,6 @@
     &.fixed-start~.main-content {
       margin-left: $navbar-vertical-open-width + 1.5;
     }
-
-    // disabled the fixed end style as sidenav show only show from the left
-    // &.fixed-end ~ .main-content {
-    //   margin-right: $navbar-vertical-open-width + 1.5;
-    // }
   }
 }
 
@@ -210,6 +272,7 @@
       transition: 0.3s ease;
       opacity: 1;
     }
+
 
     // where to the put the nested nav-links:
 
@@ -314,6 +377,10 @@
             background-color: transparent;
           }
 
+          i {
+            display: none;
+          }
+
           .icon {
             padding: 10px;
           }
@@ -323,6 +390,10 @@
             opacity: 0;
             width: 0;
           }
+        }
+
+        .dropdown-links {
+          display: none;
         }
       }
 
@@ -366,6 +437,9 @@
 
         .nav-item {
           .nav-link {
+            i {
+              display: block;
+            }
 
             .nav-link-text,
             .sidenav-normal {
@@ -373,10 +447,26 @@
               width: auto;
             }
           }
+
+          .dropdown-links {
+            display: block;
+
+            .dropdown-link-item {
+              display: block;
+            }
+          }
+        }
+
+        .dropdown-links {
+          display: none;
+
+          &.open {
+            display: flex;
+          }
         }
 
         &.bg-transparent {
-          .navbar-nav .nav-link.active{
+          .navbar-nav .nav-link.active {
             background-color: $white;
             box-shadow: $box-shadow-sm;
             margin: 4px $navbar-vertical-nav-link-padding-x + 1;
@@ -403,8 +493,9 @@
           }
 
           .docs-info {
-            margin-left: 8px;
-            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
             width: auto;
             height: auto;
           }
@@ -414,96 +505,17 @@
   }
 }
 
-// Navbar Vertical Extend (for nesting elements)
-.navbar-vertical {
-  .navbar-nav .nav-link[data-bs-toggle="collapse"] {
-
-    // style for the dropdown menu
-    &:after {
-      display: inline-block;
-      font-style: normal;
-      font-variant: normal;
-      text-rendering: auto;
-      -webkit-font-smoothing: antialiased;
-      font-family: "Font Awesome 5 Free";
-      font-weight: 700;
-      content: "\f107";
-      margin-left: auto;
-      color: rgba($dark-gradient-state, 0.5);
-      @include transition($transition-base);
-    }
-
-    // when toggling to be opened, then arrow svg will be pointing downward
-    &[aria-expanded="true"] {
-      &:after {
-        color: $dark-gradient-state;
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  // style for nested dropdown menue items (collapse elements within each nav-item)
-  .navbar-nav {
-    .nav-item {
-
-      .collapse,
-      .collapsing {
-        .nav {
-          @include transition($transition-base);
-
-          .nav-item {
-            .nav-link {
-              position: relative;
-              background-color: transparent;
-              box-shadow: none;
-              color: rgba($dark-gradient-state, 0.5);
-              margin-left: $navbar-vertical-collapse-margin-left;
-
-              &:before {
-                content: "";
-                position: absolute;
-                left: $navbar-vertical-collapse-left;
-                top: $navbar-vertical-collapse-top;
-                transform: $navbar-vertical-collapse-translate;
-                height: $navbar-vertical-collapse-dot-size;
-                width: $navbar-vertical-collapse-dot-size;
-                border-radius: $border-radius-2xl;
-                background: rgba($dark-gradient-state, 0.5);
-              }
-
-              &.active {
-                color: $dark-gradient-state;
-
-                &:before {
-                  height: $navbar-vertical-collapse-dot-size-active;
-                  width: $navbar-vertical-collapse-dot-size-active;
-                  background: $dark-gradient-state;
-                }
-              }
-            }
-
-            &.active {
-              .nav-link {
-                color: $dark-gradient-state;
-
-                &:before {
-                  height: $navbar-vertical-collapse-dot-size-active;
-                  width: $navbar-vertical-collapse-dot-size-active;
-                  background: $dark-gradient-state;
-                }
-              }
-            }
+// manages the padding when user decides to pin the menu, not toggled on hover
+// align the active styles
+@include media-breakpoint-up(md) {
+  .g-sidenav-show:not(.g-sidenav-hidden){
+    .navbar-vertical {
+      .nav-link{
+        &.active{
+          .icon{
+            margin-left: 12px;
           }
         }
-      }
-    }
-  }
-
-  &.blur {
-    .navbar-nav>.nav-item {
-      .nav-link {
-        background-color: transparent;
-        box-shadow: none;
       }
     }
   }

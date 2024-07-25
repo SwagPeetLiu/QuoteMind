@@ -161,12 +161,12 @@ export default {
     },
 
     // function that watch outs for the changes of the screen sizes
-    // if the screen size is smaller than 1200px
+    // if the screen size is smaller than 720px (md)
     // the side menu background colour cannot change
     sidenavTypeOnResize() {
       let transparent = document.querySelector("#btn-transparent");
       let white = document.querySelector("#btn-white");
-      if (window.innerWidth < 1200) {
+      if (window.innerWidth < 720) {
         transparent.classList.add("disabled");
         white.classList.add("disabled");
       } else {

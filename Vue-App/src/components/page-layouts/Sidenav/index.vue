@@ -1,9 +1,11 @@
 <!-- Controller for the side name (sidenav id for theme changes) -->
 <template>
   <aside
-    class="my-3 ms-3 overflow-auto border-0 
+    class="my-3 ms-3 overflow-auto border-0
     sidenav navbar navbar-vertical navbar-expand-xs border-radius-xl"
-    id="sidenav-main" 
+    id="sidenav-main"
+    @mouseleave="handleMenuAct(false)"
+    @mouseenter="handleMenuAct(true)"
   >
     <!-- side nav header -->
     <div class="sidenav-header">
@@ -13,7 +15,12 @@
           class="navbar-brand-img h-100" 
           alt="main_logo"
         />
-        <span class="ms-2 font-weight-bolder">{{ $t("sideNav.title") }}</span>
+        <span 
+          class="font-weight-bolder" 
+          :class="isCurrentLanEnglish ? 'ms-2' : 'ms-3'"
+        >
+          {{ $t("sideNav.title") }}
+        </span>
       </a>
     </div>
 
@@ -44,6 +51,16 @@ export default {
   },
   mounted() {
     document.querySelector("#sidenav-main").setAttribute("data-color", "dark");
-  }
+  },
+  methods: {
+    handleMenuAct(hasHovered){
+      this.$store.commit("setMenuAct", { ...this.$store.state.menuAct, hoverOver: hasHovered });
+    }
+  },
+  computed: {
+    isCurrentLanEnglish() {
+      return this.$store.getters.getLanguage === "en";
+    },
+  },
 };
 </script>

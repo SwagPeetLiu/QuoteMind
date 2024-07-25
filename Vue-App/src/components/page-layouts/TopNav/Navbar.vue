@@ -25,8 +25,8 @@
           </div>
         </li>
 
-        <!-- menu toggler -->
-        <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+        <!-- menu toggler (only show when breaking point is reached) -->
+        <li class="nav-item d-md-none ps-3 d-flex align-items-center">
           <a href="#" @click="toggleSidebar" class="p-0 nav-link text-body" id="iconNavbarSidenav">
             <i class="fa fa-bars h5" aria-hidden="true"></i>
           </a>

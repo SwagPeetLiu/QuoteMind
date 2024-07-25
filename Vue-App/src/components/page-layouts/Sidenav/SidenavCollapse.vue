@@ -1,18 +1,50 @@
 <!-- Controls displays of single directory item -->
 <template>
-  <router-link class="nav-link" :to="to" v-bind="$attrs">
-    <div
-      class="text-center shadow icon icon-shape
-      icon-sm border-radius-md d-flex 
-      align-items-center justify-content-center me-2"
+  <router-link :to="to" v-bind="$attrs" custom v-slot="{ navigate, isActive }">
+
+    <div ref="mainLink" class="nav-link" :class="{
+      'dropdown-link d-flex align-items-center': hasChildren,
+      'active': isActive || isChildActive
+    }"
+    @click="mainLinkClick(navigate)"
     >
-      <!-- creating a named slot that allow sidenav to insert the icons dynamically -->
-      <slot name="icon"></slot>
+      <!-- the nav icon -->
+      <div class="text-center shadow icon icon-shape
+      icon-sm border-radius-md d-flex 
+      align-items-center justify-content-center me-2">
+        <slot name="icon"></slot>
+      </div>
+
+      <span class="nav-link-text ms-2">{{ navText }}</span>
+
+      <!-- the dropdown icon -->
+      <i 
+        ref="dropdownIcon" 
+        v-if="hasChildren" 
+        class="fa fa-chevron-down ms-auto dropdown-arrow" 
+        :class="{ 'open': isOpened }"
+        aria-hidden="true">
+      </i>
     </div>
-    <span class="nav-link-text ms-1">{{ navText }}</span>
+
+    <!-- if the component has children, then nest directories -->
+    <div class="dropdown-links" :class="{'open': hasChildren && isOpened}">
+      <div
+        v-for="(route, text) in nestedChildren" :key="text" 
+        @click.stop="handleNestedClick(route)"
+        class="dropdown-link-item d-flex align-items-center"
+        :class="{'active': isNestedActive(route)}"
+      >
+        <i v-if="isNestedActive(route)" class="fa fa-tags" aria-hidden="true"></i>
+        <i v-else class="fa fa-circle" aria-hidden="true"></i>
+        {{ text }}
+      </div >
+    </div>
   </router-link>
 </template>
+
 <script>
+
 export default {
   name: "sidenav-collapse",
   props: {
@@ -24,11 +56,95 @@ export default {
       type: String,
       required: true,
     },
+    hasChildren: {
+      type: Boolean,
+      default: false
+    },
+    nestedChildren: {
+      type: Object
+    }
   },
-  data() {
-    return {
-      isExpanded: false,
-    };
+  data(){
+    return{
+      isChildActive: false,
+      isOpened: false
+    }
   },
+  methods: {
+    mainLinkClick(navigate) {
+
+      // if the directory is nested, then do not use to nav
+      if (this.hasChildren && this.nestedChildren) {
+        this.toggleMenu();
+      }
+      // if the directory is not nested then nav properly
+      else {
+        this.$store.commit("setMenuAct", {  
+          ...this.$store.state.menuAct,
+          mainLink: this.to.name, 
+          subLink: ""
+        });
+        navigate();
+      }
+    },
+    toggleMenu(){
+      this.isOpened = !this.isOpened;
+    },
+
+    handleNestedClick(route) {
+      try{
+        // handle the case where the main link is not yet active
+        this.isChildActive = true;
+        this.$store.commit("setMenuAct", { 
+          ...this.$store.state.menuAct, 
+          mainLink: this.to.name, 
+          subLink: route 
+        });
+        this.$router.push({ name: route });
+      }
+      catch(e){
+        console.log(e);
+      }
+    },
+
+    isNestedActive(route){
+      if (this.$store.state.menuAct.subLink == route) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+  },
+  watch:{
+    '$store.state.menuAct': {
+      handler(newValue) {
+
+        // for nested main link
+        console.log(newValue)
+        if (this.hasChildren){
+
+          // if other main links are currently active, then dactivate this main link:
+          if (newValue.subLink == ""){
+            this.isChildActive = false;
+          }
+
+          // regardless the activness, when the is menu is no longer hovered on
+          // close the menu
+          if (newValue.hoverOver === false) {
+            this.isOpened = false;
+          }
+          // when it is hovered over, and the sublink belongs to this menu, then open it up again
+          else {
+            Object.keys(this.nestedChildren).forEach((key) => {
+              if (this.nestedChildren[key] == newValue.subLink) {
+                this.isOpened = true;
+              }
+            });
+          }
+        }
+      }
+    }
+  }
 };
 </script>
