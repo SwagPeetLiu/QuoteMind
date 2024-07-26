@@ -133,12 +133,12 @@
 
 <script>
 import setTooltip from "@/assets/js/tooltip.js";
-import NavPill from "./components/NavPill.vue";
+import NavPill from "../components/NavPill.vue";
 import MasterCard from "@/examples/Cards/MasterCard.vue";
 import DefaultInfoCard from "@/examples/Cards/DefaultInfoCard.vue";
-import PaymentMethodsCard from "./components/PaymentMethodsCard.vue";
-import InvoiceCard from "./components/InvoiceCard.vue";
-import BillingCard from "./components/BillingCard.vue";
+import PaymentMethodsCard from "../components/PaymentMethodsCard.vue";
+import InvoiceCard from "../components/InvoiceCard.vue";
+import BillingCard from "../components/BillingCard.vue";
 import RankingList from "@/examples/Cards/RankingList.vue";
 import RankingListCard from "@/examples/Cards/RankingListCard.vue";
 

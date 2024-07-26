@@ -11,7 +11,7 @@
     <div class="sidenav-header">
       <a class="m-0 navbar-brand" href="/">
         <img 
-          src="favicon-black.png" 
+          src="../../../assets/img/logos/icon-black.png" 
           class="navbar-brand-img h-100" 
           alt="main_logo"
         />

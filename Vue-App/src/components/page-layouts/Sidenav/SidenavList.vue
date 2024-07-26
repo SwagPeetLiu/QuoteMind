@@ -9,7 +9,7 @@
 
       <!-- Dashboard -->
       <li class="nav-item">
-        <sidenav-collapse :navText="t('sideNav.dashboard')" :to="{ name: 'Dashboard' }">
+        <sidenav-collapse :navText="t('routes.dashboard')" :to="{ name: 'Dashboard' }">
           <template #icon> 
             <shop />
           </template>
@@ -19,13 +19,10 @@
       <!-- Company Resources -->
       <li class="nav-item">
         <sidenav-collapse 
-          :navText="t('sideNav.resources')" 
-          :to="{ name: 'Tables' }"
+          :navText="t('routes.resources')" 
+          :to="{ name: 'Resources' }"
           :hasChildren="true"
-          :nestedChildren="{
-            'tables': 'Tables',
-            'test': 'test'
-          }"
+          :nestedChildren="nestedResources"
         >
           <template #icon>
             <office />
@@ -33,9 +30,37 @@
         </sidenav-collapse>
       </li>
 
+      <!-- Customers -->
+      <li class="nav-item">
+        <sidenav-collapse 
+          :navText="t('routes.customers')" 
+          :to="{ name: 'Customers' }"
+          :hasChildren="true"
+          :nestedChildren="nestedCustomers"
+        >
+          <template #icon>
+            <office />
+          </template>
+        </sidenav-collapse>
+      </li>
+
+      <!-- Pricing -->
+      <li class="nav-item">
+        <sidenav-collapse 
+          :navText="t('routes.pricings')" 
+          :to="{ name: 'Pricings' }"
+          :hasChildren="true"
+          :nestedChildren="nestedPricings"
+        >
+          <template #icon>
+            <office />
+          </template>
+        </sidenav-collapse>
+      </li>
+      
       <!-- Transactions -->
       <li class="nav-item">
-        <sidenav-collapse :navText="t('routes.transactions')" :to="{ name: 'Billing' }">
+        <sidenav-collapse :navText="t('routes.transactions')" :to="{ name: 'Transactions' }">
           <template #icon>
             <credit-card />
           </template>
@@ -59,7 +84,7 @@
   </div>
   
   <!-- Sidenav Footer -->
-  <div class="pt-3 mx-3 mt-8 sidenav-footer">
+  <div class="pt-3 mx-3 mt-3 sidenav-footer">
     <sidenav-card
       :textPrimary="t('sideNav.need help?')"
       :textSecondary="t('sideNav.Please check Docs as well')"
@@ -105,11 +130,29 @@ export default {
     CreditCard,
     CustomerSupport,
   },
-  methods: {
-    getRoute() {
-      const routeArr = this.$route.path.split("/");
-      return routeArr[1];
+  computed: {
+    nestedResources(){
+      return {
+        'tables': 'Tables',
+        'test': 'Test',
+        [this.t('routes.products')]: 'Products',
+        [this.t('routes.materials')]: 'Materials',
+        [this.t('routes.employees')]: 'Employees',
+        [this.t('routes.positions')]: 'Positions'
+      };
     },
+    nestedCustomers(){
+      return {
+        [this.t('routes.companies')]: 'Companies',
+        [this.t('routes.clients')]: 'Clients'
+      };
+    },
+    nestedPricings(){
+      return {
+        [this.t('routes.rules')]: 'Pricing_Rules',
+        [this.t('routes.conditions')]: 'Pricing_Conditions'
+      };
+    }
   },
 };
 </script>

@@ -28,7 +28,11 @@
     </div>
 
     <!-- if the component has children, then nest directories -->
-    <div class="dropdown-links" :class="{'open': hasChildren && isOpened}">
+    <div class="dropdown-links" 
+          :class="{
+            'open': hasChildren && isOpened,
+            'mt-3': isActive || isChildActive
+          }">
       <div
         v-for="(route, text) in nestedChildren" :key="text" 
         @click.stop="handleNestedClick(route)"
@@ -44,7 +48,6 @@
 </template>
 
 <script>
-
 export default {
   name: "sidenav-collapse",
   props: {
@@ -79,11 +82,6 @@ export default {
       }
       // if the directory is not nested then nav properly
       else {
-        this.$store.commit("setMenuAct", {  
-          ...this.$store.state.menuAct,
-          mainLink: this.to.name, 
-          subLink: ""
-        });
         navigate();
       }
     },
@@ -92,29 +90,23 @@ export default {
     },
 
     handleNestedClick(route) {
-      try{
-        // handle the case where the main link is not yet active
-        this.isChildActive = true;
-        this.$store.commit("setMenuAct", { 
-          ...this.$store.state.menuAct, 
-          mainLink: this.to.name, 
-          subLink: route 
-        });
-        this.$router.push({ name: route });
-      }
-      catch(e){
-        console.log(e);
-      }
+      this.isChildActive = true;
+      this.$router.push({ name: route });
     },
 
     isNestedActive(route){
-      if (this.$store.state.menuAct.subLink == route) {
+      if (this.$store.state.menuAct.subLink == route ||
+        this.$route.name == route
+      ) {
         return true;
       }
       else {
         return false;
       }
-    }
+    },
+  },
+  created(){
+    this.isChildActive = this.isNestedActive(this.to.name);
   },
   watch:{
     '$store.state.menuAct': {
@@ -124,11 +116,11 @@ export default {
         if (this.hasChildren){
 
           // if other main links are currently active, then dactivate this main link:
-          if (newValue.subLink == ""){
+          if (newValue.mainLink !== this.to.name || newValue.subLink == ""){
             this.isChildActive = false;
             this.isOpened = false;
           }
-
+          
           // regardless the activness, when the is menu is no longer hovered on
           // close the menu
           if (newValue.hoverOver === false) {
@@ -138,6 +130,7 @@ export default {
           else {
             Object.keys(this.nestedChildren).forEach((key) => {
               if (this.nestedChildren[key] == newValue.subLink) {
+                this.isChildActive = true;
                 this.isOpened = true;
               }
             });

@@ -111,10 +111,8 @@
             width: 100%;
             cursor: pointer;
             gap: .5rem;
-            margin-top: 1rem;
             margin-bottom: .6rem;
             transition: max-height 0.4s ease, opacity 0.3s ease 0.1s, margin-top 0.4s ease, margin-bottom 0.4s ease; // on opening the container
-  
           }
         
           .dropdown-link-item {

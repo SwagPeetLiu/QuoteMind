@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import AuthorsTable from "./components/AuthorsTable";
-import ProjectsTable from "./components/ProjectsTable";
+import AuthorsTable from "../components/AuthorsTable";
+import ProjectsTable from "../components/ProjectsTable";
 
 export default {
   name: "tables",

@@ -136,7 +136,6 @@ export default {
       };
     },
     isSignUp() {
-      console.log("isSignUp", this.route.path);
       return this.route.path === '/sign-up';
     },
     getDynamicRoute() {

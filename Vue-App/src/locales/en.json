@@ -90,7 +90,6 @@
   "sideNav":{
     "title": "Quote Mind Pro",
     "pages": "Pages",
-    "dashboard": "Dashboard",
     "resources": "Resources",
     "need help?": "Need Help?",
     "Please check Docs as well": "Please check Docs as well",
@@ -99,14 +98,18 @@
   "routes":{
     "pages": "Pages",
     "dashboard": "Dashboard",
-    "profile": "Profile",
-    "companies": "Companies",
-    "clients": "Clients",
+    "resources": "Resources",
+    "products": "Products",
+    "materials": "Materials",
     "employees": "Employees",
     "positions": "Positions",
+    "customers": "Customers",
+    "companies": "Companies",
+    "clients": "Clients",
+    "profile": "Profile",
     "pricings": "Pricings",
-    "conditions": "Conditions",
-    "rules": "Rules",
+    "conditions": "Pricing Conditions",
+    "rules": "Pricing Rules",
     "transactions": "Transactions"
   },
   "dialog":{
