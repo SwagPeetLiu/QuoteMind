@@ -11,7 +11,7 @@
       <li class="nav-item">
         <sidenav-collapse :navText="t('routes.dashboard')" :to="{ name: 'Dashboard' }">
           <template #icon> 
-            <shop />
+            <Dashboard />
           </template>
         </sidenav-collapse>
       </li>
@@ -108,7 +108,7 @@
 <script>
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
-import Shop from "../../Icon/Shop.vue";
+import Dashboard from "../../Icon/Dashboard.vue";
 import Office from "../../Icon/Office.vue";
 import CreditCard from "../../Icon/CreditCard.vue";
 import CustomerSupport from "../../Icon/CustomerSupport.vue";
@@ -128,7 +128,7 @@ export default {
   components: {
     SidenavCollapse,
     SidenavCard,
-    Shop,
+    Dashboard,
     Office,
     CreditCard,
     CustomerSupport,

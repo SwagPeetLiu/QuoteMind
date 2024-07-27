@@ -4,10 +4,7 @@
       <div class="row">
         <div class="col-12">
           <ThinBar
-            styles="blur blur-rounded my-3 py-2 start-0 end-0 mx-4 shadow-lg"
-            :isBlur="true"
-            :dark-mode="false"
-            btnBackground="bg-gradient-dark"
+            :showBackgroundColour="true"
           />
         </div>
       </div>

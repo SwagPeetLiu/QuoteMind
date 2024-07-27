@@ -1,0 +1,58 @@
+// styles that controls the behhaviour of the thin nav 
+// bar on sign in and sign up page
+.thinbar {
+    z-index: 999;
+    position: absolute;
+    margin-top: 1.7rem;
+    width: 100%;
+    max-width: 100vw;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+
+    .bar-image {
+        .navbar-brand-img {
+            width: 24px;
+            height: 24px;
+
+            // on white canvas, the black coloured icon should be slightly inverted
+            .inverted-img {
+                filter: invert(25%);
+            }
+        }
+
+        span {
+            font-size: $font-size-lg;
+        }
+    }
+
+    .thinbar-item {
+        &.text-white{
+            &:hover {
+                i{
+                    color: $white;
+                }
+                span{
+                    font-weight: bold;
+                }
+            }
+        }
+        &.text-dark{
+            &:hover {
+                i{
+                    color: $dark;
+                }
+                span{
+                    font-weight: bold;
+                    background-clip: $text-gradient-bg-clip;
+                    -webkit-background-clip: $text-gradient-bg-clip;
+                    -webkit-text-fill-color: $text-gradient-text-fill;
+                    position: $text-gradient-position;
+                    z-index: $text-gradient-zindex;
+                    background-image: $text-gradient-bg-success;
+                }
+            }
+        }
+    }
+}

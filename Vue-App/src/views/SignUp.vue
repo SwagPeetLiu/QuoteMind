@@ -1,14 +1,13 @@
 <template>
   <div class="z-index-sticky">
-    <div class="row">
-      <div class="col-12">
-        <Thinbar
-          :isBlur="false"
-          btnBackground="bg-gradient-success"
-          styles="w-100 my-3 navbar-transparent mt-4"
-          :dark-mode="false"
-        />
-       </div>
+    <div class="container top-0 position-sticky z-index-sticky">
+      <div class="row">
+        <div class="col-12">
+          <Thinbar
+            :showBackgroundColour="false"
+          />
+        </div>
+      </div>
     </div>
   </div>
 

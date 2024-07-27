@@ -62,6 +62,7 @@
         />
       </div>
     </div>
+    
     <div class="row">
       <div class="col-lg-7 mb-lg-0 mb-4">
         <div class="card">
@@ -143,6 +144,8 @@
         </div>
       </div>
     </div>
+
+
     <div class="mt-4 row">
       <div class="mb-4 col-lg-5 mb-lg-0">
         <div class="card z-index-2">
@@ -197,6 +200,8 @@
           </div>
         </div>
       </div>
+
+      
       <div class="col-lg-7">
         <!-- line chart -->
         <div class="card z-index-2">
