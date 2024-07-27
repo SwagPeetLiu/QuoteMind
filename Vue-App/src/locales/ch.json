@@ -13,7 +13,7 @@
     "require valid password": "请输入密码",
     "imageTitle": "燕地鹏扬"
   },
-  "signUp":{
+  "signUp": {
     "title": "欢迎使用!",
     "subtitle": "Quote Mind为您提供自动化的报价服务",
     "register now": "注册账号",
@@ -37,6 +37,7 @@
     "Transparent": "透明",
     "White": "白色",
     "Navbar Fixed": "固定上方导航栏",
+    "Side Menu Fixed": "固定菜单",
     "Language": "语言",
     "English": "英文",
     "Chinese": "中文",
@@ -64,7 +65,7 @@
       "already registered message": "该邮箱已被注册"
     }
   },
-  "thinBar":{
+  "thinBar": {
     "advertise": "提高您的报价效率",
     "login": "登陆",
     "register": "注册",
@@ -88,46 +89,47 @@
     "by": "而生",
     "for hard working mothers": "为辛苦工作的母亲们"
   },
-  "sideNav":{
+  "sideNav": {
     "title": "燕地鹏扬",
     "pages": "其他",
-    "dashboard": "信息板",
-    "resources": "公司资源",
-    "clients":"客户源",
+    "resources": "档案",
+    "clients": "客户源",
     "need help?": "需要帮助？",
     "Please check Docs as well": "也可查阅文档",
     "contact author": "联系我们"
   },
-  "routes":{
-    "pages": "主页",
+  "routes": {
+    "pages": "其他",
     "dashboard": "信息板",
-    "profile": "用户",
-    "companies": "企业客户",
-    "clients": "客户",
+    "resources": "公司资源",
+    "products": "商品",
+    "materials": "材质",
     "employees": "员工",
     "positions": "职位",
-    "pricings": "定价 ",
+    "customers": "客户源",
+    "companies": "公司",
+    "clients": "客户",
+    "profile": "个人中心",
+    "pricings": "定价",
     "conditions": "条件",
-    "rules": "规格",
+    "rules": "金额规则",
     "transactions": "交易"
   },
-  "dialog":{
+  "dialog": {
     "error title": "请注意：",
     "failed to logout": "退出登录失败，请重试",
     "confirm": "确认",
     "cancel": "取消",
     "close": "关闭"
   },
-  "validation":{
+  "validation": {
     "cannot be empty": "不能填空",
     "too short": "过短",
     "too long": "过长",
-    
     "username": "用户名",
     "email": "邮箱",
     "password": "密码",
     "token": "注册码",
-
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符"
   }

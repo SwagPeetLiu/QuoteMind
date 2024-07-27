@@ -118,16 +118,17 @@
           .dropdown-link-item {
             font-weight: $navbar-nav-link-font-weight;
             font-size: $font-size-base;
-            transition: transform 0.1s;
 
             i {
               opacity: 1;
               font-size: $navbar-vertical-collapse-dot-size;
+              margin-left: 3px;
               margin-right: 28px;
+              transition: font-size 0.2s ease, margin-right 0.2s ease;
             }
         
             &:hover {
-              transform: scale(1.05) translateX(8px);
+              transform: scale(1.05) translateX(4px);
               transition: transform 0.1s;
               font-weight: bold;
             }
@@ -136,8 +137,10 @@
               font-weight: bold;
         
               i {
+                margin-left: 1px;
+                transition: font-size 0.2s ease, margin-right 0.2s ease;
                 font-size: $navbar-vertical-collapse-dot-size-active;
-                margin-right: 15px;
+                margin-right: 24px;
               }
             }
           }
@@ -195,7 +198,6 @@
 
       // margin-left: .8rem; (Needs to dynamically call if user needs to stablise the navbar)
       svg {
-
         .color-background,
         .color-foreground {
           fill: $white;
@@ -444,6 +446,16 @@
               opacity: 1;
               width: auto;
             }
+
+            // opening styles adjustments on active main link
+            &.active{
+              .icon{
+                transform: translateX(-3px);
+              }
+              .nav-link-text{
+                transform: translateX(-.5rem);
+              }
+            }
           }
 
           .dropdown-links {
@@ -512,6 +524,16 @@
         &.active{
           .icon{
             margin-left: 12px;
+          }
+          .nav-link-text{
+            transform: translateX(-3px);
+          }
+          .dropdown-arrow{
+            transform: translateX(-14px) rotate(0deg);
+
+            &.open {
+              transform: translateX(-14px) rotate(180deg);
+            }
           }
         }
       }

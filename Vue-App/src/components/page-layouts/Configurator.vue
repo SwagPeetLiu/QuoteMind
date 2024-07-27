@@ -67,6 +67,15 @@
             v-model="fixedKey" />
         </div>
 
+        <!-- Menu Fixed -->
+        <div class="mt-3">
+          <h6 class="mb-0">{{ t("configurator.Side Menu Fixed") }}</h6>
+        </div>
+        <div class="form-check form-switch ps-0">
+          <input class="mt-1 form-check-input ms-auto" 
+            type="checkbox" id="menuFixed" :checked="this.$store.state.isMenuFixed" @change="setMenuFixed" />
+        </div>
+
         <!--language selection-->
         <div class="dropdown mt-3" ref="language-select">
           <h6 class="mb-1">{{ t("configurator.Language") }}</h6>
@@ -158,6 +167,12 @@ export default {
       if (this.$route.name !== "Profile") {
         this.navbarFixed();
       }
+    },
+
+    // function used to dynamically set the menu fixed or not
+    setMenuFixed(){
+      const isFixed = !this.$store.state.isMenuFixed;
+      this.$store.commit("setMenuFixed", isFixed);
     },
 
     // function that watch outs for the changes of the screen sizes

@@ -36,6 +36,7 @@
     "Transparent": "Transparent",
     "White": "White",
     "Navbar Fixed": "Navbar Fixed",
+    "Side Menu Fixed": "Side Menu Fixed",
     "Language": "Language",
     "English": "English",
     "Chinese": "Chinese",
@@ -108,8 +109,8 @@
     "clients": "Clients",
     "profile": "Profile",
     "pricings": "Pricings",
-    "conditions": "Pricing Conditions",
-    "rules": "Pricing Rules",
+    "conditions": "Conditions",
+    "rules": "Rules",
     "transactions": "Transactions"
   },
   "dialog":{

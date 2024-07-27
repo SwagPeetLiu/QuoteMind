@@ -8,7 +8,7 @@
     <div class="px-3 py-1 container-fluid">
 
       <!-- Page directories breadcrumb -->
-      <breadcrumbs :currentPage="currentRouteName" :textWhite="textWhite" />
+      <breadcrumbs :textWhite="textWhite" />
 
       <!-- nav bar options -->
       <ul class="navbar-nav justify-content-end mt-2">
@@ -56,9 +56,6 @@ export default {
     return { t };
   },
   props: ["textWhite"],
-  // created() {
-  //   this.minNav;
-  // },
   methods: {
     ...mapMutations(["toggleMenuOnSmallScreens", "toggleConfigurator"]),
     ...mapActions(["toggleSidebarColor"]),
@@ -84,38 +81,6 @@ export default {
   },
   components: {
     Breadcrumbs,
-  },
-  computed: {
-    currentRouteName() {
-      const name = this.$route.name;
-      if (name == "/" || name == "Dashboard") {
-        return this.t("routes.dashboard");
-      }
-      else if (name == "Profile") {
-        return this.t("routes.profile");
-      }
-      else if (name == "Companies"){
-        return this.t("routes.companies");
-      }
-      else if (name == "Employees"){
-        return this.t("routes.employees");
-      }
-      else if (name == "Clients"){
-        return this.t("routes.clients");
-      }
-      else if (name == "Positions"){
-        return this.t("routes.positions");
-      }
-      else if (name == "Pricing_conditions"){
-        return `${this.t("routes.pricings")} ${this.t("routes.conditions")}`;
-      }
-      else if (name == "Pricing_rules"){
-        return `${this.t("routes.pricings")} ${this.t("routes.rules")}`;
-      }
-      else {
-        return this.$route.name;
-      }
-    },
   },
 
   // Controls the displays of the top nav bar (breadcrumbs displays based on

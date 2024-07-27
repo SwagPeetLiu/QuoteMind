@@ -39,7 +39,7 @@
           :nestedChildren="nestedCustomers"
         >
           <template #icon>
-            <office />
+            <customers />
           </template>
         </sidenav-collapse>
       </li>
@@ -53,7 +53,7 @@
           :nestedChildren="nestedPricings"
         >
           <template #icon>
-            <office />
+            <Pricing />
           </template>
         </sidenav-collapse>
       </li>
@@ -104,6 +104,7 @@
     </a>
   </div>
 </template>
+
 <script>
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
@@ -111,6 +112,8 @@ import Shop from "../../Icon/Shop.vue";
 import Office from "../../Icon/Office.vue";
 import CreditCard from "../../Icon/CreditCard.vue";
 import CustomerSupport from "../../Icon/CustomerSupport.vue";
+import Customers from "../../Icon/Customers.vue";
+import Pricing from "../../Icon/Pricing.vue";
 import { useI18n } from "vue-i18n";
 
 export default {
@@ -129,6 +132,8 @@ export default {
     Office,
     CreditCard,
     CustomerSupport,
+    Customers,
+    Pricing
   },
   computed: {
     nestedResources(){

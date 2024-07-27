@@ -57,6 +57,7 @@ export default {
       this.$store.commit("setMenuAct", { ...this.$store.state.menuAct, hoverOver: hasHovered });
     }
   },
+  // used to dynamically adjust titles of the sidenav
   computed: {
     isCurrentLanEnglish() {
       return this.$store.getters.getLanguage === "en";

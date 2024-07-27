@@ -31,7 +31,7 @@
     <div class="dropdown-links" 
           :class="{
             'open': hasChildren && isOpened,
-            'mt-3': isActive || isChildActive
+            'mt-3': isOpened && (isActive || isChildActive)
           }">
       <div
         v-for="(route, text) in nestedChildren" :key="text" 
@@ -39,7 +39,7 @@
         class="dropdown-link-item d-flex align-items-center"
         :class="{'active': isNestedActive(route)}"
       >
-        <i v-if="isNestedActive(route)" class="fa fa-tags" aria-hidden="true"></i>
+        <i v-if="isNestedActive(route)" class="fa fa-thumb-tack" aria-hidden="true"></i>
         <i v-else class="fa fa-circle" aria-hidden="true"></i>
         {{ text }}
       </div >

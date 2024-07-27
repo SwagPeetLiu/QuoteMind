@@ -3,7 +3,7 @@
 //
 
 .breadcrumb-item {
-    font-size: $font-size-sm;
+
     &.text-white{
       &::before {
           color: $white;
@@ -40,8 +40,10 @@
 
 
 // Links
-
 .breadcrumb-links {
+    :hover {
+        color: $danger;
+    }
     padding: 0;
     margin: 0;
     background: transparent;

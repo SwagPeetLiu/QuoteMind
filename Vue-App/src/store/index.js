@@ -17,6 +17,7 @@ export default createStore({
     // control the display of the sidenav menu
     isTransparent: "bg-transparent",
     isPinned: true,
+    isMenuFixed: false,
     menuAct: {hoverOver: false, mainLink: "", subLink: ""},
 
     // top nav bar settings:
@@ -60,7 +61,20 @@ export default createStore({
         state.isPinned = false;
       }
     },
-    
+
+    // sideMenu set to being fixed or not
+    setMenuFixed(state, payload) {
+      state.isMenuFixed = payload;
+      const sidenav_show = document.querySelector(".g-sidenav-show");
+
+      if (payload == true) {
+        sidenav_show.classList.remove("g-sidenav-hidden");
+      }
+      else{
+        sidenav_show.classList.add("g-sidenav-hidden");
+      }
+    },
+
     // Toggle the side menu's colour
     sidebarType(state, payload) {
       state.isTransparent = payload;
