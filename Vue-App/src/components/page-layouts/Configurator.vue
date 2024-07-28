@@ -28,13 +28,13 @@
         </div>
         <a href="#" class="switch-trigger background-color">
           <div class="my-2 badge-colors" :class="this.$store.state.isRTL ? 'text-end' : ' text-start'">
-            <span class="badge filter bg-gradient-primary" data-color="primary"
-              @click="sidebarColor('primary')"></span>
-            <span class="badge filter bg-gradient-dark active" data-color="dark" @click="sidebarColor('dark')"></span>
-            <span class="badge filter bg-gradient-info" data-color="info" @click="sidebarColor('info')"></span>
-            <span class="badge filter bg-gradient-success" data-color="success" @click="sidebarColor('success')"></span>
-            <span class="badge filter bg-gradient-warning" data-color="warning" @click="sidebarColor('warning')"></span>
-            <span class="badge filter bg-gradient-danger" data-color="danger" @click="sidebarColor('danger')"></span>
+            <span class="badge filter bg-gradient-primary active" data-color="primary"
+              @click="themeColor('primary')"></span>
+            <span class="badge filter bg-gradient-dark" data-color="dark" @click="themeColor('dark')"></span>
+            <span class="badge filter bg-gradient-info" data-color="info" @click="themeColor('info')"></span>
+            <span class="badge filter bg-gradient-success" data-color="success" @click="themeColor('success')"></span>
+            <span class="badge filter bg-gradient-warning" data-color="warning" @click="themeColor('warning')"></span>
+            <span class="badge filter bg-gradient-danger" data-color="danger" @click="themeColor('danger')"></span>
           </div>
         </a>
 
@@ -155,8 +155,8 @@ export default {
     ...mapActions(["toggleSidebarColor"]),
 
     // funciton used to set the theme colours of the app
-    sidebarColor(color = "dark") {
-      document.querySelector("#sidenav-main").setAttribute("data-color", color);
+    themeColor(color = "dark") {
+      this.$store.commit("setThemeColor", color);
     },
 
     sidebarType(type) {

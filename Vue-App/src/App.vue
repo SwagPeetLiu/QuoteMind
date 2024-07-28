@@ -1,9 +1,6 @@
 <template>
   <div>
-  <!-- passing donwn
-      -custom_class shows for the background of the nav cards items
-      -classes of the menu's background and position
-  -->
+  <!-- sidenav on the left side of the main container -->
   <sidenav
     :class="[
       this.$store.state.isTransparent, // menu's background
@@ -11,17 +8,24 @@
     ]"
     v-if="this.$store.state.showSidenav"
   />
+
   <main
     class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
   >
-    <!-- nav bar on the top of the main container -->
+    <!-- Top nav bar -->
     <navbar
       :class="[navClasses]"
       :textWhite="this.$store.state.isAbsolute ? 'text-white opacity-8' : ''"
       v-if="this.$store.state.showNavbar"
     />
+
+    <!-- main content -->
     <router-view />
+
+    <!-- Footer -->
     <app-footer v-show="this.$store.state.showFooter" />
+
+    <!-- Configurator toggler -->
     <configurator
       :toggle="toggleConfigurator"
       :class="[
@@ -30,6 +34,8 @@
       ]"
     />
   </main>
+
+  <!-- Overlays components -->
   <error-dialog/>
   <slide-toast/>
 </div>

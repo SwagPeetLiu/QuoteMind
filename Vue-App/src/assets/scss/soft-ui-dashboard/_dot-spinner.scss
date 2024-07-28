@@ -1,0 +1,31 @@
+.dot-loader {
+    opacity: 80%;
+    --ball-size: calc((var(--loader-width) / 3) - 5px);
+    width: var(--loader-width);
+    height: var(--ball-size);
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ball-loader-ball {
+    height: var(--ball-size);
+    width: var(--ball-size);
+    border-radius: 50%;
+    background-color: $gray-600;
+    animation: grow 0.6s ease-in-out infinite alternate;
+
+    &.ball2 {
+        animation-delay: 0.2s;
+    }
+
+    &.ball3 {
+        animation-delay: 0.4s;
+    }
+}
+
+@keyframes grow {
+    to {
+        transform: scale(0);
+    }
+}

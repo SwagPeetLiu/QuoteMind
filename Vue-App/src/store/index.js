@@ -23,10 +23,10 @@ export default createStore({
     // top nav bar settings:
     isNavFixed: false, 
     isAbsolute: false,
-
     isRTL: false,
 
     // app vue display settings
+    themeColor: localStorage.getItem("theme") || "success",
     showSidenav: true,
     showNavbar: true,
     showFooter: true,
@@ -78,6 +78,12 @@ export default createStore({
     // Toggle the side menu's colour
     sidebarType(state, payload) {
       state.isTransparent = payload;
+    },
+
+    // setting the theme colour of the app
+    setThemeColor(state, payload) {
+      localStorage.setItem("theme", payload);
+      state.themeColor = payload;
     },
 
     // changing the theme colours of the app (navbar for now)
@@ -153,5 +159,6 @@ export default createStore({
     getLanguage: (state) => state.language,
     getUser: (state) => state.user,
     haveNoDialogs: (state) => state.errorMessage === "" && state.toastMessage.message === "",
+    getMainTheme: (state) => state.themeColor,
   },
 });

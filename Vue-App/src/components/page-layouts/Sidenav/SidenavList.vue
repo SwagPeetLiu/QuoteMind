@@ -92,7 +92,8 @@
       :label="t('sideNav.contact author')"
       icon="fa fa-info-circle"
     />
-    <a class="btn bg-gradient-success w-100 mt-3 d-flex align-items-center justify-content-center" 
+    <a class="btn w-100 mt-3 d-flex align-items-center justify-content-center"
+        :class="currentMainTheme" 
         href="https://535051192liu.atlassian.net/wiki/spaces/KAN"
         target="_blank"
         norel="noopener noreferrer"
@@ -115,6 +116,8 @@ import CustomerSupport from "../../Icon/CustomerSupport.vue";
 import Customers from "../../Icon/Customers.vue";
 import Pricing from "../../Icon/Pricing.vue";
 import { useI18n } from "vue-i18n";
+// import { computed } from "vue";
+// import { useStore } from 'vuex';
 
 export default {
   name: "SidenavList",
@@ -123,6 +126,12 @@ export default {
   },
   setup() {
     const { t } = useI18n();
+
+
+    // const currentMainTheme = computed(() => {
+    //   const maintheme = store.getters.getMainTheme;
+    //   return `btn-gradient-${maintheme}`;
+    // });
     return { t };
   },
   components: {
@@ -157,6 +166,10 @@ export default {
         [this.t('routes.rules')]: 'Pricing_Rules',
         [this.t('routes.conditions')]: 'Pricing_Conditions'
       };
+    },
+    currentMainTheme(){
+      const maintheme = this.$store.getters.getMainTheme;
+      return `bg-gradient-${maintheme}`;
     }
   },
 };

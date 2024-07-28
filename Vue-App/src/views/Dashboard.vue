@@ -1,150 +1,66 @@
 <template>
   <div class="py-4 container-fluid">
+
+    <!-- First row of statistical cards
+        - each card taking up tp half of the width if the screen is getting smaller
+    -->
     <div class="row">
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <mini-statistics-card
-          title="Today's Money"
-          value="$53,000"
-          :percentage="{
-            value: '+505%',
-            color: 'text-success',
-          }"
-          :icon="{
-            component: 'ni ni-money-coins',
-            background: iconBackground,
-          }"
-          direction-reverse
-        />
+
+      <!-- mini statistics cards -->
+      <div class="col-xl-5 col-md-6 col-sm-12 mb-xl-0 mb-4">
+
+        <div 
+          class="col-6 mt-n4 mb-4 w-100 text-center text-gradient display-2 font-weight-bold"
+          :class="`text-${themeColour}`"
+        >
+          <span class="text-shadow-md"> Welcome Back! </span>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard
+              :title="t('dashboard.total products')"
+              type="sum"
+              target="products"
+              icon="ni ni-money-coins"
+            />
+          </div>
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard
+            :title="t('dashboard.total materials')"
+              type="sum"
+              target="materials"
+              icon="ni ni-money-coins"
+            />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard
+            :title="t('dashboard.total companies')"
+              type="sum"
+              target="companies"
+              icon="ni ni-money-coins"
+            />
+          </div>
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard
+            :title="t('dashboard.total clients')"
+              type="sum"
+              target="clients"
+              icon="ni ni-money-coins"
+            />
+          </div>
+        </div>
       </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <mini-statistics-card
-          title="Today's Users"
-          value="2,300"
-          :percentage="{
-            value: '+3%',
-            color: 'text-success',
-          }"
-          :icon="{
-            component: ' ni ni-world',
-            background: iconBackground,
-          }"
-          direction-reverse
-        />
-      </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <mini-statistics-card
-          title="New Clients"
-          value="+3,462"
-          :percentage="{
-            value: '-2%',
-            color: 'text-danger',
-          }"
-          :icon="{
-            component: 'ni ni-paper-diploma',
-            background: iconBackground,
-          }"
-          direction-reverse
-        />
-      </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0">
-        <mini-statistics-card
-          title="Sales"
-          value="$103,430"
-          :percentage="{
-            value: '+5%',
-            color: 'text-success',
-          }"
-          :icon="{
-            component: 'ni ni-cart',
-            background: iconBackground,
-          }"
-          direction-reverse
-        />
+
+      <!-- graph -->
+      <div class="col-xl-7 col-md-6 col-sm-12 mb-xl-0 mb-4">
+        <p class="p-5 bg-danger">fucked up</p>
       </div>
     </div>
     
-    <div class="row">
-      <div class="col-lg-7 mb-lg-0 mb-4">
-        <div class="card">
-          <div class="card-body p-3">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="d-flex flex-column h-100">
-                  <p class="mb-1 pt-2 text-bold">Built by developers</p>
-                  <h5 class="font-weight-bolder">Soft UI Dashboard</h5>
-                  <p class="mb-5">
-                    From colors, cards, typography to complex elements, you will
-                    find the full documentation.
-                  </p>
-                  <a
-                    class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto"
-                    href="javascript:;"
-                  >
-                    Read More
-                    <i
-                      class="fas fa-arrow-right text-sm ms-1"
-                      aria-hidden="true"
-                    ></i>
-                  </a>
-                </div>
-              </div>
-              <div class="col-lg-5 ms-auto text-center mt-5 mt-lg-0">
-                <div class="bg-gradient-success border-radius-lg h-100">
-                  <img
-                    src="../assets/img/shapes/waves-white.svg"
-                    class="position-absolute h-100 w-50 top-0 d-lg-block d-none"
-                    alt="waves"
-                  />
-                  <div
-                    class="position-relative d-flex align-items-center justify-content-center h-100"
-                  >
-                    <img
-                      class="w-100 position-relative z-index-2 pt-4"
-                      src="../assets/img/illustrations/rocket-white.png"
-                      alt="rocket"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-5">
-        <div class="card h-100 p-3">
-          <div
-            class="overflow-hidden position-relative border-radius-lg bg-cover h-100"
-            style="
-              background-image: url('https://demos.creative-tim.com/soft-ui-dashboard/assets/img/ivancik.jpg');
-            "
-          >
-            <span class="mask bg-gradient-dark"></span>
-            <div class="card-body position-relative z-index-1 p-3 h-100">
-              <div class="d-flex flex-column h-100">
-                <h5 class="text-white font-weight-bolder mb-4 pt-2">
-                  Work with the rockets
-                </h5>
-                <p class="text-white mb-5">
-                  Wealth creation is an evolutionarily recent positive-sum game.
-                  It is all about who take the opportunity first.
-                </p>
-                <a
-                  class="text-white font-weight-bold ps-1 mb-0 icon-move-left mt-auto"
-                  href="javascript:;"
-                >
-                  Read more
-                  <i
-                    class="fas fa-arrow-right text-sm ms-1"
-                    aria-hidden="true"
-                  ></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
     <div class="mt-4 row">
       <div class="mb-4 col-lg-5 mb-lg-0">
@@ -201,7 +117,7 @@
         </div>
       </div>
 
-      
+
       <div class="col-lg-7">
         <!-- line chart -->
         <div class="card z-index-2">
@@ -290,7 +206,7 @@
   </div>
 </template>
 <script>
-import MiniStatisticsCard from "@/examples/Cards/MiniStatisticsCard.vue";
+import StatsCard from "@/components/statistical-components/StatsCard.vue";
 import ReportsBarChart from "@/examples/Charts/ReportsBarChart.vue";
 import GradientLineChart from "@/examples/Charts/GradientLineChart.vue";
 import TimelineList from "./components/TimelineList.vue";
@@ -306,6 +222,8 @@ import {
   faCreditCard,
   faScrewdriverWrench,
 } from "@fortawesome/free-solid-svg-icons";
+import { useI18n } from "vue-i18n";
+
 export default {
   name: "dashboard-default",
   data() {
@@ -347,13 +265,22 @@ export default {
       },
     };
   },
+  setup() {
+    const { t } = useI18n();
+    return { t };
+  },
   components: {
-    MiniStatisticsCard,
+    StatsCard,
     ReportsBarChart,
     GradientLineChart,
     ProjectsCard,
     TimelineList,
     TimelineItem,
   },
+  computed:{
+    themeColour(){
+      return this.$store.getters.getMainTheme
+    }
+  }
 };
 </script>

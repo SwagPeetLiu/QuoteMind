@@ -29,7 +29,7 @@
   "configurator": {
     "Title": "Settings",
     "Subtitle": "See your dashboard options.",
-    "SideBar Colours": "Sidebar Colors",
+    "SideBar Colours": "Theme Colors",
     "SideNav Type": "Sidenav Colors",
     "Sidenav Type Description": "Choose between different sidenav types.",
     "Sidenav Type Limitation": "You can only change the sidenav type just on desktop view.",
@@ -46,6 +46,9 @@
   },
   "apiMessage": {
     "Internal server error": "Internal server error",
+    "fetch": "fetch on ",
+    "failed": " failed",
+    "success": " successed",
     "login": {
       "success": "Sucessfullly Logged in",
       "failed": "Failed to Login",
@@ -132,5 +135,12 @@
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"
+  },
+  "dashboard":{
+    "total employees": "Working Employees",
+    "total clients": "Registered Clients",
+    "total companies": "Registered Companies",
+    "total products": "Defined Products",
+    "total materials": "Defined Materials"
   }
 }

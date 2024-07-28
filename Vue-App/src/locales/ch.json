@@ -30,7 +30,7 @@
   "configurator": {
     "Title": "设置",
     "Subtitle": "可调式的选项如下：",
-    "SideBar Colours": "侧边栏颜色",
+    "SideBar Colours": "软件颜色",
     "SideNav Type": "左侧菜单类型",
     "Sidenav Type Description": "可选择俩个不同的导航类型：",
     "Sidenav Type Limitation": "此项选择只能在桌面屏幕下生效",
@@ -47,6 +47,9 @@
   },
   "apiMessage": {
     "Internal server error": "服务器内部错误",
+    "fetch": "获取",
+    "failed": "失败",
+    "success": "成功",
     "login": {
       "success": "登录成功",
       "failed": "登录失败",
@@ -132,5 +135,12 @@
     "token": "注册码",
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符"
+  },
+  "dashboard":{
+    "total employees": "工作人员",
+    "total clients": "个体客户",
+    "total companies": "公司客户",
+    "total products": "商品数量",
+    "total materials": "材质数量"
   }
 }

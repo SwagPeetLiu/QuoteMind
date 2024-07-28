@@ -54,7 +54,7 @@ export default {
     categoryLink(){
       const category = this.$store.state.menuAct.mainLink;
       const activeLink = this.$store.state.menuAct.subLink;
-      if (activeLink !== ""){
+      if (activeLink !== "" && category !== "") {
         return this.t(`routes.${category.toLowerCase()}`);
       }
       return "";
