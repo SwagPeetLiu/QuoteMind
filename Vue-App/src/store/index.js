@@ -1,12 +1,14 @@
 import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 import { setToken, clearToken } from "../utils/apiSetter";
+import { startLoginTimer, startLogoutTimer, clearLogoutTimer, clearPreviousTimers } from "../utils/sessionManager";
 
 // centralised state management over the application
 export default createStore({
   state: {
     // user info settings
     language: localStorage.getItem("language") || "en",
+    userSessionManager: { login: null, logout: null, blurListener: null, focusListener: null},
     user:{ username: "", email: "", role: "", session: ""},
     isAuthenticated: false,
 
@@ -121,16 +123,51 @@ export default createStore({
 
     // set up the user info & allow authorised queries
     setUser(state, payload) {
-      state.user = payload;
+      state.user = {
+        username: payload.username,
+        email: payload.email,
+        role: payload.role,
+        session: payload.session
+      };
       state.isAuthenticated = true;
+
+      // setting the automatic mechanism for renew session and logout:
+      clearPreviousTimers();
+      startLoginTimer(payload.credentials);
+      window.addEventListener('blur', startLogoutTimer);
+      window.addEventListener('focus', clearLogoutTimer);
+      state.userSessionManager.blurListener = startLogoutTimer;
+      state.userSessionManager.focusListener = clearLogoutTimer;
+
+      // set up axios header
       setToken(payload.session);
+
+      // if testing, then remember the login credentials:
+      if (process.env.NODE_ENV === 'test') {
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
     },
     
     // clear the user info & session association;
     clearUser(state) {
       state.user = { username: "", email: "", role: "", session: ""};
       state.isAuthenticated = false;
+      
+      // clear the automatic mechanism for renew session and logout:
+      clearPreviousTimers();
+      
+      // Clear axios header
       clearToken();
+
+      // if testing, then clear the login credentials:
+      if (process.env.NODE_ENV === 'test') {
+          localStorage.removeItem('user');
+      }
+    },
+
+    // manage the user sessions
+    setUserSessionManager(state, payload) {
+      state.userSessionManager = { ...payload };
     },
 
     // menu action tracks:

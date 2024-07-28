@@ -108,7 +108,6 @@ import { mapMutations } from "vuex";
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
 import auth from "../api/auth";
-import { useRouter } from 'vue-router';
 import store from "../store";
 import { inject } from 'vue';
 
@@ -120,7 +119,6 @@ export default {
     ThinBar
   },
   setup() {
-    const router = useRouter();
     const { t } = useI18n();
     const email = ref("");
     const password = ref("");
@@ -163,7 +161,6 @@ export default {
               isLoading.value = false;
               if (isLoggedIn) {
                 validity.value = true;
-                router.push({ name: "/" });
               }
               else {
                 validity.value = false;

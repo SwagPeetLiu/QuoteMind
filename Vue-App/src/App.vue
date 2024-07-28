@@ -81,6 +81,36 @@ export default {
         "px-0 mx-4 mt-4": !this.$store.state.isAbsolute,
       };
     },
+  },
+  mounted() {
+    // attach user's credentials in testing & dev env
+    if (process.env.NODE_ENV === "test") {
+      const storedUserString = localStorage.getItem('user');
+      if (storedUserString) {
+        const storedUser = JSON.parse(storedUserString);
+        this.$store.commit('setUser', storedUser);
+      }
+    }
+  },
+  
+  // used in composition to assist the navigation for automatic user session management
+  watch:{
+    '$store.state.user': {
+      handler(newValue){
+        // if logged in
+        if (newValue.email && newValue.session) {
+          if (this.$route.name === "Sign In" || this.$route.name === "Sign Up"){
+            this.$router.push({ name: "Dashboard" });
+          }
+        }
+        else{
+          if (this.$route.name !== "Sign In"){
+            this.$router.push({ name: "Sign In" });
+          }
+        }
+      }
+    }
+    
   }
-};
+}
 </script>

@@ -235,7 +235,6 @@ export default {
             .then((isLoggedOut) => {
               if (isLoggedOut) {
                 this.closeConfig();
-                this.$router.push({ name: "Sign In" });
               }
             })
             .catch((err) => {

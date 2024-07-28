@@ -30,13 +30,13 @@ const routes = [
     path: "/",
     name: "/",
     redirect: "/dashboard",
-    meta: { requiresAuth: false, mainLink: "Dashboard", subLink: "" }
+    meta: { requiresAuth: true, mainLink: "Dashboard", subLink: "" }
   },
   {
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
-    meta: { requiresAuth: false, mainLink: "Dashboard", subLink: "" }
+    meta: { requiresAuth: true, mainLink: "Dashboard", subLink: "" }
   },
 
   // Comapny resources:
@@ -44,43 +44,43 @@ const routes = [
     path: "/resources/",
     name: "Resources",
     component: Tables,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Tables" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Tables" }
   },
   {
     path: "/resources/tables",
     name: "Tables",
     component: Tables,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Tables" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Tables" }
   },
   {
     path: "/resources/test",
     name: "Test",
     component: test,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Test" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Test" }
   },
   {
     path: "/resources/products",
     name: "Products",
     component: Products,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Products" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Products" }
   },
   {
     path: "/resources/materials",
     name: "Materials",
     component: Materials,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Materials" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Materials" }
   },
   {
     path: "/resources/employees",
     name: "Employees",
     component: Employees,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Employees" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Employees" }
   },
   {
     path: "/resources/positions",
     name: "Positions",
     component: Positions,
-    meta: { requiresAuth: false, mainLink: "Resources", subLink: "Positions" }
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Positions" }
   },
 
   // Customers:
@@ -88,25 +88,25 @@ const routes = [
     path: "/customers/",
     name: "Customers",
     component: Companies,
-    meta: { requiresAuth: false, mainLink: "Customers", subLink: "Companies" }
+    meta: { requiresAuth: true, mainLink: "Customers", subLink: "Companies" }
   },
   {
     path: "/customers/companies",
     name: "Companies",
     component: Companies,
-    meta: { requiresAuth: false, mainLink: "Customers", subLink: "Companies" }
+    meta: { requiresAuth: true, mainLink: "Customers", subLink: "Companies" }
   },
   {
     path: "/customers/companies",
     name: "Clients",
     component: Clients,
-    meta: { requiresAuth: false, mainLink: "Customers", subLink: "Clients" }
+    meta: { requiresAuth: true, mainLink: "Customers", subLink: "Clients" }
   },
   {
     path: "/customers/billing",
     name: "Billings",
     component: Billing,
-    meta: { requiresAuth: false, mainLink: "Customers", subLink: "Billings" }
+    meta: { requiresAuth: true, mainLink: "Customers", subLink: "Billings" }
   },
 
   // pricing routes:
@@ -114,19 +114,19 @@ const routes = [
     path: "/pricings",
     name: "Pricings",
     component: Pricing_Rules,
-    meta: { requiresAuth: false, mainLink: "Pricings", subLink: "Pricing_Rules" }
+    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Rules" }
   },
   {
     path: "/pricings/pricing_rules",
     name: "Pricing_Rules",
     component: Pricing_Rules,
-    meta: { requiresAuth: false, mainLink: "Pricings", subLink: "Pricing_Rules" }
+    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Rules" }
   },
   {
     path: "/pricings/pricing_conditions",
     name: "Pricing_Conditions",
     component: Pricing_Conditions,
-    meta: { requiresAuth: false, mainLink: "Pricings", subLink: "Pricing_Conditions" }
+    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Conditions" }
   },
 
   // Transactions:
@@ -134,7 +134,7 @@ const routes = [
     path: "/transactions",
     name: "Transactions",
     component: Transactions,
-    meta: { requiresAuth: false, mainLink: "Transactions", subLink: "" }
+    meta: { requiresAuth: true, mainLink: "Transactions", subLink: "" }
   },
 
   // user informations
@@ -142,7 +142,7 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
-    meta: { requiresAuth: false, mainLink: "Profile", subLink: "" }
+    meta: { requiresAuth: true, mainLink: "Profile", subLink: "" }
   },
   {
     path: "/sign-in",
