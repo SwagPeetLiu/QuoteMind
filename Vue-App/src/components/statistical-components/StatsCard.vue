@@ -11,10 +11,10 @@
                     <p class="mb-0 text-sm text-capitalize font-weight-bold">
                         {{ title }}
                     </p>
-                    <h5 class="mb-0 font-weight-bolder">
+                    <p class="mb-n1 font-weight-bolder h3">
                         <DotLoader :size="40" v-if="isLoading"/>
                         <span v-else>{{ statsValue }}</span>
-                    </h5>
+                    </p>
                 </div>
 
                 <!-- icon definition -->

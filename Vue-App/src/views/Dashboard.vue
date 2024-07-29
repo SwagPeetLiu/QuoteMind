@@ -22,7 +22,7 @@
               :title="t('dashboard.total products')"
               type="sum"
               target="products"
-              icon="ni ni-money-coins"
+              icon="fa-solid fa-scroll"
             />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
@@ -30,7 +30,7 @@
             :title="t('dashboard.total materials')"
               type="sum"
               target="materials"
-              icon="ni ni-money-coins"
+              icon="fa-solid fa-layer-group"
             />
           </div>
         </div>
@@ -41,7 +41,7 @@
             :title="t('dashboard.total companies')"
               type="sum"
               target="companies"
-              icon="ni ni-money-coins"
+              icon="fa-solid fa-city"
             />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
@@ -49,7 +49,7 @@
             :title="t('dashboard.total clients')"
               type="sum"
               target="clients"
-              icon="ni ni-money-coins"
+              icon="fa-solid fa-address-book"
             />
           </div>
         </div>
@@ -205,6 +205,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import StatsCard from "@/components/statistical-components/StatsCard.vue";
 import ReportsBarChart from "@/examples/Charts/ReportsBarChart.vue";
@@ -222,11 +223,13 @@ import {
   faCreditCard,
   faScrewdriverWrench,
 } from "@fortawesome/free-solid-svg-icons";
+
 import { useI18n } from "vue-i18n";
 
 export default {
   name: "dashboard-default",
   data() {
+    console.log(faScrewdriverWrench);
     return {
       iconBackground: "bg-gradient-success",
       faCreditCard,

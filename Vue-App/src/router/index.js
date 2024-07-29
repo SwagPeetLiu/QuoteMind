@@ -157,12 +157,13 @@ const routes = [
     meta: { requiresAuth: false, requiresLogout: true, mainLink: "Sign Up", subLink: "" }
   },
 
-  // {
-  //   path: "/:catchAll(.*)",
-  //   name: "NotFound",
-  //   component: NotFound, // You'll need to create this component
-  //   meta: { requiresAuth: false }
-  // }
+  // TODO: add 404 page
+  {
+    path: "/:catchAll(.*)",
+    name: "NotFound",
+    component: SignIn, 
+    meta: { requiresAuth: true, mainLink: "Sign In", subLink: ""}
+  }
 ];
 
 const router = createRouter({
@@ -179,6 +180,7 @@ router.beforeEach((to, from, next) => {
   // if user is accessing routes that requires login, redirect accordingly:
   if (to.meta.requiresAuth && !isAuthenticated) {
     store.commit("setMenuAct", { ...store.state.menuAct, mainLink: "Sign In", subLink: "" });
+    console.log("redirecting to sign in");
     next({ name: "Sign In" });
   }
   // does not allow signing in again if already logged in

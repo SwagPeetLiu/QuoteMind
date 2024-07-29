@@ -138,9 +138,9 @@
   },
   "dashboard":{
     "total employees": "Working Employees",
-    "total clients": "Registered Clients",
-    "total companies": "Registered Companies",
-    "total products": "Defined Products",
-    "total materials": "Defined Materials"
+    "total clients": "Clients",
+    "total companies": "Companies",
+    "total products": "Products",
+    "total materials": "Materials"
   }
 }

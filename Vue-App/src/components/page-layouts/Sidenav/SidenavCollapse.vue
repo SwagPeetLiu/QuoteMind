@@ -114,26 +114,24 @@ export default {
 
         // for nested main link
         if (this.hasChildren){
-
-          // if other main links are currently active, then dactivate this main link:
-          if (newValue.mainLink !== this.to.name || newValue.subLink == ""){
-            this.isChildActive = false;
-            this.isOpened = false;
-          }
           
-          // regardless the activness, when the is menu is no longer hovered on
-          // close the menu
-          if (newValue.hoverOver === false) {
-            this.isOpened = false;
+          // if not matching, then mainlink is not active, menu is not opened when hovered over
+          if (newValue.mainLink !== this.to.name && newValue.subLink !== this.to.name){
+            this.isChildActive = false;
+            if (newValue.hoverOver){
+              this.isOpened = false;
+            }
           }
-          // when it is hovered over, and the sublink belongs to this menu, then open it up again
-          else {
-            Object.keys(this.nestedChildren).forEach((key) => {
-              if (this.nestedChildren[key] == newValue.subLink) {
-                this.isChildActive = true;
-                this.isOpened = true;
-              }
-            });
+          // if matching the sublink or mainlink, mainlink is active, menu is opened when hovered over
+          if (newValue.mainLink == this.to.name || newValue.subLink == this.to.name) {
+            this.isChildActive = true;
+            if (newValue.hoverOver){
+              this.isOpened = true;
+            }
+          }
+          // if not hover over, then close submenu for sure
+          if (!newValue.hoverOver){
+            this.isOpened = false;
           }
         }
       }

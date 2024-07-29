@@ -30,7 +30,7 @@ Coded by www.creative-tim.com
     
     <!-- Font Awesome Icons -->
     <script
-      src="https://kit.fontawesome.com/42d5adcbca.js"
+      src="https://kit.fontawesome.com/a728eb3288.js"
       crossorigin="anonymous"
     ></script>
     <link
@@ -53,6 +53,6 @@ Coded by www.creative-tim.com
     </noscript>
     
     <!-- On default, hide the side nav bar to make more spaces for the main app content-->
-    <div id="app" class="g-sidenav-show g-sidenav-hidden"></div>
+    <div id="app" class="g-sidenav-show g-sidenav-hidden" :class="{ 'g-sidenav-hidden': !this.$store.state.isMenuFixed }"></div>
   </body>
 </html>

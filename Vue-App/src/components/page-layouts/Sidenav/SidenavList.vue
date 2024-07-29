@@ -25,7 +25,7 @@
           :nestedChildren="nestedResources"
         >
           <template #icon>
-            <office />
+            <Resources />
           </template>
         </sidenav-collapse>
       </li>
@@ -62,7 +62,7 @@
       <li class="nav-item">
         <sidenav-collapse :navText="t('routes.transactions')" :to="{ name: 'Transactions' }">
           <template #icon>
-            <credit-card />
+            <Transactions />
           </template>
         </sidenav-collapse>
       </li>
@@ -76,7 +76,7 @@
       <li class="nav-item">
         <sidenav-collapse :navText="t('routes.profile')" :to="{ name: 'Profile' }">
           <template #icon>
-            <customer-support />
+            <Profile />
           </template>
         </sidenav-collapse>
       </li>
@@ -110,14 +110,12 @@
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
 import Dashboard from "../../Icon/Dashboard.vue";
-import Office from "../../Icon/Office.vue";
-import CreditCard from "../../Icon/CreditCard.vue";
-import CustomerSupport from "../../Icon/CustomerSupport.vue";
+import Resources from "../../Icon/Resources.vue";
+import Transactions from "../../Icon/Transactions.vue";
+import Profile from "../../Icon/Profile.vue";
 import Customers from "../../Icon/Customers.vue";
 import Pricing from "../../Icon/Pricing.vue";
 import { useI18n } from "vue-i18n";
-// import { computed } from "vue";
-// import { useStore } from 'vuex';
 
 export default {
   name: "SidenavList",
@@ -126,21 +124,15 @@ export default {
   },
   setup() {
     const { t } = useI18n();
-
-
-    // const currentMainTheme = computed(() => {
-    //   const maintheme = store.getters.getMainTheme;
-    //   return `btn-gradient-${maintheme}`;
-    // });
     return { t };
   },
   components: {
     SidenavCollapse,
     SidenavCard,
     Dashboard,
-    Office,
-    CreditCard,
-    CustomerSupport,
+    Resources,
+    Transactions,
+    Profile,
     Customers,
     Pricing
   },

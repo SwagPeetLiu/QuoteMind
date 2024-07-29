@@ -8,7 +8,7 @@
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
   >
-    <title>credit-card</title>
+    <title>transactions</title>
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g
         transform="translate(-2169.000000, -745.000000)"
