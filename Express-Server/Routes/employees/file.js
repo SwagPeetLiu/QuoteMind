@@ -59,9 +59,8 @@ module.exports = (db) => {
                 // fetch the employees
                 const employees = await db.any(`
                     SELECT e.id, e.name, e.phone, e.wechat_contact, e.qq_contact,
-                    p.name AS position
+                    (SELECT p.name FROM public.positions p WHERE p.id = e.position) AS position
                     FROM public.employees e
-                    LEFT JOIN public.positions p ON e.position = p.id
                     WHERE e.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
                     ORDER BY e.name ASC
                     LIMIT $2 OFFSET $3;

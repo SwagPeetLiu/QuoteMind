@@ -229,7 +229,6 @@ import { useI18n } from "vue-i18n";
 export default {
   name: "dashboard-default",
   data() {
-    console.log(faScrewdriverWrench);
     return {
       iconBackground: "bg-gradient-success",
       faCreditCard,

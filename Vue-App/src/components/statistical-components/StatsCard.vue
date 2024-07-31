@@ -4,7 +4,7 @@
         <div class="p-3 card-body">
 
             <!-- flex direction definition -->
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
 
                 <!-- statistic definition -->
                 <div class="d-flex flex-column justify-content-start">
@@ -13,7 +13,7 @@
                     </p>
                     <p class="mb-n1 font-weight-bolder h3">
                         <DotLoader :size="40" v-if="isLoading"/>
-                        <span v-else>{{ statsValue }}</span>
+                        <IncrementNumber v-else :endValue="statsValue" :duration="500" />
                     </p>
                 </div>
 
@@ -33,14 +33,15 @@
 <script>
 import counter from "@/api/counter";
 import DotLoader from '../reuseable-components/DotLoader.vue';
+import IncrementNumber from "./IncrementNumber.vue";
 
 export default {
     name: "StatsCard",
     components: {
-        DotLoader
+        DotLoader,
+        IncrementNumber
     },
     props: {
-
         title: {
             type: String,
             required: true,

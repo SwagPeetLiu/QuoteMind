@@ -73,18 +73,27 @@ module.exports = (db) => {
                             FROM public.materials m
                             WHERE m.id = ANY(t.materials)
                         ) END as materials,
-                        jsonb_build_object(
-                            'id', p.id,
-                            'en_name', p.en_name,
-                            'ch_name', p.ch_name
+                        (
+                            SELECT jsonb_build_object(
+                                'id', p.id,
+                                'en_name', p.en_name,
+                                'ch_name', p.ch_name
+                            )
+                            FROM public.products p
+                            WHERE p.id = t.product
                         ) as product,
-                        co.full_name as company, 
-                        c.full_name as client
+                        (
+                            SELECT co.full_name
+                            FROM public.companies co
+                            WHERE co.id = t.company
+                        ) as company,
+                        (
+                            SELECT c.full_name
+                            FROM public.clients c
+                            WHERE c.id = t.client
+                        ) as client
                     FROM public.transactions t 
-                    LEFT JOIN public.products p ON t.product = p.id
-                    LEFT JOIN public.companies co ON t.company = co.id
-                    LEFT JOIN public.clients c ON t.client = c.id
-                    WHERE t.created_by = $1 ${searched?`AND ${searchQuery}`:''}
+                    WHERE t.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
                     ORDER BY t.modified_date DESC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);

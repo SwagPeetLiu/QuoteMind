@@ -60,9 +60,8 @@ module.exports = (db) => {
                 // returning the query results:
                 const clients = await db.any(`
                     SELECT c.id, c.full_name, c.email, c.phone, c.wechat_contact, c.qq_contact, 
-                    co.full_name AS company
+                    (SELECT co.full_name FROM public.companies co WHERE co.id = c.company) AS company
                     FROM public.clients c
-                    LEFT JOIN public.companies co ON c.company = co.id
                     WHERE c.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
                     ORDER BY c.full_name ASC
                     LIMIT $2 OFFSET $3;

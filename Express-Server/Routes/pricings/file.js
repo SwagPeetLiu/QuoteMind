@@ -55,7 +55,6 @@ module.exports = (db) => {
                 const limit = pageSize * page;
                 const offset = (page - 1) * pageSize;
 
-                // fetch the pricing conditions
                 const pricing = await db.any(`
                     SELECT 
                         cond.id, 
@@ -65,14 +64,13 @@ module.exports = (db) => {
                         cond.quantity_unit,
                         cond.colour, 
                         cond.threshold,
-                        CASE
-                            WHEN p.id IS NOT NULL THEN jsonb_build_object(
-                                'id', p.id,
-                                'en_name', p.en_name,
-                                'ch_name', p.ch_name
-                            )
-                            ELSE NULL
-                        END as product,
+                        (SELECT jsonb_build_object(
+                            'id', p.id,
+                            'en_name', p.en_name,
+                            'ch_name', p.ch_name
+                        )
+                        FROM public.products p
+                        WHERE p.id = cond.product) as product,
                         CASE
                             WHEN cond.materials IS NULL OR array_length(cond.materials, 1) = 0 THEN NULL
                             ELSE (
@@ -87,29 +85,24 @@ module.exports = (db) => {
                                 WHERE m.id = ANY(cond.materials)
                             )
                         END as materials,
-                        CASE
-                            WHEN c.id IS NOT NULL THEN jsonb_build_object(
-                                'id', c.id,
-                                'full_name', c.full_name
-                            )
-                            ELSE NULL
-                        END as client,
-                        CASE
-                            WHEN co.id IS NOT NULL THEN jsonb_build_object(
-                                'id', co.id,
-                                'full_name', co.full_name
-                            )
-                            ELSE NULL
-                        END as company
+                        (SELECT jsonb_build_object(
+                            'id', c.id,
+                            'full_name', c.full_name
+                        )
+                        FROM public.clients c
+                        WHERE c.id = cond.client) as client,
+                        (SELECT jsonb_build_object(
+                            'id', co.id,
+                            'full_name', co.full_name
+                        )
+                        FROM public.companies co
+                        WHERE co.id = cond.company) as company
                     FROM public.pricing_conditions as cond
-                    LEFT JOIN public.products as p ON p.id = cond.product
-                    LEFT JOIN public.clients as c ON c.id = cond.client
-                    LEFT JOIN public.companies as co ON co.id = cond.company
                     WHERE cond.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
-                    GROUP BY cond.id, p.id, c.id, co.id
                     ORDER BY cond.id ASC
                     LIMIT $2 OFFSET $3
-                `, [owner, limit, offset]);                
+                `, [owner, limit, offset]);
+                
                 return res.status(200).json({ ...response, pricing_conditions: pricing });
             } catch (error) {
                 console.error(error);
@@ -156,62 +149,71 @@ module.exports = (db) => {
                 const limit = pageSize * page;
                 const offset = (page - 1) * pageSize;
                 
-                // fetching all the pricing rules
                 const rules = await db.any(`
                     SELECT
                         r.id, r.price_per_unit,
-                        json_agg(
-                            jsonb_build_object(
-                                'id', cond.id,
-                                'quantity', cond.quantity,
-                                'size', cond.size,
-                                'size_unit', cond.size_unit,
-                                'quantity_unit', cond.quantity_unit,
-                                'colour', cond.colour,
-                                'threshold', cond.threshold,
-                                'product', jsonb_build_object(
-                                    'id', p.id,
-                                    'en_name', p.en_name,
-                                    'ch_name', p.ch_name
-                                ),
-                                'materials', (
-                                    CASE WHEN cond.materials IS NULL THEN NULL
-                                    ELSE (
-                                        SELECT json_agg(
-                                            jsonb_build_object(
-                                                'id', m.id,
-                                                'en_name', m.en_name,
-                                                'ch_name', m.ch_name
-                                            )
+                        (
+                            SELECT json_agg(
+                                jsonb_build_object(
+                                    'id', cond.id,
+                                    'quantity', cond.quantity,
+                                    'size', cond.size,
+                                    'size_unit', cond.size_unit,
+                                    'quantity_unit', cond.quantity_unit,
+                                    'colour', cond.colour,
+                                    'threshold', cond.threshold,
+                                    'product', (
+                                        SELECT jsonb_build_object(
+                                            'id', p.id,
+                                            'en_name', p.en_name,
+                                            'ch_name', p.ch_name
                                         )
-                                        FROM public.materials m
-                                        WHERE m.id = ANY(cond.materials)
+                                        FROM public.products p
+                                        WHERE p.id = cond.product
+                                    ),
+                                    'materials', (
+                                        CASE WHEN cond.materials IS NULL THEN NULL
+                                        ELSE (
+                                            SELECT json_agg(
+                                                jsonb_build_object(
+                                                    'id', m.id,
+                                                    'en_name', m.en_name,
+                                                    'ch_name', m.ch_name
+                                                )
+                                            )
+                                            FROM public.materials m
+                                            WHERE m.id = ANY(cond.materials)
+                                        )
+                                        END
+                                    ),
+                                    'client', (
+                                        SELECT jsonb_build_object(
+                                            'id', c.id,
+                                            'full_name', c.full_name
+                                        )
+                                        FROM public.clients c
+                                        WHERE c.id = cond.client
+                                    ),
+                                    'company', (
+                                        SELECT jsonb_build_object(
+                                            'id', co.id,
+                                            'full_name', co.full_name
+                                        )
+                                        FROM public.companies co
+                                        WHERE co.id = cond.company
                                     )
-                                    END
-                                ),
-                                'client', CASE WHEN cond.client IS NULL THEN NULL 
-                                ELSE jsonb_build_object(
-                                    'id', c.id,
-                                    'full_name', c.full_name
-                                ) END,
-                                'company', CASE WHEN cond.company IS NULL THEN NULL 
-                                ELSE jsonb_build_object(
-                                    'id', co.id,
-                                    'full_name', co.full_name
-                                ) END
+                                )
+                                ORDER BY cond.id ASC
                             )
-                            ORDER BY cond.id ASC
+                            FROM public.pricing_conditions cond
+                            WHERE cond.id = ANY(r.conditions)
                         ) as conditions
                     FROM public.pricing_rules as r
-                    LEFT JOIN public.pricing_conditions as cond ON cond.id = ANY(r.conditions)
-                    LEFT JOIN public.products as p ON p.id = cond.product
-                    LEFT JOIN public.clients as c ON c.id = cond.client
-                    LEFT JOIN public.companies as co ON co.id = cond.company
                     WHERE r.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
-                    GROUP BY r.id
                     ORDER BY r.id ASC
                     LIMIT $2 OFFSET $3;
                 `, [owner, limit, offset]);
+                
                 return res.status(200).json({ ...response, pricing_rules: rules });
             } catch (error) { 
                 console.error(error);

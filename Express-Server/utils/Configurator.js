@@ -2,8 +2,6 @@
 require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
-const fs = require('fs');
-const path = require('path');
 
 // Configure the Database instance that uses the connection
 const pgp = require('pg-promise')();

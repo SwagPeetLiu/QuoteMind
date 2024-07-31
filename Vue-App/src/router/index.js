@@ -180,7 +180,6 @@ router.beforeEach((to, from, next) => {
   // if user is accessing routes that requires login, redirect accordingly:
   if (to.meta.requiresAuth && !isAuthenticated) {
     store.commit("setMenuAct", { ...store.state.menuAct, mainLink: "Sign In", subLink: "" });
-    console.log("redirecting to sign in");
     next({ name: "Sign In" });
   }
   // does not allow signing in again if already logged in
