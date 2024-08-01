@@ -1,65 +1,16 @@
 const { getConfiguration } = require("./Configurator");
 const pageSize = getConfiguration().search.pageSize;
 
-function getSearchTerm(table, target, keyword, type) {
-    let whereClause = "";
-    // deals with normal id searching:
-    if (target == "id" && type.toLowerCase() == "uuid") {
-        whereClause = `${mapQueryPrefix(table)}.${target}::text LIKE '%${keyword}%'`;
-    }
-    // FK references to other tables:
-    else if (target !== "id" && type.toLowerCase() == "uuid") {
-        const fkName = mapFKName(target);
-        whereClause = `${mapQueryPrefix(table)}.${target} IN(
-            SELECT id FROM public.${fkName.table} as ${mapQueryPrefix(fkName.table)}
-            WHERE LOWER(${fkName.name}) LIKE '%${keyword.toLowerCase()}%'
-            )`;
-    }
-    // deals with search thorugh list of UUIDs:
-    else if (type == "ARRAY") {
-        const fkName = mapFKName(target);
-        whereClause = `
-            EXISTS (
-                SELECT 1
-                FROM public.${fkName.table} as ${mapQueryPrefix(fkName.table)}
-                WHERE ${mapQueryPrefix(fkName.table)}.id = ANY(${mapQueryPrefix(table)}.${target})
-                AND LOWER(${fkName.name}) LIKE '%${keyword.toLowerCase()}%'
-            )
-        `;
-    }
-    // deals with normal string searching:
-    else if (type == "USER-DEFINED" || type.toLowerCase().includes("character")) {
-        whereClause = `LOWER(${mapQueryPrefix(table)}.${target}::text) LIKE '%${keyword.toLowerCase()}%'`;
-    }
-    // deals with numeric searchings with units
-    else if (type.toLowerCase() == "numeric" || type.toLowerCase() == "integer") {
-        const containsUnit = /[^\d.]/.test(keyword);
-        const unit = containsUnit ? keyword.split(/[^\d.]/)[1] : null;
-        let value = containsUnit ? keyword.split(/[^\d.]/)[0] : keyword;
+/*
+* ==============================================================================================
+* Formatter acts the single source of truth for the formatting of entitye query acros the server
+* ================================================================================================
+*/
 
-        if (target == "quantity" || target == "size") {
-            whereClause = `${mapQueryPrefix(table)}.${target} = ${value} 
-            ${unit ? `AND LOWER(${mapQueryPrefix(table)}.${target}_unit) = LOWER('${unit}')` : ""}`;
-        }
-        else if (target.toLowerCase() == "width" || target.toLowerCase() == "height" || target.toLowerCase() == "length") {
-            whereClause = `${mapQueryPrefix(table)}.${target} = ${value} 
-            ${unit ? `AND (LOWER(${mapQueryPrefix(table)}.en_unit) = LOWER('${unit}') 
-                    OR LOWER(${mapQueryPrefix(table)}.ch_unit) = LOWER('${unit}'))` : ""}`;
-        }
-        else {
-            whereClause = `${mapQueryPrefix(table)}.${target} = ${value}`;
-        }
-    }
-    else if (type.toLowerCase() == "timestamp with time zone") {
-
-    }
-    else {
-        whereClause = `TRUE`;
-    }
-    return whereClause;
-}
-
-// generation of the query assuming the query is validated already:
+/*
+* generation of the query assuming the query is validated already:
+*  - using valdiated and type specified post-processed query
+*/
 function generateQuery(query, table, page, owner) {
     let countQuery = { query: "", parameters: [] };
     let result = { query: "SELECT", parameters: [] };
@@ -71,16 +22,16 @@ function generateQuery(query, table, page, owner) {
     else{
         result.query += ` ${mapSpecifiedQueryColumns(table, query.fields)}`;
     }
-    console.log(result);
+    console.log("added fields",result);
 
     // Attaching the From clause:
     result.query += ` ${generateFromClause(table)}`;
-    console.log(result);
+    console.log("added from clause", result);
 
     // attaching the where clause:
     result.query += ` WHERE ${mapQueryPrefix(table)}.created_by = $${result.parameters.length + 1}`;
     result.parameters.push(owner);
-    result.query += generateWhereClause(table, query.whereClause, owner, result);
+    result.query += generateWhereClause(table, query.whereClause, result);
 
     // attaching the group by clause:
     result.query += `${mapGroupByClause(table, query)}`;
@@ -90,15 +41,11 @@ function generateQuery(query, table, page, owner) {
     result.query += ` ${mapOrderByClause(table, query)}`;
     console.log(result);
 
-    // attach the page limits, as well as another 
+    // attach the page limits, as well as another (using a nested query structure to ensure the 
+    // count is accurate & representing the criteria of the group by clauses):
     if (!page) {
         page = 1;
-        countQuery.query = `SELECT COUNT(${mapQueryPrefix(table)}.id) FROM public.${table} AS ${mapQueryPrefix(table)}`;
-        countQuery.query += ` WHERE ${mapQueryPrefix(table)}.created_by = $1`;
-        countQuery.parameters.push(owner);
-        countQuery.query += generateWhereClause(table, query.whereClause, owner, countQuery);
-        countQuery.query += `${mapGroupByClause(table, query)}`;
-        countQuery.query += ";"
+        countQuery.query += `${mapCountQuery(table, query, owner, countQuery)}`;
         console.log("count query", countQuery);
     }
     result.query += ` ${generatePageLimits(page)}`;
@@ -107,6 +54,25 @@ function generateQuery(query, table, page, owner) {
     return { search: result, count: countQuery };
 }
 
+// function used to dynamically generate the count query based on the 
+// specification of groupby clause or not
+function mapCountQuery(table, query, owner, countQuery) {
+    const groupByClause = mapGroupByClause(table, query);
+    let cQuery = "";
+    if (groupByClause) {
+        cQuery += "SELECT COUNT(*) AS count FROM ("; // account for groupby clauses
+    }
+    cQuery += `SELECT COUNT(${mapQueryPrefix(table)}.id) FROM public.${table} AS ${mapQueryPrefix(table)}`;
+    cQuery += ` WHERE ${mapQueryPrefix(table)}.created_by = $1`;
+    countQuery.parameters.push(owner);
+    cQuery += generateWhereClause(table, query.whereClause, countQuery);
+    cQuery += `${groupByClause}`;
+    cQuery += `${groupByClause ? ") AS subquery" : ""};`;
+    return cQuery;
+}
+
+// function used to map the foregin search columns of related entities (e.g., searching a company
+// of a client, then the server will autoamtically serach and map for the name of the client's company name)
 function mapFKName(target) {
     switch (target) {
         case "company":
@@ -379,7 +345,12 @@ function mapSpecifiedQueryColumns(table, fields) {
                     return `${mapQueryPrefix(table)}.${target}`
                 }
                 else{
-                    return `${specification}(${mapQueryPrefix(table)}.${target}) AS ${as}`;
+                    if (type.includes("timestamp")){
+                        return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target}) AS ${as}`;
+                    }
+                    else{
+                        return `${specification}(${mapQueryPrefix(table)}.${target}) AS ${as}`;
+                    }
                 }
             })
             .join(", ")}`;
@@ -395,14 +366,14 @@ function generateFromClause(table) {
 /**
  * Function to generate the where cluase (support complex and nested conditions)
  */
-function generateWhereClause(table, whereClause, owner, result, operator = "AND", initialised = true) {
+function generateWhereClause(table, whereClause, result, operator = "AND", initialised = true) {
 
     // if on the operator level, then resursively calling the generation of where clause:
     if ('AND' in whereClause || 'OR' in whereClause) {
         const operator = whereClause.AND ? 'AND' : 'OR';
         const conditions = whereClause[whereClause.AND ? 'AND' : 'OR'];
 
-        return ` ${initialised? "AND" : ""}(${generateWhereClause(table, conditions, owner, result, operator, false)})`;
+        return ` ${initialised? "AND" : ""}(${generateWhereClause(table, conditions, result, operator, false)})`;
     }
 
     // recusrively reaching the level of where clauses:
@@ -412,7 +383,7 @@ function generateWhereClause(table, whereClause, owner, result, operator = "AND"
             // if this item is a nesting condition or an generative condition:
             if ('AND' in c || 'OR' in c) {
                 const operator = c.AND ? 'AND' : 'OR';
-                return generateWhereClause(table, c, owner, result, operator, false);
+                return generateWhereClause(table, c, result, operator, false);
             }
             else{
                 return getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator);
@@ -541,11 +512,12 @@ function mapGroupByClause(table, query) {
                 return mapQueryPrefix(table) + "." + target;
             }
             else{
-                if (type.toLowerCase() === "timestamp with time zone"){
+                // capture special cases of time-based group by
+                if (type.includes("timestamp")){
                     return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target})`;
                 }
                 else{
-                    return `${specification}(${target})`;
+                    return `${specification}(${mapQueryPrefix(table)}.${target})`;
                 }
             }
         }).join(", ")}`;
@@ -558,20 +530,22 @@ order by clause generationes
 */
 function mapOrderByClause(table, query) {
     const noGroupBy = !query.orderByClause || !query.orderByClause.length;
-    let specifiedOrderBy = `${query.orderByClause.map((field) => {
-        const { target, specification, type, order } = field;
-            if (specification === "default"){
-                return `${mapQueryPrefix(table)}.${target} ${order}`;
-            }
-            else{
-                if (type.toLowerCase() == "timestamp with time zone"){
-                    return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target}) ${order}`;
+    let specifiedOrderBy = noGroupBy ? 
+        null : 
+        `${query.orderByClause.map((field) => {
+            const { target, specification, type, order } = field;
+                if (specification === "default"){
+                    return `${mapQueryPrefix(table)}.${target} ${order}`;
                 }
                 else{
-                    return `${specification}(${target}) ${order}`;
+                    if (type.includes("timestamp")){
+                        return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target}) ${order}`;
+                    }
+                    else{
+                        return `${specification}(${mapQueryPrefix(table)}.${target}) ${order}`;
+                    }
                 }
-            }
-    }).join(", ")}`;
+        }).join(", ")}`;
 
     switch (table) {
         case "companies":
@@ -612,7 +586,7 @@ function generatePageLimits(page) {
 }
 
 module.exports = {
-    getSearchTerm,
     mapDefaultQueryColumns,
-    generateQuery
+    generateQuery,
+    mapOperator
 }

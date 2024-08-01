@@ -1,6 +1,8 @@
+const { config } = require('dotenv');
+
 // get the configuration of the environment
 require('dotenv').config({
-    path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
+    path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.test'
 });
 
 // Configure the Database instance that uses the connection
@@ -39,12 +41,38 @@ function getConfiguration() {
 function getDBconnection() {
     return db;
 }
-function closeDBConnection() {
-    return db.$pool.end();
+
+// funciton used to retrun a single copy of the true db's properties to 
+// efficiently pre-process and validate the inputs of the users
+async function initialiseDBReferences(db) {
+    const config = getConfiguration();
+    const availableTables = config.counter.availableTargets;
+    const forbiddenTargets = config.search.forbiddenTargets;
+    try {
+        const dbReferences = await db.any(`
+           WITH targets AS (
+                SELECT table_name, 
+                    column_name, 
+                    data_type,
+                    ROW_NUMBER() OVER (PARTITION BY table_name ORDER BY column_name) AS rn
+                FROM information_schema.columns
+                WHERE table_schema = 'public' 
+                AND table_name IN ($1:csv)
+                AND column_name NOT IN ($2:csv)
+            )
+            SELECT table_name as table, column_name as column, data_type as type 
+            FROM targets ORDER BY table_name, rn;
+            `, [availableTables, forbiddenTargets]);
+        return dbReferences;
+    }
+    catch (error) {
+        console.error(error);
+        return null;
+    }
 }
 
 module.exports = {
     getConfiguration,
     getDBconnection,
-    closeDBConnection
+    initialiseDBReferences
 }
