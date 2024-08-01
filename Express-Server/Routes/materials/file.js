@@ -5,84 +5,26 @@ const {
     validateInstances,
     validateName,
     validateDescriptions,
-    validateInteger,
-    validateColumnName
 } = require('../../utils/Validator');
-const { getSearchTerm } = require('../../utils/Formatter');
-const { getConfiguration } = require("../../utils/Configurator");
-const config = getConfiguration();
-const pageSize = config.search.pageSize;
+const { 
+    mapDefaultQueryColumns,
+    mapFromClause,
+    mapQueryPrefix
+ } = require('../../utils/Formatter');
 
 module.exports = (db) => {
-    // fetching all the materials
-    router.route("/")
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            let { target, keyword, page } = req.query;
-            let searchQuery;
-            const response = {};
-
-            const searched = (!target && !keyword) ? false : true;
-            if (searched) {
-                // validate search query format:
-                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                const targetValidation = await validateColumnName(target, "materials", keyword, db);
-                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                const type = targetValidation.type;
-                searchQuery = getSearchTerm("materials",target, keyword, type);
-            }
-
-            try {
-                // validate page number (if no page defined, then counts are required)
-                if (page){
-                    page = parseInt(page);
-                    if (!page) return res.status(400).json({ message: "page number is invalid" });
-                    const pageValidation = validateInteger(page, "page number");
-                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-                }
-                else{
-                    page = 1;
-                    const count = await db.oneOrNone(`
-                        SELECT COUNT(m.*) AS count 
-                        FROM public.materials AS m
-                        WHERE m.created_by = $1 ${searched ? `AND ${searchQuery}` : ""};
-                    `, [owner]);
-                    response.count = parseInt(count.count);
-                }
-                response.searched = searched;
-                response.page = page;
-                const limit = pageSize * page;
-                const offset = (page - 1) * pageSize;
-
-                // fetching all the materials matching
-                const materials = await db.any(`
-                    SELECT m.id, m.en_name, m.ch_name 
-                    FROM public.materials AS m
-                    WHERE m.created_by = $1 ${searched ? `AND ${searchQuery}` : ""}
-                    ORDER BY m.ch_name ASC
-                    LIMIT $2 OFFSET $3`
-                    , [owner, limit, offset]);
-                return res.status(200).json({ ...response, materials: materials });
-            }
-            catch {
-                (error) => {
-                    console.error(error);
-                    return res.status(500).json({ ...response, message: "failed to fetch" });
-                }
-            }
-        });
 
     // fetching a specific material
     router.route("/:id")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
+            let query = "SELECT";
             try {
-                const material = await db.oneOrNone(`
-                    SELECT id, en_name, ch_name, descriptions 
-                    FROM public.materials 
-                    WHERE id = $1 and created_by = $2`, 
-                    [id, owner]);
+                query += ` ${mapDefaultQueryColumns("materials", true)}`;
+                query += ` ${mapFromClause("materials")}`;
+                query += ` WHERE ${mapQueryPrefix("materials")}.id = $1 AND ${mapQueryPrefix("materials")}.created_by = $2;`;
+                const material = await db.oneOrNone(query, [id, owner]);
                 return res.status(200).json({ material: material });
             }
             catch {

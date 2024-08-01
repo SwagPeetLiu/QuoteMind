@@ -3,7 +3,7 @@ const router = require("express").Router();
 const {
     validateTableExistence,
     validateAndPreProcessQuery
-} = require("../../utils/NewValidator");
+} = require("../../utils/Validator");
 const { generateQuery } = require("../../utils/Formatter");
 
 module.exports = (db, dbReferences) => {

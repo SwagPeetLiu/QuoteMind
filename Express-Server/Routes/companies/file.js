@@ -7,112 +7,26 @@ const { validateAddresses,
         validateTaxNumber,
         validateClients,
         validateInstances,
-        validateInteger,
-        validateColumnName
     } = require ('../../utils/Validator');
-const { getSearchTerm } = require('../../utils/Formatter');
-const { getConfiguration } = require("../../utils/Configurator");
-const config = getConfiguration();
-const pageSize = config.search.pageSize;
+const { 
+        mapDefaultQueryColumns,
+        mapFromClause,
+        mapQueryPrefix
+     } = require('../../utils/Formatter');
 
 module.exports = (db) => {
-    router.route("/")
-        // route on getting all the companies created by the user
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            let { target, keyword, page } = req.query;
-            let searchQuery;
-            const response = {};
 
-            // validate searches & generate the serach term
-            const searched = (!target && !keyword) ? false : true;
-            if (searched){
-                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                const targetValidation = await validateColumnName(target, "companies", keyword, db);
-                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                const type = targetValidation.type;
-                searchQuery = getSearchTerm("companies",target, keyword, type);
-            }
-
-            try {
-                // validate page number (if no page defined, then counts are required)
-                if (page){
-                    page = parseInt(page);
-                    if (!page) return res.status(400).json({ message: "page number is invalid" });
-                    const pageValidation = validateInteger(page, "page number");
-                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-                }
-                // setting up the query counts if this search is a fresh start (i.e., needs to determine the page base)
-                else{
-                    page = 1;
-                    const count = await db.oneOrNone(`
-                        SELECT COUNT(co.*) AS count 
-                        FROM public.companies as co
-                        WHERE co.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
-                    `, [owner]);
-                    response.count = parseInt(count.count);
-                }
-                response.searched = searched;
-                response.page = page;
-                const limit = pageSize * page;
-                const offset = (page - 1) * pageSize;
-            
-                // fetch the companies
-                const companies = await db.any(
-                    `SELECT id, full_name, email, phone 
-                    FROM public.companies as co
-                    WHERE co.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
-                    ORDER BY co.full_name ASC
-                    LIMIT $2 OFFSET $3;`
-                    , [owner, limit, offset]);
-                return res.status(200).json({ ...response, companies: companies });
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ ...response, message: "failed to fetch companies" });
-            }
-        });
-
-    // route on operating for a signle company:
+    // Route on operating for a signle company:
     router.route("/:id")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
+            let query = "SELECT";
             try {
-                const company = await db.oneOrNone(`
-                    SELECT co.id, co.full_name, co.email, co.phone, co.tax_number,
-                    CASE WHEN (SELECT count(id) FROM public.addresses WHERE company = co.id) = 0 THEN NULL 
-                            ELSE (
-                                SELECT jsonb_agg(
-                                    jsonb_build_object(
-                                        'id', a.id, 
-                                        'street', a.street_address, 
-                                        'city', a.city, 
-                                        'state', a.state, 
-                                        'country', a.country, 
-                                        'postal', a.postal_code, 
-                                        'category', a.category
-                                    )
-                                )
-                                FROM public.addresses a
-                                WHERE a.company = co.id
-                            )
-                    END AS addresses,
-                    CASE WHEN (SELECT count(id) FROM public.clients WHERE company = co.id) = 0 THEN NULL 
-                            ELSE (
-                                SELECT jsonb_agg(
-                                    jsonb_build_object(
-                                        'id', c.id, 
-                                        'full_name', c.full_name
-                                    )
-                                )
-                                FROM public.clients c
-                                WHERE c.company = co.id
-                            )
-                    END AS clients
-                    FROM public.companies as co
-                    WHERE id = $1 AND created_by = $2
-                    `, [id, owner]);
+                query += ` ${mapDefaultQueryColumns("companies", true)}`;
+                query += ` ${mapFromClause("companies")}`;
+                query += ` WHERE ${mapQueryPrefix("companies")}.id = $1 AND ${mapQueryPrefix("companies")}.created_by = $2;`;
+                const company = await db.oneOrNone(query, [id, owner]);
                 return res.status(200).json({ company: company });
             }
             catch (err) {

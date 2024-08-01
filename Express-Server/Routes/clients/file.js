@@ -7,115 +7,26 @@ const { validateAddresses,
     validatePhone,
     validateSocialContacts,
     validateInstances,
-    validateInteger,
-    validateColumnName
     } = require ('../../utils/Validator');
-const { getSearchTerm } = require('../../utils/Formatter');
-const { getConfiguration } = require("../../utils/Configurator");
-const config = getConfiguration();
-const pageSize = config.search.pageSize;
+const { 
+    mapDefaultQueryColumns,
+    mapFromClause,
+    mapQueryPrefix
+ } = require('../../utils/Formatter');
 
 module.exports = (db) => {
-    // endpoint on fetching all the clients created by the user
-    router.route("/")
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            let { target, keyword, page } = req.query;
-            let searchQuery;
-            const response = {};
-
-            // validate searches & generate the serach term
-            const searched = (!target && !keyword) ? false : true;
-            if (searched){
-                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                const targetValidation = await validateColumnName(target, "clients", keyword, db);
-                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                const type = targetValidation.type;
-                searchQuery = getSearchTerm("clients",target, keyword, type);
-            }
-
-            try {
-                // validate page number (if no page defined, then counts are required)
-                if (page){
-                    page = parseInt(page);
-                    if (!page) return res.status(400).json({ message: "page number is invalid" });
-                    const pageValidation = validateInteger(page, "page number");
-                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-                }
-                // setting up the query counts if this search is a fresh start (i.e., needs to determine the page base)
-                else{
-                    page = 1;
-                    const count = await db.oneOrNone(`
-                        SELECT COUNT(c.*) AS count 
-                        FROM public.clients as c
-                        WHERE c.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
-                    `, [owner]);
-                    response.count = parseInt(count.count);
-                }
-                response.searched = searched;
-                response.page = page;
-                const limit = pageSize * page;
-                const offset = (page - 1) * pageSize;
-
-                // returning the query results:
-                const clients = await db.any(`
-                    SELECT c.id, c.full_name, c.email, c.phone, c.wechat_contact, c.qq_contact, 
-                    (SELECT co.full_name FROM public.companies co WHERE co.id = c.company) AS company
-                    FROM public.clients c
-                    WHERE c.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
-                    ORDER BY c.full_name ASC
-                    LIMIT $2 OFFSET $3;
-                `, [owner, limit, offset]);
-                
-                return res.status(200).json({ ...response, clients: clients });
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ ...response, message: "failed to fetch clients" });
-            }
-        });
-
     router.route("/:id")
+
         // fetching a specific client 
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
+            let query = "SELECT";
             try {
-                const client = await db.oneOrNone(`
-                    SELECT c.id, 
-                    c.full_name, 
-                    c.email, 
-                    c.phone, 
-                    c.wechat_contact, 
-                    c.qq_contact, 
-                    CASE WHEN c.company IS NULL THEN NULL
-                            ELSE jsonb_build_object(
-                                'id', co.id,
-                                'full_name', co.full_name
-                                )
-                    END AS company,
-                    CASE WHEN (SELECT count(id) FROM public.addresses WHERE client = c.id) = 0 THEN NULL 
-                            ELSE (
-                                SELECT jsonb_agg(
-                                    jsonb_build_object(
-                                        'id', a.id, 
-                                        'street', a.street_address, 
-                                        'city', a.city, 
-                                        'state', a.state, 
-                                        'country', a.country, 
-                                        'postal', a.postal_code, 
-                                        'category', a.category
-                                    )
-                                )
-                                FROM public.addresses a
-                                WHERE a.client = c.id
-                            )
-                    END AS addresses
-                FROM public.clients AS c 
-                LEFT JOIN public.companies AS co ON c.company = co.id
-                WHERE c.id = $1 AND c.created_by = $2
-                GROUP BY c.id, co.id, co.full_name;
-                `, [id, owner]);
+                query += ` ${mapDefaultQueryColumns("clients", true)}`; // with details
+                query += ` ${mapFromClause("clients")}`;
+                query += ` WHERE ${mapQueryPrefix("clients")}.id = $1 AND ${mapQueryPrefix("clients")}.created_by = $2;`;
+                const client = await db.oneOrNone(query, [id, owner]);
                 return res.status(200).json({ client: client });
             } catch (err) {
                 console.error(err);

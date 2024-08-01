@@ -25,13 +25,13 @@ function generateQuery(query, table, page, owner) {
     console.log("added fields",result);
 
     // Attaching the From clause:
-    result.query += ` ${generateFromClause(table)}`;
+    result.query += ` ${mapFromClause(table)}`;
     console.log("added from clause", result);
 
     // attaching the where clause:
     result.query += ` WHERE ${mapQueryPrefix(table)}.created_by = $${result.parameters.length + 1}`;
     result.parameters.push(owner);
-    result.query += generateWhereClause(table, query.whereClause, result);
+    result.query += `${query.whereClause ? mapWhereClause(table, query.whereClause, result) : ""}`;
 
     // attaching the group by clause:
     result.query += `${mapGroupByClause(table, query)}`;
@@ -65,7 +65,7 @@ function mapCountQuery(table, query, owner, countQuery) {
     cQuery += `SELECT COUNT(${mapQueryPrefix(table)}.id) FROM public.${table} AS ${mapQueryPrefix(table)}`;
     cQuery += ` WHERE ${mapQueryPrefix(table)}.created_by = $1`;
     countQuery.parameters.push(owner);
-    cQuery += generateWhereClause(table, query.whereClause, countQuery);
+    cQuery += `${query.whereClause ? mapWhereClause(table, query.whereClause, result) : ""}`;
     cQuery += `${groupByClause}`;
     cQuery += `${groupByClause ? ") AS subquery" : ""};`;
     return cQuery;
@@ -121,18 +121,50 @@ function mapQueryPrefix(table) {
 }
 
 // function used to map out the default querying columns for each table
-function mapDefaultQueryColumns(table) {
-    switch (table) {
-
-        case "companies":
-            return `${mapQueryPrefix(table)}.id, 
+function mapDefaultQueryColumns(table, detailed = false) {
+    if (table === "companies") {
+        const defaultColumns = 
+                    `${mapQueryPrefix(table)}.id, 
                     ${mapQueryPrefix(table)}.full_name, 
                     ${mapQueryPrefix(table)}.email,
                     ${mapQueryPrefix(table)}.phone
                     `;
-
-        case "clients":
-            return `${mapQueryPrefix(table)}.id, 
+        const details = 
+                `, ${mapQueryPrefix(table)}.tax_number,
+                    CASE WHEN (SELECT COUNT(id) FROM public.addresses WHERE company = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', ${mapQueryPrefix("addresses")}.id, 
+                                        'street', ${mapQueryPrefix("addresses")}.street_address, 
+                                        'city', ${mapQueryPrefix("addresses")}.city, 
+                                        'state', ${mapQueryPrefix("addresses")}.state, 
+                                        'country', ${mapQueryPrefix("addresses")}.country, 
+                                        'postal', ${mapQueryPrefix("addresses")}.postal_code, 
+                                        'category', ${mapQueryPrefix("addresses")}.category
+                                    )
+                                )
+                                FROM public.addresses ${mapQueryPrefix("addresses")}
+                                WHERE ${mapQueryPrefix("addresses")}.company = ${mapQueryPrefix(table)}.id
+                            )
+                    END AS addresses,
+                    CASE WHEN (SELECT count(id) FROM public.clients WHERE company = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', ${mapQueryPrefix("clients")}.id, 
+                                        'full_name', ${mapQueryPrefix("clients")}.full_name
+                                    )
+                                )
+                                FROM public.clients ${mapQueryPrefix("clients")}
+                                WHERE ${mapQueryPrefix("clients")}.company = ${mapQueryPrefix(table)}.id
+                            )
+                    END AS clients`;
+        return detailed ? defaultColumns + details : defaultColumns;
+    }
+    else if (table === "clients"){
+        const defaultColumns = 
+                    `${mapQueryPrefix(table)}.id, 
                     ${mapQueryPrefix(table)}.full_name, 
                     ${mapQueryPrefix(table)}.email,
                     ${mapQueryPrefix(table)}.phone,
@@ -144,30 +176,46 @@ function mapDefaultQueryColumns(table) {
                         WHERE ${mapQueryPrefix("companies")}.id = ${mapQueryPrefix(table)}.company
                     ) AS company
                     `;
-
-        case "positions":
-            return `
+        const details = 
+                    `,
+                    CASE WHEN (SELECT COUNT(id) FROM public.addresses WHERE client = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
+                            ELSE (
+                                SELECT jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', ${mapQueryPrefix("addresses")}.id, 
+                                        'street', ${mapQueryPrefix("addresses")}.street_address, 
+                                        'city', ${mapQueryPrefix("addresses")}.city, 
+                                        'state', ${mapQueryPrefix("addresses")}.state, 
+                                        'country', ${mapQueryPrefix("addresses")}.country, 
+                                        'postal', ${mapQueryPrefix("addresses")}.postal_code, 
+                                        'category', ${mapQueryPrefix("addresses")}.category
+                                    )
+                                )
+                                FROM public.addresses ${mapQueryPrefix("addresses")}
+                                WHERE ${mapQueryPrefix("addresses")}.client = ${mapQueryPrefix(table)}.id
+                            )
+                    END AS addresses`;
+        return detailed ? defaultColumns + details : defaultColumns;
+    }
+    else if (table === "positions"){
+        return `
                 ${mapQueryPrefix(table)}.id, 
                 ${mapQueryPrefix(table)}.name,
                 ${mapQueryPrefix(table)}.descriptions
             `;
-
-        case "materials":
-            return `
-                ${mapQueryPrefix(table)}.id, 
-                ${mapQueryPrefix(table)}.ch_name, 
-                ${mapQueryPrefix(table)}.en_name
-            `;
-
-        case "products":
-            return `
-                ${mapQueryPrefix(table)}.id, 
-                ${mapQueryPrefix(table)}.ch_name, 
-                ${mapQueryPrefix(table)}.en_name
-            `;
-
-        case "employees":
-            return `
+    }
+    else if (table === "materials" || table === "products"){
+        const defaultColumns = 
+                    `${mapQueryPrefix(table)}.id, 
+                    ${mapQueryPrefix(table)}.ch_name, 
+                    ${mapQueryPrefix(table)}.en_name
+                    `;
+        const details = 
+                    `, ${mapQueryPrefix(table)}.descriptions`;
+        return detailed ? defaultColumns + details : defaultColumns;
+    }
+    else if (table === "employees"){
+        return `
                 ${mapQueryPrefix(table)}.id,
                 ${mapQueryPrefix(table)}.name,
                 ${mapQueryPrefix(table)}.phone,
@@ -179,9 +227,9 @@ function mapDefaultQueryColumns(table) {
                     WHERE ${mapQueryPrefix("positions")}.id = ${mapQueryPrefix(table)}.position
                 ) AS position
             `;
-
-        case "pricing_conditions":
-            return `
+    }
+    else if (table === "pricing_conditions"){
+        return `
                 ${mapQueryPrefix(table)}.id,
                 ${mapQueryPrefix(table)}.quantity,
                 ${mapQueryPrefix(table)}.quantity_unit,
@@ -197,7 +245,7 @@ function mapDefaultQueryColumns(table) {
                 FROM public.products ${mapQueryPrefix("products")}
                 WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix(table)}.product) as product,
                 CASE
-                    WHEN ${mapQueryPrefix(table)}.${mapQueryPrefix("materials")} IS NULL OR array_length(${mapQueryPrefix(table)}.materials, 1) = 0 THEN NULL
+                    WHEN ${mapQueryPrefix(table)}.materials IS NULL OR array_length(${mapQueryPrefix(table)}.materials, 1) = 0 THEN NULL
                         ELSE (
                             SELECT json_agg(
                                 jsonb_build_object(
@@ -223,8 +271,9 @@ function mapDefaultQueryColumns(table) {
                 FROM public.companies ${mapQueryPrefix("companies")}
                 WHERE ${mapQueryPrefix("companies")}.id = ${mapQueryPrefix(table)}.company) as company
             `;
-        case "pricing_rules":
-            return `
+    }
+    else if (table === "pricing_rules"){
+        return `
                 ${mapQueryPrefix(table)}.id,
                 ${mapQueryPrefix(table)}.price_per_unit,
                 (
@@ -284,10 +333,10 @@ function mapDefaultQueryColumns(table) {
                     WHERE ${mapQueryPrefix("pricing_conditions")}.id = ANY(${mapQueryPrefix(table)}.conditions)
                 ) as conditions
             `;
-
-        case "transactions": {
-            const prefiex = mapQueryPrefix(table);
-            return `
+    }
+    else if (table === "transactions") {
+        const prefiex = mapQueryPrefix(table);
+        const defaultColumns = `
                 ${prefiex}.transaction_date, ${prefiex}.creation_date, ${prefiex}.modified_date, 
                 ${prefiex}.status, ${prefiex}.id, ${prefiex}.name, ${prefiex}.quantity, 
                 ${prefiex}.price_per_unit, ${prefiex}.amount, ${prefiex}.note, ${prefiex}.colour, 
@@ -325,7 +374,36 @@ function mapDefaultQueryColumns(table) {
                     WHERE ${mapQueryPrefix("clients")}.id = ${prefiex}.client
                 ) as client
             `;
-        }
+        const details = `
+            ,
+                CASE WHEN t.addresses IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
+                ELSE ( SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'id', a.id,
+                        'street', a.street_address,
+                        'city', a.city,
+                        'state', a.state,
+                        'country', a.country,
+                        'postal', a.postal_code,
+                        'category', a.category
+                    ))
+					FROM public.addresses a
+					WHERE a.id = ANY(t.addresses)
+                ) END as addresses,
+                CASE WHEN t.employee IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
+                ELSE (SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'id', e.id,
+                        'name', e.name
+                    ))
+					FROM public.employees e
+					WHERE e.id = ANY(t.employee)
+                ) END as employee
+        `;
+        return detailed ? defaultColumns + details : defaultColumns;
+    }
+    else{
+        return `${mapQueryPrefix(table)}.id`
     }
 }
 
@@ -359,21 +437,21 @@ function mapSpecifiedQueryColumns(table, fields) {
 /*
 Function to generate the from clause of the query
 */
-function generateFromClause(table) {
+function mapFromClause(table) {
     return `FROM public.${table} AS ${mapQueryPrefix(table)}`;
 }
 
 /**
  * Function to generate the where cluase (support complex and nested conditions)
  */
-function generateWhereClause(table, whereClause, result, operator = "AND", initialised = true) {
+function mapWhereClause(table, whereClause, result, operator = "AND", initialised = true) {
 
     // if on the operator level, then resursively calling the generation of where clause:
     if ('AND' in whereClause || 'OR' in whereClause) {
         const operator = whereClause.AND ? 'AND' : 'OR';
         const conditions = whereClause[whereClause.AND ? 'AND' : 'OR'];
 
-        return ` ${initialised? "AND" : ""}(${generateWhereClause(table, conditions, result, operator, false)})`;
+        return ` ${initialised? "AND" : ""}(${mapWhereClause(table, conditions, result, operator, false)})`;
     }
 
     // recusrively reaching the level of where clauses:
@@ -383,7 +461,7 @@ function generateWhereClause(table, whereClause, result, operator = "AND", initi
             // if this item is a nesting condition or an generative condition:
             if ('AND' in c || 'OR' in c) {
                 const operator = c.AND ? 'AND' : 'OR';
-                return generateWhereClause(table, c, result, operator, false);
+                return mapWhereClause(table, c, result, operator, false);
             }
             else{
                 return getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator);
@@ -587,6 +665,10 @@ function generatePageLimits(page) {
 
 module.exports = {
     mapDefaultQueryColumns,
+    mapFromClause,
+    mapWhereClause,
+    mapOrderByClause,
     generateQuery,
-    mapOperator
+    mapOperator,
+    mapQueryPrefix
 }

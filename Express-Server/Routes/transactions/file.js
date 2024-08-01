@@ -9,172 +9,26 @@ const {
     validateInstances,
     validateString,
     validateInteger,
-    validateColumnName
 } = require('../../utils/Validator');
-const { getSearchTerm } = require('../../utils/Formatter');
-const { getConfiguration } = require("../../utils/Configurator");
-const config = getConfiguration();
-const pageSize = config.search.pageSize;
+const { 
+    mapDefaultQueryColumns,
+    mapFromClause,
+    mapQueryPrefix
+ } = require('../../utils/Formatter');
 
 module.exports = (db) => {
-    // route on obtaining all the transactions
-    router.route("/")
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            let { target, keyword, page } = req.query;
-            let searchQuery;
-            const response = {};
-
-            // validate searches & generate the serach term
-            const searched = (!target && !keyword) ? false : true;
-            if (searched){
-                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                const targetValidation = await validateColumnName(target, "transactions", keyword, db);
-                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                const type = targetValidation.type;
-                searchQuery = getSearchTerm("transactions",target, keyword, type);
-            }
-
-            try{
-                if (page){
-                    page = parseInt(page);
-                    if (!page) return res.status(400).json({ message: "page number is invalid" });
-                    const pageValidation = validateInteger(page, "page number");
-                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-                }
-                else{
-                    page = 1;
-                    const count = await db.oneOrNone(`
-                        SELECT COUNT(t.*) AS count 
-                        FROM public.transactions as t
-                        WHERE t.created_by = $1 ${searched? `AND ${searchQuery}`:''};
-                    `, [owner]);
-                    response.count = parseInt(count.count);
-                }
-                response.searched = searched;
-                response.page = page;
-                const limit = pageSize * page;
-                const offset = (page - 1) * pageSize;
-
-                const transactions = await db.any(`
-                    SELECT 
-                        t.transaction_date, t.creation_date, t.modified_date, t.status, t.id, t.name, t.quantity, 
-                        t.price_per_unit, t.amount, t.note, t.colour, t.en_unit, t.ch_unit,
-                        t.width, t.height, t.length, t.size, t.quantity_unit, t.size_unit,
-                        CASE WHEN t.materials IS NULL OR array_length(t.materials, 1) = 0 THEN NULL
-                        ELSE (
-                            SELECT jsonb_agg(
-                                jsonb_build_object(
-                                    'id', m.id,
-                                    'en_name', m.en_name,
-                                    'ch_name', m.ch_name
-                                )
-                            )
-                            FROM public.materials m
-                            WHERE m.id = ANY(t.materials)
-                        ) END as materials,
-                        (
-                            SELECT jsonb_build_object(
-                                'id', p.id,
-                                'en_name', p.en_name,
-                                'ch_name', p.ch_name
-                            )
-                            FROM public.products p
-                            WHERE p.id = t.product
-                        ) as product,
-                        (
-                            SELECT co.full_name
-                            FROM public.companies co
-                            WHERE co.id = t.company
-                        ) as company,
-                        (
-                            SELECT c.full_name
-                            FROM public.clients c
-                            WHERE c.id = t.client
-                        ) as client
-                    FROM public.transactions t 
-                    WHERE t.created_by = $1 ${searched ? `AND ${searchQuery}` : ''}
-                    ORDER BY t.modified_date DESC
-                    LIMIT $2 OFFSET $3;
-                `, [owner, limit, offset]);
-                
-                return res.status(200).json({ ...response, transactions: transactions });
-            }
-            catch {
-                (error) => {
-                    console.error(error);
-                    return res.status(500).json({ ...response, message: "failed to fetch transactions" });
-                }
-            }
-        });
     
     // Grabing all the relevant details for a specific transaction
     router.route("/:id")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
+            let query = "SELECT";
             try {
-                const transaction = await db.oneOrNone(`
-                    SELECT t.id, t.transaction_date, t.creation_date, t.modified_date, t.status, t.name, t.quantity, t.price_per_unit, t.amount, t.note, t.colour, t.width,
-                    t.height, t.length, t.en_unit, t.ch_unit, t.size, t.quantity_unit, t.size_unit,
-                    jsonb_build_object(
-                        'id', p.id,
-                        'en_name', p.en_name,
-                        'ch_name', p.ch_name
-                    ) as product, 
-                    CASE WHEN t.materials IS NULL OR array_length(t.materials, 1) = 0 THEN NULL
-                    ELSE (SELECT jsonb_agg(
-                        jsonb_build_object(
-                            'id', m.id,
-                            'en_name', m.en_name,
-                            'ch_name', m.ch_name
-                        ))
-						FROM public.materials m
-                    	WHERE m.id = ANY(t.materials)
-                    ) 
-					END as materials,
-                    CASE WHEN t.company IS NULL THEN NULL
-                    ELSE jsonb_build_object(
-                        'id', co.id,
-                        'full_name', co.full_name
-                    ) END as company,
-                    CASE WHEN t.client IS NULL THEN NULL
-                    ELSE jsonb_build_object(
-                        'id', c.id,
-                        'full_name', c.full_name
-                    ) END as client,
-                    CASE WHEN t.addresses IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
-                    ELSE ( SELECT jsonb_agg(
-                        jsonb_build_object(
-                            'id', a.id,
-                            'street', a.street_address,
-                            'city', a.city,
-                            'state', a.state,
-                            'country', a.country,
-                            'postal', a.postal_code,
-                            'category', a.category
-                        ))
-						FROM public.addresses a
-						WHERE a.id = ANY(t.addresses)
-                    ) END as addresses,
-                    CASE WHEN t.employee IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
-                    ELSE (SELECT jsonb_agg(
-                        jsonb_build_object(
-                            'id', e.id,
-                            'name', e.name
-                        ))
-						FROM public.employees e
-						WHERE e.id = ANY(t.employee)
-                    ) END as employee
-                    FROM public.transactions as t
-                    LEFT JOIN public.products as p ON p.id = t.product
-                    LEFT JOIN public.companies as co ON co.id = t.company
-                    LEFT JOIN public.clients as c ON c.id = t.client
-                    WHERE t.id = $1 AND t.created_by = $2
-                    GROUP BY t.id, p.id, co.id, c.id;
-                    `, 
-                    [id, owner]);
-
+                query += ` ${mapDefaultQueryColumns("transactions", true)}`; // with details
+                query += ` ${mapFromClause("transactions")}`;
+                query += ` WHERE ${mapQueryPrefix("transactions")}.id = $1 AND ${mapQueryPrefix("transactions")}.created_by = $2;`;
+                const transaction = await db.oneOrNone(query, [id, owner]);
                 return res.status(200).json({ transaction: transaction });
             } catch (error) {
                 console.error(error);

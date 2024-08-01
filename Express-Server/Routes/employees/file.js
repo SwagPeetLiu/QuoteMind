@@ -9,96 +9,25 @@ const {
     validateInstances,
     validateEmployeePosition,
     validateInteger,
-    validateColumnName
 } = require ('../../utils/Validator');
-const { getSearchTerm } = require('../../utils/Formatter');
-const { getConfiguration } = require("../../utils/Configurator");
-const config = getConfiguration();
-const pageSize = config.search.pageSize;
+const { 
+    mapDefaultQueryColumns,
+    mapFromClause,
+    mapQueryPrefix
+ } = require('../../utils/Formatter');
 
 module.exports = (db) => {
-    router.route("/")
-        .get(async (req, res) => {
-            const owner = req.sessionEmail;
-            let { target, keyword, page } = req.query;
-            let searchQuery;
-            const response = {};
-
-            // validate searches & generate the serach term
-            const searched = (!target && !keyword) ? false : true;
-            if (searched){
-                if (!target || !keyword) return res.status(400).json({ message: "search query is invalid" });
-                const targetValidation = await validateColumnName(target, "employees", keyword, db);
-                if (!targetValidation.valid) return res.status(400).json({ message: targetValidation.message });
-                const type = targetValidation.type;
-                searchQuery = getSearchTerm("employees", target, keyword, type);
-            }
-
-            try {
-                // validate page number (if no page defined, then counts are required)
-                if (page){
-                    page = parseInt(page);
-                    if (!page) return res.status(400).json({ message: "page number is invalid" });
-                    const pageValidation = validateInteger(page, "page number");
-                    if (!pageValidation.valid) return res.status(400).json({ message: pageValidation.message });
-                }
-                else{
-                    page = 1;
-                    const count = await db.oneOrNone(`
-                        SELECT COUNT(e.*) AS count 
-                        FROM public.employees AS e
-                        WHERE e.created_by = $1 ${searched? `AND ${searchQuery}` : ""};
-                    `, [owner]);
-                    response.count = parseInt(count.count);
-                }
-                response.searched = searched;
-                response.page = page;
-                const limit = pageSize * page;
-                const offset = (page - 1) * pageSize;
-
-                // fetch the employees
-                const employees = await db.any(`
-                    SELECT e.id, e.name, e.phone, e.wechat_contact, e.qq_contact,
-                    (SELECT p.name FROM public.positions p WHERE p.id = e.position) AS position
-                    FROM public.employees e
-                    WHERE e.created_by = $1 ${searched? `AND ${searchQuery}` : ""}
-                    ORDER BY e.name ASC
-                    LIMIT $2 OFFSET $3;
-                `, [owner, limit, offset]);
-                return res.status(200).json({ ...response, employees: employees });
-            }
-            catch (err) {
-                console.error(err);
-                return res.status(500).json({ ...response, message: "failed to fetch employees" });
-            }
-        });
-
+    // fetching specific employee
     router.route("/:id")
         .get(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
+            let query = "SELECT";
             try {
-                const employee = await db.oneOrNone(`
-                    SELECT 
-                        e.id, 
-                        e.name, 
-                        e.email, 
-                        e.phone, 
-                        e.wechat_contact, 
-                        e.qq_contact,
-                        (
-                            SELECT jsonb_build_object(
-                                'id', p.id, 
-                                'name', p.name, 
-                                'descriptions', p.descriptions
-                            ) 
-                            FROM public.positions p 
-                            WHERE p.id = e.position
-                        ) AS position
-                    FROM public.employees e
-                    WHERE e.created_by = $1 AND e.id = $2
-                    ORDER BY e.name ASC;
-                `, [owner, id]);                
+                query += ` ${mapDefaultQueryColumns("employees", true)}`;
+                query += ` ${mapFromClause("employees")}`;
+                query += ` WHERE ${mapQueryPrefix("employees")}.id = $1 AND ${mapQueryPrefix("employees")}.created_by = $2;`;
+                const employee = await db.oneOrNone(query, [id, owner]);
                 return res.status(200).json({ employee: employee });
             }
             catch (err) {

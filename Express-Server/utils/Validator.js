@@ -4,95 +4,262 @@ require('dotenv').config({
 const validator = require('validator');
 const { getConfiguration } = require('./Configurator');
 const config = getConfiguration();
-const forbiddenTargets = config.search.forbiddenTargets;
+const { mapOperator } = require('./Formatter');
 const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u; // Regular expression to check for Unicode letters, numbers, and spaces
 
-// Function to validate an array of addresses
-async function validateAddresses(addresses, owner, id, target, db, req) {
-    if (addresses) {
-        if (!Array.isArray(addresses)) return { valid: false, message: 'Invalid Format of Address information' };
-        if (addresses.length === 0) return { valid: true }; // allow empty array
-        for (let address of addresses) {
-            if (!address || !address.street || !address.city || !address.state || !address.country ||
-                !address.postal || !address.category || !address.id || !address.message) {
-                return { valid: false, message: 'Incomplete Address information' };
-            }
-            if (typeof address.street !== "string" || typeof address.city !== "string" || typeof address.state !== "string" ||
-                typeof address.country !== "string" || typeof address.postal !== "string" || !Array.isArray(address.category) ||
-                typeof address.id !== "string" || typeof address.message !== "string") {
-                return { valid: false, message: 'Invalid Format of Address information' };
-            }
-            if (!unicodeRegex.test(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !unicodeRegex.test(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !unicodeRegex.test(address.state.replace(/ /g, '')) ||
-                !unicodeRegex.test(address.country.replace(/ /g, '')) ||
-                !unicodeRegex.test(address.postal.replace(/ /g, '')) ||
-                !(address.message === "add" || address.message === "update" || address.message === "delete")) {
-                return { valid: false, message: 'Invalid Format of Address information' };
-            }
-            if (!validator.isLength(address.street, { min: config.limitations.Min_Street_Length, max: config.limitations.Max_Street_Length }) ||
-                !validator.isLength(address.city, { min: config.limitations.Min_City_Length, max: config.limitations.Max_City_Length }) ||
-                !validator.isLength(address.state, { min: config.limitations.Min_State_Length, max: config.limitations.Max_State_Length }) ||
-                !validator.isLength(address.country, { min: config.limitations.Min_Country_Length, max: config.limitations.Max_Country_Length }) ||
-                !validator.isLength(address.postal, { min: config.limitations.Min_Postal_Length, max: config.limitations.Max_Postal_Length })) {
-                return { valid: false, message: 'Invalid Length of Address information' };
-            }
-            // Validate existing address updates
-            if (address.message !== "add" && req.method !== "POST") {
-                const idValidation = validateGenericID(address.id, "address");
-                if (!idValidation.valid) return { valid: false, message: 'Invalid Address ID' };
-                try {
-                    // postgresql does not allow placeholders for column name itselfs, so use dynamic string instead
-                    const existingAddress = await db.oneOrNone(`SELECT * FROM public.addresses WHERE id = $1 AND created_by = $2 AND ${target} = $3`,
-                        [address.id, owner, id]);
-                    if (!existingAddress) {
-                        return { valid: false, message: 'Invalid ID of Address information' };
-                    }
-                }
-                catch (error) {
-                    return { valid: false, message: 'Invalid ID of Address information' };
-                }
-            }
-            // Validate address categories
-            if (address.category.length === 0 || address.category.length > config.limitations.MAX_ADDRESS_CATEGORY_LENGTH) {
-                return { valid: false, message: 'Invalid Address Category' };
-            }
-            for (let category of address.category) {
-                if (category !== "mail" && category !== "bill" && category !== "delivery&install") {
-                    return { valid: false, message: 'Invalid Address Category' };
-                }
-            }
-        }
+/*
+ * ==============================================================================
+ * Section used to validate the db References & preprocess them:
+ * ==============================================================================
+*/
+function validateAndPreProcessQuery(body, tableName, dbReferences){
+    let { searchQuery, page } = body;
+
+    // obtaining the references for such querying table
+    const references = dbReferences.filter(reference => reference.table === tableName);
+    if (references.length === 0) return { valid: false, message: "unsupported tableName"};
+
+    // validating page:
+    if (page){
+        const pageValidation = validateInteger(page, "page number");
+        if (!pageValidation.valid) return pageValidation;
     }
-    return { valid: true };
+
+    // validate the query itself:
+    if (!searchQuery || typeof searchQuery !== "object") return { valid: false, message: "invalid query object" };
+
+    // validating the querying fields:
+    if ((!'fields' in searchQuery) || (searchQuery.fields !== "default" && !Array.isArray(searchQuery.fields))){
+        return { valid: false, message: "invalid query fields" };
+    }
+    if (Array.isArray(searchQuery.fields)){
+        if (searchQuery.fields.length === 0) return { valid: false, message: "empty query fields" };
+        let mappedFields = [];
+        for (const field of searchQuery.fields){
+            const validation = validateField(field, references);
+            if (!validation.valid) return validation;
+            mappedFields.push({ ...field, type: validation.type });
+        }
+        searchQuery = { ...searchQuery, fields: mappedFields };
+    }
+
+    // validating the whereClause:
+    if (!'whereClause' in searchQuery || (searchQuery.whereClause != null && typeof searchQuery.whereClause !== "object")){
+        return { valid: false, message: "invalid whereClause" };
+    }
+    if (searchQuery.whereClause){
+        const validatedClause = validateWhereClause(searchQuery.whereClause, references);
+        if (!validatedClause) return { valid: false, message: "invalid whereClause" };
+        searchQuery = { ...searchQuery, whereClause: validatedClause };
+    }
+
+    // validating the groupByClause:
+    if (!'groupByClause' in searchQuery || 
+        (searchQuery.groupByClause != null && !Array.isArray(searchQuery.groupByClause))){
+        return { valid: false, message: "invalid groupByClause" };
+    }
+    if (Array.isArray(searchQuery.groupByClause)){
+        if (searchQuery.groupByClause.length === 0) return { valid: false, message: "empty groupByClause" };
+        let mappedGroupByClauses = [];
+        for (const clause of searchQuery.groupByClause){
+            const validation = validateGroupByClause(clause, references, searchQuery.fields);
+            if (!validation.valid) return validation;
+            mappedGroupByClauses.push({ ...clause, type: validation.type });
+        }
+        searchQuery = { ...searchQuery, groupByClause: mappedGroupByClauses };
+    }
+
+    // validating the Order BY Clause
+    if (!'orderByClause' in searchQuery || 
+        (searchQuery.orderByClause != null && !Array.isArray(searchQuery.orderByClause))){
+        return { valid: false, message: "invalid orderByClause" };
+    }
+    if (Array.isArray(searchQuery.orderByClause)){
+        if (searchQuery.orderByClause.length === 0) return { valid: false, message: "empty orderByClause" };
+        let mappedOrderByClauses = [];
+        for (const clause of searchQuery.orderByClause){
+            const validation = validateOrderByClause(clause, references, searchQuery.fields);
+            if (!validation.valid) return validation;
+            mappedOrderByClauses.push({ ...clause, type: validation.type });
+        }
+        searchQuery = { ...searchQuery, orderByClause: mappedOrderByClauses };
+    }
+    console.log(searchQuery);
+    return { valid: true, searchQuery: searchQuery };
 }
 
-async function validateClients(clients, owner, db) {
-    if (clients && clients.length > 0) {
-        for (const client of clients) {
-            if (!client || !client.id || typeof client.message !== "string" ||
-                (client.message !== "add" && client.message !== "delete")) {
-                return { valid: false, message: 'Incomplete Client information' };
-            }
+// validate the existence of the table
+function validateTableExistence(tableName, dbReferences) {
+    try {
+        const tableNames = dbReferences.map(reference => reference.table);
+        if (tableNames.includes(tableName)){
+            return { valid: true };
+        }
+        else{
+            return { valid: false, message: `Table does not exist` };
+        }
+    } catch (error) {
+        return { valid: false, message: `enable to validate table` };
+    }
+}
 
-            // validate the existing client
-            const idValidation = validateGenericID(client.id, "client");
-            if (!idValidation.valid) return { valid: false, message: 'Invalid Client ID' };
+// validate the fields of the query (references are from this table specifically)
+function validateField(field, references) {
+    if (!'target' in field || !'specification' in field || !'as' in field){
+        return { valid: false, message: "invalid query fields" };
+    }
+    const validations = [validateName(field.target), validateName(field.specification), validateString(field.as)];
+    if (validations.some(validation => !validation.valid)){
+        return { valid: false, message: "invalid query fields" };
+    }
 
-            try {
-                const existingClient = await db.oneOrNone(
-                    'SELECT * FROM public.clients WHERE id = $1::UUID AND created_by = $2',
-                    [client.id, owner]
-                );
-                if (!existingClient) {
-                    return { valid: false, message: 'Invalid Client ID' };
-                }
-            }
-            catch (error) {
-                return { valid: false, message: 'Invalid Client ID' };
-            }
+    // Using a for...of loop instead of forEach
+    for (const ref of references) {
+        if (ref.column === field.target){
+            return { valid: true, type: ref.type };
         }
     }
+    return { valid: false, message: "invalid query fields" };
+}
+
+// validate the nester whereclause:
+function validateWhereClause(whereClause, references) {
+    const keys = Object.keys(whereClause);
+
+    // on operator level
+    if (keys.length == 1 && (keys[0] == "AND" || keys[0] == "OR")) {
+        const operator = keys[0];
+        const clauses = whereClause[operator];
+        const validatedClauses = clauses.map(clause => validateWhereClause(clause, references));
+        if (validatedClauses.every(clause => clause !== null)) {
+            return { [operator]: validatedClauses };
+        }
+        return null;
+    }
+    // if clause on the comparison level
+    else if (Array.isArray(whereClause)) {
+        const validatedClauses = whereClause.map(clause => validateWhereClause(clause, references));
+        if (validatedClauses.every(clause => clause !== null)) {
+            return validatedClauses;
+        }
+        return null;
+    }
+    // single clause iteration level
+    else if (typeof whereClause == "object" &&
+        'target' in whereClause &&
+        'operator' in whereClause &&
+        'keyword' in whereClause) {
+        const validation = validateSingleWhereClause(whereClause, references);
+        if (validation.valid) {
+            return { ...whereClause, type: validation.type };
+        }
+        return null;
+    }
+    else {
+        return null;
+    }
+}
+
+// validate single where clause:
+function validateSingleWhereClause(whereClause, references) {
+    // validate the existence of the key properties
+    const { target, operator, keyword } = whereClause;
+    if (!target || !operator || !keyword) return { valid: false , message: "invalid whereClause" };
+
+    // attaching the type refrences and validate the search keywords:
+    const type = references.find(reference => reference.column == target).type;
+    if (!type) return { valid: false, message: "invalid whereClause" };
+
+    // operater must be a string (and valid)
+    const operatorValidation = validateName(operator);
+    if (!operatorValidation.valid) return { valid: false, message: "invalid operator" };
+    const mappedOperator = mapOperator(operator);
+    if (mappedOperator == "") return { valid: false, message: "invalid operator" };
+
+    // if the type is string, validate the keyword and oeprator
+    if (type.includes("character") || type == "uuid" || type == "USER-DEFINED" || type == "ARRAY") {
+        const stringValidation = validateName(keyword);
+        if (!stringValidation.valid) return { valid: false, message: "invalid keyword" };
+        if (operator != "eq" && operator != "ne") return { valid: false, message: "invalid operator" };
+    }
+
+    // allwoing inputs of both quantity & quantity units (inclusion of units must have a operator equals to eq)
+    if (type == "numeric" || type == "integer") {
+        if (!unicodeRegex.test(keyword.toString().replace(".", ""))) {
+            return { valid: false, message: "invalid integer keyword" };
+        }
+        if (!(/^[1-9]/.test(keyword))) { // if the numerical search does not begin with a valid positive number, it is invalid
+            return { valid: false, message: "invalid integer keyword" };
+        }
+    }
+
+    // allowing inputs of time comparisons:
+    if (type.includes("timestamp")) {
+        const timeValidation = validateTransactionDate(keyword);
+        if (!timeValidation.valid) return { valid: false, message: "invalid timestamp keyword" };
+    }
+    return { valid: true, type: type };
+}
+
+// function used to validate single group by clause:
+function validateGroupByClause(clause, references, fields){
+    
+    // validate user specific inputs:
+    if (!'target' in clause || !'specification' in clause) {
+        return { valid: false, message: "invalid group by clause" };
+    }
+    const { target, specification } = clause;
+    const validations = [validateName(target), validateName(specification)];
+    if (validations.some(validation => !validation.valid)) {
+        return { valid: false, message: "invalid group by clause" };
+    }
+    const fValidation = validateFunctions(specification);
+    if (!fValidation.valid) return { valid: false, message: "invalid group by function" };
+
+    // validating the group by clauses available:
+    const matchedDefault = references.find(reference => reference.column == target);
+    const isDefaultReference = matchedDefault? matchedDefault.type: null;
+
+    // validating the group
+    if (!isDefaultReference) return { valid: false, message: "invalid group by clause" };
+    return { valid: true, type: isDefaultReference};
+}
+
+// function used to validate single order by clause:
+function validateOrderByClause(clause, references, fields){
+
+    // validate user specific inputs:
+    if (!'target' in clause || !'specification' in clause || !'order' in clause) {
+        return { valid: false, message: "invalid order by clause" };
+    }
+    const { target, specification, order } = clause;
+    const validations = [validateName(target), validateName(specification), validateName(order)];
+    if (validations.some(validation => !validation.valid)) {
+        return { valid: false, message: "invalid order by clause" };
+    }
+    const fValidation = validateFunctions(specification);
+    if (!fValidation.valid) return { valid: false, message: "invalid order by clause" };
+    if (order != "ASC" && order != "DESC") return { valid: false, message: "invalid order by clause" };
+
+    // validating the group by clauses available:
+    const matchedDefault = references.find(reference => reference.column == target);
+    const isDefaultReference = matchedDefault? matchedDefault.type: null;
+
+    // validating the group
+    if (!isDefaultReference) return { valid: false, message: "invalid group by clause" };
+    return { valid: true, type: isDefaultReference};
+}
+
+
+/*
+ * ==============================================================================
+ * Tookit for validing API edpoint inputs
+ * ==============================================================================
+*/
+
+function validateToken(token) {
+    if (typeof token !== "string") return { valid: false, message: "invalid token" };
+    if (!validator.isLength(token, { min: config.limitations.Min_Token_Length, max: config.limitations.Max_Token_Length })) return { valid: false, message: "invalid token" };
     return { valid: true };
 }
 
@@ -251,26 +418,6 @@ function validateGenericID(id, target) {
     return { valid: true };
 }
 
-async function validateEmployeePosition(position, db) {
-    if (position) {
-        try {
-            // validating id
-            if (!validator.isUUID(position)) {
-                return { valid: false, message: 'Invalid ID of Position ID' };
-            }
-            // validating instance
-            const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
-            if (!positionRecord) {
-                return { valid: false, message: 'Invalid ID of Position ID' };
-            }
-        }
-        catch (error) {
-            return { valid: false, message: 'Invalid ID of Position ID' };
-        }
-    }
-    return { valid: true };
-}
-
 function validateDescriptions(descriptions) {
     if (descriptions) {
         if (typeof descriptions !== "string") {
@@ -360,31 +507,6 @@ function validateTransactionDate(date){
     return { valid: true };
 }
 
-//generic validation function for the existence of a list of instance id
-async function validateInstances(instances, owner, target, db) {
-    if (Array.isArray(instances) && instances.length > 0) {
-        // validate whether all attachments are UUIDs
-        const uuidValidations = instances.map((id) => validateGenericID(id, target));
-        if (uuidValidations.some((validation) => !validation.valid)) {
-            return { valid: false, message: `invalid ${target}` };
-        }
-
-        // validate whether all attachments exist in the database
-        try {
-            const existingRecords = await Promise.all(instances.map((id) =>
-                db.oneOrNone(`SELECT id FROM public.${target} WHERE id = $1 AND created_by = $2`, [id, owner])));
-            if (existingRecords.some((record) => !record)) {
-                return { valid: false, message: `invalid ${target}` };
-            }
-        }
-        catch (error) {
-            return { valid: false, message: `invalid ${target}` };
-        }
-    }
-    if (instances && !Array.isArray(instances)) return { valid: false, message: `invalid ${target}` };
-    return { valid: true };
-}
-
 function validatePricingThreshold(quantity, quantity_unit, size, size_unit, threshold) {
     // if numeric limitations are specified, then threshold operator should be there
     if (quantity || size) {
@@ -422,85 +544,173 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
     if (size_unit && !size) return { valid: false, message: "Invalid Pricing Size" };
     return { valid: true };
 }
-
-async function validateTableExistence(tableName, db) {
-    try {
-        const result = await db.one(`
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_name = $1
-            );
-        `, [tableName]);
-        if (!result.exists) {
-            return { valid: false, message: `Table does not exist` };
-        }
-        return { valid: true };
-    } catch (error) {
-        return { valid: false, message: `Table does not exist` };
-    }
+function validateFunctions(specification) {
+    const functionList = [
+        "default",
+        // Aggregate Functions
+        "SUM", "AVG", "COUNT", "MAX", "MIN",
+        // String Functions
+        "CONCAT", "SUBSTRING", "LOWER", "UPPER", "TRIM", "LENGTH",
+        // Date Functions
+        "DATE", "YEAR", "MONTH", "DAY", 
+        // Numeric Functions
+        "ABS", "ROUND", "FLOOR", "CEILING",
+        // Conditional Functions
+        "COALESCE", "NULLIF", "CASE",
+        // Type Conversion
+        "CAST",
+        // Window Functions
+        "ROW_NUMBER", "RANK", "DENSE_RANK", "LEAD", "LAG",
+        // Other Common Functions
+        "DISTINCT", "GROUP_CONCAT"
+    ];
+    if (!functionList.includes(specification)) 
+        return { valid: false, message: 'Invalid Function' };
+    
+    return { valid: true };
 }
 
-async function validateColumnName(columnName, tableName, keyword, db) {
-    if (typeof columnName !== "string" || typeof tableName !== "string") return { valid: false, message: "invalid target" };
-
-    // validate strings
-    const stringValdiation = validateName(columnName);
-    if (!stringValdiation.valid) return { valid: false, message: "invalid target" };
-
-    // prevent malicious attempts on grabbing details:
-    if (forbiddenTargets.includes(columnName.toLowerCase())) {
-        return { valid: false, message: "invalid target" }
-    };
-
-    // Validate target:
-    try {
-        const targetDetail = await db.any(`
-            SELECT column_name as target, data_type as type
-            FROM information_schema.columns
-            WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2;
-            `, [tableName, columnName]);
-        if (!targetDetail) return { valid: false, message: "invalid target" };
-
-        const type = targetDetail[0].type;
-        if (!type) return { valid: false, message: "invalid target" };
-
-        // validate the serach keyword based on it:
-        const keywordValidation = validateSearchKey(keyword, type);
-        if (!keywordValidation.valid) return { valid: false, message: "invalid keyword" };
-        return { valid: true, type: type };
-    }
-    catch (error) {
-        return { valid: false, message: "invalid target" };
-    }
-}
-
-function validateSearchKey(key, type) {
-    // validate for each type of search keyword
-    if (type.includes("character") || type == "uuid" || type == "timestamp" || type == "USER-DEFINED" || type == "ARRAY") {
-        if (typeof key !== "string") return { valid: false, message: "invalid target" };
-    }
-
-    // allowing inputs of both quantiy & quantity units
-    if (type == "numeric" || type == "integer") {
-        if (!unicodeRegex.test(key.toString().replace(".", ""))) {
-            return { valid: false, message: "invalid search" };
+/*
+ * ==============================================================================
+ * Tookit for Asynchronous validation procedure
+ * ==============================================================================
+*/
+async function validateEmployeePosition(position, db) {
+    if (position) {
+        try {
+            // validating id
+            if (!validator.isUUID(position)) {
+                return { valid: false, message: 'Invalid ID of Position ID' };
+            }
+            // validating instance
+            const positionRecord = await db.oneOrNone('SELECT * FROM public.positions WHERE id = $1', [position]);
+            if (!positionRecord) {
+                return { valid: false, message: 'Invalid ID of Position ID' };
+            }
         }
-        if (!(/^[1-9]/.test(key))) { // if the numerical search does not begin with a valid positive number, it is invalid
-            return { valid: false, message: "invalid search" };
+        catch (error) {
+            return { valid: false, message: 'Invalid ID of Position ID' };
         }
     }
     return { valid: true };
 }
 
-function validateToken(token) {
-    if (typeof token !== "string") return { valid: false, message: "invalid token" };
-    if (!validator.isLength(token, { min: config.limitations.Min_Token_Length, max: config.limitations.Max_Token_Length })) return { valid: false, message: "invalid token" };
+//generic validation function for the existence of a list of instance id
+async function validateInstances(instances, owner, target, db) {
+    if (Array.isArray(instances) && instances.length > 0) {
+        // validate whether all attachments are UUIDs
+        const uuidValidations = instances.map((id) => validateGenericID(id, target));
+        if (uuidValidations.some((validation) => !validation.valid)) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+
+        // validate whether all attachments exist in the database
+        try {
+            const existingRecords = await Promise.all(instances.map((id) =>
+                db.oneOrNone(`SELECT id FROM public.${target} WHERE id = $1 AND created_by = $2`, [id, owner])));
+            if (existingRecords.some((record) => !record)) {
+                return { valid: false, message: `invalid ${target}` };
+            }
+        }
+        catch (error) {
+            return { valid: false, message: `invalid ${target}` };
+        }
+    }
+    if (instances && !Array.isArray(instances)) return { valid: false, message: `invalid ${target}` };
+    return { valid: true };
+}
+
+// Function to validate an array of addresses
+async function validateAddresses(addresses, owner, id, target, db, req) {
+    if (addresses) {
+        if (!Array.isArray(addresses)) return { valid: false, message: 'Invalid Format of Address information' };
+        if (addresses.length === 0) return { valid: true }; // allow empty array
+        for (let address of addresses) {
+            if (!address || !address.street || !address.city || !address.state || !address.country ||
+                !address.postal || !address.category || !address.id || !address.message) {
+                return { valid: false, message: 'Incomplete Address information' };
+            }
+            if (typeof address.street !== "string" || typeof address.city !== "string" || typeof address.state !== "string" ||
+                typeof address.country !== "string" || typeof address.postal !== "string" || !Array.isArray(address.category) ||
+                typeof address.id !== "string" || typeof address.message !== "string") {
+                return { valid: false, message: 'Invalid Format of Address information' };
+            }
+            if (!unicodeRegex.test(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
+                !unicodeRegex.test(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
+                !unicodeRegex.test(address.state.replace(/ /g, '')) ||
+                !unicodeRegex.test(address.country.replace(/ /g, '')) ||
+                !unicodeRegex.test(address.postal.replace(/ /g, '')) ||
+                !(address.message === "add" || address.message === "update" || address.message === "delete")) {
+                return { valid: false, message: 'Invalid Format of Address information' };
+            }
+            if (!validator.isLength(address.street, { min: config.limitations.Min_Street_Length, max: config.limitations.Max_Street_Length }) ||
+                !validator.isLength(address.city, { min: config.limitations.Min_City_Length, max: config.limitations.Max_City_Length }) ||
+                !validator.isLength(address.state, { min: config.limitations.Min_State_Length, max: config.limitations.Max_State_Length }) ||
+                !validator.isLength(address.country, { min: config.limitations.Min_Country_Length, max: config.limitations.Max_Country_Length }) ||
+                !validator.isLength(address.postal, { min: config.limitations.Min_Postal_Length, max: config.limitations.Max_Postal_Length })) {
+                return { valid: false, message: 'Invalid Length of Address information' };
+            }
+            // Validate existing address updates
+            if (address.message !== "add" && req.method !== "POST") {
+                const idValidation = validateGenericID(address.id, "address");
+                if (!idValidation.valid) return { valid: false, message: 'Invalid Address ID' };
+                try {
+                    // postgresql does not allow placeholders for column name itselfs, so use dynamic string instead
+                    const existingAddress = await db.oneOrNone(`SELECT * FROM public.addresses WHERE id = $1 AND created_by = $2 AND ${target} = $3`,
+                        [address.id, owner, id]);
+                    if (!existingAddress) {
+                        return { valid: false, message: 'Invalid ID of Address information' };
+                    }
+                }
+                catch (error) {
+                    return { valid: false, message: 'Invalid ID of Address information' };
+                }
+            }
+            // Validate address categories
+            if (address.category.length === 0 || address.category.length > config.limitations.MAX_ADDRESS_CATEGORY_LENGTH) {
+                return { valid: false, message: 'Invalid Address Category' };
+            }
+            for (let category of address.category) {
+                if (category !== "mail" && category !== "bill" && category !== "delivery&install") {
+                    return { valid: false, message: 'Invalid Address Category' };
+                }
+            }
+        }
+    }
+    return { valid: true };
+}
+
+async function validateClients(clients, owner, db) {
+    if (clients && clients.length > 0) {
+        for (const client of clients) {
+            if (!client || !client.id || typeof client.message !== "string" ||
+                (client.message !== "add" && client.message !== "delete")) {
+                return { valid: false, message: 'Incomplete Client information' };
+            }
+
+            // validate the existing client
+            const idValidation = validateGenericID(client.id, "client");
+            if (!idValidation.valid) return { valid: false, message: 'Invalid Client ID' };
+
+            try {
+                const existingClient = await db.oneOrNone(
+                    'SELECT * FROM public.clients WHERE id = $1::UUID AND created_by = $2',
+                    [client.id, owner]
+                );
+                if (!existingClient) {
+                    return { valid: false, message: 'Invalid Client ID' };
+                }
+            }
+            catch (error) {
+                return { valid: false, message: 'Invalid Client ID' };
+            }
+        }
+    }
     return { valid: true };
 }
 
 module.exports = {
+    validateAndPreProcessQuery,
     validateAddresses,
     validateEmail,
     validateName,
@@ -521,7 +731,5 @@ module.exports = {
     validateString,
     validatePricingThreshold,
     validateTableExistence,
-    validateColumnName,
-    validateSearchKey,
     validateToken
 };
