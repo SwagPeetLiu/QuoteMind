@@ -1,5 +1,5 @@
 const { TestEnvironment: NodeEnvironment }= require('jest-environment-node');
-const { getDBconnection } = require('./Configurator');
+const { getDBconnection, initialiseDBReferences } = require('./Configurator');
 const express = require('express');
 
 // class used to construct the testing application without network delays (i.e., superTest simulation)
@@ -10,11 +10,13 @@ class ExpressEnvironment extends NodeEnvironment {
     async setup() {
         await super.setup();
         const app = express();
+        
         // generla setups:
         app.use(express.static('public')); // keeping all the static files in the public folder
         app.use(express.urlencoded({ extended: false })); // tools for parsing the body of the request
         app.use(express.json());
         const db = getDBconnection();
+        const dbReferences = await initialiseDBReferences(db);
         const { AuthenticationLogger } = require('./AuthMiddleware');
 
         // Open endpoints set ups:
@@ -56,11 +58,12 @@ class ExpressEnvironment extends NodeEnvironment {
         const counterRouter = require('../Routes/counter/file')(db);
         app.use("/counter", counterRouter);
 
-        const searchRouter = require('../Routes/search/file')(db);
+        const searchRouter = require('../Routes/search/file')(db, dbReferences);
         app.use("/search", searchRouter);
 
         // initialise the portal that listences for requests
         this.global.testApp = app;
+        this.global.dbReferences = dbReferences;
     }
 
     async teardown() {

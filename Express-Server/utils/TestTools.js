@@ -1,12 +1,12 @@
 require('dotenv').config({
-    path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
+    path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.test'
 });
 const { getConfiguration } = require('../utils/Configurator');
 const config = getConfiguration();
 const request = require('supertest');
 
 // Objects to construct the testing cases:
-const validNewAddress =  {
+const validNewAddress = {
     message: "add",
     id: "new",
     street: "Test Street",
@@ -18,14 +18,14 @@ const validNewAddress =  {
 }
 
 const testObject = {
-    invalidEmailSuffix : "@g.com",
-    register : {
+    invalidEmailSuffix: "@g.com",
+    register: {
         validTestUsername: "test Express",
         validTestEmail: "testExpress@gmail.com",
         validTestPassword: "testPassword%586",
     },
-    client : {
-        validSearchObject : {
+    client: {
+        validSearchObject: {
             id: "eef39",
             full_name: "one",
             email: "one",
@@ -34,7 +34,7 @@ const testObject = {
             qq_contact: "7890",
             company: "glob"
         },
-        invalidSearchObject : {
+        invalidSearchObject: {
             id: "!@#$%^&*",
             full_name: "!@#$%^&*",
             email: "!7#$%^&*",
@@ -43,8 +43,8 @@ const testObject = {
             qq_contact: "@*(@#)98",
             company: "!@#$%^&*",
         },
-        validNewAddress : validNewAddress,
-        validTestingObject : {
+        validNewAddress: validNewAddress,
+        validTestingObject: {
             full_name: "Test Client",
             email: "test517@gmail.com",
             phone: "13910404215",
@@ -53,49 +53,49 @@ const testObject = {
             company: "", // to be assigned if needed
             addresses: [validNewAddress]
         },
-        updateTestingObject :{
+        updateTestingObject: {
             full_name: "Test Client Updated",
             email: "updated517@gmail.com",
             phone: "13910404216",
             wechat_contact: "updated-517",
             qq_contact: "129384518@qq.com",
             company: null, // test for removal of connections
-            addresses: [{...validNewAddress, message: "update"}, {...validNewAddress, message: "add"}]
+            addresses: [{ ...validNewAddress, message: "update" }, { ...validNewAddress, message: "add" }]
         }
     },
-    company : {
-        validSearchObject :{
+    company: {
+        validSearchObject: {
             id: "1e101",
             full_name: "glob",
             email: "1522",
             phone: "6789"
         },
-        invalidSearchObject : {
+        invalidSearchObject: {
             id: "!@#$%^&*",
             full_name: "!@#$%^&*",
             email: "!7#$%^&*",
             phone: "-&^6111111"
         },
-        validNewAddress : validNewAddress,
-        validTestingObject : {
+        validNewAddress: validNewAddress,
+        validTestingObject: {
             full_name: "Express Company",
             email: "test517@gmail.com",
             phone: "64370423",
             tax_number: "2214512342",
-            addresses : [validNewAddress],
+            addresses: [validNewAddress],
             clients: null
         },
-        updateTestingObject :{
+        updateTestingObject: {
             full_name: "Express Company Updated",
             email: "updated517@gmail.com",
             phone: "64370456",
             tax_number: "2214512983",
-            addresses: [{...validNewAddress, message: "delete"}, {...validNewAddress, message: "add"}], // testing the deletability of addresses
+            addresses: [{ ...validNewAddress, message: "delete" }, { ...validNewAddress, message: "add" }], // testing the deletability of addresses
             clients: null
         }
     },
-    employee:{
-        validSearchObject : {
+    employee: {
+        validSearchObject: {
             id: "dc450",
             name: "Jane",
             email: "smith",
@@ -104,7 +104,7 @@ const testObject = {
             phone: "6003",
             position: "Assembler"
         },
-        invalidSearchObject : {
+        invalidSearchObject: {
             id: "!@#$%^&*",
             name: "!@#$%^&*",
             email: "!7#$%^&*",
@@ -113,7 +113,7 @@ const testObject = {
             phone: "-&^6111111",
             position: "!@#,$%^&*"
         },
-        validTestingObject : {
+        validTestingObject: {
             name: "Express Employee",
             email: "test517@gmail.com",
             wechat_contact: "test517",
@@ -121,7 +121,7 @@ const testObject = {
             phone: "13400094005",
             position: "" // to be attached
         },
-        updateTestingObject : {
+        updateTestingObject: {
             name: "Express Employee Updated",
             email: "updated517@gmail.com",
             wechat_contact: "updated-517",
@@ -130,70 +130,70 @@ const testObject = {
             position: "" // to be attached
         }
     },
-    position : {
-        validSearchObject : {
+    position: {
+        validSearchObject: {
             id: "f330",
             name: "ins"
         },
-        invalidSearchObject : {
+        invalidSearchObject: {
             id: "!@#$%^&*",
             name: "!@#$%^&*"
         },
-        validTestingObject : {
+        validTestingObject: {
             name: "Express Position",
             descriptions: "Testing tools with descriptions"
         },
-        updateTestingObject : {
+        updateTestingObject: {
             name: "Express Position Updated",
             descriptions: "Testing updates with descriptions"
         }
     },
-    material : {
-        validSearchObject : {
-            id : "742d",
-            en_name : "X-ray",
-            ch_name : "相纸"
+    material: {
+        validSearchObject: {
+            id: "742d",
+            en_name: "X-ray",
+            ch_name: "相纸"
         },
-        invalidSearchObject : {
-            id : "!@#$%^&*",
-            en_name : "!@#$%^&*",
-            ch_name : "!@#$%^&*"
+        invalidSearchObject: {
+            id: "!@#$%^&*",
+            en_name: "!@#$%^&*",
+            ch_name: "!@#$%^&*"
         },
-        validTestingObject : {
+        validTestingObject: {
             en_name: "Express Material",
             ch_name: "Express 材料",
             descriptions: "Testing tools with descriptions"
         },
-        updateTestingObject : {
+        updateTestingObject: {
             en_name: "Express Material Updated",
             ch_name: "Express 材料更新",
             descriptions: "Testing updates with descriptions"
         }
     },
-    product : {
-        validSearchObject : {
+    product: {
+        validSearchObject: {
             id: "d5770",
             en_name: "seal",
             ch_name: "公章"
         },
-        invalidSearchObject : {
-            id : "!@#$%^&*",
-            en_name : "!@#$%^&*",
-            ch_name : "!@#$%^&*"
+        invalidSearchObject: {
+            id: "!@#$%^&*",
+            en_name: "!@#$%^&*",
+            ch_name: "!@#$%^&*"
         },
-        validTestingObject : { 
+        validTestingObject: {
             en_name: "Express Product",
             ch_name: "Express 产品",
             descriptions: "Testing tools with descriptions"
         },
-        updateTestingObject : {
+        updateTestingObject: {
             en_name: "Express Product Updated",
             ch_name: "Express 产品更新",
             descriptions: "Testing updates with descriptions"
         }
     },
-    pricing_condition : {
-        validSearchObject : {
+    pricing_condition: {
+        validSearchObject: {
             id: "2ad7",
             quantity: "250个", // allow searches by numbe & units
             size: "5", // allow searches by number
@@ -203,17 +203,17 @@ const testObject = {
             client: "two",
             company: "CUNTY"
         },
-        invalidSearchObject : {
-            id : "!@#$%^&*",
-            quantity : "9999",
-            size : "9999",
-            colour : "!@#$%^&*",
-            product : "!@#$%^&*",
-            materials : "!@#$%^&*",
-            client : "!@#$%^&*",
-            company : "!@#$%^&*"
+        invalidSearchObject: {
+            id: "!@#$%^&*",
+            quantity: "9999",
+            size: "9999",
+            colour: "!@#$%^&*",
+            product: "!@#$%^&*",
+            materials: "!@#$%^&*",
+            client: "!@#$%^&*",
+            company: "!@#$%^&*"
         },
-        validTestingObject : {
+        validTestingObject: {
             quantity: 500,
             quantity_unit: "个",
             size: 5,
@@ -225,7 +225,7 @@ const testObject = {
             company: null, // to be attached
             threshold: "gt"
         },
-        updateTestingObject : {
+        updateTestingObject: {
             quantity: 600,
             quantity_unit: "张",
             size: 10,
@@ -238,26 +238,26 @@ const testObject = {
             threshold: "lt"
         }
     },
-    pricing_rule : {
-        validSearchObject : {
+    pricing_rule: {
+        validSearchObject: {
             id: "c7a7c",
             price_per_unit: "50.1"
         },
-        invalidSearchObject : {
-            id : "!@#$%^&*",
-            price_per_unit : "999"
+        invalidSearchObject: {
+            id: "!@#$%^&*",
+            price_per_unit: "999"
         },
-        validTestingObject : {
+        validTestingObject: {
             price_per_unit: 95,
             conditions: null // to be attached
         },
-        updateTestingObject : {
+        updateTestingObject: {
             price_per_unit: 70,
             conditions: null // to be attached
         }
     },
-    transaction : {
-        validSearchObject : {
+    transaction: {
+        validSearchObject: {
             id: "dc572a6",
             status: "created",
             product: "展",
@@ -275,30 +275,30 @@ const testObject = {
             length: "6.6",
             size: "19.76square M"
         },
-        invalidSearchObject : {
-            id : "!@#$%^&*",
-            status : "!@#$%^&*",
-            product : "!@#$%^&*",
-            quantity : "999pas",
-            materials : "!@#$%^&*",
-            name : "!@#$%^&*",
-            price_per_unit : "999x",
-            amount : "999kg",
-            note : "!@#$%^&*",
-            colour : "!@#$%^&*",
-            company : "!@#$%^&*",
-            client : "!@#$%^&*",
-            width : "999.9xxxx",
-            height : "999.9px",
-            length : "999.9sss",
-            size : "999.9cm"
+        invalidSearchObject: {
+            id: "!@#$%^&*",
+            status: "!@#$%^&*",
+            product: "!@#$%^&*",
+            quantity: "999pas",
+            materials: "!@#$%^&*",
+            name: "!@#$%^&*",
+            price_per_unit: "999x",
+            amount: "999kg",
+            note: "!@#$%^&*",
+            colour: "!@#$%^&*",
+            company: "!@#$%^&*",
+            client: "!@#$%^&*",
+            width: "999.9xxxx",
+            height: "999.9px",
+            length: "999.9sss",
+            size: "999.9cm"
         },
-        validTestingObject : {
+        validTestingObject: {
             status: "created",
             name: "Express Transaction",
             transaction_date: null,
             product: null, // to be attached
-            quantity: 95, 
+            quantity: 95,
             materials: null, // to be attached
             price_per_unit: 1, // to be attached
             amount: 95,
@@ -307,8 +307,8 @@ const testObject = {
             company: null,
             client: null,
             width: 6.0,
-            height: 5, 
-            length: 2, 
+            height: 5,
+            length: 2,
             size: 60,
             en_unit: "m",
             ch_unit: "米",
@@ -316,12 +316,12 @@ const testObject = {
             quantity_unit: "个",
             addresses: null // to be attached
         },
-        updateTestingObject : {
+        updateTestingObject: {
             status: "quoted",
             name: "Express Transaction Updated",
             transaction_date: "2024-07-09T00:00:00.000Z",
             product: null, // to be attached
-            quantity: 113, 
+            quantity: 113,
             materials: null, // to be attached
             price_per_unit: 1, // to be attached
             amount: 113,
@@ -330,9 +330,9 @@ const testObject = {
             company: null,
             client: null,
             width: 6.0,
-            height: 5, 
-            length: 4, 
-            size: 120, 
+            height: 5,
+            length: 4,
+            size: 120,
             en_unit: "m",
             ch_unit: "米",
             size_unit: "平米总和",
@@ -341,44 +341,79 @@ const testObject = {
         }
     },
     profile: {
-        validTestingObject : {
+        validTestingObject: {
             email: process.env.TEST_EMAIL,
             username: "Test Account",
             password: process.env.TEST_PW
         },
-        updateTestingObject : {
+        updateTestingObject: {
             email: process.env.TEST_EMAIL,
             username: "Test Account updated",
             password: `${process.env.TEST_PW}test`
         }
     },
     counter: {
-        validSearchObject : config.counter.availableTargets,
-        invalidSearchObject : config.counter.forbiddenTargets
+        validSearchObject: config.counter.availableTargets,
+        invalidSearchObject: config.counter.forbiddenTargets
+    },
+    search: {
+        defaultStructure: {
+            searchQuery: {
+                fields: "default",
+                whereClause: null,
+                groupByClause: null,
+                orderByClause: null
+            },
+            page: null
+        }
     }
 }
 
 // object to test the user input
 const invalidTestingRange = {
-    invalidSearchTargets: {
-        "invalid target" : "invalid target",
-        "forbidden target" : process.env.FORBIDDEN_SEARCH_TARGET,
-        "missing target" : undefined,
-        "empty target" : ""
+    incompleteFields: {
+        "missing target": {
+            specification: "default",
+            as: null
+        },
+        "missing specification": {
+            target: "id",
+            as: null
+        },
+        "missing as alias": {
+            target: "id",
+            specification: "default",
+        },
+        "missing as where specification is not default": {
+            target: "id",
+            specification: "TEXT",
+            as: null
+        }
     },
-    invalidSearchKeywords : {
-        "missing keyword" : undefined,
-        "empty keyword" : "",
+    incompleteWhereClause:{
+        "missing target":{
+            specification: "default"
+        }
+    },
+    invalidSearchTargets: {
+        "invalid target": "invalid target",
+        "forbidden target": process.env.FORBIDDEN_SEARCH_TARGET,
+        "missing target": undefined,
+        "empty target": ""
+    },
+    invalidSearchKeywords: {
+        "missing keyword": undefined,
+        "empty keyword": "",
     },
     page: {
         "invalid value": "test",
         "negative": -1,
         "zero": 0
     },
-    invalidCounterTargets : {
-        "invalid target" : "invalid target",
-        "forbidden counter target": testObject.counter.invalidSearchObject[0],
-        "missing target" : undefined
+    invalidCounterTargets: {
+        "invalid target": "invalid target",
+        "forbidden table name": testObject.counter.invalidSearchObject[0],
+        "missing target": undefined
     },
     email: {
         "invalid value": "!@#$%^&*",
@@ -388,25 +423,25 @@ const invalidTestingRange = {
         "unmatching email": process.env.ANOTHER_EMAIL
     },
     phone: {
-        "invalid format" : "!@#$%^&*",
+        "invalid format": "!@#$%^&*",
         "invalid type": 1,
-        "too short" : `${"1".repeat(config.limitations.Min_Phone_Length - 1)}`,
-        "too long" : `${"1".repeat(config.limitations.Max_Phone_Length + 1)}`,
+        "too short": `${"1".repeat(config.limitations.Min_Phone_Length - 1)}`,
+        "too long": `${"1".repeat(config.limitations.Max_Phone_Length + 1)}`,
     },
     wechat_contact: {
-        "invalid format" : "!@#$%^&*",
+        "invalid format": "!@#$%^&*",
         "invalid type": 1,
-        "too short" : `${"t".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
-        "too long" : `${"t".repeat(config.limitations.Max_Social_Contact_Length + 1)}`,
+        "too short": `${"t".repeat(config.limitations.Min_Social_Contact_Length - 1)}`,
+        "too long": `${"t".repeat(config.limitations.Max_Social_Contact_Length + 1)}`,
     },
     qq_contact: {
-        "invalid format" : "1324sa32",
+        "invalid format": "1324sa32",
         "invalid type": 1,
-        "too short" : "1@qq.com",
-        "too long" : `${"1".repeat(config.limitations.Max_Social_Contact_Length + 1)}@qq.com`,
+        "too short": "1@qq.com",
+        "too long": `${"1".repeat(config.limitations.Max_Social_Contact_Length + 1)}@qq.com`,
     },
     company: {
-        "non-UUID" : "1324sa32",
+        "non-UUID": "1324sa32",
         "invalid type": 1,
         "non-existing UUID": "e3f1d8d8-0581-48ea-a80b-82b5b3a8f10f" // randomly formatted string
     },
@@ -420,49 +455,49 @@ const invalidTestingRange = {
         "non-UUID": "string",
         "non-existing UUID": "e3f1d8d8-0581-48ea-a80b-82b5b3a8f10f"
     },
-    addresses : {
+    addresses: {
         "invalid type": "string",
         "invalid value": [1],
 
-        "missing street": [{...validNewAddress, street: undefined}],
-        "street name is invalid type": [{...validNewAddress, street: 1}],
-        "street name is too short": [{...validNewAddress, street: `${"t".repeat(config.limitations.Min_Address_Length - 1)}`}],
-        "street name is too long": [{...validNewAddress, street: `${"t".repeat(config.limitations.Max_Address_Length + 1)}`}],
+        "missing street": [{ ...validNewAddress, street: undefined }],
+        "street name is invalid type": [{ ...validNewAddress, street: 1 }],
+        "street name is too short": [{ ...validNewAddress, street: `${"t".repeat(config.limitations.Min_Address_Length - 1)}` }],
+        "street name is too long": [{ ...validNewAddress, street: `${"t".repeat(config.limitations.Max_Address_Length + 1)}` }],
 
-        "missing city": [{...validNewAddress, city: undefined}],
-        "city name is invalid type": [{...validNewAddress, city: 1}],
-        "city name is too short": [{...validNewAddress, city: `${"t".repeat(config.limitations.Min_City_Length - 1)}`}],
-        "city name is too long": [{...validNewAddress, city: `${"t".repeat(config.limitations.Max_City_Length + 1)}`}],
+        "missing city": [{ ...validNewAddress, city: undefined }],
+        "city name is invalid type": [{ ...validNewAddress, city: 1 }],
+        "city name is too short": [{ ...validNewAddress, city: `${"t".repeat(config.limitations.Min_City_Length - 1)}` }],
+        "city name is too long": [{ ...validNewAddress, city: `${"t".repeat(config.limitations.Max_City_Length + 1)}` }],
 
-        "missing state": [{...validNewAddress, state: undefined}],
-        "state name is invalid type": [{...validNewAddress, state: 1}],
-        "state name is too short": [{...validNewAddress, state: `${"t".repeat(config.limitations.Min_State_Length - 1)}`}],
-        "state name is too long": [{...validNewAddress, state: `${"t".repeat(config.limitations.Max_State_Length + 1)}`}],
+        "missing state": [{ ...validNewAddress, state: undefined }],
+        "state name is invalid type": [{ ...validNewAddress, state: 1 }],
+        "state name is too short": [{ ...validNewAddress, state: `${"t".repeat(config.limitations.Min_State_Length - 1)}` }],
+        "state name is too long": [{ ...validNewAddress, state: `${"t".repeat(config.limitations.Max_State_Length + 1)}` }],
 
-        "missing country": [{...validNewAddress, country: undefined}],
-        "country name is invalid type": [{...validNewAddress, country: 1}],
-        "country name is too short": [{...validNewAddress, country: `${"t".repeat(config.limitations.Min_Country_Length - 1)}`}],
-        "country name is too long": [{...validNewAddress, country: `${"t".repeat(config.limitations.Max_Country_Length + 1)}`}],
+        "missing country": [{ ...validNewAddress, country: undefined }],
+        "country name is invalid type": [{ ...validNewAddress, country: 1 }],
+        "country name is too short": [{ ...validNewAddress, country: `${"t".repeat(config.limitations.Min_Country_Length - 1)}` }],
+        "country name is too long": [{ ...validNewAddress, country: `${"t".repeat(config.limitations.Max_Country_Length + 1)}` }],
 
-        "missing postal": [{...validNewAddress, postal: undefined}],
-        "postal code is invalid type": [{...validNewAddress, postal: 1}],
-        "postal code is too short": [{...validNewAddress, postal: `${"t".repeat(config.limitations.Min_Postal_Length - 1)}`}],
-        "postal code is too long": [{...validNewAddress, postal: `${"t".repeat(config.limitations.Max_Postal_Length + 1)}`}],
+        "missing postal": [{ ...validNewAddress, postal: undefined }],
+        "postal code is invalid type": [{ ...validNewAddress, postal: 1 }],
+        "postal code is too short": [{ ...validNewAddress, postal: `${"t".repeat(config.limitations.Min_Postal_Length - 1)}` }],
+        "postal code is too long": [{ ...validNewAddress, postal: `${"t".repeat(config.limitations.Max_Postal_Length + 1)}` }],
 
-        "missing category": [{...validNewAddress, category: undefined}],
-        "category is invalid value": [{...validNewAddress, category: ["invalid category"]}],
-        "category is invalid type": [{...validNewAddress, category: [1]}],
-        "category is empty": [{...validNewAddress, category: []}],
-        "category is invalid type (non-array)": [{...validNewAddress, category: "invalid category"}]
+        "missing category": [{ ...validNewAddress, category: undefined }],
+        "category is invalid value": [{ ...validNewAddress, category: ["invalid category"] }],
+        "category is invalid type": [{ ...validNewAddress, category: [1] }],
+        "category is empty": [{ ...validNewAddress, category: [] }],
+        "category is invalid type (non-array)": [{ ...validNewAddress, category: "invalid category" }]
     },
-    password:{
+    password: {
         "empty string": "",
         "invalid credential": "!@#$%^&*",
         "invalid type": 1,
         "less than minimum": `${"t".repeat(config.limitations.Min_Password_Length - 1)}`,
         "too long": `${"t".repeat(config.limitations.Max_Password_Length + 1)}`
     },
-    loggOutToken:{
+    loggOutToken: {
         "empty string": "",
         "invalid type": 1,
         "missing": undefined,
@@ -470,11 +505,11 @@ const invalidTestingRange = {
     full_name: {
         "invalid type": 1,
         "invalid input": "!@#$%^&*",
-        "empty" : "",
-        "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
+        "empty": "",
+        "too long": `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
         "missing": undefined
     },
-    tax_number : {
+    tax_number: {
         "invalid format": "!@#$%^&*",
         "too short": `${"1".repeat(config.limitations.Min_Tax_Length - 1)}`,
         "too long": `${"1".repeat(config.limitations.Max_Tax_Length + 1)}`,
@@ -518,17 +553,17 @@ const invalidTestingRange = {
         "invalid value": "!@#$%^&*",
         "too long": `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
     },
-    width:{
+    width: {
         "invalid type": "x t4st",
         "negative": -1,
         "large value": 123456789015.1256
     },
-    height:{
+    height: {
         "invalid type": "x t4st",
         "negative": -1,
         "large value": 123456789015.1256
     },
-    length:{
+    length: {
         "invalid type": "x t4st",
         "negative": -1,
         "large value": 123456789015.1256
@@ -571,19 +606,19 @@ const invalidTestingRange = {
         "missing": undefined,
         "invalid-UUID": ["e3f1d8d8-0581-48ea-a80b-82b5b3a8f10f"]
     },
-    en_name : {
-        "missing" : undefined,
-        "empty" : "",
-        "too long" : `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-        "invalid type" : 1
+    en_name: {
+        "missing": undefined,
+        "empty": "",
+        "too long": `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
+        "invalid type": 1
     },
-    ch_name : {
-        "missing" : undefined,
-        "empty" : "",
-        "too long" : `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
-        "invalid type" : 1
+    ch_name: {
+        "missing": undefined,
+        "empty": "",
+        "too long": `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
+        "invalid type": 1
     },
-    descriptions : {
+    descriptions: {
         "too long": `${"测".repeat(config.limitations.Max_Descriptions_Length + 1)}`,
         "invalid type": 1
     },
@@ -626,7 +661,7 @@ function isClientValid(client) {
 function isAssociatedClientValid(client) {
     if ('id' in client &&
         'full_name' in client
-    ){
+    ) {
         return true;
     }
     return false
@@ -658,7 +693,7 @@ function isCompanyValid(company) { // record in the general listing
 function isAssociatedCompanyValid(company) { // records in the associated route
     if ('id' in company &&
         'full_name' in company
-    ){
+    ) {
         return true;
     }
     return false
@@ -704,12 +739,12 @@ function isEmployeeValid(employee) {
 function isAssociatedEmployeeValid(employee) {
     if ('id' in employee &&
         'name' in employee
-    ){
+    ) {
         return true;
     }
     return false
 }
-function isSpecificEmployeeValid(employee){
+function isSpecificEmployeeValid(employee) {
     if ('id' in employee &&
         'name' in employee &&
         'email' in employee &&
@@ -721,7 +756,7 @@ function isSpecificEmployeeValid(employee){
         if ('id' in employee.position &&
             'name' in employee.position &&
             'descriptions' in employee.position
-        ){
+        ) {
             return true;
         }
     }
@@ -741,7 +776,7 @@ function isMaterialValid(material) {
     if ('id' in material &&
         'en_name' in material &&
         'ch_name' in material
-    ){
+    ) {
         return true;
     }
     return false;
@@ -751,7 +786,7 @@ function isSpecificMaterialValid(material) {
         'en_name' in material &&
         'ch_name' in material &&
         'descriptions' in material
-    ){
+    ) {
         return true;
     }
     return false;
@@ -760,7 +795,7 @@ function isProductValid(product) {
     if ('id' in product &&
         'en_name' in product &&
         'ch_name' in product
-    ){
+    ) {
         return true;
     }
     return false;
@@ -770,7 +805,7 @@ function isSpecificProductValid(product) {
         'en_name' in product &&
         'ch_name' in product &&
         'descriptions' in product
-    ){
+    ) {
         return true;
     }
     return false;
@@ -785,19 +820,19 @@ function isConditionValid(condition) {
         'threshold' in condition &&
         'product' in condition &&
         'materials' in condition &&
-        'client' in condition && 
+        'client' in condition &&
         'company' in condition
-    ){
+    ) {
         // validate asociations
         const isPValid = isProductValid(condition.product);
-        const isMValid = condition.materials? isMaterialValid(condition.materials[0]) : true;
-        const isCValid = condition.client? isAssociatedClientValid(condition.client) : true;
-        const isCOValid = condition.company? isAssociatedCompanyValid(condition.company) : true;
+        const isMValid = condition.materials ? isMaterialValid(condition.materials[0]) : true;
+        const isCValid = condition.client ? isAssociatedClientValid(condition.client) : true;
+        const isCOValid = condition.company ? isAssociatedCompanyValid(condition.company) : true;
 
-        if (isPValid && 
-            isMValid && 
-            isCValid && 
-            isCOValid){
+        if (isPValid &&
+            isMValid &&
+            isCValid &&
+            isCOValid) {
             return true;
         }
     }
@@ -806,7 +841,7 @@ function isConditionValid(condition) {
 
 function isRuleValid(rule) {
     if ('id' in rule &&
-        'price_per_unit' in rule){
+        'price_per_unit' in rule) {
         const isValidCondition = isConditionValid(rule.conditions[0]);
         if (isValidCondition) return true;
     }
@@ -838,46 +873,56 @@ function isTransactionValid(transaction, granularity) {
         'product' in transaction &&
         'company' in transaction &&
         'client' in transaction
-    ){
-        const isassociatedMaterialValid = transaction.materials? isMaterialValid(transaction.materials[0]) : true;
-        const isassociatedProductValid = transaction.product? isProductValid(transaction.product) : true;
+    ) {
+        const isassociatedMaterialValid = transaction.materials ? isMaterialValid(transaction.materials[0]) : true;
+        const isassociatedProductValid = transaction.product ? isProductValid(transaction.product) : true;
         const isassociatedClientValid = (transaction.client && typeof transaction.client !== 'string') ? isAssociatedClientValid(transaction.client) : true;
         const isassociatedCompanyValid = (transaction.company && typeof transaction.company !== 'string') ? isAssociatedCompanyValid(transaction.company) : true;
-        function isAddressValid(){
-            if ('addresses' in transaction){
-                return transaction.addresses? isSpecificAddressValid(transaction.addresses[0]) : true;
+        function isAddressValid() {
+            if ('addresses' in transaction) {
+                return transaction.addresses ? isSpecificAddressValid(transaction.addresses[0]) : true;
             }
             return true;
         };
         function isEmployeeValid() {
-            if ('employee' in transaction){
-                return transaction.employee? isAssociatedEmployeeValid(transaction.employee[0]) : true;
+            if ('employee' in transaction) {
+                return transaction.employee ? isAssociatedEmployeeValid(transaction.employee[0]) : true;
             }
             return true;
         };
-        if (isassociatedMaterialValid && 
-            isassociatedProductValid && 
-            isassociatedClientValid && 
+        if (isassociatedMaterialValid &&
+            isassociatedProductValid &&
+            isassociatedClientValid &&
             isassociatedCompanyValid &&
             isAddressValid() &&
-            isEmployeeValid())
-        {
+            isEmployeeValid()) {
             return true;
         }
         return false;
     }
     return false;
 }
+
 function isSearchTargetValid(targets) {
     if (!Array.isArray(targets)) return false;
+    if (targets.length === 0) return false;
     for (const target of targets) {
-        if (!("target" in target) || !("type" in target)) return false;
-        if (config.search.forbiddenTargets.includes(target.target.toLowerCase())) return false;
+        if (!("table" in target) || (!"column" in target) || !("type" in target)) return false;
+
+        // cannot contain forbidden columns:
+        if (config.search.forbiddenTargets.includes(target.column.toLowerCase())) return false;
+
+        // cannot contain forbidden tables:
+        if (config.counter.forbiddenTargets.includes(target.table.toLowerCase())) return false;
     }
     return true;
 }
 
-// utility functions
+/*
+* ============================================================================================
+* Utility Sections
+* ============================================================================================
+*/
 function getFutureDate(daysInFuture) {
     const now = new Date();
     now.setDate(now.getDate() + daysInFuture);
@@ -893,80 +938,118 @@ function getFutureDate(daysInFuture) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
 }
 
+// function used to generate a functional field
+function getTestAlias(reference) {
+    if (reference.type === "timestamp with time zone") {
+        return {
+            target: reference.column,
+            specification: "MONTH",
+            as: "test"
+        }
+    }
+    if (reference.type.includes("character") || reference.type === "uuid" || reference.type === "USER-DEFINED") {
+        return {
+            target: reference.column,
+            specification: "TEXT",
+            as: "test"
+        }
+    }
+    if (reference.type === "ARRAY") {
+        return {
+            target: reference.column,
+            specification: "ARRAY_DIMS",
+            as: "test"
+        }
+    }
+    if (reference.type === "numeric" || reference.type === "integer") {
+        return {
+            target: reference.column,
+            specification: "ABS",
+            as: "test"
+        }
+    }
+    return {
+        target: reference.column,
+        specification: "TEXT",
+        as: "test"
+    }
+}
 
 /**
+ * ============================================================================================
  * Section of functions used to manage the valid testing cases 
+ * ============================================================================================
  */
-async function getTestSession(app){
+async function getTestSession(app) {
     const response = await request(app).post('/auth').send({
         email: process.env.TEST_EMAIL,
         password: process.env.TEST_PW
     });
     return response.body.session;
 }
-async function getTestCompany(app, session){
+async function getTestCompany(app, session) {
     const response = await request(app)
         .get('/companies')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.companies[0];
 }
-async function getTestSpecificCompany(app, session, id){
+async function getTestSpecificCompany(app, session, id) {
     const response = await request(app)
         .get(`/companies/${id}`)
         .set('session-token', session);
     return response.body.company;
 }
-async function getTestClient(app, session){
+async function getTestClient(app, session) {
     const response = await request(app)
         .get('/clients')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.clients[0];
 }
-async function getTestEmployee(app, session){
+async function getTestEmployee(app, session) {
     const response = await request(app)
         .get('/employees')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.employees[0];
 }
-async function getTestPosition(app, session){ 
+async function getTestPosition(app, session) {
     const response = await request(app)
         .get('/positions')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.positions[0];
 }
-async function getTestMaterial(app, session){
+async function getTestMaterial(app, session) {
     const response = await request(app)
         .get('/materials')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.materials[0];
 }
-async function getTestProduct(app, session){
+async function getTestProduct(app, session) {
     const response = await request(app)
         .get('/products')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.products[0];
 }
-async function getTestPricingCondition(app, session){
+async function getTestPricingCondition(app, session) {
     const response = await request(app)
         .get('/pricings/conditions')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.pricing_conditions[0];
 }
-async function getTestPricingRule(app, session){
+async function getTestPricingRule(app, session) {
     const response = await request(app)
         .get('/pricings/rules')
         .set('session-token', session)
         .query({ page: 1 });
     return response.body.pricing_rules[0];
 }
-async function getTestTransaction(app, session){
+async function getTestTransaction(app, session) {
     const response = await request(app)
         .get('/transactions')
         .set('session-token', session)
@@ -1004,5 +1087,6 @@ module.exports = {
     isConditionValid,
     isRuleValid,
     isTransactionValid,
-    isSearchTargetValid
+    isSearchTargetValid,
+    getTestAlias,
 }

@@ -12,30 +12,31 @@ const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u; // Regular expression to check f
  * Section used to validate the db References & preprocess them:
  * ==============================================================================
 */
-function validateAndPreProcessQuery(body, tableName, dbReferences){
+function validateAndPreProcessQuery(body, tableName, dbReferences) {
+    if (!('searchQuery' in body) || !('page' in body)) return { valid: false, message: "missing query object" };
     let { searchQuery, page } = body;
 
-    // obtaining the references for such querying table
-    const references = dbReferences.filter(reference => reference.table === tableName);
-    if (references.length === 0) return { valid: false, message: "unsupported tableName"};
-
     // validating page:
-    if (page){
-        const pageValidation = validateInteger(page, "page number");
-        if (!pageValidation.valid) return pageValidation;
-    }
+    if ("page")
+        if (page) {
+            const pageValidation = validateInteger(page, "page number");
+            if (!pageValidation.valid) return pageValidation;
+        }
 
     // validate the query itself:
     if (!searchQuery || typeof searchQuery !== "object") return { valid: false, message: "invalid query object" };
 
     // validating the querying fields:
-    if ((!'fields' in searchQuery) || (searchQuery.fields !== "default" && !Array.isArray(searchQuery.fields))){
+    // obtaining the references for such querying table
+    const references = dbReferences.filter(reference => reference.table === tableName);
+    if (references.length === 0) return { valid: false, message: "unsupported tableName" };
+    if (!('fields' in searchQuery) || (searchQuery.fields !== "default" && !Array.isArray(searchQuery.fields))) {
         return { valid: false, message: "invalid query fields" };
     }
-    if (Array.isArray(searchQuery.fields)){
+    if (Array.isArray(searchQuery.fields)) {
         if (searchQuery.fields.length === 0) return { valid: false, message: "empty query fields" };
         let mappedFields = [];
-        for (const field of searchQuery.fields){
+        for (const field of searchQuery.fields) {
             const validation = validateField(field, references);
             if (!validation.valid) return validation;
             mappedFields.push({ ...field, type: validation.type });
@@ -44,24 +45,24 @@ function validateAndPreProcessQuery(body, tableName, dbReferences){
     }
 
     // validating the whereClause:
-    if (!'whereClause' in searchQuery || (searchQuery.whereClause != null && typeof searchQuery.whereClause !== "object")){
+    if (!('whereClause' in searchQuery) || (searchQuery.whereClause != null && typeof searchQuery.whereClause !== "object")) {
         return { valid: false, message: "invalid whereClause" };
     }
-    if (searchQuery.whereClause){
+    if (searchQuery.whereClause) {
         const validatedClause = validateWhereClause(searchQuery.whereClause, references);
         if (!validatedClause) return { valid: false, message: "invalid whereClause" };
         searchQuery = { ...searchQuery, whereClause: validatedClause };
     }
 
     // validating the groupByClause:
-    if (!'groupByClause' in searchQuery || 
-        (searchQuery.groupByClause != null && !Array.isArray(searchQuery.groupByClause))){
+    if (!('groupByClause' in searchQuery) ||
+        (searchQuery.groupByClause != null && !Array.isArray(searchQuery.groupByClause))) {
         return { valid: false, message: "invalid groupByClause" };
     }
-    if (Array.isArray(searchQuery.groupByClause)){
+    if (Array.isArray(searchQuery.groupByClause)) {
         if (searchQuery.groupByClause.length === 0) return { valid: false, message: "empty groupByClause" };
         let mappedGroupByClauses = [];
-        for (const clause of searchQuery.groupByClause){
+        for (const clause of searchQuery.groupByClause) {
             const validation = validateGroupByClause(clause, references, searchQuery.fields);
             if (!validation.valid) return validation;
             mappedGroupByClauses.push({ ...clause, type: validation.type });
@@ -70,21 +71,20 @@ function validateAndPreProcessQuery(body, tableName, dbReferences){
     }
 
     // validating the Order BY Clause
-    if (!'orderByClause' in searchQuery || 
-        (searchQuery.orderByClause != null && !Array.isArray(searchQuery.orderByClause))){
+    if (!('orderByClause' in searchQuery) ||
+        (searchQuery.orderByClause != null && !Array.isArray(searchQuery.orderByClause))) {
         return { valid: false, message: "invalid orderByClause" };
     }
-    if (Array.isArray(searchQuery.orderByClause)){
+    if (Array.isArray(searchQuery.orderByClause)) {
         if (searchQuery.orderByClause.length === 0) return { valid: false, message: "empty orderByClause" };
         let mappedOrderByClauses = [];
-        for (const clause of searchQuery.orderByClause){
-            const validation = validateOrderByClause(clause, references, searchQuery.fields);
+        for (const clause of searchQuery.orderByClause) {
+            const validation = validateOrderByClause(clause, references);
             if (!validation.valid) return validation;
             mappedOrderByClauses.push({ ...clause, type: validation.type });
         }
         searchQuery = { ...searchQuery, orderByClause: mappedOrderByClauses };
     }
-    console.log(searchQuery);
     return { valid: true, searchQuery: searchQuery };
 }
 
@@ -92,10 +92,10 @@ function validateAndPreProcessQuery(body, tableName, dbReferences){
 function validateTableExistence(tableName, dbReferences) {
     try {
         const tableNames = dbReferences.map(reference => reference.table);
-        if (tableNames.includes(tableName)){
+        if (tableNames.includes(tableName)) {
             return { valid: true };
         }
-        else{
+        else {
             return { valid: false, message: `Table does not exist` };
         }
     } catch (error) {
@@ -105,17 +105,20 @@ function validateTableExistence(tableName, dbReferences) {
 
 // validate the fields of the query (references are from this table specifically)
 function validateField(field, references) {
-    if (!'target' in field || !'specification' in field || !'as' in field){
+    if (!('target' in field) || !('specification' in field) || !('as' in field)) {
         return { valid: false, message: "invalid query fields" };
     }
     const validations = [validateName(field.target), validateName(field.specification), validateString(field.as)];
-    if (validations.some(validation => !validation.valid)){
+    if (validations.some(validation => !validation.valid)) {
         return { valid: false, message: "invalid query fields" };
+    }
+    if (field.specification === "default" && !field.as) {
+        return { valid: false, type: "invalid alias for functional or aggregated field" };
     }
 
     // Using a for...of loop instead of forEach
     for (const ref of references) {
-        if (ref.column === field.target){
+        if (ref.column === field.target) {
             return { valid: true, type: ref.type };
         }
     }
@@ -137,7 +140,7 @@ function validateWhereClause(whereClause, references) {
         return null;
     }
     // if clause on the comparison level
-    else if (Array.isArray(whereClause)) {
+    else if (Array.isArray(whereClause) && !(keys[0] == "AND" || keys[0] == "OR")) {
         const validatedClauses = whereClause.map(clause => validateWhereClause(clause, references));
         if (validatedClauses.every(clause => clause !== null)) {
             return validatedClauses;
@@ -160,16 +163,45 @@ function validateWhereClause(whereClause, references) {
     }
 }
 
-// validate single where clause:
+// validate single where clause (type is either the degault DB property type or the transformation type)
 function validateSingleWhereClause(whereClause, references) {
     // validate the existence of the key properties
-    const { target, operator, keyword } = whereClause;
-    if (!target || !operator || !keyword) return { valid: false , message: "invalid whereClause" };
+    if (!('target' in whereClause) || !('operator' in whereClause) || !('keyword' in whereClause)
+        || !('specification' in whereClause) || !('transformType' in whereClause)) {
+        return { valid: false, message: "invalid whereClause" };
+    }
+    const { target, operator, keyword, specification, transformType } = whereClause;
+    
+    // cannot miss bacis informations (except transformType)
+    if (!target || !operator || !keyword || !specification) {
+        return { valid: false, message: "invalid whereClause (cannot miss essential info)" };
+    }
+    // validate the type of the strings
+    const stringValidations = [
+        validateName(target), 
+        validateName(operator), 
+        validateName(keyword),
+        validateName(specification), 
+        validateString(transformType),
+    ];
+    if (stringValidations.some(validation => !validation.valid)) return { valid: false, message: "invalid whereClause" };
+
+    // validate attched specification & transformType
+    if (specification !== "default") {
+        if (!transformType) return { valid: false, message: "invalid functional whereClause" };
+        if (!validateFunctions(specification).valid) return { valid: false, message: "invalid functional whereClause" };
+
+        const transValidation = validateTransformation(specification, transformType);
+        if (!transValidation.valid) return { valid: false, message: "invalid functional whereClause" };
+    }
 
     // attaching the type refrences and validate the search keywords:
-    const type = references.find(reference => reference.column == target).type;
+    let type = references.find(reference => reference.column == target).type;
     if (!type) return { valid: false, message: "invalid whereClause" };
-
+    if (specification !== "default"){
+        type = transformType;
+    }
+    
     // operater must be a string (and valid)
     const operatorValidation = validateName(operator);
     if (!operatorValidation.valid) return { valid: false, message: "invalid operator" };
@@ -202,8 +234,8 @@ function validateSingleWhereClause(whereClause, references) {
 }
 
 // function used to validate single group by clause:
-function validateGroupByClause(clause, references, fields){
-    
+function validateGroupByClause(clause, references, fields) {
+
     // validate user specific inputs:
     if (!'target' in clause || !'specification' in clause) {
         return { valid: false, message: "invalid group by clause" };
@@ -218,15 +250,15 @@ function validateGroupByClause(clause, references, fields){
 
     // validating the group by clauses available:
     const matchedDefault = references.find(reference => reference.column == target);
-    const isDefaultReference = matchedDefault? matchedDefault.type: null;
+    const isDefaultReference = matchedDefault ? matchedDefault.type : null;
 
     // validating the group
     if (!isDefaultReference) return { valid: false, message: "invalid group by clause" };
-    return { valid: true, type: isDefaultReference};
+    return { valid: true, type: isDefaultReference };
 }
 
 // function used to validate single order by clause:
-function validateOrderByClause(clause, references, fields){
+function validateOrderByClause(clause, references) {
 
     // validate user specific inputs:
     if (!'target' in clause || !'specification' in clause || !'order' in clause) {
@@ -243,11 +275,11 @@ function validateOrderByClause(clause, references, fields){
 
     // validating the group by clauses available:
     const matchedDefault = references.find(reference => reference.column == target);
-    const isDefaultReference = matchedDefault? matchedDefault.type: null;
+    const isDefaultReference = matchedDefault ? matchedDefault.type : null;
 
     // validating the group
     if (!isDefaultReference) return { valid: false, message: "invalid group by clause" };
-    return { valid: true, type: isDefaultReference};
+    return { valid: true, type: isDefaultReference };
 }
 
 
@@ -390,7 +422,7 @@ function validateSocialContacts(contacts, target) {
             if (!qqRegex.test(accountid)) {
                 return { valid: false, message: `invalid ${target} contact` };
             }
-            if (accountid.length < config.limitations.Min_Social_Contact_Length){
+            if (accountid.length < config.limitations.Min_Social_Contact_Length) {
                 return { valid: false, message: `invalid ${target} contact` };
             }
         }
@@ -458,7 +490,7 @@ function validateNumeric(value, target) {
         if (typeof value !== "number") {
             return { valid: false, message: `invalid ${target}` };
         }
-        if (value <= 0) return { valid: false, message: `invalid ${target}` }; 
+        if (value <= 0) return { valid: false, message: `invalid ${target}` };
         const regex = /^\d{1,10}(\.\d{1,2})?$/;
         if (!regex.test(value.toString())) {
             return { valid: false, message: `invalid ${target}` };
@@ -480,7 +512,7 @@ function validateTransactionStatus(status) {
     return { valid: true };
 }
 
-function validateTransactionDate(date){
+function validateTransactionDate(date) {
     if (date) {
         if (typeof date !== "string") {
             return { valid: false, message: 'Invalid Transaction Date' };
@@ -552,7 +584,7 @@ function validateFunctions(specification) {
         // String Functions
         "CONCAT", "SUBSTRING", "LOWER", "UPPER", "TRIM", "LENGTH",
         // Date Functions
-        "DATE", "YEAR", "MONTH", "DAY", 
+        "DATE", "YEAR", "MONTH", "DAY",
         // Numeric Functions
         "ABS", "ROUND", "FLOOR", "CEILING",
         // Conditional Functions
@@ -562,11 +594,27 @@ function validateFunctions(specification) {
         // Window Functions
         "ROW_NUMBER", "RANK", "DENSE_RANK", "LEAD", "LAG",
         // Other Common Functions
-        "DISTINCT", "GROUP_CONCAT"
+        "DISTINCT", "GROUP_CONCAT",
+        // testing generial functions:
+        "ARRAY_DIMS", "TEXT",
     ];
-    if (!functionList.includes(specification)) 
+    if (!functionList.includes(specification))
         return { valid: false, message: 'Invalid Function' };
+
+    return { valid: true };
+}
+
+function validateTransformation(specification, transformType){
+    const integerTransformations = ["COUNT", "YEAR", "MONTH", "DAY", "LENGTH", "ROW_NUMBER", "RANK", "DENSE_RANK"];
+    const numericTransformations = ["SUM", "AVG", "ABS", "ROUND", "FLOOR", "CEILING"];
+    const stringTransformations = ["CONCAT", "SUBSTRING", "LOWER", "UPPER", "TRIM", "GROUP_CONCAT", "TEXT"];
+    const dateTransformations = ["DATE"];
     
+    if (transformType !== "numeric" && numericTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "integer" && integerTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "string" && stringTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "date" && dateTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "numeric" && transformType !== "integer" && transformType !== "string" && transformType !== "date") return { valid: false, message: 'Invalid Function' };
     return { valid: true };
 }
 

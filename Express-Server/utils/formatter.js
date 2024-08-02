@@ -22,34 +22,36 @@ function generateQuery(query, table, page, owner) {
     else{
         result.query += ` ${mapSpecifiedQueryColumns(table, query.fields)}`;
     }
-    console.log("added fields",result);
+    //console.log("added fields",result);
 
     // Attaching the From clause:
     result.query += ` ${mapFromClause(table)}`;
-    console.log("added from clause", result);
+    //console.log("added from clause", result);
 
     // attaching the where clause:
+    //console.log("where clause =========", query.whereClause);
     result.query += ` WHERE ${mapQueryPrefix(table)}.created_by = $${result.parameters.length + 1}`;
     result.parameters.push(owner);
     result.query += `${query.whereClause ? mapWhereClause(table, query.whereClause, result) : ""}`;
+    //console.log("added where clause", result);
 
     // attaching the group by clause:
     result.query += `${mapGroupByClause(table, query)}`;
-    console.log(result);
+    //console.log("added groupby clause",result);
 
     // attaching the order by clause:
     result.query += ` ${mapOrderByClause(table, query)}`;
-    console.log(result);
+    //console.log(result);
 
     // attach the page limits, as well as another (using a nested query structure to ensure the 
     // count is accurate & representing the criteria of the group by clauses):
     if (!page) {
         page = 1;
         countQuery.query += `${mapCountQuery(table, query, owner, countQuery)}`;
-        console.log("count query", countQuery);
+        //console.log("count query", countQuery);
     }
     result.query += ` ${generatePageLimits(page)}`;
-    console.log(result);
+    //console.log(result);
 
     return { search: result, count: countQuery };
 }
@@ -65,7 +67,7 @@ function mapCountQuery(table, query, owner, countQuery) {
     cQuery += `SELECT COUNT(${mapQueryPrefix(table)}.id) FROM public.${table} AS ${mapQueryPrefix(table)}`;
     cQuery += ` WHERE ${mapQueryPrefix(table)}.created_by = $1`;
     countQuery.parameters.push(owner);
-    cQuery += `${query.whereClause ? mapWhereClause(table, query.whereClause, result) : ""}`;
+    cQuery += `${query.whereClause ? mapWhereClause(table, query.whereClause, countQuery) : ""}`;
     cQuery += `${groupByClause}`;
     cQuery += `${groupByClause ? ") AS subquery" : ""};`;
     return cQuery;
@@ -464,25 +466,25 @@ function mapWhereClause(table, whereClause, result, operator = "AND", initialise
                 return mapWhereClause(table, c, result, operator, false);
             }
             else{
-                return getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator);
+                return getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator, c.specification);
             }
         }).join(` ${operator} `);
     }
     else {
-        return getWhereTerm(result, table, whereClause.target, whereClause.keyword, whereClause.type, whereClause.operator);
+        return getWhereTerm(result, table, whereClause.target, whereClause.keyword, whereClause.type, whereClause.operator, whereClause.specification);
     }
 }
 
 // generation of the fundamental serach term
-function getWhereTerm(result, table, target, keyword, type, operator) {
+function getWhereTerm(result, table, target, keyword, type, operator, specification) {
     let whereClause = "";
 
-    // deals with normal id searching:
+    // deals with normal id searching (DO NOT SUPPORT transformation)
     if (target == "id" && type.toLowerCase() == "uuid") {
         whereClause = `${mapQueryPrefix(table)}.${target}::text ${operator !== "nt"? "LIKE" : "NOT LIKE"} '%$${result.parameters.length + 1}%'`;
         result.parameters.push(`%${keyword}%`);
     }
-    // FK references to other tables:
+    // FK references to other tables (DO NOT SUPPORT transformation)
     else if (target !== "id" && type.toLowerCase() == "uuid") {
         const fkName = mapFKName(target);
         whereClause = `${mapQueryPrefix(table)}.${target} IN(
@@ -491,7 +493,7 @@ function getWhereTerm(result, table, target, keyword, type, operator) {
             )`;
         result.parameters.push(`%${keyword.toLowerCase()}%`);
     }
-    // deals with search thorugh list of UUIDs:
+    // deals with search thorugh list of UUIDs (DO NOT SUPPORT transformation)
     else if (type == "ARRAY") {
         const fkName = mapFKName(target);
         whereClause = `
@@ -504,22 +506,24 @@ function getWhereTerm(result, table, target, keyword, type, operator) {
         `;
         result.parameters.push(`%${keyword.toLowerCase()}%`);
     }
-    // deals with normal string searching:
-    else if (type == "USER-DEFINED" || type.toLowerCase().includes("character")) {
-        whereClause = `LOWER(${mapQueryPrefix(table)}.${target}::text) ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
-        result.parameters.push(`%${keyword.toLowerCase()}%`);
+    // deals with normal string searching (SUPPORT transformation)
+    else if (type == "USER-DEFINED" || type.toLowerCase().includes("character") || type.toLowerCase() == "string") {
+        const searchTarget = (specification == "default") ? `${mapQueryPrefix(table)}.${target}` : mapFunctionalField(table, target, specification, type);
+        whereClause = `LOWER(${searchTarget}::text) ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
+        result.parameters.push(`%${keyword.toLowerCase()}%`); mapFunctionalField
     }
 
-    // deals with numeric searchings with units
+    // deals with numeric searchings with units (SUPPORT transformation, e.g., max siz, Month of date...)
     else if (type.toLowerCase() == "numeric" || type.toLowerCase() == "integer") {
         const containsUnit = /[^\d.]/.test(keyword);
         const unit = containsUnit ? keyword.split(/[^\d.]/)[1] : null;
         let value = containsUnit ? keyword.split(/[^\d.]/)[0] : keyword;
         const numericOperator = mapOperator(operator);
+        const searchTarget = (specification == "default") ? `${mapQueryPrefix(table)}.${target}` : mapFunctionalField(table, target, specification, type);
 
         // matching nuemeric value with correspondingly unit
         if (target == "quantity" || target == "size") {
-            whereClause = `(${mapQueryPrefix(table)}.${target} ${numericOperator} $${result.parameters.length + 1}`;
+            whereClause = `(${searchTarget} ${numericOperator} $${result.parameters.length + 1}`;
             result.parameters.push(value);
             if (unit) {
                 whereClause += ` AND LOWER(${mapQueryPrefix(table)}.${target}_unit) = $${result.parameters.length + 1})`;
@@ -529,7 +533,7 @@ function getWhereTerm(result, table, target, keyword, type, operator) {
             }
         }
         else if (target.toLowerCase() == "width" || target.toLowerCase() == "height" || target.toLowerCase() == "length") {
-            whereClause = `${mapQueryPrefix(table)}.${target} ${numericOperator} $${result.parameters.length + 1}`;
+            whereClause = `${searchTarget} ${numericOperator} $${result.parameters.length + 1}`;
             result.parameters.push(value);
             if (unit) {
                 whereClause += ` AND (LOWER(${mapQueryPrefix(table)}.en_unit) = $${result.parameters.length + 1} 
@@ -539,10 +543,11 @@ function getWhereTerm(result, table, target, keyword, type, operator) {
             }
         }
         else {
-            whereClause = `${mapQueryPrefix(table)}.${target} ${numericOperator} $${result.parameters.length + 1}`;
+            whereClause = `${searchTarget} ${numericOperator} $${result.parameters.length + 1}`;
             result.parameters.push(value);
         }
     }
+    // deals with timestamp searchings (DO NOT support transformation)
     else if (type.toLowerCase() == "timestamp with time zone") {
         const numericOperator = mapOperator(operator);
         whereClause = `${mapQueryPrefix(table)}.${target} ${numericOperator} $${result.parameters.length + 1}::timestamp with time zone`;
@@ -574,6 +579,23 @@ function mapOperator(operator) {
     }
 }
 
+// function used to map the functional fields:
+function mapFunctionalField(table, target, specification, type) {
+    if (specification === "default"){
+        return mapQueryPrefix(table) + "." + target;
+    }
+    else{
+        // capture special cases of time-based functions (using targets to account for timestamp type being 
+        // overwritten by transformation)
+        if (type.includes("timestamp") || target.includes("date")) {
+            return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target})`;
+        }
+        else{
+            return `${specification}(${mapQueryPrefix(table)}.${target})`;
+        }
+    }
+}
+
 /*
 Generates the group by clause for the query
     - assuming the input of groupByClause is either null or a list of valid columns
@@ -586,18 +608,7 @@ function mapGroupByClause(table, query) {
     else {
         return ` GROUP BY ${query.groupByClause.map(field => {
             const { target, specification, type } = field;
-            if (specification === "default"){
-                return mapQueryPrefix(table) + "." + target;
-            }
-            else{
-                // capture special cases of time-based group by
-                if (type.includes("timestamp")){
-                    return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target})`;
-                }
-                else{
-                    return `${specification}(${mapQueryPrefix(table)}.${target})`;
-                }
-            }
+            return mapFunctionalField(table, target, specification, type);
         }).join(", ")}`;
     }
 }
@@ -612,17 +623,7 @@ function mapOrderByClause(table, query) {
         null : 
         `${query.orderByClause.map((field) => {
             const { target, specification, type, order } = field;
-                if (specification === "default"){
-                    return `${mapQueryPrefix(table)}.${target} ${order}`;
-                }
-                else{
-                    if (type.includes("timestamp")){
-                        return `EXTRACT(${specification} FROM ${mapQueryPrefix(table)}.${target}) ${order}`;
-                    }
-                    else{
-                        return `${specification}(${mapQueryPrefix(table)}.${target}) ${order}`;
-                    }
-                }
+            return `${mapFunctionalField(table, target, specification, type)} ${order}`;
         }).join(", ")}`;
 
     switch (table) {

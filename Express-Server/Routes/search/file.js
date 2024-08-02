@@ -28,7 +28,6 @@ module.exports = (db, dbReferences) => {
                 const result = await db.any(query.search.query, query.search.parameters);
                 let count;
                 if (query.count.query !== "") {count = await db.oneOrNone(query.count.query, query.count.parameters);}
-                console.log(count);
                 return res.status(200).json({ results: result, count: count ? parseInt(count.count): null});
             }
             catch(error){
