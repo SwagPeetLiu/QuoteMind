@@ -1,5 +1,5 @@
 require('dotenv').config({
-    path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
+    path: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.test'
 });
 const request = require('supertest');
 const app = global.testApp;
@@ -12,9 +12,9 @@ const {
     getTestClient,
     testObject,
     invalidTestingRange,
-    isMaterialValid,
     isSpecificMaterialValid
 } = require('../../utils/TestTools');
+const { search } = require('../../config/devDefault');
 
 describe("Materials Route Testing", () => {
     let validSession;
@@ -25,8 +25,6 @@ describe("Materials Route Testing", () => {
     let testTransactionID;
     let testPricingConditionID;
     let testPricingRuleID;
-    const validSearchObject = testObject.material.validSearchObject;
-    const invalidSearchObject = testObject.material.invalidSearchObject;
     const validTestingObject = testObject.material.validTestingObject;
     const updateTestingObject = testObject.material.updateTestingObject;
 
@@ -37,158 +35,31 @@ describe("Materials Route Testing", () => {
         existingClient = await getTestClient(app, validSession);
     });
 
-    describe("GET: all materials", () => {
-        describe("Session token validation", () => {
-            it ("it should not proceed with no session token", async () => {
-                const response = await request(app)
-                    .get("/materials")
-                expect(response.statusCode).toBe(401);
-            });
-            it ("it should not authroise with invlaid token", async () => {
-                const response = await request(app)
-                    .get("/materials")
-                    .set('session-token', "invalid-token");
-                expect(response.statusCode).toBe(401);
-            });
-        });
-        describe ("Behaviour testing", () => {
-            it ("it should return 200 with a count vlaue if no page number is provided", async () => {
-                const response = await request(app)
-                    .get("/materials")
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body).toHaveProperty('count');
-                expect(response.body).toHaveProperty('page');
-                expect(response.body.materials.length).toBeGreaterThan(0);
-                expect(isMaterialValid(response.body.materials[0])).toBe(true);
-            });
-
-            describe("SearchTarget Validation", () => {
-                const invalidTargets = invalidTestingRange.invalidSearchTargets;
-                Object.keys(invalidTargets).forEach((target) => {
-                    it (`it should not faithfully return if searching target is ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/materials')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: invalidTargets[target],
-                                keyword: validSearchObject.en_name
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("SearchKeyword Validation", () => {
-                const invalidKeywords = invalidTestingRange.invalidSearchKeywords;
-                Object.keys(invalidKeywords).forEach((keyword) => {
-                    it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
-                        const response = await request(app)
-                            .get('/materials')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: Object.keys(validSearchObject)[0],
-                                keyword: invalidKeywords[keyword]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe("Page Validation", () => {
-                const invalidPages = invalidTestingRange.page;
-                Object.keys(invalidPages).forEach((page) => {
-                    it (`it should not faithfully return if page is ${page}`, async () => {
-                        const response = await request(app)
-                            .get('/materials')
-                            .set('session-token', validSession)
-                            .query({ 
-                                page: invalidPages[page]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("SearchResult Validation", () => {
-                Object.keys(invalidSearchObject).forEach((target) => {
-                    it (`it should return even if no matchin records on ${target} are provided`, async() => {
-                        const response = await request(app)
-                            .get('/materials')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: invalidSearchObject[target]
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.count).toBe(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.materials.length).toBe(0);
-                    });
-                });
-
-                Object.keys(validSearchObject).forEach((target) => {
-                    it (`it should return a valid searched response with a matching ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/materials')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: validSearchObject[target],
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.materials.length).toBeGreaterThan(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBeGreaterThan(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(isMaterialValid(response.body.materials[0])).toBe(true);
-                    });
-                });
-
-                it ("it should not return counts if page number is provided", async () => {
-                    const response = await request(app)
-                        .get('/materials')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: "en_name",
-                            keyword: validSearchObject.en_name,
-                            page: 1
-                        });
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body).not.toHaveProperty('count');
-                    expect(response.body.page).toBe(1);
-                    expect(response.body.materials.length).toBeGreaterThan(0);
-                    expect(isMaterialValid(response.body.materials[0])).toBe(true);
-                });
-            });
-        });
-    });
-
     describe("POST: specific material", () => {
-        it ("it should not authroise with id indication other than new", async ()=> {
+        it("it should not authroise with id indication other than new", async () => {
             const response = await request(app)
                 .post(`/materials/test`)
                 .set('session-token', validSession)
                 .send(validTestingObject);
             expect(response.statusCode).toBe(400);
         });
-        it ("it should not create if the id indicated is already existing", async () => {
+        it("it should not create if the id indicated is already existing", async () => {
             const response = await request(app)
                 .post(`/materials/${exsitingMaterial.id}`)
                 .set('session-token', validSession)
                 .send(validTestingObject);
             expect(response.statusCode).toBe(400);
         });
-        describe ("Material creation input Validation", () => {
+        describe("Material creation input Validation", () => {
             const testRange = {
-                en_name : invalidTestingRange.en_name,
-                ch_name : invalidTestingRange.ch_name,
-                descriptions : invalidTestingRange.descriptions
+                en_name: invalidTestingRange.en_name,
+                ch_name: invalidTestingRange.ch_name,
+                descriptions: invalidTestingRange.descriptions
             };
             Object.keys(testRange).forEach((property) => {
                 Object.keys(testRange[property]).forEach((situation) => {
-                    it (`it should not create a material if ${property} is ${situation}`, async () => {
-                        const invalidObject = { ...validTestingObject, [property] : testRange[property][situation] };
+                    it(`it should not create a material if ${property} is ${situation}`, async () => {
+                        const invalidObject = { ...validTestingObject, [property]: testRange[property][situation] };
                         const response = await request(app)
                             .post('/materials/new')
                             .set('session-token', validSession)
@@ -198,11 +69,11 @@ describe("Materials Route Testing", () => {
                 });
             });
         });
-        it ("it should create a new material even with null descriptions", async () => {
+        it("it should create a new material even with null descriptions", async () => {
             const response = await request(app)
                 .post('/materials/new')
                 .set('session-token', validSession)
-                .send({...validTestingObject, descriptions: null});
+                .send({ ...validTestingObject, descriptions: null });
             expect(response.statusCode).toBe(200);
             expect(response.body.id).toBeTruthy();
 
@@ -211,7 +82,7 @@ describe("Materials Route Testing", () => {
                 .set('session-token', validSession);
             expect(deleteResponse.statusCode).toBe(200);
         });
-        it ("it should create a new material with full information", async () => {
+        it("it should create a new material with full information", async () => {
             const response = await request(app)
                 .post('/materials/new')
                 .set('session-token', validSession)
@@ -221,9 +92,9 @@ describe("Materials Route Testing", () => {
             testMaterialID = response.body.id;
         });
     });
-    
+
     describe("GET: specific material", () => {
-        it ("it should get that specific material", async () => {
+        it("it should get that specific material", async () => {
             const response = await request(app)
                 .get(`/materials/${testMaterialID}`)
                 .set('session-token', validSession);
@@ -237,7 +108,7 @@ describe("Materials Route Testing", () => {
     });
 
     describe("PUT: specific material", () => {
-        it ("it should update that existing material accordingly", async () => {
+        it("it should update that existing material accordingly", async () => {
             const response = await request(app)
                 .put(`/materials/${testMaterialID}`)
                 .set('session-token', validSession)
@@ -255,8 +126,8 @@ describe("Materials Route Testing", () => {
             expect(updatedResponse.body.material.descriptions).toBe(updateTestingObject.descriptions);
         });
 
-        describe ("Material association in transactions", () => {
-            it ("it should update material association in transactions", async () => {
+        describe("Material association in transactions", () => {
+            it("it should update material association in transactions", async () => {
                 const response = await request(app)
                     .post('/transactions/new')
                     .set('session-token', validSession)
@@ -273,8 +144,8 @@ describe("Materials Route Testing", () => {
                 expect(response.body.id).toBeTruthy();
                 testTransactionID = response.body.id;
             });
-            
-            it ("material details should appear in transactions", async () => {
+
+            it("material details should appear in transactions", async () => {
                 const response = await request(app)
                     .get(`/transactions/${testTransactionID}`)
                     .set('session-token', validSession);
@@ -285,8 +156,9 @@ describe("Materials Route Testing", () => {
                 expect(response.body.transaction.materials[0].ch_name).toBe(updateTestingObject.ch_name);
             });
         });
+
         describe("Material association in pricing conditions & rules", () => {
-            it ("it should update material associations in pricing conditions & rules", async () => {
+            it("it should update material associations in pricing conditions & rules", async () => {
                 const response = await request(app)
                     .post('/pricings/conditions/new')
                     .set('session-token', validSession)
@@ -310,36 +182,54 @@ describe("Materials Route Testing", () => {
                 testPricingRuleID = ruleCreationResponse.body.id;
             });
 
-            it ("material details should appear in pricing conditions & rules", async () => {
+            it("material details should appear in pricing conditions & rules", async () => {
                 const conditionResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post(`/search/pricing_conditions`)
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(conditionResponse.statusCode).toBe(200);
-                expect(conditionResponse.body.pricing_conditions[0].materials.length).toBe(1);
-                expect(conditionResponse.body.pricing_conditions[0].materials[0].id).toBe(testMaterialID);
-                expect(conditionResponse.body.pricing_conditions[0].materials[0].en_name).toBe(updateTestingObject.en_name);
-                expect(conditionResponse.body.pricing_conditions[0].materials[0].ch_name).toBe(updateTestingObject.ch_name);
+                expect(conditionResponse.body.results[0].materials.length).toBe(1);
+                expect(conditionResponse.body.results[0].materials[0].id).toBe(testMaterialID);
+                expect(conditionResponse.body.results[0].materials[0].en_name).toBe(updateTestingObject.en_name);
+                expect(conditionResponse.body.results[0].materials[0].ch_name).toBe(updateTestingObject.ch_name);
 
                 const ruleResponse = await request(app)
-                    .get(`/pricings/rules`)
+                    .post(`/search/pricing_rules`)
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingRuleID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingRuleID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(ruleResponse.statusCode).toBe(200);
-                expect(ruleResponse.body.pricing_rules[0].conditions.length).toBe(1);
-                expect(ruleResponse.body.pricing_rules[0].conditions[0].materials[0].id).toBe(testMaterialID);
+                expect(ruleResponse.body.results[0].conditions.length).toBe(1);
+                expect(ruleResponse.body.results[0].conditions[0].materials[0].id).toBe(testMaterialID);
             });
         });
     });
 
     describe("DELETE: specific material", () => {
-        it ("it should delete that specific material & relation to other tables", async () => {
+        it("it should delete that specific material & relation to other tables", async () => {
             const response = await request(app)
                 .delete(`/materials/${testMaterialID}`)
                 .set('session-token', validSession);
@@ -359,21 +249,39 @@ describe("Materials Route Testing", () => {
 
             // checking its deletion in conditions & rules (pricing records will be removed)
             const conditionResponse = await request(app)
-                .get(`/pricings/conditions`)
+                .post(`/search/pricing_conditions`)
                 .set('session-token', validSession)
-                .query({
-                    target: 'id',
-                    keyword: testPricingConditionID
+                .send({
+                    ...testObject.search.defaultStructure,
+                    searchQuery: {
+                        ...testObject.search.defaultStructure.searchQuery,
+                        whereClause: {
+                            target: "id",
+                            operator: "eq",
+                            keyword: testPricingConditionID,
+                            specification: "default",
+                            transformType: null
+                        }
+                    }
                 });
             expect(conditionResponse.statusCode).toBe(200);
             expect(conditionResponse.body.count).toBe(0);
 
             const ruleResponse = await request(app)
-                .get(`/pricings/rules`)
+                .post(`/search/pricing_rules`)
                 .set('session-token', validSession)
-                .query({
-                    target: 'id',
-                    keyword: testPricingRuleID
+                .send({
+                    ...testObject.search.defaultStructure,
+                    searchQuery: {
+                        ...testObject.search.defaultStructure.searchQuery,
+                        whereClause: {
+                            target: "id",
+                            operator: "eq",
+                            keyword: testPricingRuleID,
+                            specification: "default",
+                            transformType: null
+                        }
+                    }
                 });
             expect(ruleResponse.statusCode).toBe(200);
             expect(ruleResponse.body.count).toBe(0);

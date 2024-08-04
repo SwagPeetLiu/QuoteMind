@@ -2,19 +2,14 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { 
-    getConfiguration, 
-} = require('../../utils/Configurator');
 const {
     getTestSession,
     getTestClient,
     testObject,
     invalidTestingRange,
-    isCompanyValid,
     isSpecificCompanyValid,
     isSpecificAddressValid
 } = require('../../utils/TestTools');
-const config = getConfiguration();
 const app = global.testApp;
 
 describe ("Companies Router", () => {
@@ -22,136 +17,15 @@ describe ("Companies Router", () => {
     let validSession;
     let validClient;
     let testingCompanyID;
-    const validSearchObject = testObject.company.validSearchObject;
-    const invalidSearchObject = testObject.company.invalidSearchObject;
-    const validNewAddress = testObject.company.validNewAddress;
     const validTestingObject = testObject.company.validTestingObject;
     const updateTestingObject = testObject.company.updateTestingObject;
-    const invalidEmailSuffix = testObject.invalidEmailSuffix;
 
     beforeAll(async () => {
         validSession = await getTestSession(app);
         validClient = await getTestClient(app, validSession);
     });
 
-    describe ("GET /", () => {
-        describe ("invalid sessino-tokens testings", () => {
-            it ("it should not authroise any access without token", async () => {
-                const response = await request(app)
-                    .get('/companies');
-                expect(response.statusCode).toBe(401);
-            });
-            it ("it should not authroise any access with invalid token", async () => {
-                const response = await request(app)
-                    .get('/companies')
-                    .set('session-token', 'invalid-test-token');
-                expect(response.statusCode).toBe(401);
-            });
-        });
-
-        describe("Behaviour Testing regarding the get all endpoints", () => {
-            it ("it should return 200 with a count value if no page number is provided", async () => {
-                const response = await request(app)
-                    .get('/companies')
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body).toHaveProperty('count');
-                expect(response.body).toHaveProperty('page');
-                expect(response.body.companies.length).toBeGreaterThan(0);
-                expect(isCompanyValid(response.body.companies[0])).toBe(true);
-            });
-            it ("it should return 200 without a count value if page number is provided", async () => {
-                const response = await request(app)
-                    .get('/companies')
-                    .set('session-token', validSession)
-                    .query({ page: 1 });
-                expect(response.statusCode).toBe(200);
-                expect(response.body).not.toHaveProperty('count');
-                expect(response.body.page).toBe(1);
-                expect(response.body.companies.length).toBeGreaterThan(0);
-                expect(isCompanyValid(response.body.companies[0])).toBe(true);
-            });
-            describe("Search Target Validation Testings", () => {
-                Object.keys(invalidTestingRange.invalidSearchTargets).forEach((target) => {
-                    it (`it should not faithfully if searching target is ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/companies')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: invalidTestingRange.invalidSearchTargets[target],
-                                keyword: validSearchObject[Object.keys(validSearchObject)[0]],
-                             });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe("Search Keyword Validation Testings", () => {
-                Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((keyword) => {
-                    it (`it should not faithfully if searching keyword is ${keyword}`, async () => {
-                        const response = await request(app)
-                            .get('/companies')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: Object.keys(validSearchObject)[0],
-                                keyword: invalidTestingRange.invalidSearchKeywords[keyword],
-                             });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe("testing for page validation", () => {
-                Object.keys(invalidTestingRange.page).forEach((situation) => {
-                    it (`it should not faithfully if page is ${situation}`, async () => {
-                        const response = await request(app)
-                            .get('/companies')
-                            .set('session-token', validSession)
-                            .query({ 
-                                page: invalidTestingRange.page[situation],
-                             });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe("Testing for searches for non-existence records", () => {
-                Object.keys(invalidSearchObject).forEach((property) => {
-                    it (`it should return normally even if searching value of ${property} is non-existence`, async () => {
-                        const response = await request(app)
-                            .get('/companies')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: property,
-                                keyword: invalidSearchObject[property],
-                             });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.companies.length).toBe(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBe(0);
-                        expect(response.body.page).toBeTruthy();
-                    });
-                });
-            });
-            describe("Testing for valid searches for existence records", () => {
-                Object.keys(validSearchObject).forEach((property) => {
-                    it (`it should return a valid searched response with a matching ${property}`, async () => {
-                        const response = await request(app)
-                            .get('/companies')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: property,
-                                keyword: validSearchObject[property],
-                             });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.companies.length).toBeGreaterThan(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBeGreaterThan(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(isCompanyValid(response.body.companies[0])).toBe(true);
-                    });
-                });
-            });
-        });
-    });
-
+    // testing specific company
     describe("Testing specific company /:id", () => {
         const testingRange = {
             full_name : invalidTestingRange.full_name,

@@ -8,7 +8,6 @@ const {
     validateSocialContacts,
     validateInstances,
     validateEmployeePosition,
-    validateInteger,
 } = require ('../../utils/Validator');
 const { 
     mapDefaultQueryColumns,

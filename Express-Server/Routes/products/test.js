@@ -2,8 +2,6 @@ require('dotenv').config({
     path: process.env.NODE_ENV === 'production' ? '.env.prod': '.env.test'
 });
 const request = require('supertest');
-const { getConfiguration} = require('../../utils/Configurator');
-const config = getConfiguration();
 const app = global.testApp;
 
 // importing the testing tools:
@@ -14,7 +12,6 @@ const {
     getTestClient,
     testObject,
     invalidTestingRange,
-    isProductValid,
     isSpecificProductValid
 } = require('../../utils/TestTools');
 
@@ -27,8 +24,6 @@ describe("Product Router", () => {
     let exsitingProduct;
     let exsitingMaterial;
     let existingClient;
-    const validSearchObject = testObject.product.validSearchObject;
-    const invalidSearchObject = testObject.product.invalidSearchObject;
     const validTestingObject = testObject.product.validTestingObject;
     const updateTestingObject = testObject.product.updateTestingObject;
 
@@ -37,135 +32,6 @@ describe("Product Router", () => {
         exsitingProduct = await getTestProduct(app, validSession);
         exsitingMaterial = await getTestMaterial(app, validSession);
         existingClient = await getTestClient(app, validSession);
-    });
-
-    describe("GET: All Products", () => {
-        describe("Session token validation", () => {
-            it("the route should not be accessible if the user does not attach a valid session", async () => {
-                const response = await request(app)
-                    .get('/products')
-                    .query({ page: 1});
-                expect(response.statusCode).toBe(401);
-            });
-            it ("it should not return with invalid session token", async () => {
-                const response = await request(app)
-                    .get('/products')
-                    .set('session-token', 'invalid-test-token')
-                    .query({ page: 1 });
-                expect(response.statusCode).toBe(401);
-            });
-        });
-        describe("Behaviour testing", () => {
-            it ("it should return 200 with a count value if no page number is provided", async () => {
-                const response = await request(app)
-                    .get('/products')
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body).toHaveProperty('count');
-                expect(response.body).toHaveProperty('page');
-                expect(response.body.products.length).toBeGreaterThan(0);
-                expect(isProductValid(response.body.products[0])).toBe(true);
-            });
-
-            describe ("Search target validation", () => {
-                const invalidTargets = invalidTestingRange.invalidSearchTargets;
-                Object.keys(invalidTargets).forEach((target) => {
-                    it (`it should not faithfully return if searching target is ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/products')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: invalidTargets[target],
-                                keyword: validSearchObject.en_name
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("Search keyword validation", () => {
-                const invalidKeywords = invalidTestingRange.invalidSearchKeywords;
-                Object.keys(invalidKeywords).forEach((keyword) => {
-                    it (`it should not faithfully return if search keyword is ${keyword}`, async () => {
-                        const response = await request(app)
-                            .get('/products')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: Object.keys(validSearchObject)[0],
-                                keyword: invalidKeywords[keyword]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("Page validation", () => {
-                const invalidPages = invalidTestingRange.page;
-                Object.keys(invalidPages).forEach((page) => {
-                    it (`it should not faithfully return if page is ${page}`, async () => {
-                        const response = await request(app)
-                            .get('/products')
-                            .set('session-token', validSession)
-                            .query({ 
-                                page: invalidPages[page]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("search result validation", () => {
-                Object.keys(invalidSearchObject).forEach((target) => {
-                    it (`it should return even if no matchin records on ${target} are provided`, async() => {
-                        const response = await request(app)
-                            .get('/products')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: invalidSearchObject[target]
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.count).toBe(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(response.body.products.length).toBe(0);
-                    });
-                });
-
-                Object.keys(validSearchObject).forEach((target) => {
-                    it (`it should return a valid searched response with a matching ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/products')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: validSearchObject[target],
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.products.length).toBeGreaterThan(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBeGreaterThan(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(isProductValid(response.body.products[0])).toBe(true);
-                    });
-                });
-
-                it ("it should not return counts if page number provided is provided", async() => {
-                    const response = await request(app)
-                        .get('/products')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: "en_name",
-                            keyword: validSearchObject.en_name,
-                            page: 1
-                        });
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body).not.toHaveProperty('count');
-                    expect(response.body.page).toBe(1);
-                    expect(response.body.products.length).toBeGreaterThan(0);
-                    expect(isProductValid(response.body.products[0])).toBe(true);
-                });
-            });
-        });
     });
 
     describe("POST: Specific Product creation", () => {
@@ -319,29 +185,47 @@ describe("Product Router", () => {
 
             it ("product details should appear in the pricing conditions & rules", async () => {
                 const conditionResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post('/search/pricing_conditions')
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(conditionResponse.statusCode).toBe(200);
-                expect(conditionResponse.body.pricing_conditions[0].product.id).toBe(testProductID);
-                expect(conditionResponse.body.pricing_conditions[0].product.en_name).toBe(updateTestingObject.en_name);
-                expect(conditionResponse.body.pricing_conditions[0].product.ch_name).toBe(updateTestingObject.ch_name);
+                expect(conditionResponse.body.results[0].product.id).toBe(testProductID);
+                expect(conditionResponse.body.results[0].product.en_name).toBe(updateTestingObject.en_name);
+                expect(conditionResponse.body.results[0].product.ch_name).toBe(updateTestingObject.ch_name);
 
                 const ruleResponse = await request(app)
-                    .get(`/pricings/rules`)
+                    .post('/search/pricing_rules')
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingRuleID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingRuleID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(ruleResponse.statusCode).toBe(200);
-                expect(ruleResponse.body.pricing_rules[0].conditions.length).toBe(1);
-                expect(ruleResponse.body.pricing_rules[0].conditions[0].product.id).toBe(testProductID);
-                expect(ruleResponse.body.pricing_rules[0].conditions[0].product.en_name).toBe(updateTestingObject.en_name);
-                expect(ruleResponse.body.pricing_rules[0].conditions[0].product.ch_name).toBe(updateTestingObject.ch_name);
+                expect(ruleResponse.body.results[0].conditions.length).toBe(1);
+                expect(ruleResponse.body.results[0].conditions[0].product.id).toBe(testProductID);
+                expect(ruleResponse.body.results[0].conditions[0].product.en_name).toBe(updateTestingObject.en_name);
+                expect(ruleResponse.body.results[0].conditions[0].product.ch_name).toBe(updateTestingObject.ch_name);
             });
         });
 
@@ -357,33 +241,60 @@ describe("Product Router", () => {
 
                 // check if that related transaction is deleted:
                 const transactionResponse = await request(app)
-                    .get(`/transactions`)
+                    .post('/search/transactions')
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testTransactionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testTransactionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(transactionResponse.statusCode).toBe(200);
-                expect(transactionResponse.body.transactions.length).toBe(0);
+                expect(transactionResponse.body.results.length).toBe(0);
 
                 // check if that related pricing condition is deleted 
                 const conditionResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post('/search/pricing_conditions')
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(conditionResponse.statusCode).toBe(200);
                 expect(conditionResponse.body.count).toBe(0);
                 
                 // check if that related pricing rule is deleted
                 const ruleResponse = await request(app)
-                    .get(`/pricings/rules`)
+                    .post('/search/pricing_rules')
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingRuleID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingRuleID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(ruleResponse.statusCode).toBe(200);
                 expect(ruleResponse.body.count).toBe(0);

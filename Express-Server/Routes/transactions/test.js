@@ -28,8 +28,6 @@ describe("/transactions Router", () => {
     let existingClient;
     let existingCompany;
     let existingEmployee;
-    const validSearchObject = testObject.transaction.validSearchObject;
-    const invalidSearchObject = testObject.transaction.invalidSearchObject;
     let validTestingObject = testObject.transaction.validTestingObject;
     let updateTestingObject = testObject.transaction.updateTestingObject;
 
@@ -71,123 +69,6 @@ describe("/transactions Router", () => {
             employee: null,
             addresses: null
         };
-    });
-
-    describe("GET: ALL transactions", () => {
-        it ("it should not acccess such route if no token was provided", async () => {
-            const response = await request(app)
-                .get('/transactions');
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should not acccess such route if invalid token was provided", async () => {
-            const response = await request(app)
-                .get('/transactions')
-                .set('session-token', 'invalid-token');
-            expect(response.statusCode).toBe(401);
-        });
-        describe("Behaviour testing for the get all endpoints", () => {
-            it ("it should return 200 with a count value if no page number is provided", async () => {
-                const response = await request(app)
-                    .get('/transactions')
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body).toHaveProperty('count');
-                expect(response.body).toHaveProperty('page');
-                expect(response.body.transactions.length).toBeGreaterThan(0);
-                expect(isTransactionValid(response.body.transactions[0])).toBe(true);
-            });
-            describe ("Search target validation", () => {
-                const invalidTargets = invalidTestingRange.invalidSearchTargets;
-                Object.keys(invalidTargets).forEach((target) => {
-                    it (`it should not faithfully return if searching target is ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/transactions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: invalidTargets[target],
-                                keyword: validSearchObject[Object.keys(validSearchObject)[0]]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe ("Search keyword validation", () => {
-                const invalidKeywords = invalidTestingRange.invalidSearchKeywords;
-                Object.keys(invalidKeywords).forEach((keyword) => {
-                    it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
-                        const response = await request(app)
-                            .get('/transactions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: Object.keys(validSearchObject)[0],
-                                keyword: invalidKeywords[keyword]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe ("Page validation", () => {
-                const invalidPages = invalidTestingRange.page;
-                Object.keys(invalidPages).forEach((page) => {
-                    it (`it should not faithfully return if page is ${page}`, async () => {
-                        const response = await request(app)
-                            .get('/transactions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                page: invalidPages[page]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-            describe("Search Results Validations", () => {
-                Object.keys(invalidSearchObject).forEach((target) => {
-                    it (`it should return even no matching records on ${target} are provided`, async () => {
-                        const response = await request(app)
-                            .get('/transactions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: invalidSearchObject[target]
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.count).toBe(0);
-                        expect(response.body.transactions.length).toBe(0);
-                    });
-                });
-                Object.keys(validSearchObject).forEach((target) => {
-                    it (`it should return properly for valid searches on ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/transactions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: target,
-                                keyword: validSearchObject[target]
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.count).toBeGreaterThan(0);
-                        expect(response.body.page).toBe(1);
-                        expect(response.body.transactions.length).toBeGreaterThan(0);
-                        expect(isTransactionValid(response.body.transactions[0])).toBe(true);
-                    });
-                });
-                it ("it should return properly without count if page number is provided", async () => {
-                    const response = await request(app)
-                        .get('/transactions')
-                        .set('session-token', validSession)
-                        .query({ 
-                            target: Object.keys(validSearchObject)[0],
-                            keyword: validSearchObject[Object.keys(validSearchObject)[0]],
-                            page: 1
-                        });
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body).not.toHaveProperty('count');
-                    expect(response.body.page).toBe(1);
-                    expect(response.body.transactions.length).toBeGreaterThan(0);
-                    expect(isTransactionValid(response.body.transactions[0])).toBe(true);
-                });
-            });
-        });
     });
 
     describe("POST: Creation of a transaction", () => {
@@ -243,6 +124,7 @@ describe("/transactions Router", () => {
                 });
             });
         });
+
         describe("combinational valdiations", () => {
             it ("it should not allow post with both null client & company", async () => {
                 const response = await request(app)

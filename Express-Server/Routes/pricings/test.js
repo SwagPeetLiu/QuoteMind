@@ -94,245 +94,6 @@ describe("/pricings testing", () => {
         };
     });
 
-    describe("GET: All Pricings", () => {
-        describe("GET: All Pricing Conditions", () => {
-            it("it should not proceed with no session token", async () => {
-                const response = await request(app)
-                    .get("/pricings/conditions")
-                expect(response.statusCode).toBe(401);
-            });
-            it("it should not proceed with invalid session token", async () => {
-                const response = await request(app)
-                    .get("/pricings/conditions")
-                    .set('session-token', "invalid-token");
-                expect(response.statusCode).toBe(401);
-            });
-            describe("Behaviour Testing", () => {
-                it("It should return 200 with a count value if no page number is provided", async () => {
-                    const response = await request(app)
-                        .get("/pricings/conditions")
-                        .set('session-token', validSession);
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body).toHaveProperty('count');
-                    expect(response.body).toHaveProperty('page');
-                    expect(response.body.pricing_conditions.length).toBeGreaterThan(0);
-                    expect(isConditionValid(response.body.pricing_conditions[0])).toBe(true);
-                });
-
-                describe("Search Target Validations", () => {
-                    const invalidSearchTargets = invalidTestingRange.invalidSearchTargets;
-                    Object.keys(invalidSearchTargets).forEach((target) => {
-                        it(`it should not faithfully return if searching target is ${target}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/conditions')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: invalidSearchTargets[target],
-                                    keyword: pricingConditionObject.validSearchObject.product
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-
-                describe("Search keyword validations", () => {
-                    const invalidSearchKeywords = invalidTestingRange.invalidSearchKeywords;
-                    Object.keys(invalidSearchKeywords).forEach((keyword) => {
-                        it(`it should not faithfully return if searching keyword is ${keyword}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/conditions')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: Object.keys(pricingConditionObject.validSearchObject)[0],
-                                    keyword: invalidSearchKeywords[keyword]
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-
-                describe("page validation", () => {
-                    const invalidPages = invalidTestingRange.page;
-                    Object.keys(invalidPages).forEach((page) => {
-                        it (`it should not faithfully return if page is ${page}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/conditions')
-                                .set('session-token', validSession)
-                                .query({
-                                    page: invalidPages[page]
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-
-                describe("Search Results validations", () => {
-                    Object.keys(pricingConditionObject.invalidSearchObject).forEach((target) => {
-                        it(`it should return even no matching records on ${target} are provided`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/conditions')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: target,
-                                    keyword: pricingConditionObject.invalidSearchObject[target]
-                                });
-                            expect(response.statusCode).toBe(200);
-                            expect(response.body.count).toBe(0);
-                            expect(response.body.pricing_conditions.length).toBe(0);
-                        })
-                    });
-                    Object.keys(pricingConditionObject.validSearchObject).forEach((target) => {
-                        it(`it should return properly for valid searches on ${target}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/conditions')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: target,
-                                    keyword: pricingConditionObject.validSearchObject[target]
-                                });
-                            expect(response.statusCode).toBe(200);
-                            expect(response.body.count).toBeGreaterThan(0);
-                            expect(response.body.page).toBe(1);
-                            expect(response.body.pricing_conditions.length).toBeGreaterThan(0);
-                            expect(isConditionValid(response.body.pricing_conditions[0])).toBe(true);
-                        });
-                    });
-                    it("it should return properly without count if page number is provided", async () => {
-                        const response = await request(app)
-                            .get('/pricings/conditions')
-                            .set('session-token', validSession)
-                            .query({
-                                target: Object.keys(pricingConditionObject.validSearchObject)[0],
-                                keyword: pricingConditionObject.validSearchObject[Object.keys(pricingConditionObject.validSearchObject)[0]],
-                                page: 1
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body).not.toHaveProperty('count');
-                        expect(response.body.page).toBe(1);
-                        expect(response.body.pricing_conditions.length).toBeGreaterThan(0);
-                        expect(isConditionValid(response.body.pricing_conditions[0])).toBe(true);
-                    });
-                });
-            });
-        });
-
-        describe("GET: All Pricing Rules", () => {
-            it("it should not proceed with no session token", async () => {
-                const response = await request(app)
-                    .get("/pricings/rules")
-                expect(response.statusCode).toBe(401);
-            });
-            it("it should not proceed with invalid session token", async () => {
-                const response = await request(app)
-                    .get("/pricings/rules")
-                    .set('session-token', "invalid-token");
-                expect(response.statusCode).toBe(401);
-            });
-            describe("Behaviour Testing", () => {
-                it("It should return 200 with a count value if no page number is provided", async () => {
-                    const response = await request(app)
-                        .get("/pricings/rules")
-                        .set('session-token', validSession);
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body).toHaveProperty('count');
-                    expect(response.body).toHaveProperty('page');
-                    expect(response.body.pricing_rules.length).toBeGreaterThan(0);
-                    expect(isRuleValid(response.body.pricing_rules[0])).toBe(true);
-                });
-                describe("Search Target Validations", () => {
-                    const invalidSearchTargets = invalidTestingRange.invalidSearchTargets;
-                    Object.keys(invalidSearchTargets).forEach((target) => {
-                        it(`it should not faithfully return if searching target is ${target}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/rules')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: invalidSearchTargets[target],
-                                    keyword: pricingRuleObject.validSearchObject.id
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-                describe("Search Keyword Validations", () => {
-                    const invalidSearchKeywords = invalidTestingRange.invalidSearchKeywords;
-                    Object.keys(invalidSearchKeywords).forEach((keyword) => {
-                        it(`it should not faithfully return if searching keyword is ${keyword}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/rules')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: Object.keys(pricingRuleObject.validSearchObject)[0],
-                                    keyword: invalidSearchKeywords[keyword]
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-                describe("Page Validations", () => {
-                    Object.keys(invalidTestingRange.page).forEach((page) => {
-                        it(`it should not faithfully return if page is ${page}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/rules')
-                                .set('session-token', validSession)
-                                .query({
-                                    page: invalidTestingRange.page[page]
-                                });
-                            expect(response.statusCode).toBe(400);
-                        });
-                    });
-                });
-                describe("Search Results validations", () => {
-                    Object.keys(pricingRuleObject.invalidSearchObject).forEach((target) => {
-                        it(`it should return even no matching records on ${target} are provided`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/rules')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: target,
-                                    keyword: pricingRuleObject.invalidSearchObject[target]
-                                });
-                            expect(response.statusCode).toBe(200);
-                            expect(response.body.count).toBe(0);
-                            expect(response.body.pricing_rules.length).toBe(0);
-                        });
-                    });
-                    Object.keys(pricingRuleObject.validSearchObject).forEach((target) => {
-                        it(`it should return properly for valid searches on ${target}`, async () => {
-                            const response = await request(app)
-                                .get('/pricings/rules')
-                                .set('session-token', validSession)
-                                .query({
-                                    target: target,
-                                    keyword: pricingRuleObject.validSearchObject[target]
-                                });
-                            expect(response.statusCode).toBe(200);
-                            expect(response.body.count).toBeGreaterThan(0);
-                            expect(response.body.page).toBe(1);
-                            expect(response.body.pricing_rules.length).toBeGreaterThan(0);
-                            expect(isRuleValid(response.body.pricing_rules[0])).toBe(true);
-                        });
-                    });
-                    it("it should not return count if page number is provided", async () => {
-                        const response = await request(app)
-                            .get('/pricings/rules')
-                            .set('session-token', validSession)
-                            .query({
-                                target: Object.keys(pricingRuleObject.validSearchObject)[0],
-                                keyword: pricingRuleObject.validSearchObject[Object.keys(pricingRuleObject.validSearchObject)[0]],
-                                page: 1
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body).not.toHaveProperty('count');
-                        expect(response.body.page).toBe(1);
-                        expect(response.body.pricing_rules.length).toBeGreaterThan(0);
-                        expect(isRuleValid(response.body.pricing_rules[0])).toBe(true);
-                    });
-                });
-            });
-        });
-    });
-
     describe("POST: Specific Pricings", () => {
         describe("Specific Pricing Conditions", () => {
             it("it should not proceed with creation with the wrong indication for pricing conditions", async () => {
@@ -349,6 +110,7 @@ describe("/pricings testing", () => {
                     .send(pricingConditionObject.validTestingObject);
                 expect(response.statusCode).toBe(400);
             });
+
             describe("Condition Creation validation", () => {
                 it("it should not create a condition with two numeric conditions at the same time", async () => {
                     const response = await request(app)
@@ -464,50 +226,69 @@ describe("/pricings testing", () => {
 
                 // verify the condition creation is valid:
                 const sizeSearchResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post("/search/pricing_conditions")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testSizeConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testSizeConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(sizeSearchResponse.statusCode).toBe(200);
                 expect(sizeSearchResponse.body.count).toBe(1);
-                expect(isConditionValid(sizeSearchResponse.body.pricing_conditions[0])).toBe(true);
-                expect(sizeSearchResponse.body.pricing_conditions[0].id).toBe(testSizeConditionID);
-                expect(sizeSearchResponse.body.pricing_conditions[0].quantity).toBe(validSizeCondition.quantity);
-                expect(sizeSearchResponse.body.pricing_conditions[0].quantity_unit).toBe(validSizeCondition.quantity_unit);
-                expect(sizeSearchResponse.body.pricing_conditions[0].size).toBe(validSizeCondition.size);
-                expect(sizeSearchResponse.body.pricing_conditions[0].size_unit).toBe(validSizeCondition.size_unit);
-                expect(sizeSearchResponse.body.pricing_conditions[0].product.id).toBe(validSizeCondition.product);
-                expect(sizeSearchResponse.body.pricing_conditions[0].materials[0].id).toBe(validSizeCondition.materials[0]);
-                expect(sizeSearchResponse.body.pricing_conditions[0].client.id).toBe(validSizeCondition.client);
-                expect(sizeSearchResponse.body.pricing_conditions[0].company.id).toBe(validSizeCondition.company);
-                expect(sizeSearchResponse.body.pricing_conditions[0].colour).toBe(validSizeCondition.colour);
-                expect(sizeSearchResponse.body.pricing_conditions[0].threshold).toBe(validSizeCondition.threshold);
+                expect(isConditionValid(sizeSearchResponse.body.results[0])).toBe(true);
+                expect(sizeSearchResponse.body.results[0].id).toBe(testSizeConditionID);
+                expect(sizeSearchResponse.body.results[0].quantity).toBe(validSizeCondition.quantity);
+                expect(sizeSearchResponse.body.results[0].quantity_unit).toBe(validSizeCondition.quantity_unit);
+                expect(sizeSearchResponse.body.results[0].size).toBe(validSizeCondition.size);
+                expect(sizeSearchResponse.body.results[0].size_unit).toBe(validSizeCondition.size_unit);
+                expect(sizeSearchResponse.body.results[0].product.id).toBe(validSizeCondition.product);
+                expect(sizeSearchResponse.body.results[0].materials[0].id).toBe(validSizeCondition.materials[0]);
+                expect(sizeSearchResponse.body.results[0].client.id).toBe(validSizeCondition.client);
+                expect(sizeSearchResponse.body.results[0].company.id).toBe(validSizeCondition.company);
+                expect(sizeSearchResponse.body.results[0].colour).toBe(validSizeCondition.colour);
+                expect(sizeSearchResponse.body.results[0].threshold).toBe(validSizeCondition.threshold);
 
                 const quantitySearchResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post("/search/pricing_conditions")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testQuantityConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testQuantityConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(quantitySearchResponse.statusCode).toBe(200);
                 expect(quantitySearchResponse.body.count).toBe(1);
-                expect(isConditionValid(quantitySearchResponse.body.pricing_conditions[0])).toBe(true);
-                expect(quantitySearchResponse.body.pricing_conditions[0].id).toBe(testQuantityConditionID);
-                expect(quantitySearchResponse.body.pricing_conditions[0].quantity).toBe(validQuantityCondition.quantity);
-                expect(quantitySearchResponse.body.pricing_conditions[0].quantity_unit).toBe(validQuantityCondition.quantity_unit);
-                expect(quantitySearchResponse.body.pricing_conditions[0].size).toBe(validQuantityCondition.size);
-                expect(quantitySearchResponse.body.pricing_conditions[0].size_unit).toBe(validQuantityCondition.size_unit);
-                expect(quantitySearchResponse.body.pricing_conditions[0].product.id).toBe(validQuantityCondition.product);
-                expect(quantitySearchResponse.body.pricing_conditions[0].materials[0].id).toBe(validQuantityCondition.materials[0]);
-                expect(quantitySearchResponse.body.pricing_conditions[0].client.id).toBe(validQuantityCondition.client);
-                expect(quantitySearchResponse.body.pricing_conditions[0].company.id).toBe(validQuantityCondition.company);
-                expect(quantitySearchResponse.body.pricing_conditions[0].colour).toBe(validQuantityCondition.colour);
-                expect(quantitySearchResponse.body.pricing_conditions[0].threshold).toBe(validQuantityCondition.threshold);
+                expect(isConditionValid(quantitySearchResponse.body.results[0])).toBe(true);
+                expect(quantitySearchResponse.body.results[0].id).toBe(testQuantityConditionID);
+                expect(quantitySearchResponse.body.results[0].quantity).toBe(validQuantityCondition.quantity);
+                expect(quantitySearchResponse.body.results[0].quantity_unit).toBe(validQuantityCondition.quantity_unit);
+                expect(quantitySearchResponse.body.results[0].size).toBe(validQuantityCondition.size);
+                expect(quantitySearchResponse.body.results[0].size_unit).toBe(validQuantityCondition.size_unit);
+                expect(quantitySearchResponse.body.results[0].product.id).toBe(validQuantityCondition.product);
+                expect(quantitySearchResponse.body.results[0].materials[0].id).toBe(validQuantityCondition.materials[0]);
+                expect(quantitySearchResponse.body.results[0].client.id).toBe(validQuantityCondition.client);
+                expect(quantitySearchResponse.body.results[0].company.id).toBe(validQuantityCondition.company);
+                expect(quantitySearchResponse.body.results[0].colour).toBe(validQuantityCondition.colour);
+                expect(quantitySearchResponse.body.results[0].threshold).toBe(validQuantityCondition.threshold);
             });
         });
+
         describe("Specific Pricing Rules", () => {
             it("it should not proceed with creation with the wrong indication for pricing rules", async () => {
                 const response = await request(app)
@@ -552,18 +333,27 @@ describe("/pricings testing", () => {
 
                 // verify the rule creation is valid:
                 const searchResponse = await request(app)
-                    .get(`/pricings/rules`)
+                    .post("/search/pricing_rules")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingRuleID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingRuleID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(searchResponse.statusCode).toBe(200);
-                expect(searchResponse.body.pricing_rules.length).toBe(1);
-                expect(isRuleValid(searchResponse.body.pricing_rules[0])).toBe(true);
-                expect(searchResponse.body.pricing_rules[0].id).toBe(testPricingRuleID);
-                expect(searchResponse.body.pricing_rules[0].price_per_unit).toBe(pricingRuleObject.validTestingObject.price_per_unit);
-                expect(searchResponse.body.pricing_rules[0].conditions.length).toBe(1);
+                expect(searchResponse.body.results.length).toBe(1);
+                expect(isRuleValid(searchResponse.body.results[0])).toBe(true);
+                expect(searchResponse.body.results[0].id).toBe(testPricingRuleID);
+                expect(searchResponse.body.results[0].price_per_unit).toBe(pricingRuleObject.validTestingObject.price_per_unit);
+                expect(searchResponse.body.results[0].conditions.length).toBe(1);
             });
         });
     });
@@ -593,40 +383,59 @@ describe("/pricings testing", () => {
 
                 // verify the conditions update is valid:
                 const sizeUpdateResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post("/search/pricing_conditions")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testSizeConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testSizeConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
+
                 expect(sizeUpdateResponse.statusCode).toBe(200);
                 expect(sizeUpdateResponse.body.count).toBe(1);
-                expect(isConditionValid(sizeUpdateResponse.body.pricing_conditions[0])).toBe(true);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].id).toBe(testSizeConditionID);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].quantity).toBe(null);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].quantity_unit).toBe(null);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].size).toBe(pricingConditionObject.updateTestingObject.size);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].size_unit).toBe(pricingConditionObject.updateTestingObject.size_unit);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].product.id).toBe(pricingConditionObject.updateTestingObject.product);
-                expect(sizeUpdateResponse.body.pricing_conditions[0].materials[0].id).toBe(pricingConditionObject.updateTestingObject.materials[0]);
+                expect(isConditionValid(sizeUpdateResponse.body.results[0])).toBe(true);
+                expect(sizeUpdateResponse.body.results[0].id).toBe(testSizeConditionID);
+                expect(sizeUpdateResponse.body.results[0].quantity).toBe(null);
+                expect(sizeUpdateResponse.body.results[0].quantity_unit).toBe(null);
+                expect(sizeUpdateResponse.body.results[0].size).toBe(pricingConditionObject.updateTestingObject.size);
+                expect(sizeUpdateResponse.body.results[0].size_unit).toBe(pricingConditionObject.updateTestingObject.size_unit);
+                expect(sizeUpdateResponse.body.results[0].product.id).toBe(pricingConditionObject.updateTestingObject.product);
+                expect(sizeUpdateResponse.body.results[0].materials[0].id).toBe(pricingConditionObject.updateTestingObject.materials[0]);
 
                 const quantityUpdateResponse = await request(app)
-                    .get(`/pricings/conditions`)
+                    .post("/search/pricing_conditions")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testQuantityConditionID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testQuantityConditionID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(quantityUpdateResponse.statusCode).toBe(200);
                 expect(quantityUpdateResponse.body.count).toBe(1);
-                expect(isConditionValid(quantityUpdateResponse.body.pricing_conditions[0])).toBe(true);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].id).toBe(testQuantityConditionID);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].size).toBe(null);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].size_unit).toBe(null);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].quantity).toBe(pricingConditionObject.updateTestingObject.quantity);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].quantity_unit).toBe(pricingConditionObject.updateTestingObject.quantity_unit);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].product.id).toBe(pricingConditionObject.updateTestingObject.product);
-                expect(quantityUpdateResponse.body.pricing_conditions[0].materials[0].id).toBe(pricingConditionObject.updateTestingObject.materials[0]);
+                expect(isConditionValid(quantityUpdateResponse.body.results[0])).toBe(true);
+                expect(quantityUpdateResponse.body.results[0].id).toBe(testQuantityConditionID);
+                expect(quantityUpdateResponse.body.results[0].size).toBe(null);
+                expect(quantityUpdateResponse.body.results[0].size_unit).toBe(null);
+                expect(quantityUpdateResponse.body.results[0].quantity).toBe(pricingConditionObject.updateTestingObject.quantity);
+                expect(quantityUpdateResponse.body.results[0].quantity_unit).toBe(pricingConditionObject.updateTestingObject.quantity_unit);
+                expect(quantityUpdateResponse.body.results[0].product.id).toBe(pricingConditionObject.updateTestingObject.product);
+                expect(quantityUpdateResponse.body.results[0].materials[0].id).toBe(pricingConditionObject.updateTestingObject.materials[0]);
             });
 
             it("it should be able to update the pricing rule correctly", async () => {
@@ -639,18 +448,27 @@ describe("/pricings testing", () => {
                 expect(response.statusCode).toBe(200);
 
                 const updateResponse = await request(app)
-                    .get(`/pricings/rules`)
+                    .post("/search/pricing_rules")
                     .set('session-token', validSession)
-                    .query({
-                        target: 'id',
-                        keyword: testPricingRuleID
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: testPricingRuleID,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
                     });
                 expect(updateResponse.statusCode).toBe(200);
                 expect(updateResponse.body.count).toBe(1);
-                expect(isRuleValid(updateResponse.body.pricing_rules[0])).toBe(true);
-                expect(updateResponse.body.pricing_rules[0].id).toBe(testPricingRuleID);
-                expect(updateResponse.body.pricing_rules[0].price_per_unit).toBe(pricingRuleObject.updateTestingObject.price_per_unit);
-                expect(updateResponse.body.pricing_rules[0].conditions.length).toBe(pricingRuleObject.updateTestingObject.conditions.length);
+                expect(isRuleValid(updateResponse.body.results[0])).toBe(true);
+                expect(updateResponse.body.results[0].id).toBe(testPricingRuleID);
+                expect(updateResponse.body.results[0].price_per_unit).toBe(pricingRuleObject.updateTestingObject.price_per_unit);
+                expect(updateResponse.body.results[0].conditions.length).toBe(pricingRuleObject.updateTestingObject.conditions.length);
             });
         });
     });
@@ -675,15 +493,24 @@ describe("/pricings testing", () => {
             expect(deletionResponse.statusCode).toBe(200);
 
             const ruleSearchResponse = await request(app)
-                .get(`/pricings/rules`)
-                .set('session-token', validSession)
-                .query({
-                    target: 'id',
-                    keyword: associationResponse.body.id
-                });
+                    .post("/search/pricing_rules")
+                    .set('session-token', validSession)
+                    .send({
+                        ...testObject.search.defaultStructure,
+                        searchQuery: {
+                            ...testObject.search.defaultStructure.searchQuery,
+                            whereClause: {
+                                target: "id",
+                                operator: "eq",
+                                keyword: associationResponse.body.id,
+                                specification: "default",
+                                transformType: null
+                            }
+                        }
+                    });
             expect(ruleSearchResponse.statusCode).toBe(200);
             expect(ruleSearchResponse.body.count).toBe(0);
-            expect(ruleSearchResponse.body.pricing_rules.length).toBe(0);
+            expect(ruleSearchResponse.body.results.length).toBe(0);
 
             // then proceed to delet the lastly created condition:
             const deletionResponse2 = await request(app)

@@ -25,24 +25,6 @@ const testObject = {
         validTestPassword: "testPassword%586",
     },
     client: {
-        validSearchObject: {
-            id: "eef39",
-            full_name: "one",
-            email: "one",
-            phone: "13800",
-            wechat_contact: "wo5678",
-            qq_contact: "7890",
-            company: "glob"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            full_name: "!@#$%^&*",
-            email: "!7#$%^&*",
-            phone: "-611111111111",
-            wechat_contact: "@*(@#)98",
-            qq_contact: "@*(@#)98",
-            company: "!@#$%^&*",
-        },
         validNewAddress: validNewAddress,
         validTestingObject: {
             full_name: "Test Client",
@@ -64,18 +46,6 @@ const testObject = {
         }
     },
     company: {
-        validSearchObject: {
-            id: "1e101",
-            full_name: "glob",
-            email: "1522",
-            phone: "6789"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            full_name: "!@#$%^&*",
-            email: "!7#$%^&*",
-            phone: "-&^6111111"
-        },
         validNewAddress: validNewAddress,
         validTestingObject: {
             full_name: "Express Company",
@@ -95,24 +65,6 @@ const testObject = {
         }
     },
     employee: {
-        validSearchObject: {
-            id: "dc450",
-            name: "Jane",
-            email: "smith",
-            wechat_contact: "smith",
-            qq_contact: "7890",
-            phone: "6003",
-            position: "Assembler"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            name: "!@#$%^&*",
-            email: "!7#$%^&*",
-            wechat_contact: "@*(@#)98",
-            qq_contact: "@*(@#)98",
-            phone: "-&^6111111",
-            position: "!@#,$%^&*"
-        },
         validTestingObject: {
             name: "Express Employee",
             email: "test517@gmail.com",
@@ -131,14 +83,6 @@ const testObject = {
         }
     },
     position: {
-        validSearchObject: {
-            id: "f330",
-            name: "ins"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            name: "!@#$%^&*"
-        },
         validTestingObject: {
             name: "Express Position",
             descriptions: "Testing tools with descriptions"
@@ -149,16 +93,6 @@ const testObject = {
         }
     },
     material: {
-        validSearchObject: {
-            id: "742d",
-            en_name: "X-ray",
-            ch_name: "相纸"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            en_name: "!@#$%^&*",
-            ch_name: "!@#$%^&*"
-        },
         validTestingObject: {
             en_name: "Express Material",
             ch_name: "Express 材料",
@@ -171,16 +105,6 @@ const testObject = {
         }
     },
     product: {
-        validSearchObject: {
-            id: "d5770",
-            en_name: "seal",
-            ch_name: "公章"
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            en_name: "!@#$%^&*",
-            ch_name: "!@#$%^&*"
-        },
         validTestingObject: {
             en_name: "Express Product",
             ch_name: "Express 产品",
@@ -767,6 +691,10 @@ const invalidTestingRange = {
     }
 }
 
+
+
+
+
 /*
 * ======================================================================
 * helper function to validate the test response of the endpoints
@@ -1045,6 +973,12 @@ function isSearchTargetValid(targets) {
     return true;
 }
 
+
+
+
+
+
+
 /*
 * ============================================================================================
 * Utility Sections
@@ -1116,10 +1050,10 @@ async function getTestSession(app) {
 }
 async function getTestCompany(app, session) {
     const response = await request(app)
-        .get('/companies')
+        .post('/search/companies')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.companies[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestSpecificCompany(app, session, id) {
     const response = await request(app)
@@ -1129,59 +1063,59 @@ async function getTestSpecificCompany(app, session, id) {
 }
 async function getTestClient(app, session) {
     const response = await request(app)
-        .get('/clients')
+        .post('/search/clients')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.clients[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestEmployee(app, session) {
     const response = await request(app)
-        .get('/employees')
+        .post('/search/employees')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.employees[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestPosition(app, session) {
     const response = await request(app)
-        .get('/positions')
+        .post('/search/positions')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.positions[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestMaterial(app, session) {
     const response = await request(app)
-        .get('/materials')
+        .post('/search/materials')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.materials[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestProduct(app, session) {
     const response = await request(app)
-        .get('/products')
+        .post('/search/products')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.products[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestPricingCondition(app, session) {
     const response = await request(app)
-        .get('/pricings/conditions')
+        .post('/search/pricing_conditions')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.pricing_conditions[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestPricingRule(app, session) {
     const response = await request(app)
-        .get('/pricings/rules')
+        .post('/search/pricing_rules')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.pricing_rules[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 async function getTestTransaction(app, session) {
     const response = await request(app)
-        .get('/transactions')
+        .post('/search/transactions')
         .set('session-token', session)
-        .query({ page: 1 });
-    return response.body.transactions[0];
+        .send(testObject.search.defaultStructure);
+    return response.body.results[0];
 }
 
 module.exports = {

@@ -8,7 +8,6 @@ const {
     getTestClient,
     testObject,
     invalidTestingRange,
-    isClientValid,
     isSpecificClientValid,
     isSpecificAddressValid
 } = require('../../utils/TestTools');
@@ -22,8 +21,6 @@ describe('Clients Router', () => {
     let existingClient;
 
     //  sett up the testing cases needed
-    const validSearchObject = testObject.client.validSearchObject;
-    const invalidSearchObject = testObject.client.invalidSearchObject;
     const validNewAddress = testObject.client.validNewAddress;
     let validTestingObject = testObject.client.validTestingObject;
     const updateTestingObject = testObject.client.updateTestingObject;
@@ -38,123 +35,6 @@ describe('Clients Router', () => {
 
         // get an existing client for testing on references:
         existingClient = await getTestClient(app, validSession);
-    });
-    
-    // Test cases for manipulating all client instances:
-    describe('GET /', () => {
-        it ("it should return status 401 if no session-token is provided", async () => {
-            const response = await request(app)
-                .get('/clients');
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 401 if invalid is provided", async () => {
-            const response = await request(app)
-                .get('/clients')
-                .set("session-token", "invalid-test-token");
-            expect(response.statusCode).toBe(401);
-        });
-        it ("it should return status 200 for get all if session-token is valid and no query parameters are specified", async () => {
-            const response = await request(app)
-                .get('/clients')
-                .set("session-token", validSession);
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('count');
-            expect(response.body.page).toBe(1);
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        it ("it should return status 200 for get all if session-token is valid and page parameter is provided", async () => {
-            const response = await request(app)
-                .get('/clients')
-                .set("session-token", validSession)
-                .query({
-                    page: 1
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body).not.toHaveProperty('count'); // only show counts if client doesn't know the page
-            expect(response.body.page).toBe(1);
-            expect(response.body.clients.length).toBeGreaterThan(0);
-            expect(isClientValid(response.body.clients[0])).toBe(true);
-        });
-        describe("search target validation", () => {
-            Object.keys(invalidTestingRange.invalidSearchTargets).forEach((situation) => {
-                it (`it should return status 400 if search target is ${situation}`, async () => {
-                    const response = await request(app)
-                        .get('/clients')
-                        .set("session-token", validSession)
-                        .query({
-                            target: invalidTestingRange.invalidSearchTargets[situation],
-                            keyword: validSearchObject[Object.keys(validSearchObject)[0]]
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-        describe("search keyword validation", () => {
-            Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((situation) => {
-                it (`it should return status 400 if search keyword is ${situation}`, async () => {
-                    const response = await request(app)
-                        .get('/clients')
-                        .set("session-token", validSession)
-                        .query({
-                            target: Object.keys(validSearchObject)[0],
-                            keyword: invalidTestingRange.invalidSearchKeywords[situation]
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-        describe("page validation", () => {
-            Object.keys(invalidTestingRange.page).forEach((situation) => {
-                it (`it should return status 400 if page is ${situation}`, async () => {
-                    const response = await request(app)
-                        .get('/clients')
-                        .set("session-token", validSession)
-                        .query({
-                            page: invalidTestingRange.page[situation]
-                        });
-                    expect(response.statusCode).toBe(400);
-                });
-            });
-        });
-        describe("Valid result display testings", () => {
-            Object.keys(validSearchObject).forEach((target) => {
-                it (`it should return status 200 for a valid ${target} search`, async () => {
-                    const response = await request(app)
-                        .get('/clients/')
-                        .set("session-token", validSession)
-                        .query({
-                            target: target,
-                            keyword: validSearchObject[target],
-                        });
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body.searched).toBe(true);
-                    expect(response.body.count).toBeGreaterThan(0);
-                    expect(response.body.page).toBeTruthy();
-                    expect(response.body.clients.length).toBeGreaterThan(0);
-                    expect(isClientValid(response.body.clients[0])).toBe(true);
-                });
-            });
-        });
-        
-        describe("Non-matching result displaying", () => {
-            Object.keys(invalidSearchObject).forEach((target) => {
-                it (`it should return status 200 for a non-matching ${target} search`, async () => {
-                    const response = await request(app)
-                        .get('/clients/')
-                        .set("session-token", validSession)
-                        .query({
-                            target: target,
-                            keyword: invalidSearchObject[target],
-                        });
-                    expect(response.statusCode).toBe(200);
-                    expect(response.body.searched).toBe(true);
-                    expect(response.body.count).toBe(0);
-                    expect(response.body.page).toBeTruthy();
-                    expect(response.body.clients.length).toBe(0);
-                });
-            });
-        });
     });
 
     // Test case for manipulating a specific client instance
@@ -243,6 +123,7 @@ describe('Clients Router', () => {
                     .set("session-token", validSession);
                 expect(response.statusCode).toBe(200);
                 const respondedClient = response.body.client;
+
                 expect(isSpecificClientValid(respondedClient)).toBe(true);
                 expect(respondedClient.id).toBe(testingClientId);
                 expect(respondedClient.full_name).toBe(validTestingObject.full_name);

@@ -150,7 +150,7 @@ function mapDefaultQueryColumns(table, detailed = false) {
                                 WHERE ${mapQueryPrefix("addresses")}.company = ${mapQueryPrefix(table)}.id
                             )
                     END AS addresses,
-                    CASE WHEN (SELECT count(id) FROM public.clients WHERE company = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
+                    CASE WHEN (SELECT COUNT(id) FROM public.clients WHERE company = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
                             ELSE (
                                 SELECT jsonb_agg(
                                     jsonb_build_object(
@@ -172,12 +172,16 @@ function mapDefaultQueryColumns(table, detailed = false) {
                     ${mapQueryPrefix(table)}.phone,
                     ${mapQueryPrefix(table)}.wechat_contact,
                     ${mapQueryPrefix(table)}.qq_contact,
-                    (SELECT 
-                        ${mapQueryPrefix("companies")}.full_name 
-                        FROM public.companies ${mapQueryPrefix("companies")} 
+                    CASE WHEN ${mapQueryPrefix(table)}.company IS NULL THEN NULL 
+                    ELSE(
+                        SELECT json_build_object(
+                            'id', ${mapQueryPrefix("companies")}.id, 
+                            'full_name', ${mapQueryPrefix("companies")}.full_name
+                        )
+                        FROM public.companies ${mapQueryPrefix("companies")}
                         WHERE ${mapQueryPrefix("companies")}.id = ${mapQueryPrefix(table)}.company
-                    ) AS company
-                    `;
+                    ) 
+                    END AS company`;
         const details = 
                     `,
                     CASE WHEN (SELECT COUNT(id) FROM public.addresses WHERE client = ${mapQueryPrefix(table)}.id) = 0 THEN NULL 
@@ -220,14 +224,20 @@ function mapDefaultQueryColumns(table, detailed = false) {
         return `
                 ${mapQueryPrefix(table)}.id,
                 ${mapQueryPrefix(table)}.name,
+                ${mapQueryPrefix(table)}.email,
                 ${mapQueryPrefix(table)}.phone,
                 ${mapQueryPrefix(table)}.wechat_contact,
                 ${mapQueryPrefix(table)}.qq_contact,
-                (
-                    SELECT ${mapQueryPrefix("positions")}.name
-                    FROM public.positions ${mapQueryPrefix("positions")} 
+                CASE WHEN ${mapQueryPrefix(table)}.position IS NULL THEN NULL 
+                ELSE (
+                    SELECT jsonb_build_object(
+                        'id', ${mapQueryPrefix("positions")}.id, 
+                        'name', ${mapQueryPrefix("positions")}.name,
+                        'descriptions', ${mapQueryPrefix("positions")}.descriptions
+                    )
+                    FROM public.positions ${mapQueryPrefix("positions")}
                     WHERE ${mapQueryPrefix("positions")}.id = ${mapQueryPrefix(table)}.position
-                ) AS position
+                ) END AS position
             `;
     }
     else if (table === "pricing_conditions"){
@@ -337,14 +347,14 @@ function mapDefaultQueryColumns(table, detailed = false) {
             `;
     }
     else if (table === "transactions") {
-        const prefiex = mapQueryPrefix(table);
+        const prefix = mapQueryPrefix(table);
         const defaultColumns = `
-                ${prefiex}.transaction_date, ${prefiex}.creation_date, ${prefiex}.modified_date, 
-                ${prefiex}.status, ${prefiex}.id, ${prefiex}.name, ${prefiex}.quantity, 
-                ${prefiex}.price_per_unit, ${prefiex}.amount, ${prefiex}.note, ${prefiex}.colour, 
-                ${prefiex}.en_unit, ${prefiex}.ch_unit, ${prefiex}.width, ${prefiex}.height, ${prefiex}.length, 
-                ${prefiex}.size, ${prefiex}.quantity_unit, ${prefiex}.size_unit,
-                CASE WHEN ${prefiex}.materials IS NULL OR array_length(${prefiex}.materials, 1) = 0 THEN NULL
+                ${prefix}.transaction_date, ${prefix}.creation_date, ${prefix}.modified_date, 
+                ${prefix}.status, ${prefix}.id, ${prefix}.name, ${prefix}.quantity, 
+                ${prefix}.price_per_unit, ${prefix}.amount, ${prefix}.note, ${prefix}.colour, 
+                ${prefix}.en_unit, ${prefix}.ch_unit, ${prefix}.width, ${prefix}.height, ${prefix}.length, 
+                ${prefix}.size, ${prefix}.quantity_unit, ${prefix}.size_unit,
+                CASE WHEN ${prefix}.materials IS NULL OR array_length(${prefix}.materials, 1) = 0 THEN NULL
                 ELSE (
                     SELECT jsonb_agg(
                         jsonb_build_object(
@@ -354,7 +364,7 @@ function mapDefaultQueryColumns(table, detailed = false) {
                         )
                     )
                     FROM public.materials ${mapQueryPrefix("materials")}
-                    WHERE ${mapQueryPrefix("materials")}.id = ANY(${prefiex}.materials)
+                    WHERE ${mapQueryPrefix("materials")}.id = ANY(${prefix}.materials)
                 ) END as materials,
                 (
                     SELECT jsonb_build_object(
@@ -363,43 +373,51 @@ function mapDefaultQueryColumns(table, detailed = false) {
                         'ch_name', ${mapQueryPrefix("products")}.ch_name
                     )
                     FROM public.products ${mapQueryPrefix("products")}
-                    WHERE ${mapQueryPrefix("products")}.id = ${prefiex}.product
+                    WHERE ${mapQueryPrefix("products")}.id = ${prefix}.product
                 ) as product,
-                (
-                    SELECT ${mapQueryPrefix("companies")}.full_name
+                CASE WHEN ${prefix}.company is NULL THEN NULL 
+                ELSE(
+                    SELECT jsonb_build_object(
+                        'id', ${mapQueryPrefix("companies")}.id,
+                        'full_name', ${mapQueryPrefix("companies")}.full_name
+                    )
                     FROM public.companies ${mapQueryPrefix("companies")}
-                    WHERE ${mapQueryPrefix("companies")}.id = ${prefiex}.company
-                ) as company,
-                (
-                    SELECT ${mapQueryPrefix("clients")}.full_name
+                    WHERE ${mapQueryPrefix("companies")}.id = ${prefix}.company
+                ) END AS company,
+                CASE WHEN ${prefix}.client is NULL THEN NULL
+                ELSE(
+                    SELECT jsonb_build_object(
+                        'id', ${mapQueryPrefix("clients")}.id,
+                        'full_name', ${mapQueryPrefix("clients")}.full_name
+                    )
                     FROM public.clients ${mapQueryPrefix("clients")}
-                    WHERE ${mapQueryPrefix("clients")}.id = ${prefiex}.client
-                ) as client
+                    WHERE ${mapQueryPrefix("clients")}.id = ${prefix}.client
+                ) END AS client
             `;
         const details = `
             ,
-                CASE WHEN t.addresses IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
+                CASE WHEN ${prefix}.addresses IS NULL OR array_length(${prefix}.addresses, 1) = 0 THEN NULL
                 ELSE ( SELECT jsonb_agg(
                     jsonb_build_object(
-                        'id', a.id,
-                        'street', a.street_address,
-                        'city', a.city,
-                        'state', a.state,
-                        'country', a.country,
-                        'postal', a.postal_code,
-                        'category', a.category
+                        'id', ${mapQueryPrefix("addresses")}.id,
+                        'street', ${mapQueryPrefix("addresses")}.street_address,
+                        'city', ${mapQueryPrefix("addresses")}.city,
+                        'state', ${mapQueryPrefix("addresses")}.state,
+                        'country', ${mapQueryPrefix("addresses")}.country,
+                        'postal', ${mapQueryPrefix("addresses")}.postal_code,
+                        'category', ${mapQueryPrefix("addresses")}.category
                     ))
-					FROM public.addresses a
-					WHERE a.id = ANY(t.addresses)
+					FROM public.addresses ${mapQueryPrefix("addresses")}
+					WHERE ${mapQueryPrefix("addresses")}.id = ANY(${prefix}.addresses)
                 ) END as addresses,
-                CASE WHEN t.employee IS NULL OR array_length(t.addresses, 1) = 0 THEN NULL
+                CASE WHEN ${prefix}.employee IS NULL OR array_length(${prefix}.employee, 1) = 0 THEN NULL
                 ELSE (SELECT jsonb_agg(
                     jsonb_build_object(
-                        'id', e.id,
-                        'name', e.name
+                        'id', ${mapQueryPrefix("employees")}.id,
+                        'name', ${mapQueryPrefix("employees")}.name
                     ))
-					FROM public.employees e
-					WHERE e.id = ANY(t.employee)
+					FROM public.employees ${mapQueryPrefix("employees")}
+					WHERE ${mapQueryPrefix("employees")}.id = ANY(${prefix}.employee)
                 ) END as employee
         `;
         return detailed ? defaultColumns + details : defaultColumns;

@@ -18,140 +18,12 @@ describe("Positions Router", () => {
     let exsitingPosition;
     let testPositionID;
     let testEmployeeID;
-    const validSearchObject = testObject.position.validSearchObject;
-    const invalidSearchObject = testObject.position.invalidSearchObject;
     const validTestingObject = testObject.position.validTestingObject;
     const updateTestingObject = testObject.position.updateTestingObject;
 
     beforeAll(async () => {
         validSession = await getTestSession(app);
         exsitingPosition = await getTestPosition(app, validSession);
-    });
-
-    describe("GET All: /positions", () => {
-        describe("Session Validation Testings",() => {
-            it ("it should not authroise any access without token", async () => {
-                const response = await request(app)
-                    .get('/positions');
-                expect(response.statusCode).toBe(401)
-            });
-            it ("it should not authroise any access with invalid token", async () => {
-                const response = await request(app)
-                    .get('/positions')
-                    .set('session-token', 'invalid-test-token');
-                expect(response.statusCode).toBe(401)
-            });
-        });
-
-        describe("Behaciour testing on the get all endpoint", () => {
-            it ("it should return status 200", async () => {
-                const response = await request(app)
-                    .get('/positions')
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body.count).toBeGreaterThan(0);
-                expect(response.body.page).toBe(1);
-                expect(response.body.positions.length).toBeGreaterThan(0);
-                expect(isPositionValid(response.body.positions[0])).toBe(true);
-            });
-
-            describe("testing search Target", () => {
-                Object.keys(invalidTestingRange.invalidSearchTargets).forEach((target) => {
-                    it (`it should not faithfully return if searching target is ${target}`, async () => {
-                        const response = await request(app)
-                            .get('/positions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: invalidTestingRange.invalidSearchTargets[target],
-                                keyword: validSearchObject[Object.keys(validSearchObject)[0]]
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("testing search keyword", () => {
-                Object.keys(invalidTestingRange.invalidSearchKeywords).forEach((keyword) => {
-                    it (`it should not faithfully return if searching keyword is ${keyword}`, async () => {
-                        const response = await request(app)
-                            .get('/positions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: Object.keys(validSearchObject)[0],
-                                keyword: invalidTestingRange.invalidSearchKeywords[keyword],
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("testing page number", () => {
-                Object.keys(invalidTestingRange.page).forEach((page) => {
-                    it (`it should not faithfully return if page is ${page}`, async () => {
-                        const response = await request(app)
-                            .get('/positions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                page: invalidTestingRange.page[page],
-                            });
-                        expect(response.statusCode).toBe(400);
-                    });
-                });
-            });
-
-            describe("testing for searching non-exsitence records", () => {
-                Object.keys(invalidSearchObject).forEach((property) => {
-                    it (`it should return normally even if searching value of ${property} is non-existence`, async () => {
-                        const response = await request(app)
-                            .get('/positions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: property,
-                                keyword: invalidSearchObject[property],
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.positions.length).toBe(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBe(0);
-                        expect(response.body.page).toBeTruthy();
-                    });
-                });
-            });
-
-            describe("testing for searching existence records", () => {
-                Object.keys(validSearchObject).forEach((property) => {
-                    it (`it should return a valid searched response with a matching ${property}`, async () => {
-                        const response = await request(app)
-                            .get('/positions')
-                            .set('session-token', validSession)
-                            .query({ 
-                                target: property,
-                                keyword: validSearchObject[property],
-                            });
-                        expect(response.statusCode).toBe(200);
-                        expect(response.body.positions.length).toBeGreaterThan(0);
-                        expect(response.body.searched).toBe(true);
-                        expect(response.body.count).toBeGreaterThan(0);
-                        expect(response.body.page).toBeTruthy();
-                        expect(isPositionValid(response.body.positions[0])).toBe(true);
-                    });
-                });
-            });
-
-            it ("it should not return count if pagination is provided", async () => {
-                const response = await request(app)
-                    .get('/positions')
-                    .set('session-token', validSession)
-                    .query({ 
-                        target: "name",
-                        keyword: validSearchObject.name,
-                        page: 1
-                    });
-                expect(response.statusCode).toBe(200);
-                expect(response.body).not.toHaveProperty('count');
-                expect(response.body.page).toBe(1);
-            });
-        });
     });
 
     describe("POST: creating a new positions", () => {
@@ -260,21 +132,6 @@ describe("Positions Router", () => {
                 .set('session-token', validSession);
             expect(associateResponse.statusCode).toBe(200);
             expect(associateResponse.body.employee.position.id).toBe(testPositionID);
-        });
-
-        describe("/positions/:id/employees testing", () => {
-            it ("it should allow getting the newly created employee realted to that newly created position", async () => {
-                const response = await request(app)
-                    .get(`/positions/${testPositionID}/employees`)
-                    .set('session-token', validSession);
-                expect(response.statusCode).toBe(200);
-                expect(response.body.employees.length).toBe(1);
-                expect(response.body.employees[0].id).toBe(testEmployeeID);
-                expect(response.body.employees[0].name).toBe(testObject.employee.validTestingObject.name);
-                expect(response.body.employees[0].phone).toBe(testObject.employee.validTestingObject.phone);
-                expect(response.body.employees[0].wechat_contact).toBe(testObject.employee.validTestingObject.wechat_contact);
-                expect(response.body.employees[0].qq_contact).toBe(testObject.employee.validTestingObject.qq_contact);
-            });
         });
     });
 
