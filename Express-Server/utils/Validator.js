@@ -18,7 +18,7 @@ function validateAndPreProcessQuery(body, tableName, dbReferences) {
 
     // validating page:
     if ("page")
-        if (page) {
+        if (page || page == 0) {
             const pageValidation = validateInteger(page, "page number");
             if (!pageValidation.valid) return pageValidation;
         }
@@ -72,8 +72,14 @@ function validateAndPreProcessQuery(body, tableName, dbReferences) {
 
     // validating the Order BY Clause
     if (!('orderByClause' in searchQuery) ||
-        (searchQuery.orderByClause != null && !Array.isArray(searchQuery.orderByClause))) {
+        (searchQuery.orderByClause !== null && 
+        !Array.isArray(searchQuery.orderByClause) && 
+        typeof searchQuery.orderByClause !== "string")
+    ){
         return { valid: false, message: "invalid orderByClause" };
+    }
+    if (typeof searchQuery.orderByClause === "string" && searchQuery.orderByClause !== "default") {
+        return { valid: false, message: "invalid groupByClause" };
     }
     if (Array.isArray(searchQuery.orderByClause)) {
         if (searchQuery.orderByClause.length === 0) return { valid: false, message: "empty orderByClause" };
@@ -105,6 +111,10 @@ function validateTableExistence(tableName, dbReferences) {
 
 // validate the fields of the query (references are from this table specifically)
 function validateField(field, references) {
+    // validate the field type:
+    if (typeof field !== "object") return { valid: false, message: "invalid query fields" };
+
+    // validate user specific inputs:
     if (!('target' in field) || !('specification' in field) || !('as' in field)) {
         return { valid: false, message: "invalid query fields" };
     }
@@ -112,7 +122,7 @@ function validateField(field, references) {
     if (validations.some(validation => !validation.valid)) {
         return { valid: false, message: "invalid query fields" };
     }
-    if (field.specification === "default" && !field.as) {
+    if (field.specification !== "default" && !field.as) {
         return { valid: false, type: "invalid alias for functional or aggregated field" };
     }
 
@@ -127,61 +137,69 @@ function validateField(field, references) {
 
 // validate the nester whereclause:
 function validateWhereClause(whereClause, references) {
-    const keys = Object.keys(whereClause);
+    try {
+        const keys = Object.keys(whereClause);
 
-    // on operator level
-    if (keys.length == 1 && (keys[0] == "AND" || keys[0] == "OR")) {
-        const operator = keys[0];
-        const clauses = whereClause[operator];
-        const validatedClauses = clauses.map(clause => validateWhereClause(clause, references));
-        if (validatedClauses.every(clause => clause !== null)) {
-            return { [operator]: validatedClauses };
+        // on operator level
+        if (keys.length == 1 && (keys[0] == "AND" || keys[0] == "OR")) {
+            const operator = keys[0];
+            const clauses = whereClause[operator];
+            const validatedClauses = clauses.map(clause => validateWhereClause(clause, references));
+            if (validatedClauses.every(clause => clause !== null)) {
+                return { [operator]: validatedClauses };
+            }
+            return null;
         }
-        return null;
-    }
-    // if clause on the comparison level
-    else if (Array.isArray(whereClause) && !(keys[0] == "AND" || keys[0] == "OR")) {
-        const validatedClauses = whereClause.map(clause => validateWhereClause(clause, references));
-        if (validatedClauses.every(clause => clause !== null)) {
-            return validatedClauses;
+        // if clause on the comparison level
+        else if (Array.isArray(whereClause) && keys.length > 0 && !(keys[0] == "AND" || keys[0] == "OR")) {
+            const validatedClauses = whereClause.map(clause => validateWhereClause(clause, references));
+            if (validatedClauses.every(clause => clause !== null)) {
+                return validatedClauses;
+            }
+            return null;
         }
-        return null;
-    }
-    // single clause iteration level
-    else if (typeof whereClause == "object" &&
-        'target' in whereClause &&
-        'operator' in whereClause &&
-        'keyword' in whereClause) {
-        const validation = validateSingleWhereClause(whereClause, references);
-        if (validation.valid) {
-            return { ...whereClause, type: validation.type };
+        // single clause iteration level
+        else if (typeof whereClause == "object" &&
+            'target' in whereClause &&
+            'operator' in whereClause &&
+            'keyword' in whereClause) {
+            const validation = validateSingleWhereClause(whereClause, references);
+            if (validation.valid) {
+                return { ...whereClause, type: validation.type };
+            }
+            return null;
         }
-        return null;
+        else {
+            return null;
+        }
     }
-    else {
+    catch (error) {
+        console.error(error);
         return null;
     }
 }
 
 // validate single where clause (type is either the degault DB property type or the transformation type)
 function validateSingleWhereClause(whereClause, references) {
+    if (!whereClause || typeof whereClause !== "object") return { valid: false, message: "invalid whereClause" };
+
     // validate the existence of the key properties
     if (!('target' in whereClause) || !('operator' in whereClause) || !('keyword' in whereClause)
         || !('specification' in whereClause) || !('transformType' in whereClause)) {
         return { valid: false, message: "invalid whereClause" };
     }
     const { target, operator, keyword, specification, transformType } = whereClause;
-    
+
     // cannot miss bacis informations (except transformType)
     if (!target || !operator || !keyword || !specification) {
         return { valid: false, message: "invalid whereClause (cannot miss essential info)" };
     }
     // validate the type of the strings
     const stringValidations = [
-        validateName(target), 
-        validateName(operator), 
+        validateName(target),
+        validateName(operator),
         validateName(keyword),
-        validateName(specification), 
+        validateName(specification),
         validateString(transformType),
     ];
     if (stringValidations.some(validation => !validation.valid)) return { valid: false, message: "invalid whereClause" };
@@ -196,12 +214,14 @@ function validateSingleWhereClause(whereClause, references) {
     }
 
     // attaching the type refrences and validate the search keywords:
-    let type = references.find(reference => reference.column == target).type;
+    const ref = references.find(reference => reference.column == target);
+    if (!ref) return { valid: false, message: "invalid whereClause" };
+    let type = ref.type;
     if (!type) return { valid: false, message: "invalid whereClause" };
-    if (specification !== "default"){
-        type = transformType;
+    if (specification !== "default") {
+        type = transformType; // allow transformation on the type
     }
-    
+
     // operater must be a string (and valid)
     const operatorValidation = validateName(operator);
     if (!operatorValidation.valid) return { valid: false, message: "invalid operator" };
@@ -234,9 +254,10 @@ function validateSingleWhereClause(whereClause, references) {
 }
 
 // function used to validate single group by clause:
-function validateGroupByClause(clause, references, fields) {
+function validateGroupByClause(clause, references) {
 
     // validate user specific inputs:
+    if (!clause || typeof clause !== "object") return { valid: false, message: "invalid group by clause" };
     if (!'target' in clause || !'specification' in clause) {
         return { valid: false, message: "invalid group by clause" };
     }
@@ -261,6 +282,7 @@ function validateGroupByClause(clause, references, fields) {
 function validateOrderByClause(clause, references) {
 
     // validate user specific inputs:
+    if (!clause || typeof clause !== "object") return { valid: false, message: "invalid group by clause" };
     if (!'target' in clause || !'specification' in clause || !'order' in clause) {
         return { valid: false, message: "invalid order by clause" };
     }
@@ -584,11 +606,9 @@ function validateFunctions(specification) {
         // String Functions
         "CONCAT", "SUBSTRING", "LOWER", "UPPER", "TRIM", "LENGTH",
         // Date Functions
-        "DATE", "YEAR", "MONTH", "DAY",
+        "YEAR", "MONTH", "DAY",
         // Numeric Functions
         "ABS", "ROUND", "FLOOR", "CEILING",
-        // Conditional Functions
-        "COALESCE", "NULLIF", "CASE",
         // Type Conversion
         "CAST",
         // Window Functions
@@ -604,17 +624,15 @@ function validateFunctions(specification) {
     return { valid: true };
 }
 
-function validateTransformation(specification, transformType){
-    const integerTransformations = ["COUNT", "YEAR", "MONTH", "DAY", "LENGTH", "ROW_NUMBER", "RANK", "DENSE_RANK"];
-    const numericTransformations = ["SUM", "AVG", "ABS", "ROUND", "FLOOR", "CEILING"];
+function validateTransformation(specification, transformType) {
+    const integerTransformations = ["COUNT", "YEAR", "MONTH", "DAY", "LENGTH", "ROW_NUMBER", "RANK", "DENSE_RANK", "SUM", "AVG", "ABS", "MAX", "MIN"];
+    const numericTransformations = ["SUM", "AVG", "ABS", "MAX", "MIN", "ROUND", "FLOOR", "CEILING"];
     const stringTransformations = ["CONCAT", "SUBSTRING", "LOWER", "UPPER", "TRIM", "GROUP_CONCAT", "TEXT"];
-    const dateTransformations = ["DATE"];
-    
+
     if (transformType !== "numeric" && numericTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
     if (transformType !== "integer" && integerTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
-    if (transformType !== "string" && stringTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
-    if (transformType !== "date" && dateTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
-    if (transformType !== "numeric" && transformType !== "integer" && transformType !== "string" && transformType !== "date") return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "text" && stringTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
+    if (transformType !== "numeric" && transformType !== "integer" && transformType !== "text") return { valid: false, message: 'Invalid Function' };
     return { valid: true };
 }
 

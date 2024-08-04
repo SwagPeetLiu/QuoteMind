@@ -362,48 +362,171 @@ const testObject = {
                 fields: "default",
                 whereClause: null,
                 groupByClause: null,
-                orderByClause: null
+                orderByClause: "default"
             },
             page: null
+        },
+        defaultfield: {
+            target: "id",
+            specification: "default",
+            as: null
+        },
+        defualtSingleWhereClause: {
+            target: "name",
+            operator: "eq",
+            keyword: "express",
+            specification: "default",
+            transformType: null
+        },
+        defaultDualWhereClause: {
+            "AND": [
+                {
+                    target: "name",
+                    operator: "eq",
+                    keyword: "express",
+                    specification: "default",
+                    transformType: null
+                },
+                {
+                    target: "id",
+                    operator: "eq",
+                    keyword: "1",
+                    specification: "default",
+                    transformType: null
+                }
+            ]
+        },
+        transformativeDualWhereClause: [
+            {
+                target: "transaction_date",
+                operator: "eq",
+                keyword: "6",
+                specification: "MONTH",
+                transformType: "integer"
+            },
+            {
+                target: "transaction_date",
+                operator: "ne",
+                keyword: "2023",
+                specification: "YEAR",
+                transformType: "integer"
+            }
+        ],
+        recursiveWhereClause: {
+            "OR": [
+                {
+                    "AND": [
+                        {
+                            target: "full_name",
+                            operator: "eq",
+                            keyword: "cli",
+                            specification: "default",
+                            transformType: null
+                        }
+                    ]
+                },
+                {
+                    target: "full_name",
+                    operator: "eq",
+                    keyword: "4",
+                    specification: "default",
+                    transformType: null
+                },
+                {
+                    target: "full_name",
+                    operator: "ne",
+                    keyword: "3",
+                    specification: "default",
+                    transformType: null
+                }
+            ]
+        },
+        defaultSingleGroupByClause: {
+            target: "id",
+            specification: "default",
+        },
+        defaultSingleOrderByClause: {
+            target: "id",
+            specification: "default",
+            order: "ASC"
         }
     }
 }
 
 // object to test the user input
 const invalidTestingRange = {
-    incompleteFields: {
-        "missing target": {
-            specification: "default",
-            as: null
-        },
-        "missing specification": {
-            target: "id",
-            as: null
-        },
-        "missing as alias": {
-            target: "id",
-            specification: "default",
-        },
-        "missing as where specification is not default": {
-            target: "id",
+    invalidColumnValue: {
+        "numeric value": 1,
+        "boolean value": true,
+        "invalud column": "testV",
+        "empty string": "",
+        "undefined": undefined
+    },
+    invalidSpecificationValue: {
+        "numeric value": 1,
+        "boolean value": true,
+        "invalud specification": "testV",
+        "empty string": "",
+        "undefined": undefined
+    },
+    invalidAlias: {
+        "numeric value": 1,
+        "boolean value": true,
+        "empty string": "",
+        "undefined": undefined,
+        "too long": `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
+    },
+    invalidOperator: {
+        "numeric value": 1,
+        "boolean value": true,
+        "empty string": "",
+        "undefined": undefined,
+        "invalid operator": "!@#",
+    },
+    invalidTransformType: {
+        "numeric value": 1,
+        "boolean value": true,
+        "empty string": "",
+        "undefined": undefined,
+        "invalid transform type": "test",
+    },
+    invalidTransformationValue: {
+        "invalid numeric specification": {
+            ...testObject.search.defaultSingleWhereClause,
             specification: "TEXT",
-            as: null
+            transformType: "numeric"
+        },
+        "invalid integer specification": {
+            ...testObject.search.defaultSingleWhereClause,
+            specification: "default",
+            transformType: "integer"
+        },
+        "invalid text specification": {
+            ...testObject.search.defaultSingleWhereClause,
+            target: "transaction_date",
+            specification: "MONTH",
+            transformType: "text"
         }
     },
-    incompleteWhereClause:{
-        "missing target":{
-            specification: "default"
-        }
+    invalidOrder: {
+        "numeric value": 1,
+        "boolean value": true,
+        "empty string": "",
+        "undefined": undefined,
+        "invalid order": "UP",
+    },
+    invalidSearchKeywords: {
+        "numeric value": 1,
+        "boolean value": true,
+        "missing keyword": undefined,
+        "empty keyword": "",
+        "too long": `${"是".repeat(config.limitations.Max_Name_Length + 1)}`,
     },
     invalidSearchTargets: {
         "invalid target": "invalid target",
         "forbidden target": process.env.FORBIDDEN_SEARCH_TARGET,
         "missing target": undefined,
         "empty target": ""
-    },
-    invalidSearchKeywords: {
-        "missing keyword": undefined,
-        "empty keyword": "",
     },
     page: {
         "invalid value": "test",
@@ -644,7 +767,11 @@ const invalidTestingRange = {
     }
 }
 
-// helper function to validate the test response of the endpoints
+/*
+* ======================================================================
+* helper function to validate the test response of the endpoints
+* ======================================================================
+*/
 function isClientValid(client) {
     if ('id' in client &&
         'full_name' in client &&

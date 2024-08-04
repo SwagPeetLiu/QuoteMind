@@ -456,9 +456,10 @@ function mapWhereClause(table, whereClause, result, operator = "AND", initialise
         return ` ${initialised? "AND" : ""}(${mapWhereClause(table, conditions, result, operator, false)})`;
     }
 
-    // recusrively reaching the level of where clauses:
+    // Recusrively reaching the level of where clauses (also Account for submitting of array on the top level)
     else if (Array.isArray(whereClause)) {
-        return whereClause.map(c => {
+        let clause = `${initialised? " AND (" : ""}`;
+        clause += whereClause.map(c => {
 
             // if this item is a nesting condition or an generative condition:
             if ('AND' in c || 'OR' in c) {
@@ -466,12 +467,15 @@ function mapWhereClause(table, whereClause, result, operator = "AND", initialise
                 return mapWhereClause(table, c, result, operator, false);
             }
             else{
-                return getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator, c.specification);
+                return `${getWhereTerm(result, table, c.target, c.keyword, c.type, c.operator, c.specification)}`;
             }
         }).join(` ${operator} `);
+        clause += `${initialised? ")" : ""}`;
+        return clause;
     }
     else {
-        return getWhereTerm(result, table, whereClause.target, whereClause.keyword, whereClause.type, whereClause.operator, whereClause.specification);
+        // account for single clause claims
+        return ` ${initialised? "AND " : ""}${getWhereTerm(result, table, whereClause.target, whereClause.keyword, whereClause.type, whereClause.operator, whereClause.specification)}`;
     }
 }
 
@@ -481,7 +485,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
 
     // deals with normal id searching (DO NOT SUPPORT transformation)
     if (target == "id" && type.toLowerCase() == "uuid") {
-        whereClause = `${mapQueryPrefix(table)}.${target}::text ${operator !== "nt"? "LIKE" : "NOT LIKE"} '%$${result.parameters.length + 1}%'`;
+        whereClause = `${mapQueryPrefix(table)}.${target}::text ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
         result.parameters.push(`%${keyword}%`);
     }
     // FK references to other tables (DO NOT SUPPORT transformation)
@@ -615,11 +619,15 @@ function mapGroupByClause(table, query) {
 
 /*
 order by clause generationes
-    - using either default or user specifics
+    - using either default or user specifics or null (no order by clause)
 */
 function mapOrderByClause(table, query) {
-    const noGroupBy = !query.orderByClause || !query.orderByClause.length;
-    let specifiedOrderBy = noGroupBy ? 
+    const noGroupBy = query.orderByClause == null;
+    if (noGroupBy) {
+        return "";
+    }
+    const useDefault = query.orderByClause == "default";
+    let specifiedOrderBy = useDefault ? 
         null : 
         `${query.orderByClause.map((field) => {
             const { target, specification, type, order } = field;
@@ -628,31 +636,31 @@ function mapOrderByClause(table, query) {
 
     switch (table) {
         case "companies":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.full_name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.full_name ASC` : specifiedOrderBy}`;
 
         case "clients":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.full_name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.full_name ASC` : specifiedOrderBy}`;
 
         case "positions":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.name ASC` : specifiedOrderBy}`;
 
         case "materials":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.ch_name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.ch_name ASC` : specifiedOrderBy}`;
 
         case "products":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.ch_name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.ch_name ASC` : specifiedOrderBy}`;
 
         case "employees":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.name ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.name ASC` : specifiedOrderBy}`;
 
         case "pricing_conditions":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.id ASC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.id ASC` : specifiedOrderBy}`;
 
         case "pricing_rules":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.price_per_unit DESC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.price_per_unit DESC` : specifiedOrderBy}`;
 
         case "transactions":
-            return `ORDER BY ${noGroupBy ? `${mapQueryPrefix(table)}.modified_date DESC` : specifiedOrderBy}`;
+            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.modified_date DESC` : specifiedOrderBy}`;
         default:
             return "";
     }
