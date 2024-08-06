@@ -503,7 +503,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
 
     // deals with normal id searching (DO NOT SUPPORT transformation)
     if (target == "id" && type.toLowerCase() == "uuid") {
-        whereClause = `${mapQueryPrefix(table)}.${target}::text ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
+        whereClause = `${mapQueryPrefix(table)}.${target}::text ${operator !== "ne"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
         result.parameters.push(`%${keyword}%`);
     }
     // FK references to other tables (DO NOT SUPPORT transformation)
@@ -511,7 +511,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
         const fkName = mapFKName(target);
         whereClause = `${mapQueryPrefix(table)}.${target} IN(
             SELECT id FROM public.${fkName.table} as ${mapQueryPrefix(fkName.table)}
-            WHERE LOWER(${fkName.name}) ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1} 
+            WHERE LOWER(${fkName.name}) ${operator !== "ne"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1} 
             )`;
         result.parameters.push(`%${keyword.toLowerCase()}%`);
     }
@@ -523,7 +523,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
                 SELECT 1
                 FROM public.${fkName.table} as ${mapQueryPrefix(fkName.table)}
                 WHERE ${mapQueryPrefix(fkName.table)}.id = ANY(${mapQueryPrefix(table)}.${target})
-                AND LOWER(${fkName.name}) ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}
+                AND LOWER(${fkName.name}) ${operator !== "ne"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}
             )
         `;
         result.parameters.push(`%${keyword.toLowerCase()}%`);
@@ -531,7 +531,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
     // deals with normal string searching (SUPPORT transformation)
     else if (type == "USER-DEFINED" || type.toLowerCase().includes("character") || type.toLowerCase() == "string") {
         const searchTarget = (specification == "default") ? `${mapQueryPrefix(table)}.${target}` : mapFunctionalField(table, target, specification, type);
-        whereClause = `LOWER(${searchTarget}::text) ${operator !== "nt"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
+        whereClause = `LOWER(${searchTarget}::text) ${operator !== "ne"? "LIKE" : "NOT LIKE"} $${result.parameters.length + 1}`;
         result.parameters.push(`%${keyword.toLowerCase()}%`); mapFunctionalField
     }
 

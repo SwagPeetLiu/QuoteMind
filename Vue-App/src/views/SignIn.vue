@@ -152,6 +152,7 @@ export default {
       // setting the validation states of the form
       submitted.value = true;
       document.getElementsByName("form")[0].classList.add("was-validated");
+      
       // proceed to attempt login
       if (isEmailValid.value && isPasswordValid.value) {
         isLoading.value = true;

@@ -4,7 +4,7 @@ const { validateString, validateTableExistence} = require('../../utils/Validator
 const { getConfiguration } = require("../../utils/Configurator");
 const config = getConfiguration();
 
-module.exports = (db) => {
+module.exports = (db, dbReferences) => {
     router.route("/:target")
         .get(async (req, res) => {
             const target = req.params.target;
@@ -25,13 +25,8 @@ module.exports = (db) => {
         const stringValdiation = validateString(target);
         if (!stringValdiation.valid) return res.status(400).json({ message: "invalid target" });
 
-        // prevent malicious attempts on grabing the count of the users
-        if (config.counter.forbiddenTargets.includes(target.toLowerCase())) {
-            return res.status(400).json({ message: "invalid target" });
-        }
-
         // check if the target exsits:
-        validTargets = await validateTableExistence(target, db);
+        const validTargets = await validateTableExistence(target, dbReferences);
         if (!validTargets.valid) return res.status(400).json({ message: validTargets.message });
         next();
     });

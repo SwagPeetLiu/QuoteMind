@@ -11,6 +11,7 @@ export default createStore({
     userSessionManager: { login: null, logout: null, blurListener: null, focusListener: null},
     user:{ username: "", email: "", role: "", session: ""},
     isAuthenticated: false,
+    dbReferences: null, // object of objects
 
     // controls the display of the configurator:
     hideConfigButton: false,
@@ -152,17 +153,19 @@ export default createStore({
     clearUser(state) {
       state.user = { username: "", email: "", role: "", session: ""};
       state.isAuthenticated = false;
-      
+      state.dbReferences = null;
+
+      // if testing, then clear the login credentials in prior:
+      if (process.env.NODE_ENV === 'test') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('dbRefs');
+      }
+    
       // clear the automatic mechanism for renew session and logout:
       clearPreviousTimers();
       
       // Clear axios header
       clearToken();
-
-      // if testing, then clear the login credentials:
-      if (process.env.NODE_ENV === 'test') {
-          localStorage.removeItem('user');
-      }
     },
 
     // manage the user sessions
@@ -173,6 +176,15 @@ export default createStore({
     // menu action tracks:
     setMenuAct(state, payload) {
       state.menuAct = { ...payload };
+    },
+
+    // used to setUp the database references for application search route:
+    setDBRefs(state, payload) {
+      state.dbReferences = { ...payload };
+
+      if (process.env.NODE_ENV === 'test') {
+        localStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
+      }
     },
 
     // message commutes
@@ -197,5 +209,6 @@ export default createStore({
     getUser: (state) => state.user,
     haveNoDialogs: (state) => state.errorMessage === "" && state.toastMessage.message === "",
     getMainTheme: (state) => state.themeColor,
+    getDBRefs: (state) => state.dbReferences
   },
 });

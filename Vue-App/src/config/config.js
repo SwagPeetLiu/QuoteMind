@@ -31,7 +31,7 @@ const config = {
         MAX_ADDRESS_CATEGORY_LENGTH: 3
     },
     search: {
-        pageSize: 10,
+        pageSize: 15,
     },
     session:{
         LOGOUT_TIME : 60 * 1000 * 15, // 15 minutes before atuo logout

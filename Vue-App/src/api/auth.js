@@ -1,5 +1,6 @@
 import axios from 'axios';
 import store from '../store';
+import search from './search';
 import { useTranslation } from '../utils/I18n';
 const { global: { t } } = useTranslation(); // access the gloabal translation function
 
@@ -20,6 +21,9 @@ const auth = {
                 credentials: data
             });
             store.commit("setToastMessage", { message: t("apiMessage.login.success"), type: "success" });
+
+            // set up the database references when loggin the user in
+            search.getReferences();
             return true;
         })
         .catch((error) => {
@@ -48,6 +52,7 @@ const auth = {
         .catch((error) => {
             store.commit("setToastMessage", { message: t("apiMessage.logout.failed"), type: "error" });
             console.error("failed to logout", error);
+            store.commit('clearUser');
             return false;
         });
     }

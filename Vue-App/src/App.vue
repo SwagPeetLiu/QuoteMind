@@ -90,6 +90,12 @@ export default {
         const storedUser = JSON.parse(storedUserString);
         this.$store.commit('setUser', storedUser);
       }
+
+      const storedDBRefsString = localStorage.getItem('dbRefs');
+      if (storedDBRefsString) {
+        const storedDBRef = JSON.parse(storedDBRefsString);
+        this.$store.commit('setDBRefs', storedDBRef);
+      }
     }
   },
   

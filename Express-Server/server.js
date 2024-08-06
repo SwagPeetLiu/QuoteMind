@@ -57,7 +57,7 @@ async function startServer() {
     const pricingRouter = require('./Routes/pricings/file')(db);
     app.use("/api/pricings", pricingRouter);
 
-    const counterRouter = require('./Routes/counter/file')(db);
+    const counterRouter = require('./Routes/counter/file')(db, dbReferences);
     app.use("/api/counter", counterRouter);
 
     const searchRouter = require('./Routes/search/file')(db, dbReferences);

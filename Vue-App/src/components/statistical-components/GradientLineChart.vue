@@ -1,10 +1,14 @@
 <template>
   <div class="p-3 pb-0 card-header">
-    <h6>{{ title }}</h6>
+    <!-- Title of the chart -->
+    <h5>{{ title }}</h5>
+
     <!-- eslint-disable vue/no-v-html -->
     <p v-if="description" class="text-sm" v-html="description" />
   </div>
+
   <div class="p-3 card-body">
+    <!-- linear line chart -->
     <div class="chart">
       <canvas :id="id" class="chart-canvas" :height="height"></canvas>
     </div>

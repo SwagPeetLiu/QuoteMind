@@ -66,6 +66,10 @@
       "incompleteness message": "注册信息不完整",
       "invalid token message": "注册码无效",
       "already registered message": "该邮箱已被注册"
+    },
+    "search": {
+      "failed to fetch dbReferences": "获取数据库结构失败",
+      "failed to search": "搜索失败"
     }
   },
   "thinBar": {
@@ -129,10 +133,16 @@
     "cannot be empty": "不能填空",
     "too short": "过短",
     "too long": "过长",
+    "has incomplete information": "不全",
+    "is invalid": "无效",
+
     "username": "用户名",
     "email": "邮箱",
     "password": "密码",
     "token": "注册码",
+    "search query": "搜索内容",
+    "search target": "搜索目标",
+
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符"
   },
@@ -142,5 +152,30 @@
     "total companies": "公司客户",
     "total products": "商品",
     "total materials": "材质"
+  },
+  "stats":{
+    "quoted": "已报价",
+    "total": "总计",
+    "time": {
+      "transactions in the last year": "总计交易量(过去12个月)",
+      "past": "过去",
+      "month": "月",
+      "week": "星期",
+      "day": "天",
+      "year": "年",
+      "in": "",
+      "Jan": "1月",
+      "Feb": "2月",
+      "Mar": "3月",
+      "Apr": "4月",
+      "May": "5月",
+      "Jun": "6月",
+      "Jul": "7月",
+      "Aug": "8月",
+      "Sep": "9月",
+      "Oct": "10月",
+      "Nov": "11月",
+      "Dec": "12月"
+    }
   }
 }

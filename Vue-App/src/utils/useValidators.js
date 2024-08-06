@@ -1,11 +1,11 @@
 /*
 * functions used to validate the user's inputs
 */
-import { useI18n } from "vue-i18n";
+import { useTranslation } from '../utils/I18n';
+const { global: { t } } = useTranslation();
 import { config } from "../config/config";
 
 export function useValidators() {
-    const { t } = useI18n(); // this hppl must be used like an composition API
 
     function isUsernameValid(username) {
         if (!username || !username.trim()) return { valid: false, message: `${t('validation.username')}${t('validation.cannot be empty')}` };
@@ -53,10 +53,36 @@ export function useValidators() {
         return { valid: true };
     }
 
+    function isSearchTableValid(tableName, dbReferences){
+        if (typeof tableName !== 'string' || !tableName.trim()) return { valid: false, message: `${t('validation.search target')}${t('validation.is invalid')}` };
+        
+        // only proceed for table validation if initialised (account for initial user login)
+        if (dbReferences){
+            const isValid = Object.values(dbReferences).some(ref => ref.table === tableName);
+            if (!isValid) return { valid: false, message: `${t('validation.search target')}${t('validation.is invalid')}` };
+        }
+        return { valid: true };
+    }
+
+    function isSearchBodyValid(body){
+        if (!('searchQuery' in body) || !('page' in body)) return { valid: false, message: `${t('validation.search query')}${t('validation.has incomplete information')}` };
+        
+        const searchQuery = body.searchQuery;
+        if (!('fields' in searchQuery) || !('whereClause' in searchQuery) || !('groupByClause' in searchQuery) || 
+        !("orderByClause" in searchQuery))
+        {
+            return { valid: false, message: `${t('validation.search query')}${t('validation.has incomplete information')}` };
+        }
+
+        return { valid: true };
+    }
+
     return {
         isUsernameValid,
         isEmailValid,
         isPasswordValid,
-        isRegisterTokenValid
+        isRegisterTokenValid,
+        isSearchTableValid,
+        isSearchBodyValid
     };
 }

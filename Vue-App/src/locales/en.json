@@ -65,6 +65,10 @@
       "incompleteness message": "Complete Registeration form is required",
       "invalid token message": "Invalid Token Provided",
       "already registered message": "Email already exists"
+    },
+    "search": {
+      "failed to fetch dbReferences": "Unable to fetch the database references",
+      "failed to search": "Failed to search"
     }
   },
   "thinBar":{
@@ -127,11 +131,15 @@
     "cannot be empty": "cannot be empty",
     "too short": "too short",
     "too long": "too long",
+    "has incomplete information": "has incomplete information",
+    "is invalid": "is invalid",
     
     "username": "Username ",
     "email": "Email ",
     "password": "Password ",
     "token": "Register Token ",
+    "search query": "Search Query ",
+    "search target": "Search Target ",
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"
@@ -142,5 +150,29 @@
     "total companies": "Companies",
     "total products": "Products",
     "total materials": "Materials"
+  },
+  "stats":{
+    "quoted": "Quoted",
+    "total": "Total",
+    "time": {
+      "transactions in the last year": "Transactions in the last year",
+      "month": "month",
+      "week": "week",
+      "day": "day",
+      "year": "year",
+      "in": "in",
+      "Jan": "Jan",
+      "Feb": "Feb",
+      "Mar": "Mar",
+      "Apr": "Apr",
+      "May": "May",
+      "Jun": "Jun",
+      "Jul": "Jul",
+      "Aug": "Aug",
+      "Sep": "Sep",
+      "Oct": "Oct",
+      "Nov": "Nov",
+      "Dec": "Dec"
+    }
   }
 }
