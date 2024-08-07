@@ -13,7 +13,6 @@ function startLoginTimer(data){
 
 // function used to autoamtically loggout the user when navigating away
 function startLogoutTimer(){
-    console.log(process.env.NODE_ENV);
     const logoutTimer = setTimeout(() => {
         auth.logout();
     }, config.session.LOGOUT_TIME);

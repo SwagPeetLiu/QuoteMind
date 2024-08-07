@@ -149,13 +149,21 @@
     "total clients": "Clients",
     "total companies": "Companies",
     "total products": "Products",
-    "total materials": "Materials"
+    "total materials": "Materials",
+    "access your transaction quotations": "Access my Transaction Quotations",
+    "transaction automation justifications": "Automating transaction quotations will reduce the processing time, minimise human errors and enabling your business to handle high volume of transactions",
+    "use now": "Use now"
   },
   "stats":{
+    "no data available": "No Data Available",
     "quoted": "Quoted",
+    "created": "Created",
+    "paid": "Paid",
     "total": "Total",
     "time": {
+      "in this period": " in this period",
       "transactions in the last year": "Transactions in the last year",
+      "transaction distribution in the last year": "Transaction distribution in the last year",
       "month": "month",
       "week": "week",
       "day": "day",

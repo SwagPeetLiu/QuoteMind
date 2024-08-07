@@ -1,5 +1,5 @@
 const config = {
-     limitations: {
+    limitations: {
         Min_Username_Length: 3,
         Max_Username_Length: 50,
         Min_Password_Length: 6,
@@ -33,9 +33,20 @@ const config = {
     search: {
         pageSize: 15,
     },
-    session:{
-        LOGOUT_TIME : 60 * 1000 * 15, // 15 minutes before atuo logout
-        LOGIN_TIME : 60 * 1000 * 55 // renew session every 55 minuetes
+    session: {
+        LOGOUT_TIME: 60 * 1000 * 15, // 15 minutes before atuo logout
+        LOGIN_TIME: 60 * 1000 * 55 // renew session every 55 minuetes
+    },
+    OVERLAY_COLOR: 'rgba(200, 200, 200, 0.7)',
+    ChartColours: {
+        primary: ['#cc519f', '#9b77b7'],
+        secondary: ['#627594', '#A8B8D8'],
+        info: ['#2152ff', '#21d4fd'],
+        success: ['#9ae637', '#4bceb6'],
+        danger: ['#ea0606', '#ff667c'],
+        warning: ['#df9a50', '#fbcf33'],
+        dark: ['#1c2037', '#49507f'],
+        light: ['#CED4DA', '#EBEFF4']
     }
 }
 

@@ -43,8 +43,8 @@
 
 
     <!-- Second row of charts -->
-    <div class="mt-4 row">
-      <div class="col-lg-5 mb-lg-0">
+    <div class="my-4 row" style="height: 380px;">
+      <div class="col-lg-5 mb-lg-0 h-100">
         <div class="card p-3 h-100">
           <reports-bar-chart id="chart-bar" title="active Users" description="(<strong>+23%</strong>) than last week"
             :chart="{
@@ -92,28 +92,8 @@
       </div>
 
       <!-- Transaction counter charts -->
-      <div class="col-lg-7">
-        <div class="card z-index-2 h-100">
-          <gradient-line-chart v-if="!isTransactionsLoading" id="chart-line"
-            :title="`${t('stats.time.transactions in the last year')}`" description="
-                <i class='fa fa-arrow-up text-success'></i><span class='font-weight-bold'>4% more</span> in 2021"
-            :chart="{
-              labels: TransactionCounterData.labels.map(label => `${t(label.month)}/${label.year}`),
-              datasets: [
-                {
-                  label: t('stats.total'),
-                  data: TransactionCounterData.counts
-                },
-                {
-                  label: t('stats.quoted'),
-                  data: TransactionCounterData.quoted
-                }
-              ]
-            }" :key="$i18n.locale" />
-          <div v-else class="p-3 card-body d-flex justify-content-center align-items-center">
-            <DotLoader :size="60" />
-          </div>
-        </div>
+      <div class="col-lg-7 h-100">
+        <TransactionSlider />
       </div>
     </div>
 
@@ -141,8 +121,8 @@
 
 <script>
 import StatsCard from "@/components/statistical-components/StatsCard.vue";
+import TransactionSlider from "@/views/components/TransactionSlider.vue";
 import ReportsBarChart from "@/examples/Charts/ReportsBarChart.vue";
-import GradientLineChart from "@/components/statistical-components/GradientLineChart.vue";
 import TimelineList from "./components/TimelineList.vue";
 import TimelineItem from "./components/TimelineItem.vue";
 import ProjectsCard from "./components/ProjectsCard.vue";
@@ -152,9 +132,6 @@ import {
   faCreditCard,
   faScrewdriverWrench,
 } from "@fortawesome/free-solid-svg-icons";
-import DotLoader from "../components/reuseable-components/DotLoader.vue";
-import search from "@/api/search";
-import { getYearlyTransactionCountsBody, FormatMonthAndYear } from "../utils/helpers";
 import { useI18n } from "vue-i18n";
 
 export default {
@@ -165,9 +142,7 @@ export default {
       faCreditCard,
       faScrewdriverWrench,
       faUsers,
-      faHandPointer,
-      isTransactionsLoading: true,
-      TransactionCounterData: null,
+      faHandPointer
     };
   },
   setup() {
@@ -177,63 +152,15 @@ export default {
   components: {
     StatsCard,
     ReportsBarChart,
-    GradientLineChart,
     ProjectsCard,
     TimelineList,
     TimelineItem,
-    DotLoader
+    TransactionSlider
   },
   computed: {
     themeColour() {
       return this.$store.getters.getMainTheme
     },
-    // to determine whether a linear graph display will satisfy the requirements
-    // or not
-    isTransactionsExtensive() {
-      if (!this.TransactionCounterData) {
-        return false;
-      }
-      else if (this.TransactionCounterData.datasets[0].data.length > 1) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    },
   },
-  methods: {
-    fetchTransactions() {
-      const { countQuery, quotedQuery } = getYearlyTransactionCountsBody();
-      let labels = [];
-      let countsArray = [];
-      let quotedArray = [];
-      this.isTransactionsLoading = true;
-
-      Promise.all([
-        search.getSearchResults(quotedQuery),
-        search.getSearchResults(countQuery)
-      ])
-        .then(([quotedData, countData]) => {
-          // formatting data arraies
-          countData.results.forEach(item => {
-            labels.push(FormatMonthAndYear(item.month, item.year));
-            countsArray.push(item.no_of_transaction);
-            const quotedItem = quotedData.results.find(i => i.month === item.month && i.year === item.year);
-            quotedArray.push(quotedItem ? quotedItem.no_of_transaction : 0);
-          });
-          this.TransactionCounterData = { labels: labels, counts: countsArray, quoted: quotedArray };
-        })
-        .catch(err => {
-          console.error('Error fetching transaction data:', err);
-          this.TransactionCounterData = { labels: labels, counts: countsArray, quoted: quotedArray };
-        })
-        .finally(() => {
-          this.isTransactionsLoading = false;
-        });
-    }
-  },
-  mounted() {
-    this.fetchTransactions()
-  }
 };
 </script>

@@ -1,0 +1,26 @@
+.doughnut-chart {
+    position: relative;
+    max-width: 230px;
+    overflow: hidden;
+    resize: both;
+
+    .tooltip-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+
+        i{
+            cursor: pointer;
+            scale: 1;
+            transition: all 0.3s ease-in-out;
+
+            &:hover{
+                scale: 1.2;
+                color: $primary;
+                transition: all 0.3s ease-in-out;
+            }
+        }
+    }
+}

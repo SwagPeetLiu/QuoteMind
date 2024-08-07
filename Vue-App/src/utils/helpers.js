@@ -35,9 +35,9 @@ function generateTimeRange(duration) {
 }
 
 // Function used to map the month and year to the correct language translation
-function FormatMonthAndYear(month, year){
+function FormatMonthAndYear(month, year) {
     let convertedMonth = "";
-    switch(month){
+    switch (month) {
         case 1:
             convertedMonth = "stats.time.Jan";
             break;
@@ -75,7 +75,51 @@ function FormatMonthAndYear(month, year){
             convertedMonth = "stats.time.Dec";
             break;
     }
-    return {month: convertedMonth, year: year};
+    return { month: convertedMonth, year: year };
+}
+
+// function used to map the gradient colour being used in the charts
+function createGradient(ctx, colorStops) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, colorStops[0]);
+    gradient.addColorStop(1, colorStops[1]);
+    return gradient;
+}
+// function used to map the stroke graduate colours for line charts 
+function createLinearGradient(ctx, hexColor){
+    // Convert hex to RGB
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 230, 0, 50);
+
+    // Add color stops
+    gradient.addColorStop(1, `rgba(${r},${g},${b},0.2)`);
+    gradient.addColorStop(0.2, `rgba(${r},${g},${b},0.0)`);
+    gradient.addColorStop(0, `rgba(${r},${g},${b},0)`);
+
+    return gradient;
+}
+
+function getContrastColour(colour) {
+    switch(colour) {
+        case 'primary':
+            return 'warning';
+        case 'success':
+            return 'info';
+        case 'info':
+            return 'success';
+        case 'warning':
+            return 'primary';
+        case 'danger':
+            return 'dark';
+        case 'dark':
+            return 'danger';
+        default:
+            return 'secondary';
+    }
 }
 
 
@@ -152,8 +196,8 @@ function getYearlyTransactionCountsBody() {
     const quotedData = JSON.parse(JSON.stringify(countData));
     quotedData.body.searchQuery.whereClause.push({
         target: "status",
-        operator: "eq",
-        keyword: "quoted",
+        operator: "ne",
+        keyword: "created",
         specification: "default",
         transformType: null
     });
@@ -161,8 +205,59 @@ function getYearlyTransactionCountsBody() {
     return { countQuery: countData, quotedQuery: quotedData };
 }
 
+function getyearlyTransactionDistributionBody() {
+    const range = generateTimeRange("year");
+    return {
+        table: "transactions",
+        body: {
+            searchQuery: {
+                fields: [
+                    {
+                        target: "status",
+                        specification: "default",
+                        as: null
+                    },
+                    {
+                        target: "id",
+                        specification: "COUNT",
+                        as: "count"
+                    }
+                ],
+                whereClause: [
+                    {
+                        target: "transaction_date",
+                        operator: "lt",
+                        keyword: range.endTime,
+                        specification: "default",
+                        transformType: null
+                    },
+                    {
+                        target: "transaction_date",
+                        operator: "gt",
+                        keyword: range.startTime,
+                        specification: "default",
+                        transformType: null
+                    }
+                ],
+                groupByClause: [
+                    {
+                        target: "status",
+                        specification: "default"
+                    }
+                ],
+                orderByClause: null
+            },
+            page: null
+        }
+    }
+}
+
 module.exports = {
     generateTimeRange,
+    getContrastColour,
+    createLinearGradient,
     getYearlyTransactionCountsBody,
+    getyearlyTransactionDistributionBody,
+    createGradient,
     FormatMonthAndYear
 }
