@@ -17,7 +17,7 @@
             <!-- counter linear chart (Side 1)-->
             <div class="carousel-item w-100 h-100 active"
                 :class="{ 'd-flex justify-content-center align-items-center': isCoutingLoading }">
-                <gradient-line-chart v-if="!isCoutingLoading" id="chart-line"
+                <gradient-line-chart v-if="!isCoutingLoading && activeSlide === 0"
                     :title="`${t('stats.time.transactions in the last year')}`" :chart="{
                         labels: transactionCounterData.labels.map(label => `${t(label.month)}/${label.year}`),
                         datasets: [
@@ -33,12 +33,12 @@
                             }
                         ]
                     }" :key="$i18n.locale" />
-                <DotLoader v-else :size="60" />
+                <DotLoader v-if="isCoutingLoading && activeSlide === 0" :size="60" />
             </div>
 
             <!-- distribution doughnut chart (Slide 2) -->
             <div class="carousel-item w-100 h-100">
-                <div v-if="!isDistritbuionLoading"
+                <div v-if="!isDistritbuionLoading && activeSlide === 1"
                     class="w-100 h-100 d-flex flex-row justify-content-center align-items-center"
                 >
                     <div class="w-40 h-100">
@@ -77,7 +77,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-else class="w-100 h-100 d-flex justify-content-center align-items-center">
+                <div v-if="isDistritbuionLoading && activeSlide === 1" class="w-100 h-100 d-flex justify-content-center align-items-center">
                     <DotLoader :size="60" />
                 </div>
             </div>
@@ -120,7 +120,10 @@ export default {
             isCoutingLoading: true,
             isDistritbuionLoading: true,
             transactionCounterData: null,
-            transactionDistributionData: null
+            transactionDistributionData: null,
+            carouselInstance : null,
+            listener: null,
+            activeSlide: 0
         }
     },
     setup() {
@@ -180,6 +183,7 @@ export default {
                     if (!this.isTransactionsExtensive) {
                         const carouselInstance = bootstrap.Carousel.getInstance(document.getElementById('transaction-carousel'));
                         if (carouselInstance) {
+                            this.activeSlide = 1;
                             carouselInstance.to(1);
                         }
                     }
@@ -216,15 +220,25 @@ export default {
                 })
                 .finally(()=>{
                     this.isDistritbuionLoading = false;
-                })
+                });
         }
     },
     mounted() {
         this.fetchTransactionCounts();
         this.fetchTransactionDistributions();
-        new bootstrap.Carousel(document.getElementById('transaction-carousel'), {
+        this.carouselInstance = new bootstrap.Carousel(document.getElementById('transaction-carousel'), {
             interval: false // Disable auto-sliding
         });
-    }
+        this.listener = (event) => {
+            console.log(event.to);
+            this.activeSlide = event.to;
+        }
+        this.carouselInstance._element.addEventListener('slide.bs.carousel', this.listener);
+    },
+    // unmounted() {
+    //     if (this.carouselInstance) {
+    //         this.carouselInstance._element.removeEventListener('slide.bs.carousel', this.listener);
+    //     }
+    // }
 };
 </script>

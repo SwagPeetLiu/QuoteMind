@@ -46,9 +46,9 @@ function clearPreviousTimers(){
         { login: null, logout: null, blurListener: null, focusListener: null });
 }
 
-module.exports = { 
+export { 
     startLoginTimer,
     startLogoutTimer,
     clearLogoutTimer,
     clearPreviousTimers
-}
+};

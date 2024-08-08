@@ -16,7 +16,7 @@
   <!-- linear line chart -->
   <div v-if="isDataAvailable">
     <div class="chart">
-      <canvas :id="id" class="chart-canvas" :height="height"></canvas>
+      <canvas id="line-chart" ref="gradientLineChart" class="chart-canvas" :height="height"></canvas>
     </div>
   </div>
   <div v-else class="pb-7 w-100 h-100 d-flex justify-content-center align-items-center">
@@ -33,10 +33,6 @@ import { config as appConfig } from "../../config/config";
 export default {
   name: "GradientLineChart",
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
     height: {
       type: String,
       default: "300",
@@ -55,7 +51,7 @@ export default {
         data: Array,
         backgroundColor: String,
       },
-    },
+    }
   },
   setup() {
     const { t } = useI18n();
@@ -118,10 +114,11 @@ export default {
   },
   methods: {
     updateChart() {
+      console.log("rendering gradient")
       if (!this.isDataAvailable) {
         return;
       }
-      const ctx = document.getElementById(this.id).getContext("2d");
+      const ctx = document.getElementById("line-chart").getContext("2d");
       const gradientStroke = createLinearGradient(ctx, appConfig.ChartColours[this.$store.getters.getMainTheme][1]);
 
       if (this.chartInstance) {
@@ -210,13 +207,6 @@ export default {
       handler() {
         this.updateChart();
       },
-      deep: true
-    },
-    chart: {
-      handler() {
-        this.updateChart();
-      },
-      deep: true
     }
   },
 };

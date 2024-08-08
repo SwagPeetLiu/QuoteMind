@@ -16,13 +16,12 @@
 </template>
 
 <script>
-import { Chart, DoughnutController, ArcElement, Tooltip, Legend, Title } from 'chart.js';
-import { ref, onMounted, computed, watch } from 'vue';
+import Chart from 'chart.js/auto';
+import { ref, onMounted, computed } from 'vue';
 import { config as appConfig } from "@/config/config.js";
 import { createGradient, getContrastColour } from "@/utils/helpers";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
-Chart.register(DoughnutController, ArcElement, Tooltip, Legend, Title);
 
 export default {
     name: 'DoughnutChart',
@@ -44,7 +43,7 @@ export default {
         const store = useStore();
         const chartCanvas = ref(null);
         const tooltipCenter = ref(null);
-        const value = ref(props.inputs.data.reduce((sum, value) => sum + value, 0));
+        const value = ref(0);
         const label = ref(t('stats.total'));
         let chart = null;
 
@@ -52,7 +51,6 @@ export default {
         const OVERLAY_COLOR = appConfig.OVERLAY_COLOR;
         let gradients = {};
 
-        // computed properties used to map out the properties
         const mappedBackgrounds = computed(() => {
             if (!props.inputs.backgroundColor || props.inputs.backgroundColor.length === 0) {
                 return [];
@@ -70,12 +68,8 @@ export default {
             });
         });
 
-        // determine if data is provided at all:
         const isDataAvailable = computed(() => {
-            if (!props.inputs.data || props.inputs.data.length === 0) {
-                return false;
-            }
-            return true;
+            return props.inputs.data && props.inputs.data.length > 0;
         });
 
         const updateChartColors = () => {
@@ -85,24 +79,18 @@ export default {
                 chart.update();
             }
         };
-        watch(() => store.state.themeColor, () => {
-            updateChartColors();
-        });
 
-        watch(() => props.inputs, () => {
-            updateChartColors();
-        }, { deep: true });
+        const createChart = () => {
+            console.log("rendering doughnut")
+            if (!isDataAvailable.value || !chartCanvas.value) return;
 
-        onMounted(() => {
-            if (!isDataAvailable.value){
-                return;
-            }
             const ctx = chartCanvas.value.getContext('2d');
 
             // Create gradients
             Object.keys(CHART_COLORS).forEach(key => {
                 gradients[key] = createGradient(ctx, CHART_COLORS[key]);
             });
+
             const data = {
                 labels: props.inputs.labels,
                 datasets: [
@@ -142,6 +130,9 @@ export default {
                     }
                 }
             };
+            if (chart) {
+                chart.destroy();
+            }
 
             chart = new Chart(ctx, chartConfig);
 
@@ -151,6 +142,10 @@ export default {
             // Initial center tooltip showing total
             const total = data.datasets[0].data.reduce((sum, value) => sum + value, 0);
             updateCenterTooltip(total, t('stats.total'));
+        };
+
+        onMounted(() => {
+            createChart();
         });
 
         const updateCenterTooltip = (newValue, newLabel) => {
@@ -177,7 +172,6 @@ export default {
             clearClicks,
             isDataAvailable
         };
-        
     }
 }
 </script>
