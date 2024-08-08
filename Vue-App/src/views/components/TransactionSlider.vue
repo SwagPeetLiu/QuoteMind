@@ -230,15 +230,14 @@ export default {
             interval: false // Disable auto-sliding
         });
         this.listener = (event) => {
-            console.log(event.to);
             this.activeSlide = event.to;
         }
         this.carouselInstance._element.addEventListener('slide.bs.carousel', this.listener);
     },
-    // unmounted() {
-    //     if (this.carouselInstance) {
-    //         this.carouselInstance._element.removeEventListener('slide.bs.carousel', this.listener);
-    //     }
-    // }
+    unmounted() {
+        if (this.carouselInstance) {
+            this.carouselInstance._element.removeEventListener('slide.bs.carousel', this.listener);
+        }
+    }
 };
 </script>
