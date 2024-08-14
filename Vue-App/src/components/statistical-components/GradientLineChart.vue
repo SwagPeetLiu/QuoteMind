@@ -1,25 +1,23 @@
 <template>
-  <div class="px-4 pt-4 d-flex justify-content-between align-items-center">
+
+  <div class="px-4 d-flex justify-content-between align-items-center w-100">
     <!-- Title of the chart -->
-    <h5>{{ title }}</h5>
+    <p class="chart-title text-shadow-lg">{{ title }}</p>
 
     <!-- eslint-disable vue/no-v-html -->
-    <div v-if="isDataAvailable" class="h6">
-      <span v-if="!isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
+    <div v-if="isDataAvailable" class="h6 chart-description">
+      <span class="d-none d-xxl-inline" v-if="!isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
       <i v-if="isIncreasing.isUp" class='fa fa-arrow-up text-gradient text-success px-1'></i>
       <i v-else class='fa fa-arrow-down text-gradient text-danger px-1'></i>
       <span class='font-weight-bold'>{{ isIncreasing.value }}</span>
-      <span v-if="isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
+      <span class="d-none d-xxl-inline" v-if="isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
     </div>
   </div>
 
   <!-- linear line chart -->
-  <div v-if="isDataAvailable">
-    <div class="chart">
-      <canvas id="line-chart" ref="gradientLineChart" class="chart-canvas" :height="height"></canvas>
-    </div>
-  </div>
-  <div v-else class="pb-7 w-100 h-100 d-flex justify-content-center align-items-center">
+  <canvas v-if="isDataAvailable" id="line-chart" ref="gradientLineChart" class="chart-canvas" style="max-height: 290px;">
+  </canvas>
+  <div v-else class="pb-7 w-100 d-flex justify-content-center align-items-center">
     <p class="text-gradient text-dark display-5 font-weight-bold">{{ t('stats.no data available') }}</p>
   </div>
 </template>
@@ -114,7 +112,6 @@ export default {
   },
   methods: {
     updateChart() {
-      console.log("rendering gradient")
       if (!this.isDataAvailable) {
         return;
       }

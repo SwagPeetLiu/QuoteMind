@@ -3,16 +3,13 @@
   height: $icon-md-width;
   background-position: $icon-shape-bg-position;
   border-radius: $border-radius-lg;
+  margin: 4;
 
   i {
     color: $white;
     opacity: $icon-shape-icon-opacity;
     top: $info-icon-top;
     position: $info-icon-position;
-  }
-
-  .ni {
-    top: 14px;
   }
 }
 

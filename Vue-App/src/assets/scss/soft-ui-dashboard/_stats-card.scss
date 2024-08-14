@@ -1,11 +1,15 @@
 .stats-card{
     cursor: pointer;
     p,span{
-        margin-left: 0px;
         transform: scale(1);
     }
     transform: scale3d(1, 1, 1);
     transition: all .2s ease-in-out;
+
+    .icon-shape{
+        min-width: $icon-md-width;
+        min-height: $icon-md-height;
+    }
 
     :hover{
         .icon{
@@ -14,8 +18,8 @@
         }
         p, span{
             transform: scale(1.1);
-            margin-left: 3px;
             transition: transform .2s ease-in-out;
         }
     }
+
 }

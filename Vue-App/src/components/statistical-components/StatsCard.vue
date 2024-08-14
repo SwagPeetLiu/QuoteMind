@@ -4,27 +4,24 @@
         <div class="p-3 card-body">
 
             <!-- flex direction definition -->
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center w-100">
 
                 <!-- statistic definition -->
-                <div class="d-flex flex-column justify-content-start">
-                    <p class="mb-0 text-sm text-capitalize font-weight-bold">
+                <div class="d-flex flex-column justify-content-start w-80 stats-definition">
+                    <p class="mb-0 text-sm text-capitalize font-weight-bold text-truncate">
                         {{ title }}
                     </p>
-                    <p class="mb-n1 font-weight-bolder h3">
-                        <DotLoader :size="40" v-if="isLoading"/>
+                    <p class="mb-n1 font-weight-bolder h3 text-truncate">
+                        <DotLoader :size="40" v-if="isLoading" />
                         <IncrementNumber v-else :endValue="statsValue" :duration="500" />
                     </p>
                 </div>
 
                 <!-- icon definition -->
-                <div 
-                    class="text-center shadow icon icon-shape border-radius-lg" 
-                    :class="currentMainTheme"
-                >
+                <div class="text-center shadow icon icon-shape border-radius-lg"
+                    :class="currentMainTheme">
                     <i class="text-lg opacity-10 mt-1" :class="icon" aria-hidden="true"></i>
                 </div>
-
             </div>
         </div>
     </div>
@@ -46,11 +43,11 @@ export default {
             type: String,
             required: true,
         },
-        type:{
+        type: {
             type: String,
             required: true,
         },
-        target:{
+        target: {
             type: String,
             required: true,
         },
@@ -59,13 +56,13 @@ export default {
             default: "ni ni-money-coins",
         }
     },
-    data(){
-        return{
+    data() {
+        return {
             isLoading: true,
             statsValue: "",
         }
     },
-    mounted(){
+    mounted() {
         counter.getCounter({ target: this.target })
             .then((response) => {
                 this.statsValue = response.counts;
@@ -77,8 +74,8 @@ export default {
                 this.isLoading = false;
             });
     },
-    computed:{
-        currentMainTheme(){
+    computed: {
+        currentMainTheme() {
             const maintheme = this.$store.getters.getMainTheme;
             return `bg-gradient-${maintheme}`;
         }

@@ -1,5 +1,5 @@
 <template>
-    <div id="transaction-carousel" class="card carousel carousel-dark slide w-100 h-100" data-bs-ride="carousel"
+    <div id="transaction-carousel" class="card p-3 carousel carousel-dark slide h-100" data-bs-ride="carousel"
         data-bs-interval="false">
 
         <!-- the bottom indicators -->
@@ -12,11 +12,13 @@
         </div>
 
         <!-- the slides -->
-        <div class="carousel-inner w-100 h-100 px-6">
+        <div class="carousel-inner h-100 d-flex">
 
             <!-- counter linear chart (Side 1)-->
-            <div class="carousel-item w-100 h-100 active"
-                :class="{ 'd-flex justify-content-center align-items-center': isCoutingLoading }">
+            <div class="carousel-item pe-2 px-md-3 h-100 active d-flex flex-column justify-content-center align-items-center"
+                :class="{
+                    'd-flex justify-content-center align-items-center': !isCoutingLoading,
+                }">
                 <gradient-line-chart v-if="!isCoutingLoading && activeSlide === 0"
                     :title="`${t('stats.time.transactions in the last year')}`" :chart="{
                         labels: transactionCounterData.labels.map(label => `${t(label.month)}/${label.year}`),
@@ -37,47 +39,41 @@
             </div>
 
             <!-- distribution doughnut chart (Slide 2) -->
-            <div class="carousel-item w-100 h-100">
-                <div v-if="!isDistritbuionLoading && activeSlide === 1"
-                    class="w-100 h-100 d-flex flex-row justify-content-center align-items-center"
-                >
-                    <div class="w-40 h-100">
-                        <DoughnutChart
-                            :title="t('stats.time.transaction distribution in the last year')" :inputs="{
-                                labels: transactionDistributionData.labels.map(label => t(`stats.${label}`)),
-                                data: transactionDistributionData.data,
-                                backgroundColor: transactionDistributionData.backgroundColors
-                            }" 
-                            :key="$i18n.locale"
-                        />
-                    </div>
+            <div class="carousel-item w-100 h-100 px-md-6 ms-md-n4 d-flex justify-content-center align-items-center">
+                <div class="w-80 w-md-50" v-if="!isDistritbuionLoading && activeSlide === 1">
+                    <DoughnutChart :title="t('stats.time.transaction distribution in the last year')" :inputs="{
+                        labels: transactionDistributionData.labels.map(label => t(`stats.${label}`)),
+                        data: transactionDistributionData.data,
+                        backgroundColor: transactionDistributionData.backgroundColors
+                    }" :key="$i18n.locale" />
+                </div>
 
-                    <div class="overflow-hidden position-relative border-radius-lg bg-cover w-60 mx-auto px-2 shadow-lg"
-                        :style="{
-                            backgroundImage:
-                                'url(' + require('@/assets/img/realistic-images/transaction-bg.jpg') + ')',
-                            backgroundPositionY: '50%',
-                        }">
-                        <span class="mask bg-gradient-dark"></span>
-                        <div class="card-body position-relative py-4 px-3">
-                            <div class="d-flex flex-column">
-                                <h5 class="text-white font-weight-bolder mb-4 pt-2">
-                                    <i class="fa-solid fa-money-bills"></i>
-                                    <span class="ms-3"> {{ t('dashboard.access your transaction quotations') }}</span>
-                                </h5>
-                                <p class="text-white mb-5">
-                                    {{ t('dashboard.transaction automation justifications') }}
-                                </p>
-                                <a class="text-white font-weight-bold ps-1 mb-0 icon-move-left mt-auto"
-                                    href="/transactions">
-                                    {{ t('dashboard.use now') }}
-                                    <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
-                                </a>
-                            </div>
+                <div class="position-relative border-radius-lg bg-cover ms-md-3 ms-xxl-2 w-50 shadow-lg p-xxxl-3 d-none d-md-inline overflow-hidden"
+                    v-if="!isDistritbuionLoading && activeSlide === 1" :style="{
+                        backgroundImage:
+                            'url(' + require('@/assets/img/realistic-images/transaction-bg.jpg') + ')',
+                        backgroundPositionY: '50%',
+                    }">
+                    <span class="mask bg-gradient-dark"></span>
+                    <div class="card-body position-relative overflow-y-auto">
+                        <div class="d-flex flex-column">
+                            <h5 class="text-white font-weight-bolder mb-4 pt-2">
+                                <i class="fa-solid fa-money-bills"></i>
+                                <span class="ms-3"> {{ t('dashboard.access your transaction quotations') }}</span>
+                            </h5>
+                            <p class="text-white text-sm mb-md-2 mb-xxxl-4 d-none d-md-block transaction-justifications">
+                                {{ t('dashboard.transaction automation justifications') }}
+                            </p>
+                            <a class="text-white font-weight-bolder ps-1 mb-0 icon-move-left mt-auto"
+                                href="/transactions">
+                                {{ t('dashboard.use now') }}
+                                <i class="fas fa-arrow-right text-sm mx-1" aria-hidden="true"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div v-if="isDistritbuionLoading && activeSlide === 1" class="w-100 h-100 d-flex justify-content-center align-items-center">
+                <div v-if="isDistritbuionLoading && activeSlide === 1"
+                    class="w-100 h-100 d-flex justify-content-center align-items-center">
                     <DotLoader :size="60" />
                 </div>
             </div>
@@ -101,10 +97,10 @@ import DoughnutChart from "@/components/statistical-components/DoughnutChart.vue
 import DotLoader from "../../components/reuseable-components/DotLoader.vue";
 import search from "@/api/search";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import 
-{ getYearlyTransactionCountsBody, 
-        getyearlyTransactionDistributionBody, 
-        FormatMonthAndYear, 
+import {
+getYearlyTransactionCountsBody,
+getyearlyTransactionDistributionBody,
+FormatMonthAndYear,
 } from "../../utils/helpers";
 import { useI18n } from "vue-i18n";
 
@@ -121,7 +117,7 @@ export default {
             isDistritbuionLoading: true,
             transactionCounterData: null,
             transactionDistributionData: null,
-            carouselInstance : null,
+            carouselInstance: null,
             listener: null,
             activeSlide: 0
         }
@@ -202,13 +198,13 @@ export default {
                     response.results.forEach(item => {
                         labels.push(item.status);
                         data.push(parseInt(item.count));
-                        if (item.status === "quoted"){
+                        if (item.status === "quoted") {
                             backgroundColors.push("theme");
                         }
-                        else if (item.status === "paid"){
+                        else if (item.status === "paid") {
                             backgroundColors.push("opposite");
                         }
-                        else{
+                        else {
                             backgroundColors.push("secondary");
                         }
                     });
@@ -218,7 +214,7 @@ export default {
                     console.error("failed to get transaction distribution", error);
                     this.transactionDistributionData = { labels: labels, data: data, backgroundColors: backgroundColors };
                 })
-                .finally(()=>{
+                .finally(() => {
                     this.isDistritbuionLoading = false;
                 });
         }
@@ -241,3 +237,21 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+@media (min-width: 768px){
+    .transaction-justifications {
+        max-lines: 5;
+        text-wrap: normal;
+        display: -webkit-box;
+        display: box;
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+        -webkit-box-orient: vertical;
+        box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: calc(1.5em * 5); /* Adjust 1.5em to match your line-height if different */
+    }
+}
+</style>

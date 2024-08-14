@@ -1,0 +1,65 @@
+// manages the css styles of general charts.js instances
+.chart-title {
+    font-weight: 600;
+    color: $dark;
+    max-lines: 1;
+}
+
+// Extra small devices (phones, less than 576px)
+@media (max-width: 575.98px) {
+    .chart-title {
+        font-size: $font-size-base; // Default size for smallest screens
+    }
+    .chart-description {
+        font-size: $font-size-sm;
+    }
+}
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .chart-title {
+        font-size: 2.6vw;
+    }
+    .chart-description {
+        font-size: 2.2vw;
+    }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .chart-title {
+        font-size: 2.45vw;
+    }
+    .chart-description {
+        font-size: 2vw;
+    }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .chart-title {
+        font-size: 2.2vw;
+    }
+    .chart-description {
+        font-size: 2vw;
+    }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+    .chart-title {
+        font-size: 1.4vw;
+    }
+    .chart-description {
+        font-size: 1.3vw;
+    }
+}
+
+@media (min-width: 1600px) {
+    .chart-title {
+        font-size: 1.1vw;
+    }
+    .chart-description {
+        font-size: 1vw;
+    }
+}

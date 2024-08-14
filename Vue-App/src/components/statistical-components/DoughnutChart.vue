@@ -1,12 +1,12 @@
 <template>
-    <div class="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
-        <p class="text-center text-gradient text-dark h4 mt-n2 mb-3">{{ title }}</p>
-        <div v-if="isDataAvailable" class="doughnut-chart position-relative mx-auto w-65">
+    <div class="d-flex flex-column h-100 w-100 justify-content-center align-items-center my-2">
+        <p class="text-center text-gradient text-dark mt-n2 mb-3 doughnut-chart-title">{{ title }}</p>
+        <div v-if="isDataAvailable" class="doughnut-chart w-80 position-relative mx-auto">
             <canvas ref="chartCanvas"></canvas>
             <div class="tooltip-center" ref="tooltipCenter">
-                <div class="font-weight-bold h2 mt-4">{{ value }}</div>
-                <div class="text-muted h6"> {{ label }}</div>
-                <i class="fa-solid fa-chart-simple mt-2 h4" @click="clearClicks"></i>
+                <div class="font-weight-bold text-gradient text-dark doughnut-chart-value mt-4">{{ value }}</div>
+                <div class="text-muted doughnut-chart-label"> {{ label }}</div>
+                <i class="fa-solid fa-chart-simple mt-2" @click="clearClicks"></i>
             </div>
         </div>
         <p v-else class="pt-4 text-center text-gradient text-dark h4 font-weight-bold">
@@ -81,7 +81,6 @@ export default {
         };
 
         const createChart = () => {
-            console.log("rendering doughnut")
             if (!isDataAvailable.value || !chartCanvas.value) return;
 
             const ctx = chartCanvas.value.getContext('2d');
