@@ -5,6 +5,7 @@ import { config } from '../config/config';
 // function used to autoamtically renew the session
 function startLoginTimer(data){
     const loginTimer = setTimeout(() => {
+        console.log("re-fresh login")
         auth.login(data);
     }, config.session.LOGIN_TIME);
     store.commit("setUserSessionManager", 

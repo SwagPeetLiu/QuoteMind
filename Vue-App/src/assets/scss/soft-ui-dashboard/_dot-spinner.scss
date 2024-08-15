@@ -12,7 +12,7 @@
     height: var(--ball-size);
     width: var(--ball-size);
     border-radius: 50%;
-    background-color: $gray-600;
+    background-color: var(--ball-color);
     animation: grow 0.6s ease-in-out infinite alternate;
 
     &.ball2 {

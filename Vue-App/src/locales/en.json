@@ -152,7 +152,9 @@
     "total materials": "Materials",
     "access your transaction quotations": "Access my Transaction Quotations",
     "transaction automation justifications": "Automating transaction quotations will reduce the processing time, minimise human errors and enabling your business to handle high volume of transactions",
-    "use now": "Use now"
+    "use now": "Use now",
+    "total sales": "Total Sales",
+    "recent sales": "Recent Sales"
   },
   "stats":{
     "no data available": "No Data Available",

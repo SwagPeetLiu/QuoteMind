@@ -154,7 +154,9 @@
     "total materials": "材质",
     "access your transaction quotations": "使用我的简易试报价",
     "transaction automation justifications": "自动化交易报价将减少处理时间，最大限度地减少人为错误，并使您的企业能够处理大量交易",
-    "use now": "立即使用"
+    "use now": "立即使用",
+    "total sales": "总营业额",
+    "recent sales": "近期营业额"
   },
   "stats":{
     "no data available": "暂无数据",

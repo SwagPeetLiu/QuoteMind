@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between align-items-center w-100">
 
                 <!-- statistic definition -->
-                <div class="d-flex flex-column justify-content-start w-80 stats-definition">
+                <div class="d-flex flex-column justify-content-start w-80 stats-definition ms-2">
                     <p class="mb-0 text-sm text-capitalize font-weight-bold text-truncate">
                         {{ title }}
                     </p>

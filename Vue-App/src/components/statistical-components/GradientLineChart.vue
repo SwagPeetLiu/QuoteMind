@@ -25,7 +25,7 @@
 <script>
 import Chart from "chart.js/auto";
 import { useI18n } from "vue-i18n";
-import { getContrastColour, createLinearGradient } from "../../utils/helpers";
+import { getContrastColour, createLinearGradient, calculateRelativeChanges } from "../../utils/helpers";
 import { config as appConfig } from "../../config/config";
 
 export default {
@@ -72,23 +72,7 @@ export default {
     },
     isIncreasing() {
       const targetArray = this.chart.datasets[0].data;
-      if (targetArray.length == 1) {
-        return { isUp: true, value: `${targetArray[0]}` };
-      }
-      else if (targetArray.length >= 2) {
-        const lastValue = targetArray[targetArray.length - 1];
-        const previousValue = targetArray[targetArray.length - 2];
-        const relativeChange = (lastValue - previousValue) / previousValue * 100;
-        if (relativeChange < 0) {
-          return { isUp: false, value: `${relativeChange.toFixed(2)}%` };
-        }
-        else {
-          return { isUp: true, value: `${relativeChange.toFixed(2)}%` };
-        }
-      }
-      else{
-        return { isUp: false, value: "- -" };
-      }
+      return calculateRelativeChanges(targetArray);
     },
     isCurrentLanEnglish() {
       return this.$store.getters.getLanguage === "en";

@@ -64,7 +64,7 @@
                             <p class="text-white text-sm mb-md-2 mb-xxxl-4 d-none d-md-block transaction-justifications">
                                 {{ t('dashboard.transaction automation justifications') }}
                             </p>
-                            <a class="text-white font-weight-bolder ps-1 mb-0 icon-move-left mt-auto"
+                            <a class="text-white font-weight-bolder mb-0 icon-move-left mt-auto"
                                 href="/transactions">
                                 {{ t('dashboard.use now') }}
                                 <i class="fas fa-arrow-right text-sm mx-1" aria-hidden="true"></i>
@@ -244,7 +244,7 @@ export default {
         max-lines: 5;
         text-wrap: normal;
         display: -webkit-box;
-        display: box;
+        display: flex;
         -webkit-line-clamp: 5;
         line-clamp: 5;
         -webkit-box-orient: vertical;

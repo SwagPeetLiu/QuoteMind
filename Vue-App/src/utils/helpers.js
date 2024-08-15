@@ -122,77 +122,107 @@ function getContrastColour(colour) {
     }
 }
 
+// function used to calculate the changes in the recent data points (returned value
+// can be relative or absolute)
+function calculateRelativeChanges(dataArray){
+
+    // calculate for relative changes
+    if (dataArray.length >= 2) {
+        const lastValue = dataArray[dataArray.length - 1];
+        const previousValue = dataArray[dataArray.length - 2];
+        const relativeChange = (lastValue - previousValue) / previousValue * 100;
+        if (relativeChange < 0) {
+          return { isUp: false, value: `${relativeChange.toFixed(2)}%` };
+        }
+        else {
+          return { isUp: true, value: `${relativeChange.toFixed(2)}%` };
+        }
+      }
+    // calculate for absolute changes
+    else if (dataArray === 1) {
+        return { isUp: true, value: `${dataArray[0]}` };
+    }
+    else {
+        return { isUp: false, value: "- -" };
+    }
+}
+
 
 /*
 * ==============================================================================
 *  Sections of helper functions that generates search bodies
 * ==============================================================================
 */
-function getYearlyTransactionCountsBody() {
+function generateYearlyScaledPartialBody(){
     const range = generateTimeRange("year");
+    return {
+        searchQuery: {
+            fields: [
+                {
+                    target: "transaction_date",
+                    specification: "MONTH",
+                    as: "month"
+                },
+                {
+                    target: "transaction_date",
+                    specification: "YEAR",
+                    as: "year"
+                }
+            ],
+            whereClause: [
+                {
+                    target: "transaction_date",
+                    operator: "lt",
+                    keyword: range.endTime,
+                    specification: "default",
+                    transformType: null
+                },
+                {
+                    target: "transaction_date",
+                    operator: "gt",
+                    keyword: range.startTime,
+                    specification: "default",
+                    transformType: null
+                }
+            ],
+            groupByClause: [
+                {
+                    target: "transaction_date",
+                    specification: "YEAR"
+                },
+                {
+                    target: "transaction_date",
+                    specification: "MONTH"
+                }
+            ],
+            orderByClause: [
+                {
+                    target: "transaction_date",
+                    specification: "YEAR",
+                    order: "ASC"
+                },
+                {
+                    target: "transaction_date",
+                    specification: "MONTH",
+                    order: "ASC"
+                }
+            ]
+        },
+        page: null
+    }
+}
+// function to generate the body for querying the yearly transaction counts
+function getYearlyTransactionCountsBody() {
+    const partialBody = { ...generateYearlyScaledPartialBody() };
+
+    // forming the total count serach body
+    partialBody.searchQuery.fields.push({ target: "id", specification: "COUNT", as: "no_of_transaction" });
     const countData = {
         table: "transactions",
-        body: {
-            searchQuery: {
-                fields: [
-                    {
-                        target: "id",
-                        specification: "COUNT",
-                        as: "no_of_transaction"
-                    },
-                    {
-                        target: "transaction_date",
-                        specification: "MONTH",
-                        as: "month"
-                    },
-                    {
-                        target: "transaction_date",
-                        specification: "YEAR",
-                        as: "year"
-                    }
-                ],
-                whereClause: [
-                    {
-                        target: "transaction_date",
-                        operator: "lt",
-                        keyword: range.endTime,
-                        specification: "default",
-                        transformType: null
-                    },
-                    {
-                        target: "transaction_date",
-                        operator: "gt",
-                        keyword: range.startTime,
-                        specification: "default",
-                        transformType: null
-                    }
-                ],
-                groupByClause: [
-                    {
-                        target: "transaction_date",
-                        specification: "YEAR"
-                    },
-                    {
-                        target: "transaction_date",
-                        specification: "MONTH"
-                    }
-                ],
-                orderByClause: [
-                    {
-                        target: "transaction_date",
-                        specification: "YEAR",
-                        order: "ASC"
-                    },
-                    {
-                        target: "transaction_date",
-                        specification: "MONTH",
-                        order: "ASC"
-                    }
-                ]
-            },
-            page: null
-        }
-    }
+        body: { ...partialBody }
+    };
+
+    // for the quoted transaction clause
     const quotedData = JSON.parse(JSON.stringify(countData));
     quotedData.body.searchQuery.whereClause.push({
         target: "status",
@@ -205,6 +235,7 @@ function getYearlyTransactionCountsBody() {
     return { countQuery: countData, quotedQuery: quotedData };
 }
 
+// function to generate the body for querying the yearly transaction distribution
 function getyearlyTransactionDistributionBody() {
     const range = generateTimeRange("year");
     return {
@@ -251,6 +282,15 @@ function getyearlyTransactionDistributionBody() {
         }
     }
 }
+// function to generate the body for querying the recent sales performance
+function getRecentSalesPerformanceBody(){
+    const partialBody = { ...generateYearlyScaledPartialBody() };
+    partialBody.searchQuery.fields.push({ target: "amount", specification: "SUM", as: "sales" });
+    return {
+        table: "transactions",
+        body: {...partialBody}
+    }
+}
 
 module.exports = {
     generateTimeRange,
@@ -258,6 +298,8 @@ module.exports = {
     createLinearGradient,
     getYearlyTransactionCountsBody,
     getyearlyTransactionDistributionBody,
+    getRecentSalesPerformanceBody,
     createGradient,
-    FormatMonthAndYear
+    FormatMonthAndYear,
+    calculateRelativeChanges
 }

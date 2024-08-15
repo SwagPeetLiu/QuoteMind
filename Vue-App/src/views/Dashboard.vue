@@ -44,48 +44,7 @@
     <div class="my-4 row">
       <div class="col-sm-12 col-xl-5 mb-lg-0" style="height: 400px;">
         <div class="card p-3 h-100">
-          <reports-bar-chart id="chart-bar" title="active Users" description="(<strong>+23%</strong>) than last week"
-            :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: {
-                label: 'Sales',
-                data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-              },
-            }" :items="[
-              {
-                icon: {
-                  color: 'primary',
-                  component: faUsers,
-                },
-                label: 'users',
-                progress: { content: '37K', percentage: 60 },
-              },
-              {
-                icon: { color: 'info', component: faHandPointer },
-                label: 'clicks',
-                progress: { content: '2m', percentage: 90 },
-              },
-              {
-                icon: { color: 'warning', component: faCreditCard },
-                label: 'Sales',
-                progress: { content: '435$', percentage: 30 },
-              },
-              {
-                icon: { color: 'danger', component: faScrewdriverWrench },
-                label: 'Items',
-                progress: { content: '43', percentage: 50 },
-              },
-            ]" />
+          <SalesReportCard />
         </div>
       </div>
 
@@ -120,16 +79,10 @@
 <script>
 import StatsCard from "@/components/statistical-components/StatsCard.vue";
 import TransactionSlider from "@/views/components/TransactionSlider.vue";
-import ReportsBarChart from "@/components/statistical-components/ReportsBarChart.vue";
+import SalesReportCard from "./components/SalesReportCard.vue";
 import TimelineList from "./components/TimelineList.vue";
 import TimelineItem from "./components/TimelineItem.vue";
 import ProjectsCard from "./components/ProjectsCard.vue";
-import {
-  faHandPointer,
-  faUsers,
-  faCreditCard,
-  faScrewdriverWrench,
-} from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "vue-i18n";
 
 export default {
@@ -137,10 +90,6 @@ export default {
   data() {
     return {
       iconBackground: "bg-gradient-success",
-      faCreditCard,
-      faScrewdriverWrench,
-      faUsers,
-      faHandPointer
     };
   },
   setup() {
@@ -149,7 +98,7 @@ export default {
   },
   components: {
     StatsCard,
-    ReportsBarChart,
+    SalesReportCard,
     ProjectsCard,
     TimelineList,
     TimelineItem,
