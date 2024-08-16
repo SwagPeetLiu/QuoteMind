@@ -132,10 +132,10 @@ function calculateRelativeChanges(dataArray){
         const previousValue = dataArray[dataArray.length - 2];
         const relativeChange = (lastValue - previousValue) / previousValue * 100;
         if (relativeChange < 0) {
-          return { isUp: false, value: `${relativeChange.toFixed(2)}%` };
+          return { isUp: false, value: `${Math.abs(relativeChange).toFixed(2)}%` };
         }
         else {
-          return { isUp: true, value: `${relativeChange.toFixed(2)}%` };
+          return { isUp: true, value: `${Math.abs(relativeChange).toFixed(2)}%` };
         }
       }
     // calculate for absolute changes

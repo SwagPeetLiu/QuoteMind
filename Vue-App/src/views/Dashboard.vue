@@ -7,7 +7,7 @@
     <div class="row mt-2">
 
       <!-- mini statistics cards -->
-      <div class="col-sm-12 col-md-8 col-xl-6 col-xxl-5 mb-xl-0">
+      <div class="col-sm-12 col-md-8 col-xl-6 col-xxl-5 mb-xl-0" style="height: 300px;">
 
         <div class="col-6 mt-0 mb-4 w-100 text-center text-gradient font-weight-bold" :class="`text-${themeColour}`">
           <span class="text-shadow-md welcome-text"> Welcome Back! </span>
@@ -35,8 +35,8 @@
       </div>
 
       <!-- 3d card displays used later -->
-      <div class="col-sm-12 col-md-4 col-xl-6 col-xxl-7 mb-xl-0 mb-4">
-        <p class="p-5 bg-danger">fucked up</p>
+      <div class="col-sm-12 col-md-4 col-xl-6 col-xxl-7 mb-xl-0 mb-4" style="height: 300px;">
+        <p class="p-5 h-100">3d designs</p>
       </div>
     </div>
 

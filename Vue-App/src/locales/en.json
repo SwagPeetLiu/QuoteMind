@@ -156,6 +156,18 @@
     "total sales": "Total Sales",
     "recent sales": "Recent Sales"
   },
+  "transactions":{
+    "simply quoting": "Easily Quoting",
+    "my transactions": "my Transactions",
+    "create": "Create",
+    "create your transactions": "Create your transactions in a simple and step-based manner",
+    "quote": "Quote",
+    "quote your transactions": "Define your own Rules to consistently and correctly quote your marketing transactions",
+    "view and extract": "View and Extract",
+    "view and extract your transactions": "View your quotations and efficiently extract the total amount of your bulk transactions",
+    "account": "Account Payment",
+    "account your transactions": "Keep track of the payment status of your transactions"
+  },
   "stats":{
     "no data available": "No Data Available",
     "quoted": "Quoted",

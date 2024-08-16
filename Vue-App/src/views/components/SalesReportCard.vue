@@ -10,13 +10,33 @@
         }" :title="t('dashboard.recent sales')" :key="$i18n.locale" />
 
         <!-- Timeline demonstration on transactions -->
-        <Horizontal-Timeline
+        <HorizontalTimeline
+            :title="t('transactions.simply quoting')"
+            :link="{text: t('transactions.my transactions'), path: '/transactions'}"
             :data="[
                 {
+                    color: 'success',
+                    icon: 'fa-solid fa-cart-plus',
+                    title: t('transactions.create'),
+                    description: t('transactions.create your transactions'),
+                },
+                {
+                    color: 'info',
+                    icon: 'fa-solid fa-tags',
+                    title: t('transactions.quote'),
+                    description: t('transactions.quote your transactions'),
+                },
+                {
+                    color: 'danger',
+                    icon: 'fa-solid fa-eye',
+                    title: t('transactions.view and extract'),
+                    description: t('transactions.view and extract your transactions'),
+                },
+                {
                     color: 'dark',
-                    icon: 'done',
-                    title: t('dashboard.transactions'),
-                    description: t('dashboard.see all transactions'),
+                    icon: 'fa-solid fa-money-bill-wave',
+                    title: t('transactions.account'),
+                    description: t('transactions.account your transactions'),
                 }
             ]"
             :key="$i18n.locale"
@@ -29,11 +49,13 @@ import ReportsBarChart from "@/components/statistical-components/ReportsBarChart
 import { getRecentSalesPerformanceBody, FormatMonthAndYear } from "@/utils/helpers.js";
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
+import HorizontalTimeline from "@/components/reuseable-components/Horizontal-Timeline.vue";
 
 export default {
     name: "SalesReportCard",
     components: {
-        ReportsBarChart
+        ReportsBarChart,
+        HorizontalTimeline
     },
     setup() {
         const { t } = useI18n();

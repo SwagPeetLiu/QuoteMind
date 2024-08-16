@@ -158,6 +158,18 @@
     "total sales": "总营业额",
     "recent sales": "近期营业额"
   },
+  "transactions":{
+    "simply quoting": "简单灵活地报价",
+    "my transactions": "我的交易",
+    "create": "创立",
+    "create your transactions": "通过简洁有序的步骤创立您的交易",
+    "quote": "报价",
+    "quote your transactions": "灵活定义您的报价规则，实现更高效的报价",
+    "view and extract": "查看和使用",
+    "view and extract your transactions": "查看倒出您的交易报价",
+    "account": "追踪付款情况",
+    "account your transactions": "准确记录以及保存您的收款情况"
+  },
   "stats":{
     "no data available": "暂无数据",
     "quoted": "已报价",

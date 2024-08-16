@@ -18,12 +18,12 @@
         <canvas :id="id" class="chart-canvas" height="150"></canvas>
       </div>
     </div>
-    <div class="d-flex align-items-center my-4 ms-2">
+    <div class="d-flex align-items-center my-3 ms-2">
         <p class="h5 my-0">{{ title }}</p>
-        <i class="text-gradient px-1 h6 my-0" :class="{'fa-solid fa-plus text-success':changesStatus.isUp, 
+        <i v-if="isDataAvailable" class="text-gradient px-1 h6 my-0" :class="{'fa-solid fa-plus text-success':changesStatus.isUp, 
           'fa-solid fa-plus text-danger': !changesStatus.isUp}">
           </i>
-        <span class="font-weight-bold h6 my-0">{{ changesStatus.value }}</span>
+        <span v-if="isDataAvailable" class="font-weight-bold h6 my-0">{{ changesStatus.value }}</span>
     </div>
   </div>
 </template>

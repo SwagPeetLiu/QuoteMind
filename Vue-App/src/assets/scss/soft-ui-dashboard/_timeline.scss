@@ -1,8 +1,67 @@
-//
-// Timeline
-//
+
+// horizontal lines
+.steps-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+// ensure each step item is using the same spaces (flex:1)
+.step-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+// adding spaces between hr lines and the icons
+.step-icon-wrapper {
+    z-index: 2;
+    background-color: white;
+    padding: 0 10px;
+    scale: 1;
+    :hover{
+        scale: 1.3;
+        transition: 0.2s ease-in-out;
+    }
+}
+.step-icon {
+    height: 40px;
+    width: 40px;
+
+    :hover{
+        scale: 1;
+        font-weight: 600;
+        transition: 0.2s ease-in-out;
+    }
+}
+// title should take aboslute positions at the bottom of the icon (avoid affects
+// on the legnth of the horizontal line)
+.step-title {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+.hr-line {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 18px);
+    /* Half icon width */
+    right: calc(-50% + 18px);
+    height: 2px;
+    background-color: #e9ecef;
+    z-index: 1;
+}
 
 
+// vertical Lines
 .timeline {
     position: relative;
 
@@ -59,7 +118,8 @@
     font-weight: $font-weight-bold;
     z-index: 1;
 
-    svg, i {
+    svg,
+    i {
         line-height: $timeline-step-line-height;
     }
 }
