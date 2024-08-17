@@ -14,7 +14,9 @@
                 >
                     <div :class="`bg-gradient-${item.color}`"
                         class="step-icon border border-white border-radius-lg d-flex justify-content-center align-items-center">
-                        <i :class="item.icon" class="text-white text-sm"></i>
+                        <FadeInElement>
+                            <i :class="item.icon" class="text-white text-sm"></i>
+                        </FadeInElement>
                     </div>
                 </div>
                 <p class="step-title text-sm font-weight-bold">{{ item.title }}</p>
@@ -27,7 +29,7 @@
                 <span>
                     {{ title }}
                 </span>
-                <router-link :to="link.path" style="text-decoration: underline;">
+                <router-link :class="{'ms-2': isCurrentLanEnglish }" :to="link.path" style="text-decoration: underline;">
                     {{ link.text }}
                 </router-link>
             </p>
@@ -35,7 +37,7 @@
 
         <!-- Descriptions on the events if clicked -->
         <SlideUpElement v-else>
-            <p class="h5">
+            <p class="h6">
                 {{ eventDescription.descriptions }}
             </p>
         </SlideUpElement>
@@ -44,9 +46,11 @@
 
 <script>
 import SlideUpElement from '@/components/reuseable-components/SlideUpElement.vue';
+import FadeInElement from '@/components/reuseable-components/FadeInElement.vue';
 export default {
     components:{
-        SlideUpElement
+        SlideUpElement,
+        FadeInElement
     },
     props: {
         title:{
@@ -69,6 +73,11 @@ export default {
     data(){
         return {
             eventDescription: { isDefault: true, descriptions: "" }
+        }
+    },
+    computed:{
+        isCurrentLanEnglish(){
+            return this.$store.getters.getLanguage === "en";
         }
     },
     methods:{

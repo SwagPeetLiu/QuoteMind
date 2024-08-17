@@ -84,7 +84,7 @@ export default createStore({
     },
 
     // setting the theme colour of the app
-    setThemeColor(state, payload) {
+    async setThemeColor(state, payload) {
       localStorage.setItem("theme", payload);
       state.themeColor = payload;
     },

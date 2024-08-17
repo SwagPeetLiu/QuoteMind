@@ -1,6 +1,6 @@
 <template>
     <!-- card styling -->
-    <div class="card stats-card">
+    <div class="card stats-card" @click="navigate(to)">
         <div class="p-3 card-body">
 
             <!-- flex direction definition -->
@@ -47,6 +47,10 @@ export default {
             type: String,
             required: true,
         },
+        to:{
+            type: String,
+            required: true,
+        },
         target: {
             type: String,
             required: true,
@@ -78,6 +82,11 @@ export default {
         currentMainTheme() {
             const maintheme = this.$store.getters.getMainTheme;
             return `bg-gradient-${maintheme}`;
+        }
+    },
+    methods:{
+        navigate(to){
+            this.$router.push({ path: to });
         }
     }
 };

@@ -175,6 +175,13 @@ export default {
           });
         }
       }
+    },
+    '$store.state.language': {
+      handler() {
+        this.$nextTick(() => {
+          this.drawGraph();
+        });
+      }
     }
   },
 }; 

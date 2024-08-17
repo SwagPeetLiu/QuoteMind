@@ -1,13 +1,16 @@
 <template>
     <div>
         <!-- recent sales performance card -->
-        <reports-bar-chart id='sales-bar-chart' color='dark' :isLoading="isLoading" :chart="{
-            labels: labels.length > 0 ? labels.map(label => `${t(label.month)}/${label.year}`) : [],
-            datasets: {
-                label: t('dashboard.total sales'),
-                data: dataArray
-            },
-        }" :title="t('dashboard.recent sales')" :key="$i18n.locale" />
+        <reports-bar-chart id='sales-bar-chart' color='dark' :isLoading="isLoading" 
+            :chart="{
+                labels: labels.length > 0 ? labels.map(label => `${t(label.month)}/${label.year}`) : [],
+                datasets: {
+                    label: t('dashboard.total sales'),
+                    data: dataArray
+                },
+            }" 
+            :title="t('dashboard.recent sales')" 
+        />
 
         <!-- Timeline demonstration on transactions -->
         <HorizontalTimeline
@@ -39,7 +42,6 @@
                     description: t('transactions.account your transactions'),
                 }
             ]"
-            :key="$i18n.locale"
         />
     </div>
 </template>

@@ -97,7 +97,7 @@ const routes = [
     meta: { requiresAuth: true, mainLink: "Customers", subLink: "Companies" }
   },
   {
-    path: "/customers/companies",
+    path: "/customers/clients",
     name: "Clients",
     component: Clients,
     meta: { requiresAuth: true, mainLink: "Customers", subLink: "Clients" }

@@ -80,7 +80,9 @@
         <div class="dropdown mt-3" ref="language-select">
           <h6 class="mb-1">{{ t("configurator.Language") }}</h6>
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-            data-bs-toggle="dropdown" aria-expanded="false">
+            data-bs-toggle="dropdown" aria-expanded="false"
+            data-bs-popper='{"strategy":"fixed","modifiers":[{"name":"offset","options":{"offset":[0,8]}}]}' 
+          >
             {{ this.$store.state.language == "en" ?
               t("configurator.English") : t("configurator.Chinese")
             }}

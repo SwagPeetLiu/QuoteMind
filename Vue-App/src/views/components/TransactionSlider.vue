@@ -15,10 +15,11 @@
         <div class="carousel-inner h-100 d-flex">
 
             <!-- counter linear chart (Side 1)-->
-            <div class="carousel-item pe-2 px-md-3 h-100 active d-flex flex-column justify-content-center align-items-center"
-                :class="{
-                    'd-flex justify-content-center align-items-center': !isCoutingLoading,
-                }">
+            <div 
+                class="carousel-item pe-2 px-md-3 h-100 active d-flex flex-column justify-content-center align-items-center"
+                :class="{'d-flex justify-content-center align-items-center': !isCoutingLoading}"
+                
+            >
                 <gradient-line-chart v-if="!isCoutingLoading && activeSlide === 0"
                     :title="`${t('stats.time.transactions in the last year')}`" :chart="{
                         labels: transactionCounterData.labels.map(label => `${t(label.month)}/${label.year}`),
@@ -31,15 +32,20 @@
                             {
                                 label: t('stats.quoted'),
                                 data: transactionCounterData.quoted,
-                                backgroundColor: this.$store.state.themeColor === 'dark' ? 'opposite' : 'dark'
+                                backgroundColor: 'dark'
                             }
                         ]
-                    }" :key="$i18n.locale" />
+                    }" 
+                    :key="$i18n.locale" 
+                />
                 <DotLoader v-if="isCoutingLoading && activeSlide === 0" :size="60" />
             </div>
 
             <!-- distribution doughnut chart (Slide 2) -->
-            <div class="carousel-item w-100 h-100 px-md-6 ms-md-n4 d-flex justify-content-center align-items-center">
+            <div 
+                class="carousel-item w-100 h-100 px-md-6 ms-md-n4 d-flex justify-content-center align-items-center"
+
+            >
                 <div class="w-80 w-md-50" v-if="!isDistritbuionLoading && activeSlide === 1">
                     <DoughnutChart :title="t('stats.time.transaction distribution in the last year')" :inputs="{
                         labels: transactionDistributionData.labels.map(label => t(`stats.${label}`)),

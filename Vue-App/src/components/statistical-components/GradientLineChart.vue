@@ -82,10 +82,14 @@ export default {
       if (this.isDataAvailable) {
         return this.chart.datasets.map(item => {
           if (item.backgroundColor === 'theme') {
-            return mainTheme;
-          } else if (item.backgroundColor === 'opposite') {
-            return getContrastColour(mainTheme);
-          } else {
+            if (mainTheme !== 'dark'){
+              return mainTheme;
+            }
+            else{
+              return getContrastColour(mainTheme);
+            }
+          }
+          else {
             return item.backgroundColor;
           }
         });
@@ -95,17 +99,17 @@ export default {
     }
   },
   methods: {
-    updateChart() {
-      if (!this.isDataAvailable) {
+    createChart() {
+      if (!this.isDataAvailable || !this.$refs.gradientLineChart) {
         return;
       }
-      const ctx = document.getElementById("line-chart").getContext("2d");
-      const gradientStroke = createLinearGradient(ctx, appConfig.ChartColours[this.$store.getters.getMainTheme][1]);
-
       if (this.chartInstance) {
         this.chartInstance.destroy();
       }
-
+      const ctx = document.getElementById("line-chart").getContext("2d");
+      const gradientColour = this.$store.getters.getMainTheme === 'dark' ? getContrastColour('dark') : this.$store.getters.getMainTheme;
+      const gradientStroke = createLinearGradient(ctx, appConfig.ChartColours[gradientColour][1]);
+      
       this.chartInstance = new Chart(ctx, {
         type: "line",
         data: {
@@ -128,6 +132,9 @@ export default {
           plugins: {
             legend: {
               display: false,
+            },
+            tooltip: {
+              enabled: true,
             },
           },
           interaction: {
@@ -181,12 +188,12 @@ export default {
     }
   },
   mounted() {
-    this.updateChart();
+    this.createChart();
   },
   watch: {
     '$store.getters.getMainTheme': {
       handler() {
-        this.updateChart();
+        this.createChart();
       },
     }
   },

@@ -19,10 +19,8 @@ import store from "./store";
 import { useTranslation } from "./utils/I18n";
 import { setBaseURL } from "./utils/apiSetter";
 import router from "./router";
-import "./assets/css/nucleo-icons.css";
-import "./assets/css/nucleo-svg.css";
 import SoftUIDashboard from "./soft-ui-dashboard";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Bootstrap JS bundle
+//import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // JS bundle only
 import 'bootstrap'; // ensure both JS and CSS are included
 import DOMPurify from 'dompurify';
 

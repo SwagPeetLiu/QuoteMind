@@ -114,9 +114,9 @@ function getContrastColour(colour) {
         case 'warning':
             return 'primary';
         case 'danger':
-            return 'dark';
+            return 'info';
         case 'dark':
-            return 'danger';
+            return 'warning';
         default:
             return 'secondary';
     }
