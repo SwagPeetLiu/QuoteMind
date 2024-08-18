@@ -22,14 +22,13 @@
       <hr class="my-1 horizontal dark" />
       <div class="pt-0 card-body pt-sm-3">
 
-        <!-- Sidebar Backgrounds -->
+        <!-- Application Theme colouring -->
         <div>
           <h6 class="mb-0">{{ t("configurator.SideBar Colours") }}</h6>
         </div>
         <a href="#" class="switch-trigger background-color">
           <div class="my-2 badge-colors" :class="this.$store.state.isRTL ? 'text-end' : ' text-start'">
-            <span class="badge filter bg-gradient-primary active" data-color="primary"
-              @click="themeColor('primary')"></span>
+            <span class="badge filter bg-gradient-primary active" data-color="primary" @click="themeColor('primary')"></span>
             <span class="badge filter bg-gradient-dark" data-color="dark" @click="themeColor('dark')"></span>
             <span class="badge filter bg-gradient-info" data-color="info" @click="themeColor('info')"></span>
             <span class="badge filter bg-gradient-success" data-color="success" @click="themeColor('success')"></span>

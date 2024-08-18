@@ -10,7 +10,8 @@
   />
 
   <main
-    class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
+    class="main-content max-height-vh-100 h-100 border-radius-lg"
+    :class="[overlaying ? 'position-fixed overflow-hidden' : 'position-relative']"
   >
     <!-- Top nav bar -->
     <navbar
@@ -38,6 +39,7 @@
   <!-- Overlays components -->
   <error-dialog/>
   <slide-toast/>
+  <ColouringCubeOverlay v-if="overlaying"/>
 </div>
 </template>
 
@@ -50,6 +52,7 @@ import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 import ErrorDialog from "./components/reuseable-components/ErrorDialog.vue";
 import SlideToast from "./components/reuseable-components/SlideToast.vue";
+import ColouringCubeOverlay from "./components/reuseable-components/ColouringCubeOverlay.vue";
 
 export default {
   name: "App",
@@ -59,7 +62,13 @@ export default {
     Navbar,
     AppFooter,
     ErrorDialog,
-    SlideToast
+    SlideToast,
+    ColouringCubeOverlay
+  },
+  data(){
+    return {
+      overlaying: false,
+    }
   },
   methods: {
     ...mapMutations(["toggleConfigurator"]),
@@ -115,8 +124,15 @@ export default {
           }
         }
       }
+    },
+    '$store.state.themeColor': {
+      handler(){
+        this.overlaying = true;
+        setTimeout(() => {
+          this.overlaying = false;
+        }, 3500);
+      }
     }
-    
   }
 }
 </script>
