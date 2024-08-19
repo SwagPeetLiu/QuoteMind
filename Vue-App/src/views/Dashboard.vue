@@ -15,46 +15,30 @@
 
         <div class="row mb-xs-0 mb-md-3">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard 
-              :title="t('dashboard.total products')" 
-              type="sum" 
-              target="products" 
-              to="/resources/products" 
+            <StatsCard :title="t('dashboard.total products')" type="sum" target="products" to="/resources/products"
               icon="fa-solid fa-scroll" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard 
-              :title="t('dashboard.total materials')" 
-              type="sum" 
-              target="materials"
-              to="/resources/materials"
+            <StatsCard :title="t('dashboard.total materials')" type="sum" target="materials" to="/resources/materials"
               icon="fa-solid fa-layer-group" />
           </div>
         </div>
 
         <div class="row">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard 
-              :title="t('dashboard.total companies')" 
-              type="sum" 
-              to="/customers/companies"
-              target="companies" 
+            <StatsCard :title="t('dashboard.total companies')" type="sum" to="/customers/companies" target="companies"
               icon="fa-solid fa-city" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard 
-              :title="t('dashboard.total clients')" 
-              type="sum" 
-              to="/customers/clients"
-              target="clients"
+            <StatsCard :title="t('dashboard.total clients')" type="sum" to="/customers/clients" target="clients"
               icon="fa-solid fa-address-book" />
           </div>
         </div>
       </div>
 
-      <!-- 3d card displays used later -->
+    <!-- 3d card displays used later -->
       <div class="col-sm-12 col-md-4 col-xl-6 col-xxl-7 mb-xl-0 mb-4" style="height: 300px;">
-        <p class="p-5 h-100">3d designs</p>
+        <DashAnime />
       </div>
     </div>
 
@@ -102,6 +86,7 @@ import TimelineList from "./components/TimelineList.vue";
 import TimelineItem from "./components/TimelineItem.vue";
 import ProjectsCard from "./components/ProjectsCard.vue";
 import { useI18n } from "vue-i18n";
+import DashAnime from "@/components/reuseable-components/DashAnime.vue";
 
 export default {
   name: "dashboard-default",
@@ -120,7 +105,8 @@ export default {
     ProjectsCard,
     TimelineList,
     TimelineItem,
-    TransactionSlider
+    TransactionSlider,
+    DashAnime
   },
   computed: {
     themeColour() {
@@ -142,8 +128,9 @@ export default {
   .welcome-text {
     font-size: 6vw;
   }
+
   /* used to set up an margin on the top when charts or component overflows to the second line */
-  .second-chart{
+  .second-chart {
     margin-top: 3%;
   }
 }
@@ -167,7 +154,8 @@ export default {
   .welcome-text {
     font-size: 3.3vw;
   }
-  .second-chart{
+
+  .second-chart {
     margin-top: 0;
   }
 }
