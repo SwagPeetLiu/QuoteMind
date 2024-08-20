@@ -1,5 +1,5 @@
 <template>
-    <div ref="container" class="w-100 ms-n5 mt-n8" style="height: 500px;">
+    <div ref="container" class="animation-container w-100 position-relative z-n1">
         <canvas ref="canvas"></canvas>
     </div>
 </template>
@@ -18,11 +18,25 @@ const store = useStore();
 let scene, camera, renderer, controls;
 let shapes = [];
 let iteration = 0;
-let cameraDistance = 6;
+
+// dynamically determine the camera distance based on the screen width:
+let cameraDistance;
+if (window.innerWidth < 576) {
+    cameraDistance = 8;
+} 
+else if (window.innerWidth >= 768 && window.innerWidth < 992) {
+    cameraDistance = 10;
+}
+else if (window.innerWidth >= 992 && window.innerWidth < 1200) {
+    cameraDistance = 7;
+}
+else {
+    cameraDistance = 6;
+}
 const population = { x: 38, z: 38 };
 
 const params = {
-    speed: 0.45,
+    speed: 0.3,
     noiseScale: 0.23,
     noiseAmp: 1.4,
 };
@@ -30,11 +44,11 @@ const params = {
 let targetX = 0;
 let targetY = 0;
 let targetZ = 0;
-const lerpFactor = 0.01;
+const lerpFactor = 0.008;
 
 // Reactive properties
 const currentTheme = computed(() => store.state.themeColor);
-const darkTheme = config.ChartColours.dark[0];
+const darkTheme = config.ChartColours.dark[1];
 
 const colourPads = computed(() => ({
     primary: [...config.ChartColours.primary, darkTheme],
@@ -245,3 +259,47 @@ onBeforeUnmount(() => {
     if (renderer) renderer.dispose();
 });
 </script>
+
+<style scoped>
+.animation-container {
+    height: 500px;
+    top: -10%;
+    left: -5%;
+}
+
+/* Mobile devices */
+@media (min-width: 300px) {
+    .animation-container {
+        height: 500px;
+        top: -10%;
+        left: -5%;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+    .animation-container {
+        height: 600px;
+        top: -5%;
+        left: -25%;
+    }
+}
+
+/* Small laptops */
+@media (min-width: 992px) {
+    .animation-container {
+        height: 400px;
+        top: -10%;
+        left: -5%;
+    }
+}
+
+/* large laptops */
+@media (min-width: 1200px) {
+    .animation-container {
+        height: 500px;
+        top: -10%;
+        left: -5%;
+    }
+}
+</style>

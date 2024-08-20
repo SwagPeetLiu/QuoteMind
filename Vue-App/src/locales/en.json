@@ -145,11 +145,14 @@
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"
   },
   "dashboard":{
+    "welcome": "Welcome Back!",
     "total employees": "Working Employees",
     "total clients": "Clients",
     "total companies": "Companies",
     "total products": "Products",
     "total materials": "Materials",
+    "total conditions": "Pricing Conditions",
+    "total rules": "Pricing Rules",
     "access your transaction quotations": "Access my Transaction Quotations",
     "transaction automation justifications": "Automating transaction quotations will reduce the processing time, minimise human errors and enabling your business to handle high volume of transactions",
     "use now": "Use now",

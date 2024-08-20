@@ -4,14 +4,10 @@
     <!-- First row of statistical cards
         - each card taking up tp half of the width if the screen is getting smaller
     -->
-    <div class="row mt-2">
+    <div class="row">
 
       <!-- mini statistics cards -->
-      <div class="col-sm-12 col-md-8 col-xl-6 col-xxl-5 mb-xl-0" style="height: 300px;">
-
-        <div class="col-6 mt-0 mb-4 w-100 text-center text-gradient font-weight-bold" :class="`text-${themeColour}`">
-          <span class="text-shadow-md welcome-text"> Welcome Back! </span>
-        </div>
+      <div class="col-sm-12 col-md-8 col-xl-6 col-xxl-5 mb-xl-0">
 
         <div class="row mb-xs-0 mb-md-3">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
@@ -24,7 +20,7 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row mb-xs-0 mb-md-3">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
             <StatsCard :title="t('dashboard.total companies')" type="sum" to="/customers/companies" target="companies"
               icon="fa-solid fa-city" />
@@ -34,16 +30,34 @@
               icon="fa-solid fa-address-book" />
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard :title="t('dashboard.total rules')" type="sum" to="/pricings/pricing_rules" target="pricing_rules"
+              icon="fa-solid fa-city" />
+          </div>
+          <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
+            <StatsCard :title="t('dashboard.total conditions')" type="sum" to="/pricings/pricing_conditions" target="pricing_conditions"
+              icon="fa-solid fa-address-book" />
+          </div>
+        </div>
       </div>
 
     <!-- 3d card displays used later -->
-      <div class="col-sm-12 col-md-4 col-xl-6 col-xxl-7 mb-xl-0 mb-4" style="height: 300px;">
+      <div 
+        class="col-sm-12 col-md-4 col-xl-6 col-xxl-7 d-flex justify-content-center align-items-center" 
+        style="height: 300px;"
+      >
+        <span 
+          class="position-absolute text-center text-gradient font-weight-bold bg-danger text-shadow-md welcome-text mt-n6" 
+          :class="`text-dark`"> 
+          {{ t("dashboard.welcome") }} </span>
         <DashAnime />
       </div>
     </div>
 
     <!-- Second row of charts -->
-    <div class="my-4 row">
+    <div class="mb-3 row mt-n5 mt-md-3">
       <div class="col-sm-12 col-xl-5 mb-lg-0" style="height: 400px;">
         <div class="card p-3 h-100">
           <SalesReportCard />
@@ -126,7 +140,7 @@ export default {
 /* Mobile devices */
 @media (min-width: 300px) {
   .welcome-text {
-    font-size: 6vw;
+    font-size: 6.5vw;
   }
 
   /* used to set up an margin on the top when charts or component overflows to the second line */
@@ -163,7 +177,7 @@ export default {
 /* Extra large large laptops */
 @media (min-width: 1600px) {
   .welcome-text {
-    font-size: 2.6vw;
+    font-size: 3vw;
   }
 }
 </style>
