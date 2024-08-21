@@ -34,11 +34,11 @@
         <div class="row">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
             <StatsCard :title="t('dashboard.total rules')" type="sum" to="/pricings/pricing_rules" target="pricing_rules"
-              icon="fa-solid fa-city" />
+              icon="fa-solid fa-tags" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
             <StatsCard :title="t('dashboard.total conditions')" type="sum" to="/pricings/pricing_conditions" target="pricing_conditions"
-              icon="fa-solid fa-address-book" />
+              icon="fa-solid fa-pen-ruler" />
           </div>
         </div>
       </div>
@@ -72,10 +72,10 @@
 
     <!-- Third row of cards -->
     <div class="row my-4">
-      <div class="col-sm-6 col-md-6 col-lg-8 mb-md-0 mb-4">
-        <projects-card />
+      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0 mb-4" style="height: 480px;">
+        <QuotationCompletionCard />
       </div>
-      <div class="col-sm-6 col-md-6 col-lg-4">
+      <div class="col-sm-6 col-md-6 col-lg-6" style="height: 480px;">
         <timeline-list class="h-100" title="Orders overview" description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
         <span class='font-weight-bold'>24%</span> this month">
           <timeline-item color="success" icon="bell-55" title="$2400 Design changes" date-time="22 DEC 7:20 PM" />
@@ -98,7 +98,7 @@ import TransactionSlider from "@/views/components/TransactionSlider.vue";
 import SalesReportCard from "./components/SalesReportCard.vue";
 import TimelineList from "./components/TimelineList.vue";
 import TimelineItem from "./components/TimelineItem.vue";
-import ProjectsCard from "./components/ProjectsCard.vue";
+import QuotationCompletionCard from "./components/QuotationCompletionCard.vue";
 import { useI18n } from "vue-i18n";
 import DashAnime from "@/components/reuseable-components/DashAnime.vue";
 
@@ -116,16 +116,11 @@ export default {
   components: {
     StatsCard,
     SalesReportCard,
-    ProjectsCard,
+    QuotationCompletionCard,
     TimelineList,
     TimelineItem,
     TransactionSlider,
     DashAnime
-  },
-  computed: {
-    themeColour() {
-      return this.$store.getters.getMainTheme
-    },
   },
 };
 </script>

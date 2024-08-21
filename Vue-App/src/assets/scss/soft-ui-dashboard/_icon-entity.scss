@@ -1,0 +1,23 @@
+.icon-container{
+    height: 42px;
+    width: 42px;
+    opacity: 0.9;
+    div{
+        height: 40px;
+        width: 40px;
+    }
+    i{
+        font-size: 1rem;
+    }
+}
+.name-container{
+    .icon-name{
+        margin-top: -10%;
+        font-size: 0.9rem;
+    }
+    .icon-id{
+        margin-top: 10px;
+        margin-left: 2px;
+        font-size: 0.7rem;
+    }
+}
