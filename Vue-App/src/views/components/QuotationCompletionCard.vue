@@ -13,21 +13,20 @@
           <thead>
             <tr>
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
-                <div class="d-flex align-items-center">
-                  <img :src="`/img/icons/${quoteTarget}.png`" alt="Total Transactions" style="width: 38px; height: 38px" />
-                  <span class="ms-2 mt-1 text-xs">{{ t(`routes.${quoteTarget}`) }}</span>
+                <div class="d-flex align-items-center justify-content-start ms-1">
+                  <img :src="getTargetImage(quoteTarget)" alt="Total Transactions" style="width: 32px; height: 32px" />
+                  <span class="ms-3 mt-1 text-xs">{{ t(`routes.${quoteTarget}`) }}</span>
                 </div> 
               </th>
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
-                <div class="d-flex align-items-center justify-content-center">
-                  <img :src="`/img/icons/${quoteTarget}.png`" alt="Total Transactions"
-                    style="width: 38px; height: 38px" />
+                <div class="d-flex align-items-center justify-content-center" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                  <img src="../../assets/img/icons/total-transactions.png" alt="Total Transactions" style="width: 32px; height: 32px" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.unpaid') }}</span>
                 </div>
               </th>
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
                 <div class="d-flex align-items-center justify-content-center">
-                  <img src="../../assets/img/icons/percentage.png" alt="Percentage" style="width: 38px; height: 38px" />
+                  <img src="../../assets/img/icons/percentage.png" alt="Percentage" style="width: 32px; height: 32px" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.quoted') }}</span>
                 </div>
               </th>
@@ -36,10 +35,10 @@
 
           <!-- content of tables -->
           <tbody v-if="!isLoading && isDataAvailable">
-            <tr v-for="(record, index) in companies" :key="index">
+            <tr v-for="(record, index) in records" :key="index">
               <td>
-                <IconEntity :theme="themeColour" icon="fa-solid fa-building" :name="record.company.full_name"
-                  :id="record.company.id" />
+                <IconEntity :theme="themeColour" icon="fa-solid fa-building" :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
+                  :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id" />
               </td>
               <td class="align-middle text-center font-weight-bold">
                 <span>{{ $i18n.locale === "en" ? "$" : "¥" }}</span>
@@ -62,7 +61,7 @@
           </tbody>
         </table>
         <div v-if="isLoading" class="d-flex justify-content-center align-items-center h-100 mt-n4">
-          loading
+          <DotLoader :size="60" />
         </div>
         <div 
           v-if="!isLoading && !isDataAvailable" 
@@ -82,18 +81,19 @@ import IncrementNumber from "@/components/statistical-components/IncrementNumber
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
+import DotLoader from "@/components/reuseable-components/DotLoader.vue";
 
 export default {
   name: "quotation-completion-card",
   components: {
     SoftProgress,
     IconEntity,
-    IncrementNumber
+    IncrementNumber,
+    DotLoader
   },
   props:{
     quoteTarget: {
       type: String,
-      default: "companies",
       required: true
     }
   },
@@ -106,14 +106,14 @@ export default {
       return this.$store.getters.getMainTheme
     },
     isDataAvailable(){
-      return this.companies.length > 0
+      return this.records.length > 0
     }
   },
   data(){
     const { t } = useI18n();
     return {
       isLoading: true,
-      companies: [],
+      records: [],
       t: t
     }
   },
@@ -123,9 +123,9 @@ export default {
       search.getQuotationTargets({target: this.quoteTarget})
         .then((response) => {
           if (response.isCompleted) {
-            this.companies = response.data.companies.map((company) => ({
-              ...company,
-              percentage: calculatePercentage(company.created_transactions, company.total_transactions),
+            this.records = response.data[this.quoteTarget].map((record) => ({
+              ...record,
+              percentage: calculatePercentage(record.created_transactions, record.total_transactions),
             }));
           }
         })
@@ -135,6 +135,14 @@ export default {
         .finally(() => {
           this.isLoading = false;
         });
+    },
+    getTargetImage(target){
+      try{
+        return require(`../../assets/img/icons/${target}.png`);
+      }
+      catch(err){
+        console.log(err)
+      }
     }
   }
 };

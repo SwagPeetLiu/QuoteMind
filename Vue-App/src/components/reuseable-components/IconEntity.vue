@@ -14,7 +14,7 @@
 
         <!-- Name & id -->
         <p class="name-container d-flex flex-column ms-2 my-0">
-            <span class="icon-name text-gradient text-dark font-weight-bold">{{ name }}</span>
+            <span class="icon-name text-gradient text-dark font-weight-bold text-truncate">{{ name }}</span>
             <span class="icon-id position-absolute text-secondary">#{{ id }}</span>
         </p>
     </div>

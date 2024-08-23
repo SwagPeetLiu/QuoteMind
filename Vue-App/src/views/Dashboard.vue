@@ -71,22 +71,12 @@
     </div>
 
     <!-- Third row of cards -->
-    <div class="row my-4">
-      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0 mb-4" style="height: 480px;">
-        <QuotationCompletionCard />
+    <div class="row mt-4 mb-n4">
+      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0" style="height: 460px;">
+        <QuotationCompletionCard quoteTarget="companies"/>
       </div>
-      <div class="col-sm-6 col-md-6 col-lg-6" style="height: 480px;">
-        <timeline-list class="h-100" title="Orders overview" description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
-        <span class='font-weight-bold'>24%</span> this month">
-          <timeline-item color="success" icon="bell-55" title="$2400 Design changes" date-time="22 DEC 7:20 PM" />
-          <TimelineItem color="danger" icon="html5" title="New order #1832412" date-time="21 DEC 11 PM" />
-          <TimelineItem color="info" icon="cart" title="Server payments for April" date-time="21 DEC 9:34 PM" />
-          <TimelineItem color="warning" icon="credit-card" title="New card added for order #4395133"
-            date-time="20 DEC 2:20 AM" />
-          <TimelineItem color="primary" icon="key-25" title="Unlock packages for development"
-            date-time="18 DEC 4:54 AM" />
-          <TimelineItem color="info" icon="check-bold" title="Notifications unread" date-time="15 DEC" />
-        </timeline-list>
+      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0" style="height: 460px;">
+        <QuotationCompletionCard quoteTarget="clients"/>
       </div>
     </div>
   </div>
@@ -96,8 +86,6 @@
 import StatsCard from "@/components/statistical-components/StatsCard.vue";
 import TransactionSlider from "@/views/components/TransactionSlider.vue";
 import SalesReportCard from "./components/SalesReportCard.vue";
-import TimelineList from "./components/TimelineList.vue";
-import TimelineItem from "./components/TimelineItem.vue";
 import QuotationCompletionCard from "./components/QuotationCompletionCard.vue";
 import { useI18n } from "vue-i18n";
 import DashAnime from "@/components/reuseable-components/DashAnime.vue";
@@ -117,8 +105,6 @@ export default {
     StatsCard,
     SalesReportCard,
     QuotationCompletionCard,
-    TimelineList,
-    TimelineItem,
     TransactionSlider,
     DashAnime
   },
