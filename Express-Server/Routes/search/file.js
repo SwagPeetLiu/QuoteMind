@@ -4,15 +4,45 @@ const {
     validateTableExistence,
     validateAndPreProcessQuery
 } = require("../../utils/Validator");
-const { generateQuery } = require("../../utils/Formatter");
+const { 
+    generateQuery,
+    generateQuotationProgressQuery
+} = require("../../utils/Formatter");
 
 module.exports = (db, dbReferences) => {
 
     // routes to getting all the valid search targets for an instance(table):
     router.route("/targets")
-        .get( (req, res) => {
+        .get((req, res) => {
             if (!dbReferences) return res.status(500).json({ message: "failed to get search targets", targets: null });
             return res.status(200).json({ targets: dbReferences });
+        });
+
+    // routes to directly report the top 5 clients and companies:
+    router.route("/top-clients")
+        .get(async(req, res) => {
+            const clientsQuery = generateQuotationProgressQuery("client");
+            try{
+                const topClients = await db.any(clientsQuery);
+                return res.status(200).json({ clients: topClients });
+            }
+            catch(error){
+                console.error(error);
+                return res.status(500).json({ message: "failed to get top clients", clients: null });
+            }
+        });
+
+    router.route("/top-companies")
+        .get(async(req, res) => {
+            const companiesQuery = generateQuotationProgressQuery("company");
+            try{
+                const topCompanies = await db.any(companiesQuery);
+                return res.status(200).json({ companies: topCompanies });
+            }
+            catch(error){
+                console.error(error);
+                return res.status(500).json({ message: "failed to get top companies", companies: null });
+            }
         });
     
     // routes to support maximised searchabilities in the platform:

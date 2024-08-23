@@ -1,9 +1,8 @@
 const { getConfiguration } = require("./Configurator");
 const pageSize = getConfiguration().search.pageSize;
-
 /*
 * ==============================================================================================
-* Formatter acts the single source of truth for the formatting of entitye query acros the server
+* Formatter acts the single source of truth for the formatting of entitye query across the server
 * ================================================================================================
 */
 
@@ -690,6 +689,43 @@ function generatePageLimits(page) {
     return `LIMIT ${limit} OFFSET ${offset};`
 }
 
+/*
+* ==============================================================================================
+* Sections used to generate the quotations on the performance queries on transactions
+* ================================================================================================
+*/
+function generateQuotationProgressQuery(target){
+    const targetTable = target === "client" ? "clients" : "companies";
+    return `
+        WITH top_${target} AS (
+            SELECT 
+            ${mapQueryPrefix("transactions")}.${target}, 
+                COUNT(*) AS created_transactions
+            FROM public.transactions ${mapQueryPrefix("transactions")}
+            WHERE ${mapQueryPrefix("transactions")}.status = 'created' AND ${mapQueryPrefix("transactions")}.${target} IS NOT NULL
+            GROUP BY ${mapQueryPrefix("transactions")}.${target}
+            ORDER BY created_transactions DESC
+            LIMIT 5
+        )
+        SELECT 
+        (
+            SELECT jsonb_build_object(
+                'id', ${mapQueryPrefix(targetTable)}.id,
+                'full_name', ${mapQueryPrefix(targetTable)}.full_name
+            )
+            FROM public.${targetTable} ${mapQueryPrefix(targetTable)}
+            WHERE ${mapQueryPrefix(targetTable)}.id = tc.${target}
+        ) AS ${target},
+        tc.created_transactions,
+        COUNT(${mapQueryPrefix("transactions")}.id) AS total_transactions,
+        COALESCE(SUM(CASE WHEN ${mapQueryPrefix("transactions")}.status = 'quoted' THEN ${mapQueryPrefix("transactions")}.amount ELSE 0 END), 0) AS upaid
+        FROM top_${target} tc
+        JOIN public.transactions ${mapQueryPrefix("transactions")} ON tc.${target} = ${mapQueryPrefix("transactions")}.${target}
+        GROUP BY tc.${target}, tc.created_transactions
+        ORDER BY tc.created_transactions DESC
+    `;
+}
+
 module.exports = {
     mapDefaultQueryColumns,
     mapFromClause,
@@ -697,5 +733,6 @@ module.exports = {
     mapOrderByClause,
     generateQuery,
     mapOperator,
-    mapQueryPrefix
+    mapQueryPrefix,
+    generateQuotationProgressQuery
 }

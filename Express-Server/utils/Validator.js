@@ -72,10 +72,10 @@ function validateAndPreProcessQuery(body, tableName, dbReferences) {
 
     // validating the Order BY Clause
     if (!('orderByClause' in searchQuery) ||
-        (searchQuery.orderByClause !== null && 
-        !Array.isArray(searchQuery.orderByClause) && 
-        typeof searchQuery.orderByClause !== "string")
-    ){
+        (searchQuery.orderByClause !== null &&
+            !Array.isArray(searchQuery.orderByClause) &&
+            typeof searchQuery.orderByClause !== "string")
+    ) {
         return { valid: false, message: "invalid orderByClause" };
     }
     if (typeof searchQuery.orderByClause === "string" && searchQuery.orderByClause !== "default") {
@@ -701,11 +701,11 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                 typeof address.id !== "string" || typeof address.message !== "string") {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
-            if (!unicodeRegex.test(address.street.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !unicodeRegex.test(address.city.replace(/ /g, '').replace(/[^a-zA-Z0-9]/g, '')) ||
-                !unicodeRegex.test(address.state.replace(/ /g, '')) ||
-                !unicodeRegex.test(address.country.replace(/ /g, '')) ||
-                !unicodeRegex.test(address.postal.replace(/ /g, '')) ||
+            if (!unicodeRegex.test(address.street) ||
+                !unicodeRegex.test(address.city) ||
+                !unicodeRegex.test(address.state) ||
+                !unicodeRegex.test(address.country) ||
+                !unicodeRegex.test(address.postal) ||
                 !(address.message === "add" || address.message === "update" || address.message === "delete")) {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
