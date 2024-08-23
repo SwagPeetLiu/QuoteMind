@@ -69,7 +69,8 @@
     },
     "search": {
       "failed to fetch dbReferences": "获取数据库结构失败",
-      "failed to search": "搜索失败"
+      "failed to search": "搜索失败",
+      "failed to obtain the top": "未能获取置顶的"
     }
   },
   "thinBar": {
@@ -144,7 +145,8 @@
     "search target": "搜索目标",
 
     "invalid email": "邮箱格式错误",
-    "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符"
+    "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符",
+    "invalid performance target": "此报价衡量无效"
   },
   "dashboard":{
     "welcome": "QuoteMind欢迎您!",
@@ -159,7 +161,9 @@
     "transaction automation justifications": "自动化交易报价将减少处理时间，最大限度地减少人为错误，并使您的企业能够处理大量交易",
     "use now": "立即使用",
     "total sales": "总营业额",
-    "recent sales": "近期营业额"
+    "recent sales": "近期营业额",
+    "corporates Quotation Progress": "企业客户报价进度",
+    "clients Quotation Progress": "个体客户报价进度"
   },
   "transactions":{
     "simply quoting": "简单灵活地报价",
@@ -178,6 +182,7 @@
     "quoted": "已报价",
     "created": "已创立",
     "paid": "已付款",
+    "unpaid": "未付款",
     "total": "总计",
     "time": {
       "in this period": "在本期间",
@@ -201,6 +206,8 @@
       "Oct": "10月",
       "Nov": "11月",
       "Dec": "12月"
+    },
+    "units":{
     }
   }
 }

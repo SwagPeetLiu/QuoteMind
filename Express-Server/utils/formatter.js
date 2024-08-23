@@ -718,7 +718,7 @@ function generateQuotationProgressQuery(target){
         ) AS ${target},
         tc.created_transactions,
         COUNT(${mapQueryPrefix("transactions")}.id) AS total_transactions,
-        COALESCE(SUM(CASE WHEN ${mapQueryPrefix("transactions")}.status = 'quoted' THEN ${mapQueryPrefix("transactions")}.amount ELSE 0 END), 0) AS upaid
+        COALESCE(SUM(CASE WHEN ${mapQueryPrefix("transactions")}.status = 'quoted' THEN ${mapQueryPrefix("transactions")}.amount ELSE 0 END), 0) AS unpaid
         FROM top_${target} tc
         JOIN public.transactions ${mapQueryPrefix("transactions")} ON tc.${target} = ${mapQueryPrefix("transactions")}.${target}
         GROUP BY tc.${target}, tc.created_transactions

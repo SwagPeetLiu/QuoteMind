@@ -54,6 +54,28 @@ const search = {
                 console.error("failed to search", error);
                 return { isCompleted: false, data: null };
             });
+    },
+
+    // get the Top clients & Comapnies that would require quotation attentions:
+    getQuotationTargets:(data) => {
+        if (!data || !data.target ){
+            console.warn("Incomplete information");
+            return { isCompleted: false, data: null };
+        }
+        if (typeof data.target != "string" || (data.target != "clients" && data.target != "companies")) {
+            store.commit("setToastMessage", { message: t('validation.invalid performance target'), type: "error" });
+            return { isCompleted: false, data: null };
+        }
+        return axios
+            .get(`/search/top-${data.target}`)
+            .then((response) => {
+                return { isCompleted: true, data: response.data };
+            })
+            .catch((error) => {
+                store.commit("setToastMessage", { message: `${t("apiMessage.search.failed to obtain the top")}${t(`routes.${data.target}`)}`, type: "error" });
+                console.error("failed to get quotation targets", error);
+                return { isCompleted: false, data: null };
+            });
     }
 }
 

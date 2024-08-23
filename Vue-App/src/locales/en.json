@@ -68,7 +68,8 @@
     },
     "search": {
       "failed to fetch dbReferences": "Unable to fetch the database references",
-      "failed to search": "Failed to search"
+      "failed to search": "Failed to search",
+      "failed to obtain the top": "Failed to obtain the top"
     }
   },
   "thinBar":{
@@ -142,7 +143,8 @@
     "search target": "Search Target ",
 
     "invalid email": "Email must be a valid email",
-    "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character"
+    "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character",
+    "invalid performance target": "Performance Target invalid"
   },
   "dashboard":{
     "welcome": "Welcome Back!",
@@ -157,7 +159,9 @@
     "transaction automation justifications": "Automating transaction quotations will reduce the processing time, minimise human errors and enabling your business to handle high volume of transactions",
     "use now": "Use now",
     "total sales": "Total Sales",
-    "recent sales": "Recent Sales"
+    "recent sales": "Recent Sales",
+    "corporates Quotation Progress": "Companies Quotation Progress",
+    "clients Quotation Progress": "Clients Quotation Progress"
   },
   "transactions":{
     "simply quoting": "Easily Quoting",
@@ -176,6 +180,7 @@
     "quoted": "Quoted",
     "created": "Created",
     "paid": "Paid",
+    "unpaid": "Upaid",
     "total": "Total",
     "time": {
       "in this period": " in this period",
@@ -199,5 +204,7 @@
       "Nov": "Nov",
       "Dec": "Dec"
     }
+  },
+  "units":{
   }
 }

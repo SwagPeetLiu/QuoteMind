@@ -146,7 +146,9 @@ function calculateRelativeChanges(dataArray){
         return { isUp: false, value: "- -" };
     }
 }
-
+function calculatePercentage(base, total){
+    return (base/total * 100).toFixed(0);
+}
 
 /*
 * ==============================================================================
@@ -301,5 +303,6 @@ module.exports = {
     getRecentSalesPerformanceBody,
     createGradient,
     FormatMonthAndYear,
-    calculateRelativeChanges
+    calculateRelativeChanges,
+    calculatePercentage
 }

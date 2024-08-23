@@ -3,7 +3,6 @@ Express-Server/node_modules
 Express-Server/config
 Express-Server/.env.test
 Express-Server/.env.prod
-Express-Server/
 
 # Front-end files:
 Vue-App/node_modules
