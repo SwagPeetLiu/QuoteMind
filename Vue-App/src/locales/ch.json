@@ -180,8 +180,10 @@
   "stats":{
     "no data available": "暂无数据",
     "quoted": "已报价",
+    "quoted explanations": "已报价或已付款",
     "created": "已创立",
     "paid": "已付款",
+    "unpaid explanations": "已报价未付款",
     "unpaid": "未付款",
     "total": "总计",
     "time": {

@@ -178,9 +178,11 @@
   "stats":{
     "no data available": "No Data Available",
     "quoted": "Quoted",
+    "quoted explanations": "Quoted or Paid",
     "created": "Created",
     "paid": "Paid",
     "unpaid": "Upaid",
+    "unpaid explanations": "Quoted but not paid yet",
     "total": "Total",
     "time": {
       "in this period": " in this period",
@@ -207,4 +209,4 @@
   },
   "units":{
   }
-}
+} 

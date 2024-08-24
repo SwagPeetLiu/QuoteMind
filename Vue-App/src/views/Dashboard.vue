@@ -72,10 +72,10 @@
 
     <!-- Third row of cards -->
     <div class="row mt-4 mb-n4">
-      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0" style="height: 460px;">
+      <div class="col-sm-12 col-xxl-6 mb-3 mb-xxl-0" style="height: 460px;">
         <QuotationCompletionCard quoteTarget="companies"/>
       </div>
-      <div class="col-sm-6 col-md-6 col-lg-6 mb-md-0" style="height: 460px;">
+      <div class="col-sm-12 col-xxl-6 mb-sm-0" style="height: 460px;">
         <QuotationCompletionCard quoteTarget="clients"/>
       </div>
     </div>

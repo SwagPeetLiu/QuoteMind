@@ -9,22 +9,32 @@
 
     <div class="card-body px-2 py-2">
       <div class="table-responsive h-100 overflow-hidden">
-        <table class="table align-items-center mb-0 table-hover">
+        <table class="table align-items-center mb-0 table-hover custom-width-columns">
           <thead>
             <tr>
-              <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
+              <th class="text-uppercase text-secondary font-weight-bolder opacity-8 col-target">
                 <div class="d-flex align-items-center justify-content-start ms-1">
                   <img :src="getTargetImage(quoteTarget)" alt="Total Transactions" style="width: 32px; height: 32px" />
                   <span class="ms-3 mt-1 text-xs">{{ t(`routes.${quoteTarget}`) }}</span>
                 </div> 
               </th>
-              <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
+              <th 
+                v-if="isLargeScreen"
+                class="text-uppercase text-secondary font-weight-bolder opacity-8 col-unpaid"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                :title="t('stats.unpaid explanations')"
+              >
                 <div class="d-flex align-items-center justify-content-center" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
                   <img src="../../assets/img/icons/total-transactions.png" alt="Total Transactions" style="width: 32px; height: 32px" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.unpaid') }}</span>
                 </div>
               </th>
-              <th class="text-uppercase text-secondary font-weight-bolder opacity-8">
+              <th class="text-uppercase text-secondary font-weight-bolder opacity-8 col-quoted"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                :title="t('stats.quoted explanations')"
+              >
                 <div class="d-flex align-items-center justify-content-center">
                   <img src="../../assets/img/icons/percentage.png" alt="Percentage" style="width: 32px; height: 32px" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.quoted') }}</span>
@@ -35,19 +45,19 @@
 
           <!-- content of tables -->
           <tbody v-if="!isLoading && isDataAvailable">
-            <tr v-for="(record, index) in records" :key="index">
+            <tr v-for="(record, index) in records" :key="index" class="table-row">
               <td>
                 <IconEntity :theme="themeColour" icon="fa-solid fa-building" :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
                   :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id" />
               </td>
-              <td class="align-middle text-center font-weight-bold">
+              <td class="align-middle text-center font-weight-bold d-none d-md-table-cell">
                 <span>{{ $i18n.locale === "en" ? "$" : "¥" }}</span>
                 <IncrementNumber :endValue="record.unpaid" :duration="500" />
               </td>
               <td class="align-middle">
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="font-weight-bold mx-2">{{record.percentage}}%</span>
-                  <div>
+                  <div class="d-none d-lg-inline">
                     <soft-progress 
                       :color="themeColour" 
                       class="mx-auto" 
@@ -74,7 +84,6 @@
 </template>
 
 <script>
-import setTooltip from "@/assets/js/tooltip.js";
 import SoftProgress from "@/components/soft-components/SoftProgress.vue";
 import IconEntity from "../../components/reuseable-components/IconEntity.vue";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
@@ -82,6 +91,7 @@ import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
 import DotLoader from "@/components/reuseable-components/DotLoader.vue";
+import setTooltip from "@/assets/js/tooltip.js";
 
 export default {
   name: "quotation-completion-card",
@@ -100,6 +110,10 @@ export default {
   mounted() {
     setTooltip();
     this.getTopComapnies();
+    window.addEventListener('resize', this.updateWindowWidth);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.updateWindowWidth);
   },
   computed: {
     themeColour() {
@@ -107,6 +121,9 @@ export default {
     },
     isDataAvailable(){
       return this.records.length > 0
+    },
+    isLargeScreen() {
+      return this.windowWidth >= 768;
     }
   },
   data(){
@@ -114,7 +131,8 @@ export default {
     return {
       isLoading: true,
       records: [],
-      t: t
+      t: t,
+      windowWidth: window.innerWidth
     }
   },
   methods:{
@@ -125,7 +143,7 @@ export default {
           if (response.isCompleted) {
             this.records = response.data[this.quoteTarget].map((record) => ({
               ...record,
-              percentage: calculatePercentage(record.created_transactions, record.total_transactions),
+              percentage: calculatePercentage((record.total_transactions-record.created_transactions), record.total_transactions),
             }));
           }
         })
@@ -143,7 +161,39 @@ export default {
       catch(err){
         console.log(err)
       }
+    },
+    updateWindowWidth() {
+      this.windowWidth = window.innerWidth;
     }
   }
 };
 </script>
+
+<style scoped>
+.custom-width-columns {
+  table-layout: fixed;
+  width: 100%;
+}
+.custom-width-columns .col-target {
+  width: 75%;
+}
+.custom-width-columns .col-quoted {
+  width: 25%;
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+  .custom-width-columns {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .custom-width-columns .col-target {
+    width: 45%;
+  }
+  .custom-width-columns .col-unpaid,
+  .custom-width-columns .col-quoted {
+    width: 27.5%;
+  }
+}
+</style>

@@ -7,6 +7,8 @@ export default function setTooltip() {
   );
   // eslint-disable-next-line no-unused-vars
   var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
+    return new bootstrap.Tooltip(tooltipTriggerEl,{
+      template: '<div class="tooltip my-n3" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner bg-gradient-dark"></div></div>'
+    });
   });
 }

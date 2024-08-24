@@ -132,7 +132,6 @@
 </template>
 
 <script>
-import setTooltip from "@/assets/js/tooltip.js";
 import NavPill from "../components/NavPill.vue";
 import MasterCard from "@/examples/Cards/MasterCard.vue";
 import DefaultInfoCard from "@/examples/Cards/DefaultInfoCard.vue";
@@ -153,9 +152,6 @@ export default {
     BillingCard,
     RankingList,
     RankingListCard,
-  },
-  mounted() {
-    setTooltip();
-  },
+  }
 };
 </script>

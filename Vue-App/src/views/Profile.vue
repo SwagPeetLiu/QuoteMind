@@ -563,7 +563,6 @@ import {
 import DefaultProjectCard from "./components/DefaultProjectCard.vue";
 import PlaceHolderCard from "@/examples/Cards/PlaceHolderCard.vue";
 import setNavPills from "@/assets/js/nav-pills.js";
-import setTooltip from "@/assets/js/tooltip.js";
 
 export default {
   name: "ProfileOverview",
@@ -598,7 +597,6 @@ export default {
   mounted() {
     this.$store.state.isAbsolute = true;
     setNavPills();
-    setTooltip(this.$store.state.bootstrap);
   },
   beforeUnmount() {
     this.$store.state.isAbsolute = false;
