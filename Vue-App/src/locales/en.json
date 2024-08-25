@@ -184,6 +184,7 @@
     "unpaid": "Upaid",
     "unpaid explanations": "Quoted but not paid yet",
     "total": "Total",
+    "in total of": "in total of ",
     "time": {
       "in this period": " in this period",
       "transactions in the last year": "Transactions in the last year",
@@ -208,5 +209,9 @@
     }
   },
   "units":{
+    "transactionUnit": ""
+  },
+  "others":{
+    "remains": " remains "
   }
 } 

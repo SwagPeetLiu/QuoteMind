@@ -75,23 +75,20 @@
             type="checkbox" id="menuFixed" :checked="this.$store.state.isMenuFixed" @change="setMenuFixed" />
         </div>
 
-        <!--language selection-->
-        <div class="dropdown mt-3" ref="language-select">
+       <!--language selection-->
+       <div class="dropdown mt-3" ref="language-select">
           <h6 class="mb-1">{{ t("configurator.Language") }}</h6>
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-            data-bs-toggle="dropdown" aria-expanded="false"
-            data-bs-popper='{"strategy":"fixed","modifiers":[{"name":"offset","options":{"offset":[0,8]}}]}' 
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdownButton"
+            data-bs-toggle="dropdown" aria-expanded="false" 
+            @click="initializeLanguagePopper"
           >
-            {{ this.$store.state.language == "en" ?
-              t("configurator.English") : t("configurator.Chinese")
-            }}
+            {{ $store.state.language == "en" ? t("configurator.English") : t("configurator.Chinese") }}
             <span class="arrow-right ms-2"></span>
           </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('en')">{{ t("configurator.English") }}</a>
-            </li>
-            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('ch')">{{ t("configurator.Chinese") }}</a>
-            </li>
+          <ul id="popper" class="dropdown-menu" aria-labelledby="languageDropdownButton">
+            <div data-popper-arrow class="dropdown-popper-arrow"></div>
+            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('en')">{{ t("configurator.English") }}</a></li>
+            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('ch')">{{ t("configurator.Chinese") }}</a></li>
           </ul>
         </div>
 
@@ -134,6 +131,7 @@ import Spinner from "../reuseable-components/Spinner.vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import auth from "../../api/auth";
+ import initializePopper from "@/assets/js/dropdown.js";
 
 export default {
   name: "configurator",
@@ -168,6 +166,9 @@ export default {
       if (this.$route.name !== "Profile") {
         this.navbarFixed();
       }
+    },
+    initializeLanguagePopper() {
+      initializePopper('#languageDropdownButton', '#languageDropdownButton + .dropdown-menu','[data-popper-arrow]');
     },
 
     // function used to dynamically set the menu fixed or not

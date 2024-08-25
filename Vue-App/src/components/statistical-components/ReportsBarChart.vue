@@ -20,8 +20,8 @@
     </div>
     <div class="d-flex align-items-center my-3 ms-2">
         <p class="h5 my-0">{{ title }}</p>
-        <i v-if="isDataAvailable" class="text-gradient px-1 h6 my-0" :class="{'fa-solid fa-plus text-success':changesStatus.isUp, 
-          'fa-solid fa-plus text-danger': !changesStatus.isUp}">
+        <i v-if="isDataAvailable" class="text-gradient px-1 h6 my-0" :class="{'fa-solid fa-arrow-trend-up text-success':changesStatus.isUp, 
+          'fa-solid fa-arrow-trend-down text-danger': !changesStatus.isUp}">
           </i>
         <span v-if="isDataAvailable" class="font-weight-bold h6 my-0">{{ changesStatus.value }}</span>
     </div>

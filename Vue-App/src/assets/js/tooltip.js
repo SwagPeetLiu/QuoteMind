@@ -1,14 +1,37 @@
 import bootstrap from "bootstrap/dist/js/bootstrap";
 
-// initialization of Tooltips
-export default function setTooltip() {
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
-  // eslint-disable-next-line no-unused-vars
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl,{
-      template: '<div class="tooltip my-n3" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner bg-gradient-dark"></div></div>'
+export default function initTooltips() {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  
+  tooltipTriggerList.forEach((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl, {
+      template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner bg-gradient-dark"></div></div>',
+      popperConfig: (defaultBsPopperConfig) => {
+        return {
+          ...defaultBsPopperConfig,
+          modifiers: [
+            ...defaultBsPopperConfig.modifiers,
+            {
+              name: 'offset',
+              options: {
+                offset: [0, -8], // Adjust this value as needed
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                padding: 0,
+              },
+            },
+            {
+              name: 'flip',
+              options: {
+                padding: 0,
+              },
+            },
+          ],
+        };
+      },
     });
   });
 }

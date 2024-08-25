@@ -25,7 +25,7 @@
                 data-bs-placement="top"
                 :title="t('stats.unpaid explanations')"
               >
-                <div class="d-flex align-items-center justify-content-center" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                <div class="d-flex align-items-center justify-content-center">
                   <img src="../../assets/img/icons/total-transactions.png" alt="Total Transactions" style="width: 32px; height: 32px" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.unpaid') }}</span>
                 </div>
@@ -54,7 +54,11 @@
                 <span>{{ $i18n.locale === "en" ? "$" : "¥" }}</span>
                 <IncrementNumber :endValue="record.unpaid" :duration="500" />
               </td>
-              <td class="align-middle">
+              <td class="align-middle" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  :title="`${t('stats.in total of')}${record.total_transactions}${t('units.transactionUnit')}, ${record.created_transactions}${t('units.transactionUnit')}${t('others.remains')}${t('stats.unpaid')}`"
+              >
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="font-weight-bold mx-2">{{record.percentage}}%</span>
                   <div class="d-none d-lg-inline">
@@ -91,7 +95,7 @@ import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
 import DotLoader from "@/components/reuseable-components/DotLoader.vue";
-import setTooltip from "@/assets/js/tooltip.js";
+import initTooltips  from "@/assets/js/tooltip.js";
 
 export default {
   name: "quotation-completion-card",
@@ -108,9 +112,14 @@ export default {
     }
   },
   mounted() {
-    setTooltip();
+    initTooltips();
     this.getTopComapnies();
     window.addEventListener('resize', this.updateWindowWidth);
+  },
+  updated() {
+    this.$nextTick(() => {
+      initTooltips();
+    });
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.updateWindowWidth);

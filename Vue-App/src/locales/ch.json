@@ -186,6 +186,7 @@
     "unpaid explanations": "已报价未付款",
     "unpaid": "未付款",
     "total": "总计",
+    "in total of": "总计",
     "time": {
       "in this period": "在本期间",
       "transactions in the last year": "总计交易量(过去12个月)",
@@ -208,8 +209,12 @@
       "Oct": "10月",
       "Nov": "11月",
       "Dec": "12月"
-    },
-    "units":{
     }
+  },
+  "units":{
+    "transactionUnit": "笔"
+  },
+  "others":{
+    "remains": "是"
   }
 }
