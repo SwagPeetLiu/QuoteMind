@@ -36,7 +36,7 @@ else {
 const population = { x: 38, z: 38 };
 
 const params = {
-    speed: 0.3,
+    speed: 0.55,
     noiseScale: 0.23,
     noiseAmp: 1.4,
 };
@@ -44,7 +44,7 @@ const params = {
 let targetX = 0;
 let targetY = 0;
 let targetZ = 0;
-const lerpFactor = 0.008;
+const lerpFactor = 0.01;
 
 // Reactive properties
 const currentTheme = computed(() => store.state.themeColor);

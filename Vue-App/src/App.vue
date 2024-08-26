@@ -4,13 +4,14 @@
   <sidenav
     :class="[
       this.$store.state.isTransparent, // menu's background
-      'fixed-start' // menu's position
+      'fixed-start', // menu's position
+      'hide-scrollbar'
     ]"
     v-if="this.$store.state.showSidenav"
   />
 
   <main
-    class="main-content max-height-vh-100 h-100 border-radius-lg"
+    class="main-content max-height-vh-100 h-100 border-radius-lg overflow-x-hidden"
     :class="[overlaying ? 'position-fixed overflow-hidden' : 'position-relative']"
   >
     <!-- Top nav bar -->

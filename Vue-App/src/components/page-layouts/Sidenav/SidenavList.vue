@@ -1,7 +1,7 @@
 <!-- this component controls the Listings of the navigation pages -->
 <template>
   <div
-    class="w-auto h-auto collapse navbar-collapse max-height-vh-100 h-100"
+    class="w-auto h-auto collapse navbar-collapse max-height-vh-100 h-100 hide-scrollbar"
     id="sidenav-collapse-main"
   >
     <!-- Operations available when logged in -->
