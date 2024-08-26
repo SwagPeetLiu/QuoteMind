@@ -751,6 +751,8 @@ $btn-border-rounded:          1.875rem !default;
 $btn-icon-transition:         all .2s cubic-bezier(.34,1.61,.7,1.3) !default;
 $btn-icon-transform-right:          translateX(5px) !default;
 $btn-icon-transform-left:          translateX(-5px) !default;
+$btn-icon-spin-transition:    transform 0.3s ease-in-out !default;
+$btn-icon-spin-left:          rotate(-90deg) !default;
 
 // Allows for customizing button radius independently from global border radius
 $btn-border-radius:           $border-radius-md !default;

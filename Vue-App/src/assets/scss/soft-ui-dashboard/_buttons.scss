@@ -200,3 +200,17 @@
     }
   }
 }
+
+
+// buttons that has an effect on spinning the icons:
+.icon-spin-left {
+  i {
+    transition: $btn-icon-spin-transition;
+  }
+  &:hover,
+  &:focus {
+    i {
+      transform: $btn-icon-spin-left;
+    }
+  }
+}
