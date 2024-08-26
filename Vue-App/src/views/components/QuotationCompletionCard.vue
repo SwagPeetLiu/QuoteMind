@@ -75,7 +75,7 @@
           </tbody>
         </table>
         <div v-if="isLoading" class="d-flex justify-content-center align-items-center h-100 mt-n4">
-          <DotLoader :size="60" />
+          <DashLoader :size="80"/>
         </div>
         <div 
           v-if="!isLoading && !isDataAvailable" 
@@ -94,7 +94,7 @@ import IncrementNumber from "@/components/statistical-components/IncrementNumber
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
-import DotLoader from "@/components/reuseable-components/DotLoader.vue";
+import DashLoader from "@/components/reuseable-components/DashLoader.vue";
 import initTooltips  from "@/assets/js/tooltip.js";
 
 export default {
@@ -103,7 +103,7 @@ export default {
     SoftProgress,
     IconEntity,
     IncrementNumber,
-    DotLoader
+    DashLoader
   },
   props:{
     quoteTarget: {
@@ -160,7 +160,9 @@ export default {
           console.error(error);
         })
         .finally(() => {
-          this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 300);
         });
     },
     getTargetImage(target){
