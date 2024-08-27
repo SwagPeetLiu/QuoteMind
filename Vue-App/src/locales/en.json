@@ -163,6 +163,12 @@
     "corporates Quotation Progress": "Companies Quotation Progress",
     "clients Quotation Progress": "Clients Quotation Progress"
   },
+  "profile":{
+    "title": "QuoteMind Portfolio",
+    "admin": "Admin",
+    "user": "User",
+    "tester": "Tester"
+  },
   "transactions":{
     "simply quoting": "Easily Quoting",
     "my transactions": "My Transactions",
@@ -182,9 +188,10 @@
     "created": "Created",
     "paid": "Paid",
     "unpaid": "Upaid",
+    "unquoted": "Unquoted",
     "unpaid explanations": "Quoted but not paid yet",
     "total": "Total",
-    "in total of": "in total of ",
+    "in total of": "In total of ",
     "time": {
       "in this period": " in this period",
       "transactions in the last year": "Transactions in the last year",
@@ -207,6 +214,12 @@
       "Nov": "Nov",
       "Dec": "Dec"
     }
+  },
+  "form":{
+    "name": "Name",
+    "email": "Email",
+    "edit": "Edit",
+    "password": "Password"
   },
   "units":{
     "transactionUnit": ""

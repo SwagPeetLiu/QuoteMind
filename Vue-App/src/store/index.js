@@ -25,7 +25,6 @@ export default createStore({
 
     // top nav bar settings:
     isNavFixed: false, 
-    isAbsolute: false,
     isRTL: false,
 
     // app vue display settings
@@ -207,7 +206,7 @@ export default createStore({
     getIsAuthenticated: (state) => state.isAuthenticated,
     getLanguage: (state) => state.language,
     getUser: (state) => state.user,
-    haveNoDialogs: (state) => state.errorMessage === "" && state.toastMessage.message === "",
+    haveNoDialogs: (state) => state.errorMessage === "",
     getMainTheme: (state) => state.themeColor,
     getDBRefs: (state) => state.dbReferences
   },

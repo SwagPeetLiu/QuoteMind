@@ -149,7 +149,7 @@
     "invalid performance target": "此报价衡量无效"
   },
   "dashboard":{
-    "welcome": "QuoteMind欢迎您!",
+    "welcome": "QuoteMind 欢迎您!",
     "total employees": "工作人员",
     "total clients": "个体客户",
     "total companies": "公司客户",
@@ -164,6 +164,12 @@
     "recent sales": "近期营业额",
     "corporates Quotation Progress": "企业客户报价进度",
     "clients Quotation Progress": "个体客户报价进度"
+  },
+  "profile":{
+    "title": "QuoteMind 资料",
+    "admin": "管理员",
+    "user": "用户",
+    "tester": "测试员"
   },
   "transactions":{
     "simply quoting": "简单灵活地报价",
@@ -185,6 +191,7 @@
     "paid": "已付款",
     "unpaid explanations": "已报价未付款",
     "unpaid": "未付款",
+    "unquoted": "未报价",
     "total": "总计",
     "in total of": "总计",
     "time": {

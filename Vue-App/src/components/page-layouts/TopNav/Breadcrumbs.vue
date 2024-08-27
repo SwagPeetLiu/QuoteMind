@@ -3,25 +3,23 @@
   <nav aria-label="breadcrumb">
 
     <!-- page navs -->
-    <ol class="px-0 pt-1 pb-0 mb-0 bg-transparent breadcrumb">
+    <ol class="px-0 pt-1 mt-4 pb-0 mb-0 bg-transparent breadcrumb">
 
       <!-- home button -->
-      <li class="breadcrumb-item" :class="textWhite">
-        <i class="fa fa-home opacity-8 font-size-lg" aria-hidden="true"></i>
+      <li class="breadcrumb-item">
+        <i class="fa fa-home opacity-8 font-size-lg" :class="{ 'text-white': isCurrentLinkProfile }"
+          aria-hidden="true" style="cursor: pointer;" @click="$router.push({ path: '/' })">
+        </i>
       </li>
 
       <!-- the active route -->
-      <li 
-        v-if="categoryLink !== ''"
-        class="breadcrumb-item active" 
-        :class="textWhite ? 'text-white' : 'text-dark'" 
-        aria-current="page"
-      >
+      <li v-if="categoryLink !== ''" class="breadcrumb-item active"
+        :class="{ 'text-white': isCurrentLinkProfile, 'text-dark': !isCurrentLinkProfile }" aria-current="page">
         {{ categoryLink }}
       </li>
 
       <!-- possible category of the route -->
-      <li class="breadcrumb-item" :class="textWhite ? 'text-white' : 'text-dark'">
+      <li class="breadcrumb-item" :class="{ 'text-white': isCurrentLinkProfile, 'text-dark': !isCurrentLinkProfile }">
         {{ currentPage }}
       </li>
 
@@ -30,7 +28,7 @@
     </ol>
 
     <!-- current page name determination -->
-    <h5 class="mb-0 font-weight-bolder" :class="textWhite ? 'text-white' : ''">
+    <h5 class="mb-0 font-weight-bolder" :class="{ 'text-white': isCurrentLinkProfile }">
       {{ currentPage }}
     </h5>
   </nav>
@@ -41,17 +39,15 @@ import { useI18n } from "vue-i18n";
 
 export default {
   name: "breadcrumbs",
-  props: {
-    textWhite: {
-      type: String,
-    },
-  },
   setup() {
     const { t } = useI18n();
     return { t }
   },
   computed: {
-    categoryLink(){
+    isCurrentLinkProfile() {
+      return this.$route.path === '/profile';
+    },
+    categoryLink() {
       const category = this.$store.state.menuAct.mainLink;
       const activeLink = this.$store.state.menuAct.subLink;
       if (activeLink !== "" && category !== "") {
@@ -100,5 +96,6 @@ export default {
       }
     }
   },
-};
+}
+
 </script>

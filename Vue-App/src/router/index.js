@@ -3,7 +3,6 @@ import store from "../store";
 import Dashboard from "@/views/Dashboard.vue";
 
 // Company Resources
-import Tables from "@/views/resources/Tables.vue";
 import test from "@/views/resources/test.vue";
 import Employees from "@/views/resources/Employees.vue";
 import Materials from "@/views/resources/Materials.vue";
@@ -43,14 +42,8 @@ const routes = [
   {
     path: "/resources/",
     name: "Resources",
-    component: Tables,
-    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Tables" }
-  },
-  {
-    path: "/resources/tables",
-    name: "Tables",
-    component: Tables,
-    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Tables" }
+    component: test,
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Test" }
   },
   {
     path: "/resources/test",

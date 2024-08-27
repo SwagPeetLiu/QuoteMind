@@ -84,7 +84,6 @@ export default {
             if (!isDataAvailable.value || !chartCanvas.value) return;
 
             const ctx = chartCanvas.value.getContext('2d');
-            console.log(ctx)
             // Create gradients
             Object.keys(CHART_COLORS).forEach(key => {
                 gradients[key] = createGradient(ctx, CHART_COLORS[key]);

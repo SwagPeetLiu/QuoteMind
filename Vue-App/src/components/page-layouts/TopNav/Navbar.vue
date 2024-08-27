@@ -1,14 +1,14 @@
 <!-- navbar on the top of the main container -->
 <template>
-  <nav class="shadow-none navbar navbar-main navbar-expand-lg border-radius-xl" 
+  <nav class="shadow-none navbar navbar-main navbar-expand-lg border-radius-xl px-2 mx-4 mt-2" 
       v-bind="$attrs" 
       id="navbarBlur"
       data-scroll="true"
   >
-    <div class="px-3 py-1 container-fluid">
+    <div class="px-3 py-1 container-fluid" :class="{'positions-absolute mb-n3': isCurrentLinkProfile}">
 
       <!-- Page directories breadcrumb -->
-      <breadcrumbs :textWhite="textWhite" />
+      <breadcrumbs/>
 
       <!-- nav bar options -->
       <ul class="navbar-nav justify-content-end mt-2">
@@ -17,25 +17,24 @@
         <li class="nav-item d-flex align-items-center">
           <div 
             @click="logout" class="px-0 nav-link font-weight-bold d-flex align-items-center icon-move-left" 
-            :class="textWhite ? textWhite : 'text-body'"
             style="cursor: pointer;"
           >
-            <i class="fa fa-sign-out me-md-2 me-sm-1 h5"></i>
-            <span class="d-sm-inline d-none h6"> {{ t('configurator.Logout') }}</span>
+            <i class="fa fa-sign-out me-md-2 me-sm-1 h5" :class="{'text-white': isCurrentLinkProfile}"></i>
+            <span class="d-sm-inline d-none h6" :class="{'text-white': isCurrentLinkProfile}"> {{ t('configurator.Logout') }}</span>
           </div>
         </li>
 
         <!-- menu toggler (only show when breaking point is reached) -->
         <li class="nav-item d-md-none ps-3 d-flex align-items-center">
-          <a href="#" @click="toggleSidebar" class="p-0 nav-link text-body" id="iconNavbarSidenav">
-            <i class="fa fa-bars h5" aria-hidden="true"></i>
+          <a href="#" @click="toggleSidebar" class="p-0 nav-link" id="iconNavbarSidenav">
+            <i class="fa fa-bars h5" :class="{'text-white': isCurrentLinkProfile}" aria-hidden="true"></i>
           </a>
         </li>
 
          <!-- configurator -->
         <li class="px-3 nav-item d-flex align-items-center">
-          <a class="p-0 nav-link icon-spin-left" @click="toggleConfigurator" :class="textWhite ? textWhite : 'text-body'">
-            <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav h5"></i>
+          <a class="p-0 nav-link icon-spin-left" @click="toggleConfigurator">
+            <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav h5" :class="{'text-white': isCurrentLinkProfile}"></i>
           </a>
         </li>
       </ul>
@@ -55,7 +54,6 @@ export default {
     const { t } = useI18n();
     return { t };
   },
-  props: ["textWhite"],
   methods: {
     ...mapMutations(["toggleMenuOnSmallScreens", "toggleConfigurator"]),
     ...mapActions(["toggleSidebarColor"]),
@@ -81,6 +79,11 @@ export default {
   },
   components: {
     Breadcrumbs,
+  },
+  computed:{
+    isCurrentLinkProfile(){
+      return this.$route.path === '/profile';
+    }
   },
 
   // Controls the displays of the top nav bar (breadcrumbs displays based on

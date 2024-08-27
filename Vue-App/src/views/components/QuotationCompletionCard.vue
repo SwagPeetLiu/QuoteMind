@@ -57,7 +57,7 @@
               <td class="align-middle" 
                   data-bs-toggle="tooltip" 
                   data-bs-placement="top" 
-                  :title="`${t('stats.in total of')}${record.total_transactions}${t('units.transactionUnit')}, ${record.created_transactions}${t('units.transactionUnit')}${t('others.remains')}${t('stats.unpaid')}`"
+                  :title="`${t('stats.in total of')}${record.total_transactions}${t('units.transactionUnit')}, ${record.created_transactions}${t('units.transactionUnit')}${t('others.remains')}${t('stats.unquoted')}`"
               >
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="font-weight-bold mx-2">{{record.percentage}}%</span>

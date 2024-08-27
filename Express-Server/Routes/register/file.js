@@ -47,8 +47,8 @@ module.exports = (db) => {
                     return res.status(409).json({ message: 'Email already exists' });
                 }
                 const hashedPassword = await bcrypt.hash(password, 10);
-                const defaultRole = "tester";
-                const newUser = await db.oneOrNone('INSERT INTO public.user (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *', [username, email, hashedPassword,defaultRole]);
+                const defaultRole = "user";
+                const newUser = await db.oneOrNone('INSERT INTO public.user (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *', [username, email, hashedPassword, defaultRole]);
                 res.status(200).json({ 
                     message: 'User created successfully',
                     user: {
