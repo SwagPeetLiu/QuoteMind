@@ -10,6 +10,7 @@ front-end (classical SPA)
   - Axios -- for API endpoint calls to perform CRUD operations
   - scss -- sass preprocessor scripting language to boost the functionality of css and organising styling codes
   - fontawsome -- efficient font & icon toolkits that are based on pure css
+  - three / gsap to create appealing animation objects on the UIs
 
 back-end
   - node.js -- running express as the backend server

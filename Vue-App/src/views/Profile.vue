@@ -9,7 +9,7 @@
         backgroundPositionY: '10%',
       }"
     >
-      <p class="text-white font-weight-bold text-glow display-3">{{ t('profile.title') }}</p>
+      <LoadInText :inputClass="'text-white font-weight-bold text-glow display-3'" :text="t('profile.title')"/>
     </div>
 
     <!-- profile card -->
@@ -87,6 +87,11 @@
         </div>
       </div>
     </div>
+
+    <!-- profile settings & application settings -->
+    <div class="">
+
+    </div>
   </div>
 
   <!-- Settings -->
@@ -96,17 +101,20 @@
 import setNavPills from "@/assets/js/nav-pills.js";
 import { useI18n } from "vue-i18n";
 import { fadeOutSlideRight } from "@/utils/styler";
+import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 
 export default {
   name: "ProfileOverview",
+  components:{
+    LoadInText
+  },
   data() {
     const { t } = useI18n({});
     return {
       t,
       role: this.$store.state.user.role,
       resizeObserver: null,
-      initialised: false,
-      resizing: false
+      initialised: false
     };
   },
   mounted() {
@@ -123,13 +131,13 @@ export default {
       this.role = role;
     },
     handleResize() {
-      if (!this.initialised || this.resizing) {
+      if (!this.initialised) {
         this.initialised = true;
         return;
       }
-      this.resizing = true;
-      setTimeout(() => {
-        var total = document.querySelectorAll('.nav-pills');
+      if (this.$store.state.pillResizing) return;
+      this.$store.commit("setPillResizing", true);
+      var total = document.querySelectorAll('.nav-pills');
         total.forEach(function (item) {
           // check to remove existing tab animations
           var existingMovingTab = item.querySelector('.moving-tab');
@@ -137,8 +145,11 @@ export default {
             fadeOutSlideRight(existingMovingTab, 500, 20)
           }
         });
-        setNavPills();
-        this.resizing = false;
+      setTimeout(() => {
+        setNavPills()
+        .then(() => {
+          this.$store.commit("setPillResizing", false);
+        });
       }, 250);
     },
     setResizeListener() {

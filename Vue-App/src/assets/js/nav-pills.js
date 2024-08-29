@@ -1,10 +1,16 @@
 /* eslint-disable */
-
-export default function setNavPills() {
+export default async function setNavPills() {
   var total = document.querySelectorAll('.nav-pills');
 
   function initNavs() {
     total.forEach(function (item, i) {
+      var existingMovingTabs = item.querySelectorAll('.moving-tab');
+      if (existingMovingTabs) {
+        for (var i = 0; i < existingMovingTabs.length; i++) {
+          existingMovingTabs[i].remove();
+        }
+      }
+
       var moving_div = document.createElement('div');
       var active_li = item.querySelector('li .nav-link.active') || item.querySelector('li:first-child .nav-link');
       var tab = active_li.cloneNode();
@@ -51,7 +57,7 @@ export default function setNavPills() {
 
   setTimeout(function () {
     initNavs();
-  }, 100);
+  }, 250);
 
   // Tabs navigation resize
 

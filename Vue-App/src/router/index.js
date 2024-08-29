@@ -26,8 +26,8 @@ import SignUp from "@/views/SignUp.vue";
 const routes = [
   {
     path: "/",
-    name: "/",
-    redirect: "/dashboard",
+    name: "Home",
+    redirect: { name: "Dashboard" },
     meta: { requiresAuth: true, mainLink: "Dashboard", subLink: "" }
   },
   {

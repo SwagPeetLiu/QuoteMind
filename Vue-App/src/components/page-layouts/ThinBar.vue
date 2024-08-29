@@ -56,7 +56,7 @@
         to="#"
         :class="showBackgroundColour ? 'text-dark' : 'text-white'"
       >
-        <i class="fa fa-shield opacity-6 me-3" aria-hidden="true"></i>
+        <i class="fa-solid fa-shield-halved opacity-6 me-3"></i>
         <span>{{ t('thinBar.privacy') }}</span>
       </router-link>
     </div>

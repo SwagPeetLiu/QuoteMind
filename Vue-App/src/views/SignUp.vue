@@ -25,9 +25,7 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="mx-auto text-center col-lg-5">
-          <h1 class="mt-5 mb-3 text-white text-glow display-2 font-weight-bold ">
-            {{ t('signUp.title') }}
-          </h1>
+          <LoadInText :inputClass="'mt-4 mb-3 text-white text-glow display-2 font-weight-bold'" :text="t('signUp.title')"/>
           <p class="text-white text-lead fs-5 text-glow font-weight-normal">
             {{ t('signUp.subtitle') }}
           </p>
@@ -172,20 +170,22 @@
 import { ref, computed } from 'vue';
 import { useI18n } from "vue-i18n";
 import { useRouter } from 'vue-router';
-import IntroFooter from "../components/page-layouts/IntroFooter.vue";
-import Thinbar from "../components/page-layouts/ThinBar.vue";
+import IntroFooter from "@/components/page-layouts/IntroFooter.vue";
+import Thinbar from "@/components/page-layouts/ThinBar.vue";
 import { mapMutations } from "vuex";
-import { useValidators } from "../utils/useValidators";
-import register from '../api/register';
-import Spinner from '../components/reuseable-components/Spinner.vue';
+import { useValidators } from "@/utils/useValidators";
+import register from '@/api/register';
+import Spinner from '@/components/reuseable-components/Spinner.vue';
 import { inject } from 'vue';
+import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 
 export default {
   name: "SignupBasic",
   components: {
     IntroFooter,
     Spinner,
-    Thinbar
+    Thinbar,
+    LoadInText
   },
   setup() {
     const { t } = useI18n();

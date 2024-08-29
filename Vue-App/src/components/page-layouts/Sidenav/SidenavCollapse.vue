@@ -95,8 +95,8 @@ export default {
     },
 
     isNestedActive(route){
-      if (this.$store.state.menuAct.subLink == route ||
-        this.$route.name == route
+      console.log(this.$store.state.menuAct, route)
+      if (this.$store.state.menuAct.subLink == route
       ) {
         return true;
       }
@@ -105,7 +105,7 @@ export default {
       }
     },
   },
-  created(){
+  mounted(){
     this.isChildActive = this.isNestedActive(this.to.name);
   },
   watch:{

@@ -22,6 +22,7 @@ export default createStore({
     isPinned: true,
     isMenuFixed: false,
     menuAct: {hoverOver: false, mainLink: "", subLink: ""},
+    pillResizing: false,
 
     // top nav bar settings:
     isNavFixed: false, 
@@ -192,6 +193,9 @@ export default createStore({
     },
     setToastMessage(state, payload) {
       state.toastMessage = payload;
+    },
+    setPillResizing(state, payload) {
+      state.pillResizing = payload;
     }
   },
   actions: {
