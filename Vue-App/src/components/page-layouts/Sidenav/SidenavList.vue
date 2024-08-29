@@ -139,8 +139,6 @@ export default {
   computed: {
     nestedResources(){
       return {
-        'tables': 'Tables',
-        'test': 'Test',
         [this.t('routes.products')]: 'Products',
         [this.t('routes.materials')]: 'Materials',
         [this.t('routes.employees')]: 'Employees',

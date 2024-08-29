@@ -95,7 +95,6 @@ export default {
     },
 
     isNestedActive(route){
-      console.log(this.$store.state.menuAct, route)
       if (this.$store.state.menuAct.subLink == route
       ) {
         return true;

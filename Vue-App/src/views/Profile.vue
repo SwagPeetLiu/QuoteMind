@@ -1,15 +1,14 @@
 <template>
   <div class="container-fluid mt-n7">
     <!-- background-image container -->
-    <div
-      class="mt-4 page-header min-height-500 border-radius-xl z-n1 d-flex align-items-center justify-content-center"
+    <div class="mt-4 page-header border-radius-xl z-n1 d-flex align-items-center justify-content-center"
       :style="{
+        minHeight: '450px',
         backgroundImage:
           'url(' + require('@/assets/img/curved-images/mountain.jpg') + ')',
         backgroundPositionY: '10%',
-      }"
-    >
-      <LoadInText :inputClass="'text-white font-weight-bold text-glow display-3'" :text="t('profile.title')"/>
+      }">
+      <LoadInText :inputClass="'text-white font-weight-bold text-glow display-3'" :text="t('profile.title')" />
     </div>
 
     <!-- profile card -->
@@ -17,12 +16,8 @@
       <div class="row gx-4">
         <div class="col-auto">
           <div class="avatar avatar-xl position-relative">
-            <img
-              src="@/assets/img/people/file.jpg"
-              alt="profile_image"
-              class="shadow-sm w-100 border-radius-lg"
-              style="filter: brightness(95%); image-rendering: -webkit-optimize-contrast;"
-            />
+            <img src="@/assets/img/people/file.jpg" alt="profile_image" class="shadow-sm w-100 border-radius-lg"
+              style="filter: brightness(95%); image-rendering: -webkit-optimize-contrast;" />
           </div>
         </div>
 
@@ -35,49 +30,27 @@
         </div>
 
         <!-- Tab based role selector -->
-        <div
-          class="mx-auto mt-3 col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0"
-        >
+        <div class="mx-auto mt-3 col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0">
           <div class="nav-wrapper position-relative end-0" id="role-selector">
-            <ul
-              class="p-1 bg-transparent nav nav-pills nav-fill"
-              role="tablist"
-            >
+            <ul class="p-1 bg-transparent nav nav-pills nav-fill" role="tablist">
               <li class="nav-item">
-                <a
-                  class="px-0 py-1 mb-0 nav-link"
-                  :class="{'active': role === 'admin'}"
-                  data-bs-toggle="tab"
-                  role="tab"
-                  :aria-selected="role === 'admin'? 'true' : 'false'"
-                  @click.prevent="handleRoleSwitch('admin')"
-                >
-                <i class="fa-solid fa-user-gear"></i>
+                <a class="px-0 py-1 mb-0 nav-link" :class="{ 'active': role === 'admin' }" data-bs-toggle="tab" role="tab"
+                  :aria-selected="role === 'admin' ? 'true' : 'false'" @click.prevent="handleRoleSwitch('admin')">
+                  <i class="fa-solid fa-user-gear"></i>
                   <span class="ms-2">{{ t('profile.admin') }}</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a
-                  class="px-0 py-1 mb-0 nav-link"
-                  :class="{'active': role === 'user'}"
-                  data-bs-toggle="tab"
-                  role="tab"
-                  :aria-selected="role === 'user'? 'true' : 'false'"
-                  @click.prevent="handleRoleSwitch('user')"
-                >
-                <i class="fa-solid fa-user-tie"></i>
+                <a class="px-0 py-1 mb-0 nav-link" :class="{ 'active': role === 'user' }" data-bs-toggle="tab" role="tab"
+                  :aria-selected="role === 'user' ? 'true' : 'false'" @click.prevent="handleRoleSwitch('user')">
+                  <i class="fa-solid fa-user-tie"></i>
                   <span class="ms-2">{{ t('profile.user') }}</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a
-                  class="px-0 py-1 mb-0 nav-link"
-                  :class="{'active': role === 'tester'}"
-                  data-bs-toggle="tab"
-                  role="tab"
-                  :aria-selected="role === 'tester'? 'true' : 'false'"
-                  @click.prevent="handleRoleSwitch('tester')"
-                >
+                <a class="px-0 py-1 mb-0 nav-link" :class="{ 'active': role === 'tester' }" data-bs-toggle="tab"
+                  role="tab" :aria-selected="role === 'tester' ? 'true' : 'false'"
+                  @click.prevent="handleRoleSwitch('tester')">
                   <i class="fa-solid fa-person-dots-from-line"></i>
                   <span class="ms-2">{{ t('profile.tester') }}</span>
                 </a>
@@ -89,12 +62,17 @@
     </div>
 
     <!-- profile settings & application settings -->
-    <div class="">
-
+    <div class="row mt-3 mb-0 mx-n2">
+      <div class="col-6 px-2">
+        <div class="card" style="height: 300px;">
+        </div>
+      </div>
+      <div class="col-6 px-2">
+        <div class="card" style="height: 300px;">
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- Settings -->
 </template>
 
 <script>
@@ -105,7 +83,7 @@ import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 
 export default {
   name: "ProfileOverview",
-  components:{
+  components: {
     LoadInText
   },
   data() {
@@ -126,8 +104,8 @@ export default {
   beforeUnmount() {
     this.teardownResizeObserver();
   },
-  methods:{
-    handleRoleSwitch(role){
+  methods: {
+    handleRoleSwitch(role) {
       this.role = role;
     },
     handleResize() {
@@ -138,18 +116,18 @@ export default {
       if (this.$store.state.pillResizing) return;
       this.$store.commit("setPillResizing", true);
       var total = document.querySelectorAll('.nav-pills');
-        total.forEach(function (item) {
-          // check to remove existing tab animations
-          var existingMovingTab = item.querySelector('.moving-tab');
-          if (existingMovingTab) {
-            fadeOutSlideRight(existingMovingTab, 500, 20)
-          }
-        });
+      total.forEach(function (item) {
+        // check to remove existing tab animations
+        var existingMovingTab = item.querySelector('.moving-tab');
+        if (existingMovingTab) {
+          fadeOutSlideRight(existingMovingTab, 500, 20)
+        }
+      });
       setTimeout(() => {
         setNavPills()
-        .then(() => {
-          this.$store.commit("setPillResizing", false);
-        });
+          .then(() => {
+            this.$store.commit("setPillResizing", false);
+          });
       }, 250);
     },
     setResizeListener() {
