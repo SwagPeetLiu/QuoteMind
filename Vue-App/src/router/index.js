@@ -15,7 +15,6 @@ import Companies from "@/views/customers/Companies.vue";
 
 // pricings & transactions
 import Transactions from "@/views/Transactions.vue";
-import Billing from "@/views/customers/Billing.vue";
 import Pricing_Conditions from "@/views/pricings/Pricing_Conditions.vue";
 import Pricing_Rules from "@/views/pricings/Pricing_Rules.vue";
 
@@ -94,12 +93,6 @@ const routes = [
     name: "Clients",
     component: Clients,
     meta: { requiresAuth: true, mainLink: "Customers", subLink: "Clients" }
-  },
-  {
-    path: "/customers/billing",
-    name: "Billings",
-    component: Billing,
-    meta: { requiresAuth: true, mainLink: "Customers", subLink: "Billings" }
   },
 
   // pricing routes:

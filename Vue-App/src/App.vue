@@ -112,7 +112,7 @@ export default {
         // if logged in
         if (newValue.email && newValue.session) {
           if (this.$route.name === "Sign In" || this.$route.name === "Sign Up"){
-            this.$router.push({ name: "Dashboard" });
+            this.$router.push({ name: "/" });
           }
         }
         else{

@@ -9,7 +9,7 @@
 
       <!-- Dashboard -->
       <li class="nav-item">
-        <sidenav-collapse :navText="t('routes.dashboard')" :to="{ name: 'Dashboard' }">
+        <sidenav-collapse :navText="t('routes.dashboard')" :to="{ path: '/dashboard' }">
           <template #icon> 
             <Dashboard />
           </template>
