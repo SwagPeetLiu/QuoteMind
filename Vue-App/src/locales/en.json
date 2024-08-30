@@ -165,6 +165,7 @@
   },
   "profile":{
     "title": "QuoteMind Portfolio",
+    "accountDetails": "Account Details",
     "admin": "Admin",
     "user": "User",
     "tester": "Tester"
@@ -216,10 +217,12 @@
     }
   },
   "form":{
-    "name": "Name",
+    "username": "User Name",
     "email": "Email",
     "edit": "Edit",
-    "password": "Password"
+    "password": "Password",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "units":{
     "transactionUnit": ""

@@ -167,6 +167,7 @@
   },
   "profile":{
     "title": "QuoteMind 资料",
+    "accountDetails": "账户资料",
     "admin": "管理员",
     "user": "用户",
     "tester": "测试员"
@@ -217,6 +218,14 @@
       "Nov": "11月",
       "Dec": "12月"
     }
+  },
+  "form":{
+    "username": "用户名",
+    "email": "邮箱",
+    "edit": "编辑",
+    "password": "密码",
+    "save": "保存",
+    "cancel": "取消"
   },
   "units":{
     "transactionUnit": "笔"

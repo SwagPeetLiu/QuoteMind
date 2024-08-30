@@ -3,9 +3,15 @@
 */
 import { useTranslation } from '../utils/I18n';
 const { global: { t } } = useTranslation();
-import { config } from "../config/config";
+import { config } from "@/config/config";
 
 export function useValidators() {
+    // centralised validator on the client side:
+    function mapValidation(target, value) {
+        if (target === 'username') return isUsernameValid(value);
+        if (target === 'email') return isEmailValid(value);
+        if (target === 'password') return isPasswordValid(value);
+    }
 
     function isUsernameValid(username) {
         if (!username || !username.trim()) return { valid: false, message: `${t('validation.username')}${t('validation.cannot be empty')}` };
@@ -78,6 +84,7 @@ export function useValidators() {
     }
 
     return {
+        mapValidation,
         isUsernameValid,
         isEmailValid,
         isPasswordValid,

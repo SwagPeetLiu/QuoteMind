@@ -1,0 +1,31 @@
+.editable-container {
+    input {
+        min-width: 280px;
+        padding-left: 38px;
+    }
+
+    .input-icon {
+        transition: all 0.3s ease;
+
+        &.editing {
+            position: absolute;
+            z-index: 1;
+            scale: 0.9;
+            translate: 8px 0px;
+        }
+    }
+
+    .input-label {
+        transition: all 0.3s ease;
+
+        &.editing {
+            position: absolute;
+            background-color: $white;
+            padding-left: 3px;
+            padding-right: 3px;
+            z-index: 1;
+            scale: 0.75;
+            translate: 12px -22px;
+        }
+    }
+}

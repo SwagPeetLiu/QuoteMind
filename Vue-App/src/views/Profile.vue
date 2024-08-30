@@ -8,7 +8,7 @@
           'url(' + require('@/assets/img/curved-images/mountain.jpg') + ')',
         backgroundPositionY: '10%',
       }">
-      <LoadInText :inputClass="'text-white font-weight-bold text-glow display-3'" :text="t('profile.title')" />
+      <LoadInText inputClass="text-white font-weight-bold text-glow display-3" :text="t('profile.title')" />
     </div>
 
     <!-- profile card -->
@@ -61,10 +61,39 @@
       </div>
     </div>
 
-    <!-- profile settings & application settings -->
+    <!-- profile Info & application settings -->
     <div class="row mt-3 mb-0 mx-n2">
       <div class="col-6 px-2">
         <div class="card" style="height: 300px;">
+          <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">{{ t('profile.accountDetails') }}</p>
+          <form class="card-body d-flex align-items-start py-1 ms-1 was-validated" :class="{'needs-validation': isEditing}" name="form" novalidate>
+            <EditableInfo
+              :icon="'fa-solid fa-envelope-open-text'"
+              name="email"
+              :isDisabled="true"
+              :isRequired="true"
+              :value="$store.state.user.email"
+              type="email"
+              :formStatus="formStatus"
+              @update-form="validateInputUpdate"
+            />
+
+            <button 
+              v-if="isEditing"
+              type="button" 
+              class="btn btn-secondary ms-auto" 
+              @click.prevent="updateStatus('cancel')"
+            >
+              {{ t('form.cancel') }}
+            </button>
+            <button 
+              type="button" 
+              class="btn bg-gradient-info ms-auto" 
+              @click.prevent="updateStatus(`${isEditing ? 'saving' : 'editing'}`)"
+            >
+              {{ isEditing ? t('form.save') : t('form.edit') }}
+            </button>
+          </form>
         </div>
       </div>
       <div class="col-6 px-2">
@@ -80,11 +109,13 @@ import setNavPills from "@/assets/js/nav-pills.js";
 import { useI18n } from "vue-i18n";
 import { fadeOutSlideRight } from "@/utils/styler";
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
+import EditableInfo from "@/components/reuseable-components/EditableInfo.vue";
 
 export default {
   name: "ProfileOverview",
   components: {
-    LoadInText
+    LoadInText,
+    EditableInfo
   },
   data() {
     const { t } = useI18n({});
@@ -92,7 +123,13 @@ export default {
       t,
       role: this.$store.state.user.role,
       resizeObserver: null,
-      initialised: false
+      initialised: false,
+      formStatus: "display",
+      formData: {
+        email: { value: this.$store.state.user.email, isvaldiated: null },
+        username: { value: this.$store.state.user.username, isvaldiated: null },
+        password: { value: "", isvaldiated: null },
+      }
     };
   },
   mounted() {
@@ -139,6 +176,17 @@ export default {
         this.resizeObserver.disconnect();
         this.resizeObserver = null;
       }
+    },
+    updateStatus(status) {
+      this.formStatus = status;
+    },
+    validateInputUpdate(name, value, isValid) {
+      console.log("validateInputUpdate", name, value, isValid);
+    }
+  },
+  computed:{
+    isEditing() {
+      return this.formStatus === 'editing';
     }
   }
 };

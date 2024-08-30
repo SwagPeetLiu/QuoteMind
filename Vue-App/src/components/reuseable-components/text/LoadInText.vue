@@ -1,6 +1,6 @@
 <template>
   <div  :class="$props.inputClass" ref="line1Ref">
-    <span v-for="char in spanElements" :key="char" :class="char === ' ' ? 'space' + $props.inputClass : $props.inputClass">
+    <span v-for="char in spanElements" :key="char" :class="char === ' ' ? 'space ' + $props.inputClass : $props.inputClass">
       {{ char }}
     </span>
   </div>
@@ -70,6 +70,6 @@ span {
 
 span.space {
   display: inline-block;
-  width: 10px;
+  width: 15px;
 }
 </style>
