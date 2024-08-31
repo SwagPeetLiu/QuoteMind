@@ -165,10 +165,7 @@
   },
   "profile":{
     "title": "QuoteMind Portfolio",
-    "accountDetails": "Account Details",
-    "admin": "Admin",
-    "user": "User",
-    "tester": "Tester"
+    "accountDetails": "Account Details"
   },
   "transactions":{
     "simply quoting": "Easily Quoting",
@@ -219,6 +216,10 @@
   "form":{
     "username": "User Name",
     "email": "Email",
+    "admin": "Admin",
+    "user": "User",
+    "tester": "Tester",
+    "role": "Role",
     "edit": "Edit",
     "password": "Password",
     "save": "Save",

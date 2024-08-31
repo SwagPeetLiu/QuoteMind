@@ -1,5 +1,5 @@
 <template>
-    <div class="spinner-border" style="width: 1.5rem; height: 1.5rem;" role="status">
+    <div class="spinner-border" style="width: 1.5rem; height: 1.5rem; margin-top: 0; margin-bottom: 0;" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
 </template>

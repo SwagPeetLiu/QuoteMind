@@ -47,7 +47,9 @@ const config = {
         warning: ['#df9a50', '#fbcf33'],
         dark: ['#1c2037', '#49507f'],
         light: ['#CED4DA', '#EBEFF4']
-    }
+    },
+    passwordOverlay: '************',
+    samePasswordIndicator: 'SameAsOld0517!'
 }
 
 module.exports = { config };

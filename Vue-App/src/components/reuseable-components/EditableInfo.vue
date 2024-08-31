@@ -114,6 +114,7 @@ export default {
         prepareUpdate(){
             if (this.formStatus === "cancel"){
                 this.inputValue = this.originalValue;
+                return this.$emit("update-form", this.name, this.originalValue, false);
             }
             else if (this.formStatus === "saving"){
                 // no need validate if it cannot be updated
@@ -123,7 +124,7 @@ export default {
                 }
                 // conduct validations:
                 const inputValidation = mapValidation(this.name, this.inputValue);
-                console.log("input validation", inputValidation);
+                this.isValid = inputValidation.valid;
                 this.$emit("update-form", this.name, this.inputValue, this.isValid);
             }
 
@@ -132,8 +133,7 @@ export default {
     },
     computed:{
         isEditing(){
-            console.log("isEditing", this.formStatus);
-            return this.formStatus == "editing";
+            return this.formStatus == "editing" || this.formStatus == "saving";
         }
     }
 }

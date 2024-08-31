@@ -10,7 +10,12 @@ export function useValidators() {
     function mapValidation(target, value) {
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
-        if (target === 'password') return isPasswordValid(value);
+        if (target === 'password'){
+            if (value === config.passwordOverlay){
+                return { valid: true };
+            }
+            return isPasswordValid(value);
+        };
         return true;
     }
 

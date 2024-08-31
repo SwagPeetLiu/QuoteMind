@@ -25,7 +25,7 @@
         <div class="col-auto my-auto">
           <div class="h-100">
             <h5 class="mb-1">{{ $store.state.user.username }}</h5>
-            <p class="ms-1 mb-0 text-sm font-weight-bold">{{ t(`profile.${role}`) }}</p>
+            <p class="ms-1 mb-0 text-sm font-weight-bold">{{ t(`form.${role}`) }}</p>
           </div>
         </div>
 
@@ -37,14 +37,14 @@
                 <a class="px-0 py-1 mb-0 nav-link" :class="{ 'active': role === 'admin' }" data-bs-toggle="tab" role="tab"
                   :aria-selected="role === 'admin' ? 'true' : 'false'" @click.prevent="handleRoleSwitch('admin')">
                   <i class="fa-solid fa-user-gear"></i>
-                  <span class="ms-2">{{ t('profile.admin') }}</span>
+                  <span class="ms-2">{{ t('form.admin') }}</span>
                 </a>
               </li>
               <li class="nav-item">
                 <a class="px-0 py-1 mb-0 nav-link" :class="{ 'active': role === 'user' }" data-bs-toggle="tab" role="tab"
                   :aria-selected="role === 'user' ? 'true' : 'false'" @click.prevent="handleRoleSwitch('user')">
                   <i class="fa-solid fa-user-tie"></i>
-                  <span class="ms-2">{{ t('profile.user') }}</span>
+                  <span class="ms-2">{{ t('form.user') }}</span>
                 </a>
               </li>
               <li class="nav-item">
@@ -52,7 +52,7 @@
                   role="tab" :aria-selected="role === 'tester' ? 'true' : 'false'"
                   @click.prevent="handleRoleSwitch('tester')">
                   <i class="fa-solid fa-person-dots-from-line"></i>
-                  <span class="ms-2">{{ t('profile.tester') }}</span>
+                  <span class="ms-2">{{ t('form.tester') }}</span>
                 </a>
               </li>
             </ul>
@@ -64,16 +64,29 @@
     <!-- profile Info & application settings -->
     <div class="row mt-3 mb-0 mx-n2">
       <div class="col-6 px-2">
-        <div class="card" style="height: 250px;">
+        <div class="card" style="height: 270px;">
           <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">{{ t('profile.accountDetails') }}</p>
           <form 
             class="card-body position-relative was-validated mt-n4" 
-            :class="{'needs-validation': isEditing}" 
+            :class="{'needs-validation': formStatus === 'editing'}" 
             name="form"
             novalidate
           >
             <div class="row g-3">
-              <div class="col-12">
+              <div class="col-6">
+                <EditableInfo
+                  :icon="'fa-solid fa-shield-halved'"
+                  name="role"
+                  :isDisabled="true"
+                  :isRequired="true"
+                  :value="$store.state.user.role"
+                  type="text"
+                  :formStatus="formStatus"
+                  @update-form="validateInputUpdate"
+                />
+              </div>
+
+              <div class="col-6">
                 <EditableInfo
                   :icon="'fa-solid fa-envelope-open-text'"
                   name="email"
@@ -105,7 +118,7 @@
                   name="password"
                   :isDisabled="false"
                   :isRequired="true"
-                  :value="'***********(sajdjaklssasa sadas )'"
+                  :value="passwordOverlay"
                   type="password"
                   :formStatus="formStatus"
                   @update-form="validateInputUpdate"
@@ -116,7 +129,7 @@
             <!-- form controls -->
             <div class="position-absolute bottom-0 end-0 me-3 d-flex gap-2">
               <button 
-                v-if="isEditing"
+                v-if="formStatus === 'editing'"
                 type="button" 
                 class="btn btn-secondary form-button" 
                 @click.prevent="updateStatus('cancel')"
@@ -126,9 +139,11 @@
               <button 
                 type="button" 
                 class="btn bg-gradient-info form-button" 
-                @click.prevent="updateStatus(`${isEditing ? 'saving' : 'editing'}`)"
+                @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
+                :disabled="formStatus === 'saving'"
               >
-                {{ isEditing ? t('form.save') : t('form.edit') }}
+                <Spinner v-if="formStatus === 'saving'" />
+                <span v-else>{{ formStatus === 'editing' ? t('form.save') : t('form.edit') }}</span>
               </button>
             </div>
           </form>
@@ -144,20 +159,23 @@
 </template>
 
 <script>
+import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
 import setNavPills from "@/assets/js/nav-pills.js";
 import { useI18n } from "vue-i18n";
 import { fadeOutSlideRight } from "@/utils/styler";
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import EditableInfo from "@/components/reuseable-components/EditableInfo.vue";
-
+import { config } from '@/config/config';
 export default {
   name: "ProfileOverview",
   components: {
     LoadInText,
-    EditableInfo
+    EditableInfo,
+    Spinner
   },
   data() {
     const { t } = useI18n({});
+    const passwordOverlay = config.passwordOverlay;
     return {
       t,
       role: this.$store.state.user.role,
@@ -165,10 +183,12 @@ export default {
       initialised: false,
       formStatus: "display",
       formData: {
-        email: { value: this.$store.state.user.email, isvaldiated: null },
-        username: { value: this.$store.state.user.username, isvaldiated: null },
-        password: { value: "", isvaldiated: null },
-      }
+        role: { value: this.$store.state.user.role, isvaldiated: false },
+        email: { value: this.$store.state.user.email, isvaldiated: false },
+        username: { value: this.$store.state.user.username, isvaldiated: false },
+        password: { value: config.samePasswordIndicator, isvaldiated: false },
+      },
+      passwordOverlay: passwordOverlay
     };
   },
   mounted() {
@@ -217,15 +237,33 @@ export default {
       }
     },
     updateStatus(status) {
-      this.formStatus = status;
+      if (status === "saving") {
+        this.submitform();
+      }else{
+        this.formStatus = status;
+      }
     },
     validateInputUpdate(name, value, isValid) {
-      console.log("validateInputUpdate", name, value, isValid);
-    }
-  },
-  computed:{
-    isEditing() {
-      return this.formStatus === 'editing';
+      if (name === "password" && value === this.passwordOverlay) {
+        this.formData[name] = { value: config.samePasswordIndicator, isvaldiated: true };
+      }
+      else{
+        this.formData[name] = { value: value, isvaldiated: isValid };
+      }
+    },
+    submitform() {
+      this.formStatus = "saving";
+      // await for data updates
+      setTimeout(() => {
+        console.log("form submitted", this.formData);
+        const isFormValid = Object.values(this.formData).every((item) => item.isvaldiated);
+        if (isFormValid) {
+          this.formStatus = "display";
+        }
+        else{
+          this.formStatus = "editing";
+        }
+      }, 500);
     }
   }
 };
