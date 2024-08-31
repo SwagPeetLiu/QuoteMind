@@ -1,9 +1,19 @@
 <template>
-  <div  :class="$props.inputClass" ref="line1Ref">
-    <span v-for="char in spanElements" :key="char" :class="char === ' ' ? 'space ' + $props.inputClass : $props.inputClass">
-      {{ char }}
-    </span>
-  </div>
+  <p 
+    :class="inputClass" 
+    class="hide-scrollbar" 
+    style="white-space: nowrap; overflow: hidden; text-overflow: clip;" 
+    ref="line1Ref"
+  >
+      <span 
+        v-for="char in spanElements" 
+        :key="char" 
+        :class="char === ' ' ? 'space ' + inputClass : inputClass"
+        :style="char === ' ' ? { width: spaceWidth + 'px' } : {}"
+      >
+        {{ char }}
+      </span>
+  </p>
 </template>
 
 <script>
@@ -21,6 +31,11 @@ export default {
       type: String,
       required: true,
       default: "hello quoteminder",
+    },
+    spaceWidth: {
+      type: Number,
+      required: false,
+      default: 15,
     }
   },
   computed: {
@@ -59,6 +74,11 @@ export default {
 </script>
 
 <style scoped>
+.load-in-text{
+  width: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .loadInLine {
   font-size: 0;
 }
@@ -70,6 +90,5 @@ span {
 
 span.space {
   display: inline-block;
-  width: 15px;
 }
 </style>

@@ -175,7 +175,7 @@ import Thinbar from "@/components/page-layouts/ThinBar.vue";
 import { mapMutations } from "vuex";
 import { useValidators } from "@/utils/useValidators";
 import register from '@/api/register';
-import Spinner from '@/components/reuseable-components/Spinner.vue';
+import Spinner from '@/components/reuseable-components/loader/Spinner.vue';
 import { inject } from 'vue';
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 

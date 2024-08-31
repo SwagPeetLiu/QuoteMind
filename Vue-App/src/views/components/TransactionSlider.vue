@@ -100,7 +100,7 @@
 <script>
 import GradientLineChart from "@/components/statistical-components/GradientLineChart.vue";
 import DoughnutChart from "@/components/statistical-components/DoughnutChart.vue";
-import DotLoader from "../../components/reuseable-components/DotLoader.vue";
+import DotLoader from "../../components/reuseable-components/loader/DotLoader.vue";
 import search from "@/api/search";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {

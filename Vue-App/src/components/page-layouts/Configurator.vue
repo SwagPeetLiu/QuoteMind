@@ -127,10 +127,10 @@
 
 <script>
 import { mapMutations, mapActions } from "vuex";
-import Spinner from "../reuseable-components/Spinner.vue";
+import Spinner from "../reuseable-components/loader/Spinner.vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
-import auth from "../../api/auth";
+import auth from "@/api/auth";
  import initializePopper from "@/assets/js/dropdown.js";
 
 export default {

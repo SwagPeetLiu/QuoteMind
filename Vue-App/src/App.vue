@@ -44,15 +44,15 @@
 </template>
 
 <script>
-import Sidenav from "./components/page-layouts/Sidenav";
+import Sidenav from "@/components/page-layouts/Sidenav";
 import Configurator from "@/components/page-layouts/Configurator.vue";
-import Navbar from "./components/page-layouts/TopNav/Navbar.vue";
-import AppFooter from "./components/page-layouts/AppFooter.vue";
+import Navbar from "@/components/page-layouts/TopNav/Navbar.vue";
+import AppFooter from "@/components/page-layouts/AppFooter.vue";
 import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
-import ErrorDialog from "./components/reuseable-components/ErrorDialog.vue";
-import SlideToast from "./components/reuseable-components/SlideToast.vue";
-import ColouringCubeOverlay from "./components/reuseable-components/ColouringCubeOverlay.vue";
+import ErrorDialog from "@/components/reuseable-components/ErrorDialog.vue";
+import SlideToast from "@/components/reuseable-components/SlideToast.vue";
+import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
 
 export default {
   name: "App",

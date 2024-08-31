@@ -1,5 +1,7 @@
 <template>
-    <div class="d-flex align-items-center position-relative editable-container" >
+    <div 
+        class="d-flex align-items-center justify-content-start position-relative editable-container"
+    >
         <!-- input icon -->
         <i 
             class="me-2 text-2xl text-gradient input-icon" 
@@ -20,7 +22,12 @@
         </p>
 
         <!-- current value -->
-        <LoadInText v-if="!isEditing" inputClass="text-2xl text-dark" :text="value"/>
+        <LoadInText 
+            v-if="!isEditing" 
+            inputClass="text-2xl text-dark my-0" 
+            :text="value"
+            :spaceWidth="9" 
+        />
 
         <!-- input value -->
         <input 
@@ -131,3 +138,5 @@ export default {
     }
 }
 </script>
+
+

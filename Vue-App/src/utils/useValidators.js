@@ -11,6 +11,7 @@ export function useValidators() {
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
         if (target === 'password') return isPasswordValid(value);
+        return true;
     }
 
     function isUsernameValid(username) {

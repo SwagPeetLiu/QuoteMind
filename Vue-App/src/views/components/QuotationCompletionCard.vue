@@ -89,12 +89,12 @@
 
 <script>
 import SoftProgress from "@/components/soft-components/SoftProgress.vue";
-import IconEntity from "../../components/reuseable-components/IconEntity.vue";
+import IconEntity from "@/components/reuseable-components/IconEntity.vue";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
-import DashLoader from "@/components/reuseable-components/DashLoader.vue";
+import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
 import initTooltips  from "@/assets/js/tooltip.js";
 
 export default {

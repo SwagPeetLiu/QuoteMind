@@ -30,7 +30,7 @@
 
 <script>
 import Chart from "chart.js/auto";
-import DotLoader from "@/components/reuseable-components/DotLoader.vue";
+import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import { useI18n } from "vue-i18n";
 import { calculateRelativeChanges } from "@/utils/helpers";
 

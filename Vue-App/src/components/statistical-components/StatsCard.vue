@@ -29,7 +29,7 @@
 
 <script>
 import counter from "@/api/counter";
-import DotLoader from '../reuseable-components/DotLoader.vue';
+import DotLoader from '../reuseable-components/loader/DotLoader.vue';
 import IncrementNumber from "./IncrementNumber.vue";
 
 export default {

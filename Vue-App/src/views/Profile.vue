@@ -64,38 +64,77 @@
     <!-- profile Info & application settings -->
     <div class="row mt-3 mb-0 mx-n2">
       <div class="col-6 px-2">
-        <div class="card" style="height: 300px;">
+        <div class="card" style="height: 250px;">
           <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">{{ t('profile.accountDetails') }}</p>
-          <form class="card-body d-flex align-items-start py-1 ms-1 was-validated" :class="{'needs-validation': isEditing}" name="form" novalidate>
-            <EditableInfo
-              :icon="'fa-solid fa-envelope-open-text'"
-              name="email"
-              :isDisabled="true"
-              :isRequired="true"
-              :value="$store.state.user.email"
-              type="email"
-              :formStatus="formStatus"
-              @update-form="validateInputUpdate"
-            />
-
-            <button 
-              v-if="isEditing"
-              type="button" 
-              class="btn btn-secondary ms-auto" 
-              @click.prevent="updateStatus('cancel')"
-            >
-              {{ t('form.cancel') }}
-            </button>
-            <button 
-              type="button" 
-              class="btn bg-gradient-info ms-auto" 
-              @click.prevent="updateStatus(`${isEditing ? 'saving' : 'editing'}`)"
-            >
-              {{ isEditing ? t('form.save') : t('form.edit') }}
-            </button>
+          <form 
+            class="card-body position-relative was-validated mt-n4" 
+            :class="{'needs-validation': isEditing}" 
+            name="form"
+            novalidate
+          >
+            <div class="row g-3">
+              <div class="col-12">
+                <EditableInfo
+                  :icon="'fa-solid fa-envelope-open-text'"
+                  name="email"
+                  :isDisabled="true"
+                  :isRequired="true"
+                  :value="$store.state.user.email"
+                  type="email"
+                  :formStatus="formStatus"
+                  @update-form="validateInputUpdate"
+                />
+              </div>
+              
+              <div class="col-md-6">
+                <EditableInfo
+                  :icon="'fa-solid fa-user-tag'"
+                  name="username"
+                  :isDisabled="false"
+                  :isRequired="true"
+                  :value="$store.state.user.username"
+                  type="text"
+                  :formStatus="formStatus"
+                  @update-form="validateInputUpdate"
+                />
+              </div>
+              
+              <div class="col-md-6">
+                <EditableInfo
+                  :icon="'fa-solid fa-unlock-keyhole'"
+                  name="password"
+                  :isDisabled="false"
+                  :isRequired="true"
+                  :value="'***********(sajdjaklssasa sadas )'"
+                  type="password"
+                  :formStatus="formStatus"
+                  @update-form="validateInputUpdate"
+                />
+              </div>
+            </div>
+            
+            <!-- form controls -->
+            <div class="position-absolute bottom-0 end-0 me-3 d-flex gap-2">
+              <button 
+                v-if="isEditing"
+                type="button" 
+                class="btn btn-secondary form-button" 
+                @click.prevent="updateStatus('cancel')"
+              >
+                {{ t('form.cancel') }}
+              </button>
+              <button 
+                type="button" 
+                class="btn bg-gradient-info form-button" 
+                @click.prevent="updateStatus(`${isEditing ? 'saving' : 'editing'}`)"
+              >
+                {{ isEditing ? t('form.save') : t('form.edit') }}
+              </button>
+            </div>
           </form>
         </div>
       </div>
+
       <div class="col-6 px-2">
         <div class="card" style="height: 300px;">
         </div>

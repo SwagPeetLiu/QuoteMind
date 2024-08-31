@@ -45,8 +45,8 @@
 </template>
 
 <script>
-import SlideUpElement from '@/components/reuseable-components/SlideUpElement.vue';
-import FadeInElement from '@/components/reuseable-components/FadeInElement.vue';
+import SlideUpElement from '@/components/reuseable-components/styler/SlideUpElement.vue';
+import FadeInElement from '@/components/reuseable-components/styler/FadeInElement.vue';
 export default {
     components:{
         SlideUpElement,

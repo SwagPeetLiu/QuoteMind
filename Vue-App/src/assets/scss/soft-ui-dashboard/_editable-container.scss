@@ -1,6 +1,9 @@
 .editable-container {
+    max-width: 100%;
+    text-overflow: clip;
+    white-space: nowrap;
+
     input {
-        min-width: 280px;
         padding-left: 38px;
     }
 

@@ -100,15 +100,15 @@
 </template>
 
 <script>
-import IntroFooter from "../components/page-layouts/IntroFooter.vue";
-import ThinBar from "../components/page-layouts/ThinBar.vue";
-import Spinner from "../components/reuseable-components/Spinner.vue";
+import IntroFooter from "@/components/page-layouts/IntroFooter.vue";
+import ThinBar from "@/components/page-layouts/ThinBar.vue";
+import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
 const body = document.getElementsByTagName("body")[0];
 import { mapMutations } from "vuex";
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
-import auth from "../api/auth";
-import store from "../store";
+import auth from "@/api/auth";
+import store from "@/store";
 import { inject } from 'vue';
 
 export default {
