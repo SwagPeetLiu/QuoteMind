@@ -142,7 +142,7 @@
                 @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
                 :disabled="formStatus === 'saving'"
               >
-                <Spinner v-if="formStatus === 'saving'" />
+                <Spinner v-if="formStatus === 'saving'" :size="1.1"/>
                 <span v-else>{{ formStatus === 'editing' ? t('form.save') : t('form.edit') }}</span>
               </button>
             </div>
@@ -166,6 +166,8 @@ import { fadeOutSlideRight } from "@/utils/styler";
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import EditableInfo from "@/components/reuseable-components/EditableInfo.vue";
 import { config } from '@/config/config';
+import profile from "@/api/profile";
+
 export default {
   name: "ProfileOverview",
   components: {
@@ -244,6 +246,7 @@ export default {
       }
     },
     validateInputUpdate(name, value, isValid) {
+      // the special cases that user not to change their password
       if (name === "password" && value === this.passwordOverlay) {
         this.formData[name] = { value: config.samePasswordIndicator, isvaldiated: true };
       }
@@ -253,12 +256,28 @@ export default {
     },
     submitform() {
       this.formStatus = "saving";
-      // await for data updates
+
+      // Await for data updates
       setTimeout(() => {
         console.log("form submitted", this.formData);
         const isFormValid = Object.values(this.formData).every((item) => item.isvaldiated);
         if (isFormValid) {
-          this.formStatus = "display";
+          profile.updateProfile({
+            username: this.formData.username.value,
+            email: this.formData.email.value,
+            password: this.formData.password.value
+          }).
+          then((response) => {
+            if (response.isCompleted){
+              this.formStatus = "display";
+            }
+            else{
+              this.formStatus = "editing";
+            }
+          })
+          .catch(() => {
+            this.formStatus = "editing";
+          });
         }
         else{
           this.formStatus = "editing";

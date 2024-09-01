@@ -70,6 +70,11 @@
       "failed to fetch dbReferences": "Unable to fetch the database references",
       "failed to search": "Failed to search",
       "failed to obtain the top": "Failed to obtain the top"
+    },
+    "profile":{
+      "email cannot be changed": "Email cannot be changed",
+      "success": "Sucessfullly Updated profile",
+      "failed": "Failed to Update profile"
     }
   },
   "thinBar":{

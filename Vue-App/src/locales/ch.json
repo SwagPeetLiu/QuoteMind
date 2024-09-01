@@ -71,6 +71,11 @@
       "failed to fetch dbReferences": "获取数据库结构失败",
       "failed to search": "搜索失败",
       "failed to obtain the top": "未能获取置顶的"
+    },
+    "profile":{
+      "email cannot be changed": "不能更改邮箱",
+      "success": "个人信息更新成功",
+      "failed": "个人信息更新失败"
     }
   },
   "thinBar": {
