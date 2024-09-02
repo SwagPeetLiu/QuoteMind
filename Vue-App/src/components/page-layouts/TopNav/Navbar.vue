@@ -1,11 +1,11 @@
 <!-- navbar on the top of the main container -->
 <template>
-  <nav class="shadow-none navbar navbar-main navbar-expand-lg border-radius-xl px-2 mx-4 mt-2" 
+  <nav class="shadow-none navbar navbar-main navbar-expand-lg border-radius-xl px-2 mx-4 mt-4" 
       v-bind="$attrs" 
       id="navbarBlur"
       data-scroll="true"
   >
-    <div class="px-3 py-1 container-fluid" :class="{'positions-absolute mb-n3': isCurrentLinkProfile}">
+    <div class="px-3 py-1 container-fluid" :class="{'positions-absolute mb-n3 mt-3': isCurrentLinkProfile}">
 
       <!-- Page directories breadcrumb -->
       <breadcrumbs/>

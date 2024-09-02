@@ -3,7 +3,7 @@
   <nav aria-label="breadcrumb">
 
     <!-- page navs -->
-    <ol class="px-0 pt-1 mt-4 pb-0 mb-0 bg-transparent breadcrumb">
+    <ol class="px-0 pb-0 mb-0 bg-transparent breadcrumb">
 
       <!-- home button -->
       <li class="breadcrumb-item">

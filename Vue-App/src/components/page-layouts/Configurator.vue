@@ -62,8 +62,7 @@
         </div>
         <div class="form-check form-switch ps-0">
           <input class="mt-1 form-check-input ms-auto" 
-            type="checkbox" id="navbarFixed" :checked="this.$store.state.isNavFixed" @change="setNavbarFixed"
-            v-model="fixedKey" />
+            type="checkbox" id="navbarFixed" :checked="this.$store.state.isNavFixed" @change="setNavbarFixed"/>
         </div>
 
         <!-- Menu Fixed -->
@@ -76,21 +75,8 @@
         </div>
 
        <!--language selection-->
-       <div class="dropdown mt-3" ref="language-select">
-          <h6 class="mb-1">{{ t("configurator.Language") }}</h6>
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdownButton"
-            data-bs-toggle="dropdown" aria-expanded="false" 
-            @click="initializeLanguagePopper"
-          >
-            {{ $store.state.language == "en" ? t("configurator.English") : t("configurator.Chinese") }}
-            <span class="arrow-right ms-2"></span>
-          </button>
-          <ul id="popper" class="dropdown-menu" aria-labelledby="languageDropdownButton">
-            <div data-popper-arrow class="dropdown-popper-arrow"></div>
-            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('en')">{{ t("configurator.English") }}</a></li>
-            <li><a class="dropdown-item" href="#" @click.prevent="setLanguage('ch')">{{ t("configurator.Chinese") }}</a></li>
-          </ul>
-        </div>
+       <h6 class="mt-3 mb-2">{{ t("configurator.Language") }}</h6>
+       <languageDropDown/>
 
         <!-- contribution EOI-->
         <hr class="horizontal dark my-sm-4" />
@@ -131,23 +117,19 @@ import Spinner from "../reuseable-components/loader/Spinner.vue";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import auth from "@/api/auth";
- import initializePopper from "@/assets/js/dropdown.js";
+import languageDropDown from "@/components/reuseable-components/styler/languageDropDown.vue";
 
 export default {
   name: "configurator",
   props: ["toggle"],
   components:{
-    Spinner
+    Spinner,
+    languageDropDown
   },
   setup() {
     const { t } = useI18n();
     const isLoading = ref(false);
     return { t, isLoading };
-  },
-  data() {
-    return {
-      fixedKey: "",
-    };
   },
   methods: {
     ...mapMutations(["navbarMinimize", "sidebarType", "navbarFixed"]),
@@ -163,14 +145,8 @@ export default {
     },
 
     setNavbarFixed() {
-      if (this.$route.name !== "Profile") {
-        this.navbarFixed();
-      }
+      this.navbarFixed();
     },
-    initializeLanguagePopper() {
-      initializePopper('#languageDropdownButton', '#languageDropdownButton + .dropdown-menu','[data-popper-arrow]');
-    },
-
     // function used to dynamically set the menu fixed or not
     setMenuFixed(){
       const isFixed = !this.$store.state.isMenuFixed;
@@ -190,15 +166,6 @@ export default {
         transparent.classList.remove("disabled");
         white.classList.remove("disabled");
       }
-    },
-
-    setLanguage(language) {
-      if (language === this.$i18n.locale) {
-        return;
-      }
-      this.$i18n.locale = language;
-      this.$store.commit("setLanguage", language);
-      this.$refs["language-select"].blur(); // remove the focus on the selection:
     },
     toggleConfig(event) {
       if (event) {

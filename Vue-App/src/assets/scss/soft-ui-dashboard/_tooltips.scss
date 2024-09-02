@@ -7,3 +7,12 @@
 .bs-tooltip-left .tooltip-arrow {
   right: $tooltip-arrow-right;
 }
+
+// invlaid tooltips for inputs
+.invalid-tooltip {
+  max-width: 90%;
+  overflow: auto;
+  text-overflow: unset;
+  white-space: normal;
+  word-wrap: break-word;
+}

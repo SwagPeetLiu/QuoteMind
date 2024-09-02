@@ -1,3 +1,8 @@
+/**
+ * ========================================================================
+ * Stlyer codes used to perform css aniamtions on HTML elements
+ * ========================================================================
+ */
 function fadeOutElement(element, duration) {
     element.style.opacity = 1;
     element.style.transition = `opacity ${duration}ms ease`;

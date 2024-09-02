@@ -26,13 +26,14 @@
             v-if="!isEditing" 
             inputClass="text-2xl text-dark my-0" 
             :text="value"
-            :spaceWidth="9" 
+            :spaceWidth="7" 
         />
 
         <!-- input value -->
         <input 
             v-if="isEditing" 
             class="form-control overflow-hidden border border-2 border-dark"
+            :class="{'is-invalid': !isValid}"
             :type="type" 
             :id="name" 
             :required="isRequired"
@@ -42,7 +43,7 @@
 
         <!-- validation tooltip -->
         <div v-if="isEditing" class="invalid-tooltip fs-7">
-            {{ t('signIn.require valid email') }}
+            {{ validationTips }}
         </div>
     </div>
 </template>
@@ -95,40 +96,38 @@ export default {
     },
     data(){
         const { t } = useI18n({});
+
         return {
             inputValue: this.value,
             originalValue: this.value,
-            isValid: false,
+            isValid: true,
+            validationTips: "",
             t: t
         }
     },
     watch:{
         formStatus(newValue){
-            console.log("form status changed", newValue);
-            if (newValue !== "editing"){ 
-                this.prepareUpdate();
-            }
-        }
-    },
-    methods:{
-        prepareUpdate(){
-            if (this.formStatus === "cancel"){
+            // allow cancelling when the form is in editing mode
+            if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
                 return this.$emit("update-form", this.name, this.originalValue, false);
             }
-            else if (this.formStatus === "saving"){
-                // no need validate if it cannot be updated
+            else if (newValue === "saving" || newValue === "editing"){
+                // direct submission if the input is disabled
                 if (this.isDisabled){
                     this.isValid = true;
                     return this.$emit("update-form", this.name, this.originalValue, true);
                 }
-                // conduct validations:
-                const inputValidation = mapValidation(this.name, this.inputValue);
-                this.isValid = inputValidation.valid;
-                this.$emit("update-form", this.name, this.inputValue, this.isValid);
             }
-
-            // no need to update anything if merely to display the updated
+        },
+        // changing inputs when the form is in editing mode
+        inputValue(newValue){
+            const inputValidation = mapValidation(this.name, newValue);
+            this.isValid = inputValidation.valid;
+            if (!this.isValid){
+                this.validationTips = inputValidation.message;
+            }
+            this.$emit("update-form", this.name, newValue, this.isValid);
         }
     },
     computed:{

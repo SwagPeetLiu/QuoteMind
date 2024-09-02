@@ -1,7 +1,8 @@
 import axios from 'axios';
-import store from '../store';
+import store from '@/store';
 import { useTranslation } from '../utils/I18n';
 import auth from './auth';
+import { config } from '@/config/config';
 const { global: { t } } = useTranslation(); // access the gloabal translation function
 
 const profile = {
@@ -15,12 +16,14 @@ const profile = {
             return { isCompleted: false };
         }
         return axios
-            .post('/profile', data)
+            .put('/profile', data)
             .then(() => {
-                // after successfully updating tehe profile, then the user should be re-logged in
-                auth
+                // After successfully updating tehe profile, then the user should be re-logged in
+                if (data.password !== config.samePasswordIndicator) {
+                    auth
                     .login({ email: data.email, password: data.password })
                     .then(() => {
+                        store.commit("setToastMessage", { message: t("apiMessage.login.success"), type: "success" });
                         return { isCompleted: true };
                     })
                     .catch((error) => {
@@ -28,6 +31,10 @@ const profile = {
                         store.commit("setToastMessage", { message: t("apiMessage.login.failed"), type: "error" });
                         return { isCompleted: false };
                     });
+                }
+                store.commit("setToastMessage", { message: t("apiMessage.profile.success"), type: "success" });
+                store.state.user.username = data.username;
+                return { isCompleted: true };
             })
             .catch((error) => {
                 console.error("failed to update profile", error);

@@ -61,9 +61,9 @@
       </div>
     </div>
 
-    <!-- profile Info & application settings -->
     <div class="row mt-3 mb-0 mx-n2">
       <div class="col-6 px-2">
+        <!-- profile Info -->
         <div class="card" style="height: 270px;">
           <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">{{ t('profile.accountDetails') }}</p>
           <form 
@@ -138,9 +138,9 @@
               </button>
               <button 
                 type="button" 
-                class="btn bg-gradient-info form-button" 
+                class="btn form-button" :class="`bg-gradient-${$store.state.themeColor}`"
                 @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
-                :disabled="formStatus === 'saving'"
+                :disabled="formStatus === 'saving' || (formStatus === 'editing' && isInputInvalid)"
               >
                 <Spinner v-if="formStatus === 'saving'" :size="1.1"/>
                 <span v-else>{{ formStatus === 'editing' ? t('form.save') : t('form.edit') }}</span>
@@ -150,8 +150,45 @@
         </div>
       </div>
 
+      <!-- Application settings -->
       <div class="col-6 px-2">
-        <div class="card" style="height: 300px;">
+        <div class="card" style="height: 270px;">
+          <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">
+            {{ t('profile.applicationSettings') }}
+          </p>
+          <div class="card-body mt-n4">
+            <div class="row g-3 mx-2">
+              <div class="col-6 d-flex align-items-center justify-content-center">
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-sliders my-0 h4 text-gradient fopnt-weight-bolder" :class="`text-${$store.state.themeColor}`"></i>
+                    <h6 class="my-0 ms-3 h5">{{ t("configurator.Side Menu Fixed") }}</h6>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="mt-1 form-check-input ms-auto" 
+                      type="checkbox" id="menuFixed" :checked="this.$store.state.isMenuFixed" @change="setMenuFixed" />
+                  </div>
+              </div>
+
+              <div class="col-6 d-flex align-items-center justify-content-center">
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-language my-0 h3 text-gradient fopnt-weight-bolder" :class="`text-${$store.state.themeColor}`"></i>
+                    <h6 class="my-0 ms-3 h5">{{ t("configurator.Language") }}</h6>
+                  </div>
+                  <LanguageDropDown :class="['mt-3 ps-4']"/>
+              </div>
+              <p class="col-12 mt-3 text-center mb-0 h4 text-gradient text-dark font-weight-bold">
+                {{ t("configurator.SideBar Colours") }}
+              </p>
+              <div class="col-12 mt-3 d-flex align-items-center justify-content-center colour-pickers">
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-primary text-shadow-lg" :class="{'active': $store.state.themeColor === 'primary'}" @click="themeColor('primary')"></i>
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-dark text-shadow-lg" :class="{'active': $store.state.themeColor === 'dark'}" @click="themeColor('dark')"></i>
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-info text-shadow-lg" :class="{'active': $store.state.themeColor === 'info'}" @click="themeColor('info')"></i>
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-success text-shadow-lg" :class="{'active': $store.state.themeColor === 'success'}" @click="themeColor('success')"></i>
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-warning text-shadow-lg" :class="{'active': $store.state.themeColor === 'warning'}" @click="themeColor('warning')"></i>
+                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-danger text-shadow-lg" :class="{'active': $store.state.themeColor === 'danger'}" @click="themeColor('danger')"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -167,13 +204,15 @@ import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import EditableInfo from "@/components/reuseable-components/EditableInfo.vue";
 import { config } from '@/config/config';
 import profile from "@/api/profile";
+import LanguageDropDown from "@/components/reuseable-components/styler/languageDropDown.vue";
 
 export default {
   name: "ProfileOverview",
   components: {
     LoadInText,
     EditableInfo,
-    Spinner
+    Spinner,
+    LanguageDropDown
   },
   data() {
     const { t } = useI18n({});
@@ -185,10 +224,10 @@ export default {
       initialised: false,
       formStatus: "display",
       formData: {
-        role: { value: this.$store.state.user.role, isvaldiated: false },
-        email: { value: this.$store.state.user.email, isvaldiated: false },
-        username: { value: this.$store.state.user.username, isvaldiated: false },
-        password: { value: config.samePasswordIndicator, isvaldiated: false },
+        role: { value: this.$store.state.user.role, isvaldiated: true },
+        email: { value: this.$store.state.user.email, isvaldiated: true },
+        username: { value: this.$store.state.user.username, isvaldiated: true },
+        password: { value: config.samePasswordIndicator, isvaldiated: true },
       },
       passwordOverlay: passwordOverlay
     };
@@ -202,7 +241,18 @@ export default {
   beforeUnmount() {
     this.teardownResizeObserver();
   },
+  computed: {
+    isInputInvalid() {
+      return Object.values(this.formData).some((input) => !input.isvaldiated);
+    }
+  },
   methods: {
+    setMenuFixed() {
+      this.$store.commit("setMenuFixed", !this.$store.state.isMenuFixed);
+    },
+    themeColor(color = "dark") {
+      this.$store.commit("setThemeColor", color);
+    },
     handleRoleSwitch(role) {
       this.role = role;
     },
@@ -259,9 +309,7 @@ export default {
 
       // Await for data updates
       setTimeout(() => {
-        console.log("form submitted", this.formData);
-        const isFormValid = Object.values(this.formData).every((item) => item.isvaldiated);
-        if (isFormValid) {
+        if (!this.isInputInvalid) {
           profile.updateProfile({
             username: this.formData.username.value,
             email: this.formData.email.value,
@@ -287,3 +335,30 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.colour-pickers {
+  i{
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &:hover{
+      transform: scale(1.2);
+    }
+  }
+}
+
+/* Add the following CSS for the active class */
+@keyframes rotate {
+  from {
+    transform: scale(1.4) rotate(0deg);
+  }
+  to {
+    transform: scale(1.4) rotate(360deg);
+  }
+}
+.colour-pickers i.active {
+  transform: scale(1.4);
+  animation: rotate 5s linear infinite;
+}
+</style>

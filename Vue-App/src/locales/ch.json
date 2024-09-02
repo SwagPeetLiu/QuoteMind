@@ -172,7 +172,8 @@
   },
   "profile":{
     "title": "QuoteMind 资料",
-    "accountDetails": "账户资料"
+    "accountDetails": "账户资料",
+    "applicationSettings": "应用设置"
   },
   "transactions":{
     "simply quoting": "简单灵活地报价",

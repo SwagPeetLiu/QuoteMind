@@ -170,7 +170,7 @@ export default {
         return require(`../../assets/img/icons/${target}.png`);
       }
       catch(err){
-        console.log(err)
+        console.error(err)
       }
     },
     updateWindowWidth() {

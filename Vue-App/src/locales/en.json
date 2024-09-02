@@ -170,7 +170,8 @@
   },
   "profile":{
     "title": "QuoteMind Portfolio",
-    "accountDetails": "Account Details"
+    "accountDetails": "Account Details",
+    "applicationSettings": "Application Settings"
   },
   "transactions":{
     "simply quoting": "Easily Quoting",

@@ -12,7 +12,7 @@
 
   <main
     class="main-content max-height-vh-100 h-100 border-radius-lg overflow-x-hidden"
-    :class="[overlaying ? 'position-fixed overflow-hidden' : 'position-relative']"
+    :class="[overlaying ? 'overflow-y-hidden' : 'position-relative']"
   >
     <!-- Top nav bar -->
     <navbar
@@ -83,8 +83,8 @@ export default {
     // function used to control the top nav bar's displays
     navClasses() {
       return {
-        "position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky": this
-          .$store.state.isNavFixed
+        "position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky": 
+        this.$store.state.isNavFixed && this.$route.path !== "/profile",
       };
     },
   },
