@@ -14,7 +14,7 @@
     <!-- profile card -->
     <div class="mx-4 overflow-hidden card card-body blur shadow-blur mt-n6">
       <div class="row gx-4">
-        <div class="col-auto">
+        <div class="col-auto mt-md-3 mt-lg-0">
           <div class="avatar avatar-xl position-relative">
             <img src="@/assets/img/people/file.jpg" alt="profile_image" class="shadow-sm w-100 border-radius-lg"
               style="filter: brightness(95%); image-rendering: -webkit-optimize-contrast;" />
@@ -62,9 +62,9 @@
     </div>
 
     <div class="row mt-3 mb-0 mx-n2">
-      <div class="col-6 px-2">
+      <div class="col-12 col-xl-6 px-2">
         <!-- profile Info -->
-        <div class="card" style="height: 270px;">
+        <div class="card profile-card" :class="{'editing': formStatus === 'editing' || formStatus === 'saving'}">
           <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">{{ t('profile.accountDetails') }}</p>
           <form 
             class="card-body position-relative was-validated mt-n4" 
@@ -73,7 +73,7 @@
             novalidate
           >
             <div class="row g-3">
-              <div class="col-6">
+              <div class="col-12 col-lg-6">
                 <EditableInfo
                   :icon="'fa-solid fa-shield-halved'"
                   name="role"
@@ -86,7 +86,7 @@
                 />
               </div>
 
-              <div class="col-6">
+              <div class="col-12 col-lg-6">
                 <EditableInfo
                   :icon="'fa-solid fa-envelope-open-text'"
                   name="email"
@@ -99,7 +99,7 @@
                 />
               </div>
               
-              <div class="col-md-6">
+              <div class="col-12 col-lg-6">
                 <EditableInfo
                   :icon="'fa-solid fa-user-tag'"
                   name="username"
@@ -112,7 +112,7 @@
                 />
               </div>
               
-              <div class="col-md-6">
+              <div class="col-12 col-lg-6">
                 <EditableInfo
                   :icon="'fa-solid fa-unlock-keyhole'"
                   name="password"
@@ -151,16 +151,19 @@
       </div>
 
       <!-- Application settings -->
-      <div class="col-6 px-2">
-        <div class="card" style="height: 270px;">
+      <div class="col-12 col-xl-6 mt-3 mt-xl-0 px-2">
+        <div class="card control-card" :class="{'editing': formStatus === 'editing' || formStatus === 'saving'}">
           <p class="card-header text-gradient text-dark font-weight-bold h4 my-0">
             {{ t('profile.applicationSettings') }}
           </p>
-          <div class="card-body mt-n4">
+          <div class="card-body mt-n5 mt-md-n4">
             <div class="row g-3 mx-2">
-              <div class="col-6 d-flex align-items-center justify-content-center">
+              <div class="col-12 col-md-6 mt-4 mt-md-0 d-flex align-items-center justify-content-center">
                   <div class="d-flex align-items-center">
-                    <i class="fa-solid fa-sliders my-0 h4 text-gradient fopnt-weight-bolder" :class="`text-${$store.state.themeColor}`"></i>
+                    <i 
+                      class="fa-solid fa-sliders my-0 h4 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
+                      :class="`text-${$store.state.themeColor}`"
+                    ></i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Side Menu Fixed") }}</h6>
                   </div>
                   <div class="form-check form-switch">
@@ -169,17 +172,20 @@
                   </div>
               </div>
 
-              <div class="col-6 d-flex align-items-center justify-content-center">
+              <div class="col-12 col-md-6 mt-2 mt-md-0 d-flex align-items-center justify-content-center">
                   <div class="d-flex align-items-center">
-                    <i class="fa-solid fa-language my-0 h3 text-gradient fopnt-weight-bolder" :class="`text-${$store.state.themeColor}`"></i>
+                    <i 
+                      class="fa-solid fa-language my-0 h3 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
+                      :class="`text-${$store.state.themeColor}`"
+                    ></i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Language") }}</h6>
                   </div>
                   <LanguageDropDown :class="['mt-3 ps-4']"/>
               </div>
-              <p class="col-12 mt-3 text-center mb-0 h4 text-gradient text-dark font-weight-bold">
+              <p class="col-12 mt-1 text-center mb-0 h4 text-gradient text-dark font-weight-bold">
                 {{ t("configurator.SideBar Colours") }}
               </p>
-              <div class="col-12 mt-3 d-flex align-items-center justify-content-center colour-pickers">
+              <div class="col-12 mt-2 d-flex align-items-center justify-content-center colour-pickers">
                 <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-primary text-shadow-lg" :class="{'active': $store.state.themeColor === 'primary'}" @click="themeColor('primary')"></i>
                 <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-dark text-shadow-lg" :class="{'active': $store.state.themeColor === 'dark'}" @click="themeColor('dark')"></i>
                 <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-info text-shadow-lg" :class="{'active': $store.state.themeColor === 'info'}" @click="themeColor('info')"></i>
@@ -360,5 +366,58 @@ export default {
 .colour-pickers i.active {
   transform: scale(1.4);
   animation: rotate 5s linear infinite;
+}
+
+/* Mobile devices */
+@media (min-width: 300px) {
+  .profile-card{
+    height: 320px;
+    transition: height 0.3s ease-in-out;
+
+    &.editing{
+      height: 370px;
+    }
+  }
+  .control-card{
+    height: 270px;
+  }
+}
+
+@media (min-width: 576px) {
+
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+  .control-card{
+    height: 230px;
+    transition: height 0.3s ease-in-out;
+
+    &.editing{
+      height: 260px;
+    }
+  }
+}
+
+/* Small laptops */
+@media (min-width: 992px) {
+  .profile-card{
+    height: 230px;
+    transition: height 0.3s ease-in-out;
+
+    &.editing{
+      height: 260px;
+    }
+  }
+}
+
+/* large laptops */
+@media (min-width: 1200px) {
+  
+}
+
+/* Extra large large laptops */
+@media (min-width: 1600px) {
+
 }
 </style>
