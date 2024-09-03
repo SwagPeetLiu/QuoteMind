@@ -383,10 +383,6 @@ export default {
   }
 }
 
-@media (min-width: 576px) {
-
-}
-
 /* Tablets */
 @media (min-width: 768px) {
   .control-card{
@@ -409,15 +405,5 @@ export default {
       height: 260px;
     }
   }
-}
-
-/* large laptops */
-@media (min-width: 1200px) {
-  
-}
-
-/* Extra large large laptops */
-@media (min-width: 1600px) {
-
 }
 </style>
