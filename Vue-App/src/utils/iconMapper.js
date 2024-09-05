@@ -27,7 +27,9 @@ function getIcon(target) {
             return "fa-brands fa-weixin";
         case "position":
             return "fa-solid fa-address-card";
+        
         case "color":
+        case "colour":
             return "fa-solid fa-palette";
 
         case "materials":

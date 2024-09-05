@@ -70,7 +70,8 @@
     "search": {
       "failed to fetch dbReferences": "获取数据库结构失败",
       "failed to search": "搜索失败",
-      "failed to obtain the top": "未能获取置顶的"
+      "failed to obtain the top": "未能获取置顶的",
+      "add filter": "添加筛选"
     },
     "profile":{
       "email cannot be changed": "不能更改邮箱",
@@ -237,18 +238,19 @@
   "units":{
     "transactionUnit": "笔"
   },
-  "colmns":{
+  "columns":{
     "id": "编号",
-    "company": "公司",
+    "client": "个体客户",
+    "company": "公司客户",
     "email": "电子邮件",
-    "full_name": "全名",
+    "full_name": "名称",
     "phone": "电话",
     "qq_contact": "QQ联系方式",
     "wechat_contact": "微信联系方式",
     "name": "名称",
     "position": "职位",
-    "ch_name": "中文名称",
-    "en_name": "英文名称",
+    "ch_name": "名称",
+    "en_name": "名称",
     "colour": "颜色",
     "materials": "材料",
     "product": "产品",

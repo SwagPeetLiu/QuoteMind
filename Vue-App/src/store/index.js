@@ -181,7 +181,6 @@ export default createStore({
     // used to setUp the database references for application search route:
     setDBRefs(state, payload) {
       state.dbReferences = { ...payload };
-
       if (process.env.NODE_ENV === 'test') {
         localStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
       }

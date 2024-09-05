@@ -69,7 +69,8 @@
     "search": {
       "failed to fetch dbReferences": "Unable to fetch the database references",
       "failed to search": "Failed to search",
-      "failed to obtain the top": "Failed to obtain the top"
+      "failed to obtain the top": "Failed to obtain the top",
+      "add filter": "Add Filter"
     },
     "profile":{
       "email cannot be changed": "Email cannot be changed",
@@ -236,6 +237,7 @@
   },
   "columns":{
     "id": "ID",
+    "client": "Client",
     "company": "Company",
     "email": "Email",
     "full_name": "Full Name",
@@ -244,8 +246,8 @@
     "wechat_contact": "WeChat Contact",
     "name": "Name",
     "position": "Position",
-    "ch_name": "Chinese Name",
-    "en_name": "English Name",
+    "ch_name": "Name",
+    "en_name": "Name",
     "colour": "Color",
     "materials": "Materials",
     "product": "Product",
