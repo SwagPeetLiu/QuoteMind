@@ -20,8 +20,8 @@
     </div>
     <div class="d-flex align-items-center my-3 ms-2">
         <p class="h5 my-0">{{ title }}</p>
-        <i v-if="isDataAvailable" class="text-gradient px-1 h6 my-0" :class="{'fa-solid fa-arrow-trend-up text-success':changesStatus.isUp, 
-          'fa-solid fa-arrow-trend-down text-danger': !changesStatus.isUp}">
+        <i v-if="isDataAvailable" class="text-gradient px-1 h6 my-0" :class="[getIcon(changesStatus.isUp ? 'trend up' : 'trend down'),
+          changesStatus.isUp ? 'text-success' : 'text-danger']">
           </i>
         <span v-if="isDataAvailable" class="font-weight-bold h6 my-0">{{ changesStatus.value }}</span>
     </div>
@@ -33,6 +33,7 @@ import Chart from "chart.js/auto";
 import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import { useI18n } from "vue-i18n";
 import { calculateRelativeChanges } from "@/utils/helpers";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "ReportsBarChart",
@@ -89,6 +90,7 @@ export default {
     }
   },
   methods: {
+    getIcon: getIcon,
     drawGraph() {
       if(!this.isDataAvailable) return;
 

@@ -237,6 +237,35 @@
   "units":{
     "transactionUnit": "笔"
   },
+  "colmns":{
+    "id": "编号",
+    "company": "公司",
+    "email": "电子邮件",
+    "full_name": "全名",
+    "phone": "电话",
+    "qq_contact": "QQ联系方式",
+    "wechat_contact": "微信联系方式",
+    "name": "名称",
+    "position": "职位",
+    "ch_name": "中文名称",
+    "en_name": "英文名称",
+    "colour": "颜色",
+    "materials": "材料",
+    "product": "产品",
+    "quantity": "数量",
+    "size": "尺寸",
+    "price_per_unit": "单价",
+    "amount": "金额",
+    "creation_date": "创建日期",
+    "employee": "员工",
+    "height": "高度",
+    "length": "长度",
+    "modified_date": "修改日期",
+    "note": "备注",
+    "status": "状态",
+    "transaction_date": "交易日期",
+    "width": "宽度"
+  },
   "others":{
     "remains": "是"
   }

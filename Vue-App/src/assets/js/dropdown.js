@@ -4,7 +4,6 @@ export default function initializePopper(buttonSelector, dropdownSelector, arrow
   const button = document.querySelector(buttonSelector);
   const dropdown = document.querySelector(dropdownSelector);
   const arrow = document.querySelector(arrowSelector);
-
   if (!button || !dropdown || !arrow) {
     console.error('Elements not found');
     return null;

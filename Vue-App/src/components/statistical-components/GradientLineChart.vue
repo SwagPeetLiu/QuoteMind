@@ -7,8 +7,8 @@
     <!-- eslint-disable vue/no-v-html -->
     <div v-if="isDataAvailable" class="h6 chart-description">
       <span class="d-none d-xxl-inline" v-if="!isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
-      <i v-if="isIncreasing.isUp" class='fa fa-arrow-up text-gradient text-success px-1'></i>
-      <i v-else class='fa fa-arrow-down text-gradient text-danger px-1'></i>
+      <i v-if="isIncreasing.isUp" :class="getIcon('periodic increase')" class='text-gradient text-success px-1'></i>
+      <i v-else :class="getIcon('periodic decrease')" class='text-gradient text-danger px-1'></i>
       <span class='font-weight-bold'>{{ isIncreasing.value }}</span>
       <span class="d-none d-xxl-inline" v-if="isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
     </div>
@@ -27,6 +27,7 @@ import Chart from "chart.js/auto";
 import { useI18n } from "vue-i18n";
 import { getContrastColour, createLinearGradient, calculateRelativeChanges } from "../../utils/helpers";
 import { config as appConfig } from "../../config/config";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "GradientLineChart",
@@ -99,6 +100,7 @@ export default {
     }
   },
   methods: {
+    getIcon: getIcon,
     createChart() {
       if (!this.isDataAvailable || !this.$refs.gradientLineChart) {
         return;

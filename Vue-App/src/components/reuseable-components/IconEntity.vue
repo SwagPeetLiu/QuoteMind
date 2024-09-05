@@ -7,8 +7,8 @@
         >
             <div class="position-absolute bg-white z-2 rounded-circle"></div>
             <i 
-                class="fa-solid fa-city text-gradient my-0 mx-3 z-3" 
-                :class="`text-${theme}`"
+                class="text-gradient my-0 mx-3 z-3" 
+                :class="`text-${theme} ${icon}`"
             ></i>
         </div>
 

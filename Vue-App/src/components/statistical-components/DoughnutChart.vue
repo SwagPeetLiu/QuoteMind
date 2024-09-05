@@ -6,7 +6,7 @@
             <div class="tooltip-center" ref="tooltipCenter">
                 <div class="font-weight-bold text-gradient text-dark doughnut-chart-value mt-4">{{ value }}</div>
                 <div class="text-muted doughnut-chart-label"> {{ label }}</div>
-                <i class="fa-solid fa-chart-simple mt-2" @click="clearClicks"></i>
+                <i class="mt-2" :class="getChartIcon" @click="clearClicks"></i>
             </div>
         </div>
         <p v-else class="pt-4 text-center text-gradient text-dark h4 font-weight-bold">
@@ -22,6 +22,7 @@ import { config as appConfig } from "@/config/config.js";
 import { createGradient, getContrastColour } from "@/utils/helpers";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
     name: 'DoughnutChart',
@@ -161,6 +162,8 @@ export default {
             chart.update();
         }
 
+        const getChartIcon = getIcon('chart distribution');
+
         return {
             t,
             value,
@@ -168,7 +171,8 @@ export default {
             chartCanvas,
             tooltipCenter,
             clearClicks,
-            isDataAvailable
+            isDataAvailable,
+            getChartIcon
         };
     },
     watch:{

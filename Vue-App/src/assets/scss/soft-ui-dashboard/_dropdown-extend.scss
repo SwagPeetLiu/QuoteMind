@@ -25,7 +25,82 @@
 }
 
 @include media-breakpoint-down(xl) {
- .dropdown-lg-responsive {
-   min-width: $dropdown-lg-width-responsive;
- }
+  .dropdown-lg-responsive {
+    min-width: $dropdown-lg-width-responsive;
+  }
+}
+
+
+// Target-based Dropdown (Customised SCSS)
+.target-dropdown {
+  position: relative;
+  padding: 4px;
+  border-radius: $border-radius-md;
+  transition: scale 0.3s ease-in-out;
+  z-index: 1;
+
+  &:hover {
+    scale: 1.02;
+  }
+
+  .toggle-arrow {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .target-toggle {
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    border-radius: $border-radius-md;
+    background-color: $white;
+  }
+
+  .target-menu {
+    display: block;
+    position: absolute;
+    width: 100%;
+    background-color: $white;
+    border-radius: $border-radius-md;
+    box-shadow: $dropdown-box-shadow;
+    padding: 10px;
+    margin-top: 5px;
+    left: -3px;
+    transform: translateY(-100%); // Start slightly higher
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.18s ease-in-out;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.toggle-open {
+    .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    .target-menu {
+      display: block;
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+      transition:
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.2s ease-in-out 0.05s; // Delay opacity increase
+
+      .target-item {
+        border-radius: $border-radius-md;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $gray-200;
+
+          p {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
 }

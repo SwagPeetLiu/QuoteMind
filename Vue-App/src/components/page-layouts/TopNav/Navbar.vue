@@ -19,7 +19,7 @@
             @click="logout" class="px-0 nav-link font-weight-bold d-flex align-items-center icon-move-left" 
             style="cursor: pointer;"
           >
-            <i class="fa fa-sign-out me-md-2 me-sm-1 h5" :class="{'text-white': isCurrentLinkProfile}"></i>
+            <i class="me-md-2 me-sm-1 h5" :class="[getIcon('sign out'), isCurrentLinkProfile && 'text-white']"></i>
             <span class="d-sm-inline d-none h6" :class="{'text-white': isCurrentLinkProfile}"> {{ t('configurator.Logout') }}</span>
           </div>
         </li>
@@ -27,14 +27,14 @@
         <!-- menu toggler (only show when breaking point is reached) -->
         <li class="nav-item d-md-none ps-3 d-flex align-items-center">
           <a href="#" @click="toggleSidebar" class="p-0 nav-link" id="iconNavbarSidenav">
-            <i class="fa fa-bars h5" :class="{'text-white': isCurrentLinkProfile}" aria-hidden="true"></i>
+            <i class="h5" :class="[getIcon('menu'), isCurrentLinkProfile && 'text-white']" aria-hidden="true"></i>
           </a>
         </li>
 
          <!-- configurator -->
         <li class="px-3 nav-item d-flex align-items-center">
           <a class="p-0 nav-link icon-spin-left" @click="toggleConfigurator">
-            <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav h5" :class="{'text-white': isCurrentLinkProfile}"></i>
+            <i class="cursor-pointer fixed-plugin-button-nav h5" :class="[getIcon('settings'), isCurrentLinkProfile && 'text-white']"></i>
           </a>
         </li>
       </ul>
@@ -47,6 +47,7 @@ import Breadcrumbs from "./Breadcrumbs.vue";
 import { mapMutations, mapActions } from "vuex";
 import { useI18n } from "vue-i18n";
 import auth from "../../../api/auth";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "navbar",
@@ -57,6 +58,7 @@ export default {
   methods: {
     ...mapMutations(["toggleMenuOnSmallScreens", "toggleConfigurator"]),
     ...mapActions(["toggleSidebarColor"]),
+    getIcon: getIcon,
 
     // function used to open the menu to the left on small screens
     toggleSidebar() {

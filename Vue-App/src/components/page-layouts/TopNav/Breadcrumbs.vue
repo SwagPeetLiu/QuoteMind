@@ -7,7 +7,7 @@
 
       <!-- home button -->
       <li class="breadcrumb-item">
-        <i class="fa fa-home opacity-8 font-size-lg" :class="{ 'text-white': isCurrentLinkProfile }"
+        <i class="opacity-8 font-size-lg" :class="[getIcon('home'), isCurrentLinkProfile && 'text-white']"
           aria-hidden="true" style="cursor: pointer;" @click="$router.push({ path: '/' })">
         </i>
       </li>
@@ -36,6 +36,7 @@
 
 <script>
 import { useI18n } from "vue-i18n";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "breadcrumbs",
@@ -96,6 +97,9 @@ export default {
       }
     }
   },
+  methods:{
+    getIcon: getIcon
+  }
 }
 
 </script>

@@ -47,7 +47,7 @@
           <tbody v-if="!isLoading && isDataAvailable">
             <tr v-for="(record, index) in records" :key="index" class="table-row">
               <td>
-                <IconEntity :theme="themeColour" icon="fa-solid fa-building" :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
+                <IconEntity :theme="themeColour" :icon="getIcon(quoteTarget)" :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
                   :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id" />
               </td>
               <td class="align-middle text-center font-weight-bold d-none d-md-table-cell">
@@ -96,6 +96,7 @@ import { useI18n } from "vue-i18n";
 import { calculatePercentage } from "@/utils/helpers";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
 import initTooltips  from "@/assets/js/tooltip.js";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "quotation-completion-card",
@@ -145,6 +146,7 @@ export default {
     }
   },
   methods:{
+    getIcon: getIcon,
     // function used to get the companies that reuiqre user's attntion on transaction quotations
     getTopComapnies(){
       search.getQuotationTargets({target: this.quoteTarget})

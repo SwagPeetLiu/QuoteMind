@@ -90,7 +90,7 @@
       :textSecondary="t('sideNav.Please check Docs as well')"
       route="mailto:535051192liu@gmail.com"
       :label="t('sideNav.contact author')"
-      icon="fa fa-info-circle"
+      :icon="getIcon('info')"
     />
     <a class="btn w-100 mt-3 d-flex align-items-center justify-content-center"
         :class="currentMainTheme" 
@@ -98,7 +98,7 @@
         target="_blank"
         norel="noopener noreferrer"
     >
-      <i class="fa fa-file-text text-white me-2" aria-hidden="true"></i>
+      <i class="text-white me-2" :class="getIcon('resources')" aria-hidden="true"></i>
       <span class="text-white docs-info">
         {{ t('sideNav.resources') }}
       </span>
@@ -116,6 +116,7 @@ import Profile from "../../Icon/Profile.vue";
 import Customers from "../../Icon/Customers.vue";
 import Pricing from "../../Icon/Pricing.vue";
 import { useI18n } from "vue-i18n";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "SidenavList",
@@ -162,5 +163,8 @@ export default {
       return `bg-gradient-${maintheme}`;
     }
   },
+  methods:{
+    getIcon: getIcon
+  }
 };
 </script>

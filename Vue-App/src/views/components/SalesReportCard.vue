@@ -19,25 +19,25 @@
             :data="[
                 {
                     color: 'success',
-                    icon: 'fa-solid fa-cart-plus',
+                    icon: getIcon('create transaction'),
                     title: t('transactions.create'),
                     description: t('transactions.create your transactions'),
                 },
                 {
                     color: 'info',
-                    icon: 'fa-solid fa-tags',
+                    icon: getIcon('quote trnasaction'),
                     title: t('transactions.quote'),
                     description: t('transactions.quote your transactions'),
                 },
                 {
                     color: 'danger',
-                    icon: 'fa-solid fa-eye',
+                    icon: getIcon('view and extract'),
                     title: t('transactions.view and extract'),
                     description: t('transactions.view and extract your transactions'),
                 },
                 {
                     color: 'dark',
-                    icon: 'fa-solid fa-money-bill-wave',
+                    icon: getIcon('account'),
                     title: t('transactions.account'),
                     description: t('transactions.account your transactions'),
                 }
@@ -52,6 +52,7 @@ import { getRecentSalesPerformanceBody, FormatMonthAndYear } from "@/utils/helpe
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import HorizontalTimeline from "@/components/reuseable-components/Horizontal-Timeline.vue";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
     name: "SalesReportCard",
@@ -89,7 +90,8 @@ export default {
                 .finally(() => {
                     this.isLoading = false;
                 });
-        }
+        },
+        getIcon: getIcon
     },
     mounted() {
         this.getRecentSalesPerformance();

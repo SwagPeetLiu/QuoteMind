@@ -23,7 +23,7 @@
         :class="showBackgroundColour ? 'text-dark' : 'text-white'"
         aria-current="page" to="#"
       >
-        <i class="fa fa-handshake-o opacity-6 me-3" aria-hidden="true"></i>
+        <i class="me-3" :class="[getIcon('us'), $route.path === '/sign-in' ? 'text-secondary': 'text-white']" aria-hidden="true"></i>
         <span>{{ t('thinBar.us') }}</span>
       </router-link>
 
@@ -35,7 +35,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        <i class="fa fa-code opacity-6 me-3" aria-hidden="true"></i>
+        <i class="me-3" :class="[getIcon('code'), $route.path === '/sign-in' ? 'text-secondary': 'text-white']" aria-hidden="true"></i>
         <span>{{ t('thinBar.source') }}</span>
       </a>
 
@@ -45,7 +45,7 @@
         :to="getDynamicRoute"
         :class="showBackgroundColour ? 'text-dark' : 'text-white'"
       >
-        <i class="fas fa-user-circle opacity-6 me-3" aria-hidden="true"></i>
+        <i class="me-3" :class="[getIcon('sign up'), $route.path === '/sign-in' ? 'text-secondary': 'text-white']" aria-hidden="true"></i>
         <span v-if="isSignUp">{{ t('thinBar.login') }}</span>
         <span v-else>{{ t('thinBar.register') }}</span>
       </router-link>
@@ -56,7 +56,7 @@
         to="#"
         :class="showBackgroundColour ? 'text-dark' : 'text-white'"
       >
-        <i class="fa-solid fa-shield-halved opacity-6 me-3"></i>
+        <i class="me-3" :class="[getIcon('privacy'), $route.path === '/sign-in' ? 'text-secondary': 'text-white']" aria-hidden="true"></i>
         <span>{{ t('thinBar.privacy') }}</span>
       </router-link>
     </div>
@@ -76,6 +76,7 @@ import downArrWhite from "@/assets/img/down-arrow-white.svg";
 import downArrBlack from "@/assets/img/down-arrow-dark.svg";
 import { useI18n } from "vue-i18n";
 import { useRoute } from 'vue-router';
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "thinBar",
@@ -105,6 +106,9 @@ export default {
     getDynamicRoute() {
       return this.isSignUp ? '/sign-in' : '/sign-up';
     }
+  },
+  methods: {
+    getIcon: getIcon
   },
   mounted() {
     // adding the sucess class to the navbar
