@@ -3,13 +3,16 @@
 *  Sections of helper functions shared across the Vue-app
 * ==============================================================================
 */
-function generateTimeRange(duration) {
+function generateDateRange(duration) {
     const now = new Date();
     let startDate = new Date(now);
 
     switch (duration.toLowerCase()) {
         case 'year':
             startDate.setFullYear(now.getFullYear() - 1);
+            break;
+        case 'quarter':
+            startDate.setMonth(now.getMonth() - 3);
             break;
         case 'month':
             startDate.setMonth(now.getMonth() - 1);
@@ -21,16 +24,20 @@ function generateTimeRange(duration) {
             startDate.setDate(now.getDate() - 1);
             break;
         default:
-            throw new Error('Unsupported duration');
+            throw new Error('Unsupported duration. Please use "year", "month", "week", or "day".');
     }
 
     // Reset time to midnight
     startDate.setHours(0, 0, 0, 0);
     now.setHours(0, 0, 0, 0);
+    return { startDate: startDate, endDate: now };
+}
 
+function generateTimeRange(duration) {
+    const { startDate, endDate } = generateDateRange(duration);
     return {
-        startTime: startDate.toISOString().split('T')[0] + 'T00:00:00.000Z',
-        endTime: now.toISOString().split('T')[0] + 'T00:00:00.000Z'
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString()
     };
 }
 
@@ -119,6 +126,24 @@ function getContrastColour(colour) {
             return 'warning';
         default:
             return 'secondary';
+    }
+}
+function mapThemedCalendarColor(colour) {
+    switch(colour) {
+        case 'primary':
+            return 'pink';
+        case 'success':
+            return 'green';
+        case 'info':
+            return 'blue';
+        case 'warning':
+            return 'yellow';
+        case 'danger':
+            return 'red';
+        case 'dark':
+            return 'yellow';
+        default:
+            return 'purple';
     }
 }
 
@@ -295,6 +320,7 @@ function getRecentSalesPerformanceBody(){
 }
 
 module.exports = {
+    generateDateRange,
     generateTimeRange,
     getContrastColour,
     createLinearGradient,
@@ -304,5 +330,6 @@ module.exports = {
     createGradient,
     FormatMonthAndYear,
     calculateRelativeChanges,
-    calculatePercentage
+    calculatePercentage,
+    mapThemedCalendarColor
 }

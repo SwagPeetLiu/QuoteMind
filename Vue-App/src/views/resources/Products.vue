@@ -1,7 +1,7 @@
 <template>
   <div class="py-2 container-fluid">
     <div class="d-flex flex-column min-vh-80">
-      <SearchController :target="'clients'"/>
+      <SearchController :target="'transactions'"/>
       <div class="mt-3" style="min-height: 600px; max-height: 820px"></div>
     </div>
   </div>

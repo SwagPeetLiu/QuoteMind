@@ -1,0 +1,15 @@
+.calendar-container{
+    padding-top: 10px;
+    input{
+        border: none;
+        outline: none;
+        background-color: transparent;
+        width: 100px;
+
+        &:active, &:focus{
+            border: none;
+            outline: none;
+            font-weight: 500;
+        }
+    }
+}

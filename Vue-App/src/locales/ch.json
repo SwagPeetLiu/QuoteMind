@@ -71,7 +71,9 @@
       "failed to fetch dbReferences": "获取数据库结构失败",
       "failed to search": "搜索失败",
       "failed to obtain the top": "未能获取置顶的",
-      "add filter": "添加筛选"
+      "add filter": "添加筛选",
+      "add your filter": "筛选您的搜索结果",
+      "search":"搜索"
     },
     "profile":{
       "email cannot be changed": "不能更改邮箱",

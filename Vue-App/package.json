@@ -33,6 +33,7 @@
     "gsap": "^3.12.5",
     "pnltri": "^2.1.1",
     "three": "^0.167.1",
+    "v-calendar": "^3.1.2",
     "vue": "3.2.0",
     "vue-flatpickr-component": "9.0.5",
     "vue-i18n": "^9.13.1",
@@ -41,6 +42,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",

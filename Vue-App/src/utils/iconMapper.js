@@ -90,6 +90,10 @@ function getIcon(target) {
             return "fa-solid fa-arrow-trend-down";
         case "chart distribution":
             return "fa-solid fa-chart-simple";
+        case "calendar":
+            return "fa-solid fa-calendar-days";
+        case "between":
+            return "fa-solid fa-arrow-right-arrow-left";
 
         // controls:
         case "home":
@@ -121,6 +125,10 @@ function getIcon(target) {
             return "fa-solid fa-tags";
         case "view and extract":
             return "fa-solid fa-eye";
+        case "search enter":
+            return "fa-solid fa-arrow-turn-down";
+        case "add":
+            return "fa-solid fa-plus";
         default:
             return "fa-solid fa-circle-info";
     }

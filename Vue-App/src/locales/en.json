@@ -70,7 +70,9 @@
       "failed to fetch dbReferences": "Unable to fetch the database references",
       "failed to search": "Failed to search",
       "failed to obtain the top": "Failed to obtain the top",
-      "add filter": "Add Filter"
+      "add filter": "Add Filter",
+      "add your filter": "Add your filter to flexibly Serach",
+      "search": "Search "
     },
     "profile":{
       "email cannot be changed": "Email cannot be changed",

@@ -1,6 +1,6 @@
 <template>
     <div class="card" style="min-height: 120px; max-height: 220px">
-        <div class="row mx-2 flex-grow-1 my-2">
+        <div class="row mx-1 flex-grow-1 my-2">
 
             <!-- multi search panel -->
             <div class="col-5 py-2">
@@ -24,31 +24,49 @@
                             </li>
                         </ul>
                     </div>
-                    <button class="w-30 h-100 btn bg-gradient-dark my-0 ms-2">{{ t("apiMessage.search.add filter") }}</button>
+                    <button 
+                        class="w-30 h-100 btn bg-gradient-dark my-0 ms-2 d-flex align-items-center justify-content-center"
+                    >
+                        <i class="me-2 my-0" :class="getIcon('add')"></i>
+                        <span>{{ t("apiMessage.search.add filter") }}</span>
+                    </button>
                 </div>
 
                 <!-- mapping different types of inputs for users to control the serach mechanism -->
-                <input class="w-100 h-50 border border-secondary border-2 rounded px-2 overfllow-hidden" />
-
+                <div v-if="currentSearchType === 'text'" class="w-100 h-50 position-relative search-text-input">
+                    <input 
+                        v-model="searchValue.textValue"
+                        class="overfllow-hidden w-100 h-100 px-2" 
+                        type="text" 
+                        :placeholder="`${t('apiMessage.search.search')}${t(`columns.${currentSelection.name}`)}`"
+                    />
+                    <i :class="getIcon('search enter')" class="position-absolute ms-n4 mt-3" style="rotate: 90deg;"></i>
+                </div>
+                <div v-else class="w-100 h-50 px-4">
+                    <RangedCalendar />
+                </div>
             </div>
 
             <!-- current searched conditions (where clause) -->
             <div class="col-7 pt-2 px-2">
-                <!-- <div 
-                    class="h-100 bg-gradient-dark border border-2 border-dark" 
-                    style="opacity: 0.15; padding: 2rem; border-radius: 0.5rem;"
-                > -->
-                <div style="background-color: rgba(0, 0, 0, 0.1); padding: 1rem; border: 2px solid #1f2937; border-radius: 0.5rem;">
+                <div class="w-100 h-100 border-3 border-secondary position-relative" style="border-style: dotted;">
+                    <div class="bg-gradient-dark h-100 w-100 position-absolute z-1" style="opacity: 0.15;"></div>
+                    <div v-if="isWhereClausePresents" class="d-flex align-items-start justify-content-start p-3 z-n1">
+                        <p class="text-gradient text-dark font-weight-bold ms-2 z-2"></p>
+                    </div>
+                    <div v-else class="z-n1 bg-transparent w-100 h-100 d-flex align-items-center justify-content-center">
+                        <p class="my-0 z-2 h6 font-weight-bold text-gradient text-dark">{{ t("apiMessage.search.add your filter") }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
 import { useI18n } from "vue-i18n";
 import { getIcon } from "@/utils/iconMapper.js";
+import RangedCalendar from "@/components/statistical-components/RangedCalendar.vue";
 
 export default {
     name: "SearchController",
@@ -57,6 +75,9 @@ export default {
             type: String,
             required: true
         }
+    },
+    components: {
+        RangedCalendar
     },
     data(){
         const { t } = useI18n({});
@@ -67,10 +88,12 @@ export default {
             inputTerm: { value : "" },
             existingWhereClauses: [],
             isSlideOut: false,
-            toggleListener: null
+            toggleListener: null,
+            searchValue: {textValue: "", dateRange: {start: null, end: null}},
         }
     },
     methods:{
+        getIcon: getIcon,
         handleClickOutside(event) {
             if (this.isSlideOut && !this.$refs.targetDropdownContainer.contains(event.target)) {
                 this.isSlideOut = false;
@@ -124,6 +147,24 @@ export default {
         }
     },
     computed:{
+        currentSearchType(){
+            console.log(this.currentSelection);
+            if (this.currentSelection.type == "uuid" || 
+                this.currentSelection.type.includes("character") ||
+                this.currentSelection.type.includes("USER-DEFINED") ||
+                this.currentSelection.type.includes("ARRAY") ||
+                this.currentSelection.type.includes("integer") ||
+                this.currentSelection.type.includes("numeric")
+            ) {
+                return "text";
+            }
+            else if (this.currentSelection.type.includes("timestamp")) {
+                return "timestamp";
+            }
+            else{
+                return "text";
+            }
+        },
         currentSelection(){
             return this.targets.filter(item => item.name === this.currentTarget)[0];
         },
@@ -150,6 +191,9 @@ export default {
                 default:
                     return [];
             }
+        },
+        isWhereClausePresents(){
+            return this.existingWhereClauses.length > 0;
         }
     },
     beforeMount() {
