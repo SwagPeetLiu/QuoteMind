@@ -1,8 +1,15 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   transpileDependencies: ['@vuepic/vue-datepicker', 'date-fns'],
   configureWebpack: {
+    plugins: [
+      new webpack.DefinePlugin({
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
+        __VUE_OPTIONS_API__: JSON.stringify(true),
+      })
+    ],
     module: {
       rules: [
         {

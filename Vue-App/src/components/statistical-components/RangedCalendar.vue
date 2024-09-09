@@ -57,7 +57,6 @@ export default {
         },
         yearRange() {
             const currentYear = new Date().getFullYear();
-            console.log(currentYear - config.limitations.MAX_YEAR_RELEVANCY, currentYear);
             return [currentYear - config.limitations.MAX_YEAR_RELEVANCY, currentYear];
         },
         minStartDate() {
