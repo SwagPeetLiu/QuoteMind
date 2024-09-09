@@ -14,7 +14,7 @@
                         </div>
                         <ul class="target-menu">
                             <li 
-                                v-for="item in targets" 
+                                v-for="item in targets"
                                 :key="item.name" 
                                 class="target-item d-flex align-items-center justify-content-center my-2"
                                 @click="selectTarget(item.name)"
@@ -148,7 +148,6 @@ export default {
     },
     computed:{
         currentSearchType(){
-            console.log(this.currentSelection);
             if (this.currentSelection.type == "uuid" || 
                 this.currentSelection.type.includes("character") ||
                 this.currentSelection.type.includes("USER-DEFINED") ||

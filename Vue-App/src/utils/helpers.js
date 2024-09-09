@@ -128,24 +128,6 @@ function getContrastColour(colour) {
             return 'secondary';
     }
 }
-function mapThemedCalendarColor(colour) {
-    switch(colour) {
-        case 'primary':
-            return 'pink';
-        case 'success':
-            return 'green';
-        case 'info':
-            return 'blue';
-        case 'warning':
-            return 'yellow';
-        case 'danger':
-            return 'red';
-        case 'dark':
-            return 'yellow';
-        default:
-            return 'purple';
-    }
-}
 
 // function used to calculate the changes in the recent data points (returned value
 // can be relative or absolute)
@@ -330,6 +312,5 @@ module.exports = {
     createGradient,
     FormatMonthAndYear,
     calculateRelativeChanges,
-    calculatePercentage,
-    mapThemedCalendarColor
+    calculatePercentage
 }

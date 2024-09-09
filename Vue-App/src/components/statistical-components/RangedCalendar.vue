@@ -1,76 +1,100 @@
 <template>
-    <div class="d-flex align-items-center justify-content-between calendar-container">
-
-        <VCalendar 
-            v-model="range.start" 
-            mode="date" 
-            :masks="masks" 
-            :color="mapCalendarColor($store.state.themeColor)"
-            title-position="left"
-            expanded
-        >
-            <template v-slot="{ inputValue, inputEvents, isDragging }">
-                <div class="d-flex align-items-center justify-content-center flex-grow-1 bg-gray-100 border rounded">
-                    <i class="me-3 text-secondary h6 my-0" :class="getIcon('calendar')"></i>
-                    <input :class="isDragging ? 'text-gray-600' : 'text-dark'" :value="inputValue"
-                        v-on="inputEvents" />
-                </div>
-            </template>
-        </VCalendar>
-
+    <div class="d-flex align-items-center justify-content-between position-relative">
+        <Datepicker v-model="range.start" :enable-time-picker="false" auto-apply
+            :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
+            :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
+            :year-range="yearRange"
+            :min-date="minStartDate"
+            :max-date="maxStartDate" 
+            :key="$i18n.locale"
+            :class="[$store.state.themeColor]"
+        />
         <i class="mx-4 d-flex h5 my-0" :class="getIcon('between')"></i>
-        
-        <VCalendar 
-            v-model="range.end"
-            mode="date"
-            :masks="masks"
-            :color="mapCalendarColor($store.state.themeColor)"
-            title-position="left"
-            expanded
-        >
-            <template v-slot="{ inputValue, inputEvents, isDragging }">
-                <div class="d-flex align-items-center justify-content-center flex-grow-1 bg-gray-100 border rounded">
-                    <i class="me-3 text-secondary h6 my-0" :class="getIcon('calendar')"></i>
-                    <input :class="isDragging ? 'text-gray-600' : 'text-dark'" :value="inputValue"
-                        v-on="inputEvents" />
-                </div>
-            </template>
-        </VCalendar>
+        <Datepicker 
+            v-model="range.end" 
+            :enable-time-picker="false" 
+            auto-apply
+            :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
+            :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
+            :year-range="yearRange" 
+            :key="$i18n.locale" 
+            :min-date="minEndDate"
+            :max-date="maxEndDate"
+            :class="[$store.state.themeColor]"
+        /> 
     </div>
 </template>
 
 <script>
-import VCalendar  from 'v-calendar';
-import 'v-calendar/dist/style.css';
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 import { generateDateRange } from "@/utils/helpers";
 import { getIcon } from "@/utils/iconMapper.js";
-import { useI18n } from 'vue-i18n';
-import { mapThemedCalendarColor } from "@/utils/helpers";
+import { config } from "@/config/config";
 
 export default {
     name: "RangedCalendar",
     components: {
-        VCalendar 
+        Datepicker
     },
     data() {
         const { startDate, endDate } = generateDateRange("year");
-        const { t } = useI18n({});
         return {
-            masks: {
-                input: 'YYYY-MM-DD'
-            },
             range: {
                 start: startDate,
                 end: endDate
             },
-            t: t
+            dateFormat: { en: 'yyyy-MM-dd', ch: 'yyyy年MM月dd日' },
+            locales: {
+                en: "en-US",
+                ch: "zh-CN"
+            }
+        };
+    },
+    computed: {
+        isCurrentLanEnglish() {
+            return this.$store.getters.getLanguage === "en";
+        },
+        yearRange() {
+            const currentYear = new Date().getFullYear();
+            console.log(currentYear - config.limitations.MAX_YEAR_RELEVANCY, currentYear);
+            return [currentYear - config.limitations.MAX_YEAR_RELEVANCY, currentYear];
+        },
+        minStartDate() {
+            const date = new Date();
+            date.setFullYear(date.getFullYear() - config.limitations.MAX_YEAR_RELEVANCY);
+            return date;
+        },
+        maxStartDate() {
+            if (this.range.end) {
+                const date = new Date(this.range.end);
+                date.setDate(date.getDate() - 1);
+                return date;
+            }
+            return new Date(); // default to today
+        },
+        minEndDate() {
+            if (this.range.start) {
+                const date = new Date(this.range.start);
+                date.setDate(date.getDate() + 1);
+                return date;
+            }
+            return new Date(); // Default to today if no start date is selected
+        },
+        maxEndDate() {
+            return new Date(); // Today
         }
     },
     methods: {
-        getIcon: getIcon,
-        mapCalendarColor: (color) => {
-            return mapThemedCalendarColor(color);
+        getIcon,
+    },
+    watch: {
+        range: {
+            handler(newVal) {
+                console.log(newVal);
+            },
+            deep: true
         }
     }
-}
+};
 </script>

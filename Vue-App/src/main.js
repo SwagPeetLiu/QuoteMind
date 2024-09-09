@@ -34,5 +34,7 @@ const i18n = useTranslation();
 appInstance.use(router);
 appInstance.use(i18n);
 appInstance.use(SoftUIDashboard);
+
+// sanitise user input
 appInstance.provide('$sanitize', (dirty) => DOMPurify.sanitize(dirty));
 appInstance.mount("#app");

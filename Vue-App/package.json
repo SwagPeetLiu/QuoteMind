@@ -1,6 +1,6 @@
 {
   "name": "quote-mind-ui-dashboard",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "private": true,
   "author": "Peter Liu",
   "license": "SEE LICENSE IN <https://www.creative-tim.com/license>",
@@ -25,6 +25,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@popperjs/core": "2.10.2",
+    "@vuepic/vue-datepicker": "^9.0.3",
     "axios": "^1.7.2",
     "bootstrap": "5.1.3",
     "chart.js": "^3.9.1",
@@ -33,12 +34,11 @@
     "gsap": "^3.12.5",
     "pnltri": "^2.1.1",
     "three": "^0.167.1",
-    "v-calendar": "^3.1.2",
-    "vue": "3.2.0",
+    "vue": "^3.5.3",
     "vue-flatpickr-component": "9.0.5",
     "vue-i18n": "^9.13.1",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.4.3",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",

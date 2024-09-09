@@ -28,7 +28,8 @@ const config = {
         Max_Descriptions_Length: 300,
         Min_Token_Length: 5,
         Max_Token_Length: 165,
-        MAX_ADDRESS_CATEGORY_LENGTH: 3
+        MAX_ADDRESS_CATEGORY_LENGTH: 3,
+        MAX_YEAR_RELEVANCY: 5
     },
     search: {
         pageSize: 15,
