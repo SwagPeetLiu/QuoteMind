@@ -16,7 +16,16 @@ export function useValidators() {
             }
             return isPasswordValid(value);
         };
-        return true;
+
+        // general search validations:
+        if (target === "textInput"){
+            return isTextInputValid(value);
+        }
+        if (target === "rangedDateInput"){
+            return isRangedDateInputValid(value);
+        }
+
+        return { valid: true };
     }
 
     function isUsernameValid(username) {
@@ -25,6 +34,7 @@ export function useValidators() {
         if (username.length > config.limitations.Max_Username_Length) return { valid: false, message: `${t('validation.username')}${t('validation.too long')}` };
         return { valid: true };
     }
+
     function isEmailValid(email, required) {
         const isEmpty = !email || !email.trim();
         if (isEmpty && required) {
@@ -88,6 +98,52 @@ export function useValidators() {
 
         return { valid: true };
     }
+
+    // general string based search
+    function isTextInputValid(textInput) {
+        if (!textInput || typeof textInput !== 'string' || !textInput.trim()){
+            return { 
+                valid: false, 
+                message: `${t('validation.search value')}${t('validation.cannot be empty')}` 
+            };
+        }
+        else if (textInput.length > config.limitations.Max_Name_Length) {
+            return { 
+                valid: false, 
+                message: `${t('validation.search value')}${t('validation.too long')}` 
+            };
+        }
+        else{
+            return { valid: true };
+        }
+    }
+
+    // general date transactions
+    function isRangedDateInputValid(dateObject) {
+    if (!dateObject || (typeof dateObject !== 'object')) {
+        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    }
+
+    const { start, end } = dateObject;
+
+    if (!start && !end) {
+        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    }
+
+    if (start && !(start instanceof Date)) {
+        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    }
+
+    if (end && !(end instanceof Date)) {
+        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    }
+
+    if (start && end && start >= end) {
+        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    }
+
+    return { valid: true };
+}
 
     return {
         mapValidation,

@@ -1,5 +1,5 @@
 <template>
-    <div class="card" style="min-height: 120px; max-height: 220px">
+    <div class="card" style="height: 130px;">
         <div class="row mx-1 flex-grow-1 my-2">
 
             <!-- multi search panel -->
@@ -24,8 +24,12 @@
                             </li>
                         </ul>
                     </div>
+
+                    <!-- button to add on a new filter -->
                     <button 
                         class="w-30 h-100 btn bg-gradient-dark my-0 ms-2 d-flex align-items-center justify-content-center"
+                        :disabled="!isSearchInputValid"
+                        @click="addFilter()"
                     >
                         <i class="me-2 my-0" :class="getIcon('add')"></i>
                         <span>{{ t("apiMessage.search.add filter") }}</span>
@@ -33,31 +37,26 @@
                 </div>
 
                 <!-- mapping different types of inputs for users to control the serach mechanism -->
-                <div v-if="currentSearchType === 'text'" class="w-100 h-50 position-relative search-text-input">
-                    <input 
-                        v-model="searchValue.textValue"
-                        class="overfllow-hidden w-100 h-100 px-2" 
-                        type="text" 
-                        :placeholder="`${t('apiMessage.search.search')}${t(`columns.${currentSelection.name}`)}`"
-                    />
-                    <i :class="getIcon('search enter')" class="position-absolute ms-n4 mt-3" style="rotate: 90deg;"></i>
-                </div>
+                <SearchTextInput 
+                    class="w-100 h-50"
+                    v-if="currentSearchType === 'text'" 
+                    :target="currentSelection.name"
+                    @update-search-value="setSearchValue"
+                    :clearingInput="clearInput"
+                />
+
                 <div v-else class="w-100 h-50 px-4">
-                    <RangedCalendar />
+                    <RangedCalendar 
+                        :target="currentSelection.name"
+                        @update-search-value="setSearchValue"
+                        :clearingInput="clearInput"
+                    />
                 </div>
             </div>
 
             <!-- current searched conditions (where clause) -->
-            <div class="col-7 pt-2 px-2">
-                <div class="w-100 h-100 border-3 border-secondary position-relative" style="border-style: dotted;">
-                    <div class="bg-gradient-dark h-100 w-100 position-absolute z-1" style="opacity: 0.15;"></div>
-                    <div v-if="isWhereClausePresents" class="d-flex align-items-start justify-content-start p-3 z-n1">
-                        <p class="text-gradient text-dark font-weight-bold ms-2 z-2"></p>
-                    </div>
-                    <div v-else class="z-n1 bg-transparent w-100 h-100 d-flex align-items-center justify-content-center">
-                        <p class="my-0 z-2 h6 font-weight-bold text-gradient text-dark">{{ t("apiMessage.search.add your filter") }}</p>
-                    </div>
-                </div>
+            <div class="col-7 pt-2 px-2 h-100">
+                <FilterArea :inputClauses="existingInputs"/>
             </div>
         </div>
     </div>
@@ -66,18 +65,22 @@
 <script>
 import { useI18n } from "vue-i18n";
 import { getIcon } from "@/utils/iconMapper.js";
+import SearchTextInput from "@/components/reuseable-components/SearchTextInput.vue";
 import RangedCalendar from "@/components/statistical-components/RangedCalendar.vue";
+import FilterArea from "@/components/statistical-components/FilterArea.vue";
 
 export default {
     name: "SearchController",
     props:{
-        target: {
+        target: { // table name
             type: String,
             required: true
         }
     },
     components: {
-        RangedCalendar
+        RangedCalendar,
+        SearchTextInput,
+        FilterArea
     },
     data(){
         const { t } = useI18n({});
@@ -85,11 +88,11 @@ export default {
             t: t,
             currentTarget: "id",
             targets: [],
-            inputTerm: { value : "" },
-            existingWhereClauses: [],
+            existingInputs: [],
             isSlideOut: false,
-            toggleListener: null,
-            searchValue: {textValue: "", dateRange: {start: null, end: null}},
+            toggleListener: null, // handling clicks outside
+            searchValue: {value: null, type: null, isValid: false},
+            clearInput: false
         }
     },
     methods:{
@@ -110,6 +113,7 @@ export default {
         },
         selectTarget(target){
             this.currentTarget = target;
+            this.searchValue = {value: null, type: null, isValid: false};
             this.toggleDropdown();
         },
         mapSelections(){
@@ -144,6 +148,19 @@ export default {
                     this.currentTarget = this.targets[0].name;
                 }
             }
+        },
+        setSearchValue(target, value, isValid){
+            if (target === this.currentSelection.name) {
+                this.searchValue = {value: value, type: this.currentSelection.type, isValid: isValid};
+            }
+        },
+        addFilter(){
+            this.clearInput = true;
+            this.existingInputs.push({...this.searchValue, target: this.currentSelection.name});
+            this.searchValue = {value: null, type: null, isValid: false};
+            setTimeout(() => {
+                this.clearInput = false;
+            }, 100);
         }
     },
     computed:{
@@ -191,8 +208,13 @@ export default {
                     return [];
             }
         },
-        isWhereClausePresents(){
-            return this.existingWhereClauses.length > 0;
+        isSearchInputValid(){
+            if (this.searchValue.isValid) {
+                return true;
+            }
+            else{
+                return false;
+            }
         }
     },
     beforeMount() {

@@ -72,7 +72,8 @@
       "failed to obtain the top": "Failed to obtain the top",
       "add filter": "Add Filter",
       "add your filter": "Add your filter to flexibly Serach",
-      "search": "Search "
+      "search": "Search ",
+      "select": "Select "
     },
     "profile":{
       "email cannot be changed": "Email cannot be changed",
@@ -147,8 +148,11 @@
     "email": "Email ",
     "password": "Password ",
     "token": "Register Token ",
+    "date range": "Date Range ",
+
     "search query": "Search Query ",
     "search target": "Search Target ",
+    "search value": "Search Value ",
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character",
@@ -189,6 +193,9 @@
     "account your transactions": "Keep track of the payment status of your transactions"
   },
   "stats":{
+    "or": "OR",
+    "and": "AND",
+    "includes": "Includes",
     "no data available": "No Data Available",
     "quoted": "Quoted",
     "quoted explanations": "Quoted or Paid",
@@ -200,6 +207,10 @@
     "total": "Total",
     "in total of": "In total of ",
     "time": {
+      "starts from": "Starts From",
+      "before": "Before",
+      "start": "Start ",
+      "end": "End ",
       "in this period": " in this period",
       "transactions in the last year": "Transactions in the last year",
       "transaction distribution in the last year": "Transaction Distribution",

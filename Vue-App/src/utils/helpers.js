@@ -85,6 +85,27 @@ function FormatMonthAndYear(month, year) {
     return { month: convertedMonth, year: year };
 }
 
+function formatDate(date, locale) {
+    const options = {
+      year: 'numeric',
+      month: `${locale === 'en' ? 'short' : 'long'}`,
+      day: 'numeric',
+    };
+    if (locale === 'en') {
+        let [month, day, year] = date.toLocaleString('en-US', options).split(' ');
+        day = day.replace(',', '');
+        
+        // Add ordinal suffix
+        const suffixes = ['th', 'st', 'nd', 'rd'];
+        const suffix = suffixes[(day % 10 > 3 || Math.floor(day / 10) === 1) ? 0 : (day % 10)];
+        
+        return `${year} ${month} ${day}${suffix}`;
+    }
+    else{
+        return date.toLocaleString('zh-CN', options);
+    }
+  }
+
 // function used to map the gradient colour being used in the charts
 function createGradient(ctx, colorStops) {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -93,7 +114,7 @@ function createGradient(ctx, colorStops) {
     return gradient;
 }
 // function used to map the stroke graduate colours for line charts 
-function createLinearGradient(ctx, hexColor){
+function createLinearGradient(ctx, hexColor) {
     // Convert hex to RGB
     const r = parseInt(hexColor.slice(1, 3), 16);
     const g = parseInt(hexColor.slice(3, 5), 16);
@@ -111,7 +132,7 @@ function createLinearGradient(ctx, hexColor){
 }
 
 function getContrastColour(colour) {
-    switch(colour) {
+    switch (colour) {
         case 'primary':
             return 'warning';
         case 'success':
@@ -131,7 +152,7 @@ function getContrastColour(colour) {
 
 // function used to calculate the changes in the recent data points (returned value
 // can be relative or absolute)
-function calculateRelativeChanges(dataArray){
+function calculateRelativeChanges(dataArray) {
 
     // calculate for relative changes
     if (dataArray.length >= 2) {
@@ -139,12 +160,12 @@ function calculateRelativeChanges(dataArray){
         const previousValue = dataArray[dataArray.length - 2];
         const relativeChange = (lastValue - previousValue) / previousValue * 100;
         if (relativeChange < 0) {
-          return { isUp: false, value: `${Math.abs(relativeChange).toFixed(2)}%` };
+            return { isUp: false, value: `${Math.abs(relativeChange).toFixed(2)}%` };
         }
         else {
-          return { isUp: true, value: `${Math.abs(relativeChange).toFixed(2)}%` };
+            return { isUp: true, value: `${Math.abs(relativeChange).toFixed(2)}%` };
         }
-      }
+    }
     // calculate for absolute changes
     else if (dataArray === 1) {
         return { isUp: true, value: `${dataArray[0]}` };
@@ -153,8 +174,21 @@ function calculateRelativeChanges(dataArray){
         return { isUp: false, value: "- -" };
     }
 }
-function calculatePercentage(base, total){
-    return (base/total * 100).toFixed(0);
+
+function calculatePercentage(base, total) {
+    return (base / total * 100).toFixed(0);
+}
+
+function getUniqueObjects(array) {
+    const uniqueMap = new Map();
+
+    for (const item of array) {
+        const key = JSON.stringify(item);
+        if (!uniqueMap.has(key)) {
+            uniqueMap.set(key, item);
+        }
+    }
+    return Array.from(uniqueMap.values());
 }
 
 /*
@@ -162,7 +196,7 @@ function calculatePercentage(base, total){
 *  Sections of helper functions that generates search bodies
 * ==============================================================================
 */
-function generateYearlyScaledPartialBody(){
+function generateYearlyScaledPartialBody() {
     const range = generateTimeRange("year");
     return {
         searchQuery: {
@@ -292,12 +326,12 @@ function getyearlyTransactionDistributionBody() {
     }
 }
 // function to generate the body for querying the recent sales performance
-function getRecentSalesPerformanceBody(){
+function getRecentSalesPerformanceBody() {
     const partialBody = { ...generateYearlyScaledPartialBody() };
     partialBody.searchQuery.fields.push({ target: "amount", specification: "SUM", as: "sales" });
     return {
         table: "transactions",
-        body: {...partialBody}
+        body: { ...partialBody }
     }
 }
 
@@ -312,5 +346,7 @@ module.exports = {
     createGradient,
     FormatMonthAndYear,
     calculateRelativeChanges,
-    calculatePercentage
+    calculatePercentage,
+    getUniqueObjects,
+    formatDate
 }

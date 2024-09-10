@@ -73,7 +73,8 @@
       "failed to obtain the top": "未能获取置顶的",
       "add filter": "添加筛选",
       "add your filter": "筛选您的搜索结果",
-      "search":"搜索"
+      "search":"搜索",
+      "select":"选择"
     },
     "profile":{
       "email cannot be changed": "不能更改邮箱",
@@ -149,8 +150,11 @@
     "email": "邮箱",
     "password": "密码",
     "token": "注册码",
+    "date range": "日期范围",
+
     "search query": "搜索内容",
     "search target": "搜索目标",
+    "search value": "搜索内容",
 
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符",
@@ -191,6 +195,9 @@
     "account your transactions": "准确记录以及保存您的收款情况"
   },
   "stats":{
+    "or": "或者",
+    "and": "并且",
+    "includes": "包含",
     "no data available": "暂无数据",
     "quoted": "已报价",
     "quoted explanations": "已报价或已付款",
@@ -202,6 +209,10 @@
     "total": "总计",
     "in total of": "总计",
     "time": {
+      "starts from": "开始于",
+      "before": "截止于",
+      "start": "开始",
+      "end": "结束",
       "in this period": "在本期间",
       "transactions in the last year": "总计交易量(过去12个月)",
       "transaction distribution in the last year": "交易分布（过去12个月）",

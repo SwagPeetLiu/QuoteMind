@@ -129,6 +129,10 @@ function getIcon(target) {
             return "fa-solid fa-arrow-turn-down";
         case "add":
             return "fa-solid fa-plus";
+        case "cancel":
+            return "fa-solid fa-xmark";
+        case "switch":
+            return "fa-solid fa-repeat";
         default:
             return "fa-solid fa-circle-info";
     }

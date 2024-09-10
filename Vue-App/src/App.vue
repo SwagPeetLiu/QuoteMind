@@ -11,7 +11,7 @@
   />
 
   <main
-    class="main-content max-height-vh-100 h-100 border-radius-lg overflow-x-hidden"
+    class="main-content max-height-vh-100 h-100 border-radius-lg overflow-x-hidden thin-scrollbar"
     :class="[overlaying ? 'overflow-y-hidden' : 'position-relative']"
   >
     <!-- Top nav bar -->

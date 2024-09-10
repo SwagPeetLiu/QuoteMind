@@ -7,3 +7,18 @@
       display: none; /* WebKit browsers (Chrome, Safari) */
     }
 }
+
+/* Webkit Browsers (Chrome, Safari, Edge) */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 7px;  /* Set the width for vertical scrollbar */
+  height: 7px; /* Set the height for horizontal scrollbar */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3); /* Darker thumb for visibility */
+  border-radius: 10px; /* Rounded corners */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); /* Lighter track color */
+}
