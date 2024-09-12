@@ -29,6 +29,7 @@
     width: 100%;
     max-height: 250px;
     overflow-y: auto;
+    overflow-x: hidden;
     background-color: $white;
     border-radius: $border-radius-md;
     box-shadow: $dropdown-box-shadow;

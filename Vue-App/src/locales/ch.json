@@ -197,7 +197,8 @@
   "stats":{
     "or": "或者",
     "and": "并且",
-    "includes": "包含",
+    "contains": "包含",
+    "named": "名为",
     "no data available": "暂无数据",
     "quoted": "已报价",
     "quoted explanations": "已报价或已付款",

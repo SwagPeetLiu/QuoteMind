@@ -50,7 +50,19 @@ const config = {
         light: ['#CED4DA', '#EBEFF4']
     },
     passwordOverlay: '************',
-    samePasswordIndicator: 'SameAsOld0517!'
+    samePasswordIndicator: 'SameAsOld0517!',
+    // arbitrary order displayed to users on filtering elements
+    arbitraryAttributeOrder:{
+        "clients": ["id", "full_name", "phone", "qq_contact", "wechat_contact", "email", "company"],
+        "companies": ['id', "full_name", "phone", "email"],
+        "employees": ["id", "name", "phone", "wechat_contact", "qq_contact", "position", "email"],
+        "materials": ["id", "ch_name", "en_name"],
+        "positions": ["id", "name"],
+        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"],
+        "pricing_rules": ["id", "price_per_unit"],
+        "products": ["id", "ch_name", "en_name"],
+        "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "size_unit", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
+    }
 }
 
 module.exports = { config };

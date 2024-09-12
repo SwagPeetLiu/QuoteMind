@@ -9,45 +9,42 @@
         <!-- displaying the current mapped WhereClauses -->
         <div 
             v-if="isWhereClausePresents && !isLoading" 
-            class="d-flex flex-wrap align-items-start justify-content-start z-2 p-2 thin-scrollbar overflow-x-hidden overflow-y-auto"
+            class="d-flex flex-wrap align-items-start z-2 p-2 thin-scrollbar overflow-x-hidden overflow-y-auto"
             style="height: 90px;"
         >
             <div 
                 v-for="(target, index) in Object.keys(mappedWhereClauses)"
+                :id="index"
                 :key="index"
                 class="badge clause-badge my-1 py-3 px-2 me-2 d-inline-flex align-items-center z-2 shadow" 
                 :class="`bg-gradient-${$store.state.themeColor}`"
             >
                 
                 <!-- target -->
-                <i class="text-white text-lg me-1 my-0" :class="getIcon(target)"></i>
-                <u class="text-white text-lg me-1 my-0">{{ t(`columns.${target}`) }}</u>
+                <i class="text-white text-lg mx-2 my-0" :class="getIcon(target)"></i>
+                <u class="text-white text-lg me-1 my-0 badge-target">{{ t(`columns.${target}`) }}</u>
 
-                <!-- indicator -->
-                <div 
-                    class="text-white text-lg me-1 my-0"
-                    v-if="mappedWhereClauses[target].type.includes('timestamp') && 
-                        (mappedWhereClauses[target].values[0].start == null || 
-                        mappedWhereClauses[target].values[0].end == null)"
-                >
+                <!-- indicator (dynamic depending on the filtration type)-->
+                <div class="text-white text-lg me-1 my-0" v-if="mappedTargetType(mappedWhereClauses[target]) == 'ranged date'">
                     {{ mappedWhereClauses[target].values[0].end == null? t('stats.time.starts from') : t('stats.time.before') }}
                 </div>
-                <span 
-                    v-if="!mappedWhereClauses[target].type.includes('timestamp')"
-                    class="text-white text-lg me-1 my-0">{{ t('stats.includes') }}
-                </span>
-
+                <div 
+                    v-if="!mappedTargetType(mappedWhereClauses[target]).includes('date')"
+                    class="text-white text-lg mx-2 my-0">
+                    <span v-if="mappedTargetType(mappedWhereClauses[target]) == 'number'">=</span>
+                    <span v-else>{{ t(`stats.${mappIndicator(target)}`) }}</span>
+                </div>
 
                 <!-- input Contents (time-based) -->
                 <div 
-                    v-if="mappedWhereClauses[target].type.includes('timestamp')"
-                    class="text-white text-lg ms-2 my-0 d-flex align-items-center"
+                    v-if="mappedTargetType(mappedWhereClauses[target]).includes('date')"
+                    class="text-white text-lg ms-2 my-1 d-flex align-items-center"
                 >
                     <span class="my-0" v-if="mappedWhereClauses[target].values[0].start">
                         {{ formatDate(mappedWhereClauses[target].values[0].start, $i18n.locale) }}
                     </span>
                     <i 
-                        v-if="mappedWhereClauses[target].values[0].start && mappedWhereClauses[target].values[0].end" 
+                        v-if="mappedTargetType(mappedWhereClauses[target]) == 'ranged date'" 
                         class="mx-2 my-0 text-xs" 
                         :class="getIcon('between')">
                     </i>
@@ -59,28 +56,35 @@
                 <!-- input Contents (text-based) -->
                 <div 
                     v-else
-                    class="text-white text-lg my-0 d-flex align-items-center"
+                    class="text-white text-lg d-inline-flex align-items-center"
                     v-for="(inputValue, inputIndex) in mappedWhereClauses[target].values" 
                     :key="inputIndex"
                 >
                     <!-- search input -->
                     <span class="my-0">
-                        {{isCurrentLanEnglish? "'" : "“"}}
+                        {{isCurrentLanEnglish && mappedTargetType(mappedWhereClauses[target]) == 'number' ? "" : "“"}}
                         {{ inputValue }}
-                        {{isCurrentLanEnglish? "'" : "”"}}
+                        {{isCurrentLanEnglish && mappedTargetType(mappedWhereClauses[target]) == 'number' ? "" : "”"}}
                     </span>
 
-                    <!-- connector -->
+                    <!-- connector (or / and) -->
                     <div 
-                        class="my-0 ms-2 rounded-2 bg-gray-600 d-flex align-items-center px-2 cursor-pointer" 
-                        v-if="inputIndex < mappedWhereClauses[target].values.length - 1">
+                        class="py-0 mx-2 rounded-2 bg-gray-600 d-inline-flex align-items-center px-2 cursor-pointer" 
+                        v-if="inputIndex < mappedWhereClauses[target].values.length - 1"
+                        @click="changeConnector(connectorMap.get(target) == 'or' ? 'and' : 'or', target)"
+                    >
                         <span class="my-0 text-sm">{{ t(`stats.${connectorMap.get(target)}`) }}</span>
                         <i class="ms-2 my-0 text-xs" :class="getIcon('switch')"></i>
                     </div>
                 </div>
 
                 <!-- remove button -->
-                <i class="text-white ms-3 me-1 mt-1 text-lg cursor-pointer" :class="getIcon('cancel')"></i>
+                <i 
+                    class="text-white ms-3 me-1 mt-1 text-lg cursor-pointer" 
+                    :class="getIcon('cancel')"
+                    @click="removeClause(target)"
+                >
+                </i>
             </div>
         </div>
 
@@ -96,7 +100,7 @@
 import { useI18n } from "vue-i18n";
 import { getUniqueObjects } from "@/utils/helpers";
 import {getIcon} from "@/utils/iconMapper.js";
-import { formatDate } from "@/utils/helpers";
+import { formatDate, mappIndicator } from "@/utils/helpers";
 
 export default {
     name: "FilterArea",
@@ -158,18 +162,53 @@ export default {
     methods:{
         getIcon,
         formatDate,
+        mappIndicator,
         mapArrayToCategorizedObject(arr){
             return arr
         },
+        // toggle between the or and and connector for a specific column 
         changeConnector(connector, target) {
             if (this.connectorMap.has(target)) {
                 this.connectorMap.set(target, connector);
             }
+        },
+        mappedTargetType(targetObject){
+            if (targetObject.type.includes('timestamp') && 
+                (targetObject.values[0].start == null || 
+                targetObject.values[0].end == null)
+            ){
+                return "ranged date";
+            }
+            else if (targetObject.type.includes('timestamp')) {
+                return "date";
+            }
+            else if(targetObject.type.includes('numeric') || targetObject.type.includes('integer')) {
+                return "number";
+            }
+            else {
+                return "text";
+            }
+        },
+        // emits to remove the inputs for a specific search target:
+        removeClause(target, index){
+            const deletingElement = document.getElementById(index);
+            if (deletingElement) {
+                deletingElement.classList.add("fade-out");
+            }
+            else{
+                console.warn('failed to fetching the filter element to delete')
+            }
+            const modifiedClauses = this.inputClauses.filter((clause) => {
+                return clause.target !== target;
+            });
+            setTimeout(() => {
+                this.$emit("update-clauses", modifiedClauses);
+            }, 100);
         }
     },
     watch:{
         // update the connectorMap when whereClauses are changed
-        mappedWhereClauses : {
+        mappedWhereClauses: {
             handler(newValue){
                 const currentTargets = Object.keys(newValue);
                 if (currentTargets.length > 0) {

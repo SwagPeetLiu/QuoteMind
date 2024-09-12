@@ -51,7 +51,7 @@ function getIcon(target) {
 
         case "creation_date":
             return "fa-solid fa-clock-rotate-left";
-        case "modification_date":
+        case "modified_date":
             return "fa-solid fa-clock";
         case "transaction_date":
             return "fa-solid fa-calendar-check";

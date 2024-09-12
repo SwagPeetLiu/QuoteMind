@@ -12,7 +12,7 @@
                             <span class="text-gradient text-dark font-weight-bold">{{ t(`columns.${currentSelection.name}`) }}</span>
                             <i class="fa-solid fa-caret-down ms-auto me-2 toggle-arrow"></i>
                         </div>
-                        <ul class="target-menu">
+                        <ul class="target-menu thin-scrollbar">
                             <li 
                                 v-for="item in targets"
                                 :key="item.name" 
@@ -39,7 +39,7 @@
                 <!-- mapping different types of inputs for users to control the serach mechanism -->
                 <SearchTextInput 
                     class="w-100 h-50"
-                    v-if="currentSearchType === 'text'" 
+                    v-if="currentSearchType !== 'timestamp'" 
                     :target="currentSelection.name"
                     @update-search-value="setSearchValue"
                     :clearingInput="clearInput"
@@ -56,7 +56,10 @@
 
             <!-- current searched conditions (where clause) -->
             <div class="col-7 pt-2 px-2 h-100">
-                <FilterArea :inputClauses="existingInputs"/>
+                <FilterArea 
+                    :inputClauses="existingInputs"
+                    @update-clauses="filterClauses"
+                />
             </div>
         </div>
     </div>
@@ -68,6 +71,7 @@ import { getIcon } from "@/utils/iconMapper.js";
 import SearchTextInput from "@/components/reuseable-components/SearchTextInput.vue";
 import RangedCalendar from "@/components/statistical-components/RangedCalendar.vue";
 import FilterArea from "@/components/statistical-components/FilterArea.vue";
+import { config } from "@/config/config";
 
 export default {
     name: "SearchController",
@@ -113,8 +117,12 @@ export default {
         },
         selectTarget(target){
             this.currentTarget = target;
+            this.clearInput = this.currentSelection.type.includes("timestamp") ? false : true; // no need to clear it if it's a time based switch
             this.searchValue = {value: null, type: null, isValid: false};
             this.toggleDropdown();
+            setTimeout(() => {
+                this.clearInput = false;
+            }, 100);
         },
         mapSelections(){
             const currentLanguage = this.$store.getters.getLanguage;
@@ -149,11 +157,15 @@ export default {
                 }
             }
         },
+        // manages the current search value upon input changes
         setSearchValue(target, value, isValid){
+            console.log(target, value, isValid);
+            console.log(this.currentSelection.name);
             if (target === this.currentSelection.name) {
                 this.searchValue = {value: value, type: this.currentSelection.type, isValid: isValid};
             }
         },
+        // pushing in the value of a new filter for filtration Area to deal with
         addFilter(){
             this.clearInput = true;
             this.existingInputs.push({...this.searchValue, target: this.currentSelection.name});
@@ -161,18 +173,27 @@ export default {
             setTimeout(() => {
                 this.clearInput = false;
             }, 100);
+        },
+        // manages the input updates from children component (filter calibrations)
+        filterClauses(modifiedInputs){
+            this.existingInputs = modifiedInputs;
         }
     },
     computed:{
         currentSearchType(){
             if (this.currentSelection.type == "uuid" || 
                 this.currentSelection.type.includes("character") ||
-                this.currentSelection.type.includes("USER-DEFINED") ||
-                this.currentSelection.type.includes("ARRAY") ||
-                this.currentSelection.type.includes("integer") ||
-                this.currentSelection.type.includes("numeric")
+                this.currentSelection.type.includes("ARRAY")
             ) {
                 return "text";
+            }
+            else if (this.currentSelection.name=="status"){
+                return "categorical";
+            }
+            else if (this.currentSelection.type.includes("integer") ||
+                    this.currentSelection.type.includes("numeric")
+            ) {
+                return "number"; 
             }
             else if (this.currentSelection.type.includes("timestamp")) {
                 return "timestamp";
@@ -185,28 +206,7 @@ export default {
             return this.targets.filter(item => item.name === this.currentTarget)[0];
         },
         arbitraryOrder(){
-            switch (this.target){
-                case "clients":
-                    return ["id", "full_name", "phone", "qq_contact", "wechat_contact", "email", "company"];
-                case "companies":
-                    return ['id', "full_name", "phone", "email"];
-                case "employees":
-                    return ["id", "name", "phone", "wechat_contact", "qq_contact", "position", "email"];
-                case "materials":
-                    return ["id", "ch_name", "en_name"];
-                case "positions":
-                    return ["id", "name"];
-                case "pricing_conditions":
-                    return ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"];
-                case "pricing_rules":
-                    return ["id", "price_per_unit"];
-                case "products":
-                    return ["id", "ch_name", "en_name"];
-                case "transactions":
-                    return ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size","size_unit", "length", "width", "height", "employee", "modified_date", "creation_date", "note"];
-                default:
-                    return [];
-            }
+            return config.arbitraryAttributeOrder[this.target];
         },
         isSearchInputValid(){
             if (this.searchValue.isValid) {

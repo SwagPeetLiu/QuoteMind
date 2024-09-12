@@ -195,7 +195,8 @@
   "stats":{
     "or": "OR",
     "and": "AND",
-    "includes": "Includes",
+    "contains": "contains",
+    "named": "named",
     "no data available": "No Data Available",
     "quoted": "Quoted",
     "quoted explanations": "Quoted or Paid",

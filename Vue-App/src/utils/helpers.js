@@ -191,6 +191,26 @@ function getUniqueObjects(array) {
     return Array.from(uniqueMap.values());
 }
 
+// function used to describe the use of indicator in the search pannel
+// (i.e., xxx attribuite contains / named as "yyy")
+function mappIndicator(target) {
+    if (target.includes("name")) {
+        return "named";
+    }
+    else if (
+        target === "company" || 
+        target === "client" || 
+        target === "employee" || 
+        target === "product" || 
+        target === "materials"
+    ){
+        return "named";
+    }
+    else{
+        return "contains";
+    }
+}
+
 /*
 * ==============================================================================
 *  Sections of helper functions that generates search bodies
@@ -348,5 +368,6 @@ module.exports = {
     calculateRelativeChanges,
     calculatePercentage,
     getUniqueObjects,
-    formatDate
+    formatDate,
+    mappIndicator
 }

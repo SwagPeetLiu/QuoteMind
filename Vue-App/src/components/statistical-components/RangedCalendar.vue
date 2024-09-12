@@ -119,6 +119,10 @@ export default {
             },
             deep: true
         },
+        target(newValue) {
+            const inputValidation = mapValidation("rangedDateInput", this.range);
+            this.$emit('update-search-value', newValue, this.range, inputValidation.valid);
+        },
         clearingInput(newValue) {
             if (newValue) {
                 this.range = {
