@@ -14,7 +14,7 @@
       <ul class="navbar-nav justify-content-end mt-2">
 
         <!-- logout button -->
-        <li class="nav-item d-flex align-items-center">
+        <li class="nav-item d-none d-md-flex align-items-center">
           <div 
             @click="logout" class="px-0 nav-link font-weight-bold d-flex align-items-center icon-move-left" 
             style="cursor: pointer;"
@@ -32,7 +32,7 @@
         </li>
 
          <!-- configurator -->
-        <li class="px-3 nav-item d-flex align-items-center">
+        <li class="px-3 nav-item d-none d-md-flex align-items-center">
           <a class="p-0 nav-link icon-spin-left" @click="toggleConfigurator">
             <i class="cursor-pointer fixed-plugin-button-nav h5" :class="[getIcon('settings'), isCurrentLinkProfile && 'text-white']"></i>
           </a>

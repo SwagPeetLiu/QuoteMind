@@ -19,7 +19,7 @@
                 v-for="(target) in Object.keys(mappedWhereClauses)"
                 :id="`badge-${target}`"
                 :key="target"
-                class="badge clause-badge z-0 my-1 py-1 py-sm-2 px-2 me-2 shadow d-flex flex-wrap d-sm-inline-flex align-items-center" 
+                class="badge clause-badge z-0 my-1 py-1 py-sm-2 px-2 me-2 shadow d-flex flex-wrap flex-sm-nowrap d-sm-inline-flex align-items-center" 
                 :class="`bg-gradient-${$store.state.themeColor}`"
             >
                 
