@@ -159,8 +159,6 @@ export default {
         },
         // manages the current search value upon input changes
         setSearchValue(target, value, isValid){
-            console.log(target, value, isValid);
-            console.log(this.currentSelection.name);
             if (target === this.currentSelection.name) {
                 this.searchValue = {value: value, type: this.currentSelection.type, isValid: isValid};
             }
@@ -177,6 +175,42 @@ export default {
         // manages the input updates from children component (filter calibrations)
         filterClauses(modifiedInputs){
             this.existingInputs = modifiedInputs;
+        },
+
+        // URL management upon filtration changes
+        parseUrlParams() {
+            console.log('parsing current url params');
+            const queryString = this.$route.query.filters;
+            if (queryString) {
+                try {
+                    this.existingInputs = JSON.parse(decodeURIComponent(queryString));
+                } catch (error) {
+                    console.error("Error parsing URL parameters:", error);
+                    this.existingInputs = [];
+                }
+            } else {
+                this.existingInputs = [];
+            }
+        },
+        updateUrlParams() {
+            console.log('updating url params');
+            console.log('current route: ', this.$route.query);
+            
+            if (this.existingInputs.length > 0) {
+                const queryString = encodeURIComponent(JSON.stringify(this.existingInputs));
+                this.$router.push({ query: { filters: queryString } }).catch(err => {
+                    if (err.name !== 'NavigationDuplicated') {
+                        throw err;
+                    }
+                });
+            } 
+            else {
+                this.$router.replace({ query: {} }).catch(err => {
+                    if (err.name !== 'NavigationDuplicated') {
+                        throw err;
+                    }
+                });
+            }
         }
     },
     computed:{
@@ -220,8 +254,24 @@ export default {
     beforeMount() {
         this.mapSelections();
     },
+    created(){
+        this.parseUrlParams();
+    },
     beforeUnmount() {
         document.removeEventListener('click', this.handleClickOutside, true);
+    },
+    watch:{
+        existingInputs:{
+            handler(){
+                this.updateUrlParams();
+            },
+            deep: true
+        },
+        '$route'() {
+            console.log('route changed');
+            console.log('current route: ', this.$route.query);
+            this.parseUrlParams();
+        }
     }
 };
 </script>

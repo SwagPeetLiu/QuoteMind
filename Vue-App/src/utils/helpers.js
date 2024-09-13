@@ -345,6 +345,7 @@ function getyearlyTransactionDistributionBody() {
         }
     }
 }
+
 // function to generate the body for querying the recent sales performance
 function getRecentSalesPerformanceBody() {
     const partialBody = { ...generateYearlyScaledPartialBody() };
@@ -352,6 +353,90 @@ function getRecentSalesPerformanceBody() {
     return {
         table: "transactions",
         body: { ...partialBody }
+    }
+}
+
+/*
+function to loop through and generate the where clauses
+    - conditions (JSON objects that maintains the current selected filtration attributes)
+    - operations (map objects that contains the operators (AND / OR) on each attribute)
+*/
+function generateSearchQueryWhereClause(conditions, clauseOperators) {
+    const numOfConditions = Object.keys(conditions).length;
+
+    // no attribute attached:
+    if (numOfConditions === 0) { return null }
+
+    // single attribute 
+    else if (numOfConditions === 1) {
+        const target = Object.keys(conditions)[0];
+        const searchObject = conditions[target];
+        const operator = clauseOperators.get(target);
+        const whereClause = generateWhereClause(target, searchObject, operator);
+        return whereClause;
+    }
+    
+    // multiple attributes filtration
+    else {
+        return { 
+            "AND" : 
+                Object.keys(conditions).map((target) => {
+                    const searchObject = conditions[target];
+                    const operator = clauseOperators.get(target);
+                    return generateWhereClause(target, searchObject, operator);
+            })
+        };
+    }
+}
+
+// function used to generate a single whereclause
+function generateWhereClause(target, searchObject, clauseOperator) {
+    if (searchObject.type.includes('timestamp')) {
+        const range = searchObject.values[0];
+        const startClause = range.start ? {
+            target: target,
+            operator: 'ge',
+            keyword: range.start,
+            specification: 'default',
+            transformType: null
+        } : null;
+        const endClause = range.end ? {
+            target: target,
+            operator: 'le',
+            keyword: range.end,
+            specification: 'default',
+            transformType: null
+        } : null;
+
+        if (startClause && endClause) return {"AND": [startClause, endClause]};
+        else if (startClause) return startClause;
+        else if (endClause) return endClause;
+        else return null;
+    }
+    else {
+        if (searchObject.values.length == 1) {
+            return {
+                target: target,
+                operator: "eq",
+                keyword: searchObject.values[0],
+                specification: 'default',
+                transformType: null
+            }
+        }
+        else if (searchObject.values.length > 1) {
+            return {
+                [clauseOperator.toUpperCase()]: searchObject.values.map((value) => {
+                    return {
+                        target: target,
+                        operator: "eq",
+                        keyword: value,
+                        specification: 'default',
+                        transformType: null
+                    }
+                })
+            };
+        }
+        else return null;
     }
 }
 
@@ -369,5 +454,6 @@ module.exports = {
     calculatePercentage,
     getUniqueObjects,
     formatDate,
-    mappIndicator
+    mappIndicator,
+    generateSearchQueryWhereClause
 }

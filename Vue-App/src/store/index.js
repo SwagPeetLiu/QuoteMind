@@ -2,6 +2,7 @@ import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 import { setToken, clearToken } from "../utils/apiSetter";
 import { startLoginTimer, startLogoutTimer, clearLogoutTimer, clearPreviousTimers } from "../utils/sessionManager";
+import { generateSearchQueryWhereClause } from "../utils/helpers";
 
 // centralised state management over the application
 export default createStore({
@@ -43,6 +44,9 @@ export default createStore({
     loadingDelay: 800,
     errorMessage: "",
     toastMessage: { message: "", type: "" },
+
+    // Entity Representation Messages:
+    searchWhereBody: null
   },
   mutations: {
     // function to toggle the config button at the right bottom of the screen
@@ -195,6 +199,12 @@ export default createStore({
     },
     setPillResizing(state, payload) {
       state.pillResizing = payload;
+    },
+
+    // transformative function used to map filtration Area into API where clauses:
+    setSearchWhereBody(state, payload) {
+      state.searchWhereBody = generateSearchQueryWhereClause(payload.conditions, payload.operators);
+      //console.log("store: setting WhereClause:", state.searchWhereBody);
     }
   },
   actions: {

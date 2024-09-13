@@ -202,14 +202,15 @@ export default {
                 return clause.target !== target;
             });
             setTimeout(() => {
+                console.log("updated clauses", modifiedClauses);
                 this.$emit("update-clauses", modifiedClauses);
             }, 100);
         }
     },
     watch:{
-        // update the connectorMap when whereClauses are changed
         mappedWhereClauses: {
             handler(newValue){
+                // update the connectorMap when whereClauses are changed
                 const currentTargets = Object.keys(newValue);
                 if (currentTargets.length > 0) {
                     currentTargets.forEach(target => {
@@ -218,10 +219,13 @@ export default {
                         }
                     });
                 }
+
+                // emits messages on the update of whereclause searches:
+                this.$store.commit("setSearchWhereBody", {conditions: newValue, operators: this.connectorMap});
             },
             immediate: true,
             deep: true
-        }
+        },
     }
 };
 </script>
