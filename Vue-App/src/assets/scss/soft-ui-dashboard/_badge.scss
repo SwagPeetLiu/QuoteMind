@@ -6,12 +6,16 @@
 
 // app specific badge modifications
 .clause-badge {
-  height: 34px;
+
   transition: transform 0.2s ease-in-out;
   animation: fadeIn 0.1s ease-in-out;
 
-  .badge-target{
+  .badge-target {
     text-transform: uppercase;
+  }
+
+  .clause-text-lg {
+    font-size: 0.85rem;
   }
 }
 
@@ -19,7 +23,49 @@
   animation: fadeOut 0.1s ease-in-out forwards;
 }
 
-
 .clause-badge:hover {
   transform: scale(1.02);
+}
+
+@media (max-width: 250px) {
+  .clause-badge{
+    height: fit-content;
+  }
+}
+
+@media (min-width: 576px) {
+  .clause-badge {
+    height: 34px;
+
+    .clause-text-lg {
+      font-size: $font-size-base;
+    }
+  }
+}
+
+/* Small laptops */
+@media (min-width: 992px) {
+  .clause-badge {
+    .clause-text-lg {
+      font-size: 1.4vw;
+    }
+  }
+}
+
+/* large laptops */
+@media (min-width: 1200px) {
+  .clause-badge {
+    .clause-text-lg {
+      font-size: 1.2vw;
+    }
+  }
+}
+
+/* Extra large large laptops */
+@media (min-width: 1600px) {
+  .clause-badge {
+    .clause-text-lg {
+      font-size: 0.9vw;
+    }
+  }
 }

@@ -1,29 +1,41 @@
 <template>
     <div class="d-flex align-items-center justify-content-between position-relative">
-        <Datepicker v-model="range.start" :enable-time-picker="false" auto-apply
-            :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
-            :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
-            :year-range="yearRange"
-            :min-date="minStartDate"
-            :max-date="maxStartDate" 
-            :key="$i18n.locale"
-            :class="[$store.state.themeColor]"
-            :placeholder="`${t('apiMessage.search.select')}${t('stats.time.start')}${t(`columns.${target}`)}`"
-        />
-        <i class="mx-4 d-flex h5 my-0" :class="getIcon('between')"></i>
-        <Datepicker 
-            v-model="range.end" 
-            :enable-time-picker="false" 
-            auto-apply
-            :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
-            :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
-            :year-range="yearRange" 
-            :key="$i18n.locale" 
-            :min-date="minEndDate"
-            :max-date="maxEndDate"
-            :class="[$store.state.themeColor]"
-            :placeholder="`${t('apiMessage.search.select')}${t('stats.time.end')}${t(`columns.${target}`)}`"
-        /> 
+
+        <!-- start date (stacking in column if on mobile) -->
+        <div class="d-flex flex-grow-1 flex-column align-items-center mx-1 mx-sm-0">
+            <p class="d-inline d-sm-none my-0 font-weight-bold">Start</p>
+            <Datepicker v-model="range.start" :enable-time-picker="false" auto-apply
+                :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
+                :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
+                :year-range="yearRange"
+                :min-date="minStartDate"
+                :max-date="maxStartDate" 
+                :key="$i18n.locale"
+                :class="[$store.state.themeColor]"
+                :placeholder="`${t('apiMessage.search.select')}${t('stats.time.start')}${t(`columns.${target}`)}`"
+            />
+        </div>
+
+        <!-- indicator on large screens -->
+        <i class="d-none d-sm-block mx-4 h5 my-0" :class="getIcon('between')"></i>
+
+        <!-- end date (stacking in column if on mobile) -->
+        <div class="d-flex flex-grow-1 flex-column align-items-center mx-1 mx-sm-0">
+            <p class="d-inline d-sm-none my-0 font-weight-bold">End</p>
+            <Datepicker 
+                v-model="range.end" 
+                :enable-time-picker="false" 
+                auto-apply
+                :format="isCurrentLanEnglish ? dateFormat.en : dateFormat.ch"
+                :locale="isCurrentLanEnglish ? locales.en : locales.ch" 
+                :year-range="yearRange" 
+                :key="$i18n.locale" 
+                :min-date="minEndDate"
+                :max-date="maxEndDate"
+                :class="[$store.state.themeColor]"
+                :placeholder="`${t('apiMessage.search.select')}${t('stats.time.end')}${t(`columns.${target}`)}`"
+            /> 
+        </div>
     </div>
 </template>
 

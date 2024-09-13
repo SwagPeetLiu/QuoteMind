@@ -1,36 +1,39 @@
 <template>
     <div 
-        class="w-100 h-100 border-3 border-secondary position-relative" 
-        style="border-style: dotted;"
+        class="w-100 border-3 border-secondary position-relative" 
+        style="border-style: dotted; height: 100px; max-height: 100px;"
     >
         <!-- overlay -->
-        <div class="bg-gradient-dark h-100 w-100 position-absolute z-1" style="opacity: 0.12;"></div>
-        
+        <div 
+            class="bg-gradient-dark h-100 w-100 position-absolute z-0" 
+            style="opacity: 0.12; "
+        >
+        </div>
+
         <!-- displaying the current mapped WhereClauses -->
         <div 
             v-if="isWhereClausePresents && !isLoading" 
-            class="d-flex flex-wrap align-items-start z-2 p-2 thin-scrollbar overflow-x-hidden overflow-y-auto"
-            style="height: 90px;"
+            class="d-flex flex-wrap align-items-start z-0 p-2 thin-scrollbar overflow-x-auto overflow-y-auto h-100"
         >
             <div 
-                v-for="(target, index) in Object.keys(mappedWhereClauses)"
-                :id="index"
-                :key="index"
-                class="badge clause-badge my-1 py-3 px-2 me-2 d-inline-flex align-items-center z-2 shadow" 
+                v-for="(target) in Object.keys(mappedWhereClauses)"
+                :id="`badge-${target}`"
+                :key="target"
+                class="badge clause-badge z-0 my-1 py-1 py-sm-2 px-2 me-2 shadow d-flex flex-wrap d-sm-inline-flex align-items-center" 
                 :class="`bg-gradient-${$store.state.themeColor}`"
             >
                 
                 <!-- target -->
-                <i class="text-white text-lg mx-2 my-0" :class="getIcon(target)"></i>
-                <u class="text-white text-lg me-1 my-0 badge-target">{{ t(`columns.${target}`) }}</u>
+                <i class="text-white clause-text-lg mx-2 my-0" :class="getIcon(target)"></i>
+                <u class="text-white clause-text-lg me-1 my-0 badge-target">{{ t(`columns.${target}`) }}</u>
 
                 <!-- indicator (dynamic depending on the filtration type)-->
-                <div class="text-white text-lg me-1 my-0" v-if="mappedTargetType(mappedWhereClauses[target]) == 'ranged date'">
+                <div class="text-white clause-text-lg me-1 my-0" v-if="mappedTargetType(mappedWhereClauses[target]) == 'date'">
                     {{ mappedWhereClauses[target].values[0].end == null? t('stats.time.starts from') : t('stats.time.before') }}
                 </div>
                 <div 
                     v-if="!mappedTargetType(mappedWhereClauses[target]).includes('date')"
-                    class="text-white text-lg mx-2 my-0">
+                    class="text-white clause-text-lg mx-2 my-0">
                     <span v-if="mappedTargetType(mappedWhereClauses[target]) == 'number'">=</span>
                     <span v-else>{{ t(`stats.${mappIndicator(target)}`) }}</span>
                 </div>
@@ -38,7 +41,7 @@
                 <!-- input Contents (time-based) -->
                 <div 
                     v-if="mappedTargetType(mappedWhereClauses[target]).includes('date')"
-                    class="text-white text-lg ms-2 my-1 d-flex align-items-center"
+                    class="text-white clause-text-lg ms-2 my-1 d-flex align-items-center"
                 >
                     <span class="my-0" v-if="mappedWhereClauses[target].values[0].start">
                         {{ formatDate(mappedWhereClauses[target].values[0].start, $i18n.locale) }}
@@ -56,7 +59,7 @@
                 <!-- input Contents (text-based) -->
                 <div 
                     v-else
-                    class="text-white text-lg d-inline-flex align-items-center"
+                    class="text-white clause-text-lg d-inline-flex align-items-center"
                     v-for="(inputValue, inputIndex) in mappedWhereClauses[target].values" 
                     :key="inputIndex"
                 >
@@ -80,7 +83,7 @@
 
                 <!-- remove button -->
                 <i 
-                    class="text-white ms-3 me-1 mt-1 text-lg cursor-pointer" 
+                    class="text-white ms-auto me-1 mt-1 clause-text-lg cursor-pointer" 
                     :class="getIcon('cancel')"
                     @click="removeClause(target)"
                 >
@@ -90,7 +93,7 @@
 
         <!-- if no whereClauses are present -->
         <div v-if="!isWhereClausePresents && !isLoading" class="z-n1 bg-transparent w-100 h-100 d-flex align-items-center justify-content-center">
-            <p class="my-0 z-2 h6 font-weight-bold text-gradient text-dark">{{ t("apiMessage.search.add your filter") }}
+            <p class="my-0 h6 font-weight-bold text-gradient text-dark">{{ t("apiMessage.search.add your filter") }}
             </p>
         </div>
     </div>
@@ -174,8 +177,8 @@ export default {
         },
         mappedTargetType(targetObject){
             if (targetObject.type.includes('timestamp') && 
-                (targetObject.values[0].start == null || 
-                targetObject.values[0].end == null)
+                (targetObject.values[0].start != null || 
+                targetObject.values[0].end != null)
             ){
                 return "ranged date";
             }
@@ -190,8 +193,8 @@ export default {
             }
         },
         // emits to remove the inputs for a specific search target:
-        removeClause(target, index){
-            const deletingElement = document.getElementById(index);
+        removeClause(target){
+            const deletingElement = document.querySelector(`#badge-${target}`);
             if (deletingElement) {
                 deletingElement.classList.add("fade-out");
             }
@@ -202,7 +205,6 @@ export default {
                 return clause.target !== target;
             });
             setTimeout(() => {
-                console.log("updated clauses", modifiedClauses);
                 this.$emit("update-clauses", modifiedClauses);
             }, 100);
         }
@@ -225,7 +227,7 @@ export default {
             },
             immediate: true,
             deep: true
-        },
+        }
     }
 };
 </script>

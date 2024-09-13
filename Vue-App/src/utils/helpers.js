@@ -85,14 +85,25 @@ function FormatMonthAndYear(month, year) {
     return { month: convertedMonth, year: year };
 }
 
+/**
+ * function used to display user-friendly Date info:
+ * @param {*} date - Date opbject / ISO string (URL decodeed version)
+ * @param {*} locale - en / ch
+ */
+
 function formatDate(date, locale) {
+    // convert to date object if input date is a string
+    let convertedDate = date;
+    if (typeof date === 'string') {
+        convertedDate = new Date(date);
+    }
     const options = {
       year: 'numeric',
       month: `${locale === 'en' ? 'short' : 'long'}`,
       day: 'numeric',
     };
     if (locale === 'en') {
-        let [month, day, year] = date.toLocaleString('en-US', options).split(' ');
+        let [month, day, year] = convertedDate.toLocaleString('en-US', options).split(' ');
         day = day.replace(',', '');
         
         // Add ordinal suffix
@@ -102,7 +113,7 @@ function formatDate(date, locale) {
         return `${year} ${month} ${day}${suffix}`;
     }
     else{
-        return date.toLocaleString('zh-CN', options);
+        return convertedDate.toLocaleString('zh-CN', options);
     }
   }
 

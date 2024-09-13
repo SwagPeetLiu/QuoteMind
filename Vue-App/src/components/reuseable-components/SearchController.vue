@@ -1,12 +1,12 @@
 <template>
-    <div class="card" style="height: 130px;">
+    <div class="card" style="height: fit-content;">
         <div class="row mx-1 flex-grow-1 my-2">
 
             <!-- multi search panel -->
-            <div class="col-5 py-2">
-                <div class="h-50 mb-2 d-flex align-items-center">
+            <div class="col-12 col-xl-6 col-xxl-5 py-2">
+                <div class="h-50 mb-2 d-flex align-items-center" style="max-height: 45px">
                     <div 
-                        ref="targetDropdownContainer" class="target-dropdown h-100 w-70" :class="[`bg-gradient-${$store.state.themeColor}`, isSlideOut ? 'toggle-open' : 'toggle-closed']">
+                        ref="targetDropdownContainer" class="target-dropdown h-100 w-80" :class="[`bg-gradient-${$store.state.themeColor}`, isSlideOut ? 'toggle-open' : 'toggle-closed']">
                         <div class="target-toggle d-flex align-items-center justify-content-center" @click="toggleDropdown()">
                             <i class="ms-auto me-2" :class="[currentSelection.icon, `text-gradient text-${$store.state.themeColor}`]"></i>
                             <span class="text-gradient text-dark font-weight-bold">{{ t(`columns.${currentSelection.name}`) }}</span>
@@ -27,12 +27,12 @@
 
                     <!-- button to add on a new filter -->
                     <button 
-                        class="w-30 h-100 btn bg-gradient-dark my-0 ms-2 d-flex align-items-center justify-content-center"
+                        class="w-20 h-100 btn bg-gradient-dark my-0 ms-2 d-flex align-items-center justify-content-center"
                         :disabled="!isSearchInputValid"
                         @click="addFilter()"
                     >
-                        <i class="me-2 my-0" :class="getIcon('add')"></i>
-                        <span>{{ t("apiMessage.search.add filter") }}</span>
+                        <i class="me-sm-2 my-0" :class="getIcon('add')"></i>
+                        <span class="d-none d-sm-block">{{ t("apiMessage.search.add filter") }}</span>
                     </button>
                 </div>
 
@@ -45,7 +45,7 @@
                     :clearingInput="clearInput"
                 />
 
-                <div v-else class="w-100 h-50 px-4">
+                <div v-else class="w-100 h-50 px-sm-4">
                     <RangedCalendar 
                         :target="currentSelection.name"
                         @update-search-value="setSearchValue"
@@ -55,7 +55,7 @@
             </div>
 
             <!-- current searched conditions (where clause) -->
-            <div class="col-7 pt-2 px-2 h-100">
+            <div class="col-12 col-xl-6 col-xxl-7 pt-2 px-2 h-100">
                 <FilterArea 
                     :inputClauses="existingInputs"
                     @update-clauses="filterClauses"
@@ -88,11 +88,20 @@ export default {
     },
     data(){
         const { t } = useI18n({});
+        let parsedInputs = [];
+        const queryString = this.$route.query.filters;
+        if (queryString) {
+            try {
+                parsedInputs = JSON.parse(decodeURIComponent(queryString));
+            } catch (error) {
+                console.error("Error parsing URL parameters:", error);
+            }
+        }
         return {
             t: t,
             currentTarget: "id",
             targets: [],
-            existingInputs: [],
+            existingInputs: parsedInputs,
             isSlideOut: false,
             toggleListener: null, // handling clicks outside
             searchValue: {value: null, type: null, isValid: false},
@@ -177,9 +186,8 @@ export default {
             this.existingInputs = modifiedInputs;
         },
 
-        // URL management upon filtration changes
+        //URL management upon filtration changes
         parseUrlParams() {
-            console.log('parsing current url params');
             const queryString = this.$route.query.filters;
             if (queryString) {
                 try {
@@ -193,9 +201,6 @@ export default {
             }
         },
         updateUrlParams() {
-            console.log('updating url params');
-            console.log('current route: ', this.$route.query);
-            
             if (this.existingInputs.length > 0) {
                 const queryString = encodeURIComponent(JSON.stringify(this.existingInputs));
                 this.$router.push({ query: { filters: queryString } }).catch(err => {
@@ -254,9 +259,6 @@ export default {
     beforeMount() {
         this.mapSelections();
     },
-    created(){
-        this.parseUrlParams();
-    },
     beforeUnmount() {
         document.removeEventListener('click', this.handleClickOutside, true);
     },
@@ -268,8 +270,6 @@ export default {
             deep: true
         },
         '$route'() {
-            console.log('route changed');
-            console.log('current route: ', this.$route.query);
             this.parseUrlParams();
         }
     }
