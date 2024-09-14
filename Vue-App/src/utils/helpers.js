@@ -222,6 +222,59 @@ function mappIndicator(target) {
     }
 }
 
+// Function used to map the record's name to its Identification
+function getRecordName(target, locale){
+    if (
+        target === "company" || 
+        target === "client" ||
+        target === "companies" ||
+        target === "clients"
+    ) {
+        return "full_name";
+    }
+    else if (
+        target === "employee" || 
+        target === "employees" ||
+        target === "positions" || 
+        target === "position"
+    ) {
+        return "name";
+    }
+    else if (
+        target === "product" || 
+        target === "products" ||
+        target === "material" ||
+        target === "materials"
+    ) {
+        return `${locale}_name`;
+    }
+    else {
+        return "name";
+    }
+}
+
+function mapColumnType(column){
+    if (
+        column === "company" || 
+        column === "client" ||
+        column === "companies" ||
+        column === "clients" || 
+        column === "employee" || 
+        column === "employees" ||
+        column === "positions" || 
+        column === "position" ||
+        column === "product" || 
+        column === "products" ||
+        column === "material" ||
+        column === "materials"
+    ) {
+        return "reference";
+    }
+    else {
+        return "ordinary";
+    }
+}
+
 module.exports = {
     generateDateRange,
     generateTimeRange,
@@ -234,4 +287,6 @@ module.exports = {
     getUniqueObjects,
     formatDate,
     mappIndicator,
+    getRecordName,
+    mapColumnType
 }

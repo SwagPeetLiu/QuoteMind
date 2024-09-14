@@ -62,6 +62,7 @@ const config = {
     },
     passwordOverlay: '************',
     samePasswordIndicator: 'SameAsOld0517!',
+
     // arbitrary order displayed to users on filtering elements
     arbitraryAttributeOrder:{
         "clients": ["id", "full_name", "phone", "qq_contact", "wechat_contact", "email", "company"],
@@ -69,21 +70,27 @@ const config = {
         "employees": ["id", "name", "phone", "wechat_contact", "qq_contact", "position", "email"],
         "materials": ["id", "ch_name", "en_name"],
         "positions": ["id", "name"],
-        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"],
+        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour"],
         "pricing_rules": ["id", "price_per_unit"],
         "products": ["id", "ch_name", "en_name"],
-        "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "size_unit", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
+        "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
     },
+    // dedfault displaying columns on table styling
+    /*
+        - target: mapped to id & name (full_name, ch_name, en_nane) & icon
+        - name: mapped to ch_name & en_name
+        - size: will be mapped & rendered with all dimensions (units, length, width, height)
+    */
     defaultListings:{
         "clients": ["target", "phone", "qq_contact", "wechat_contact", "email", "company"],
         "companies": ["target", "phone", "email"],
         "employees": ["target", "phone", "wechat_contact", "qq_contact", "position", "email"],
         "materials": ["target", "descriptions"],
-        "positions": ["id", "name"],
-        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"],
-        "pricing_rules": ["id", "price_per_unit"],
-        "products": ["id", "ch_name", "en_name"],
-        "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "size_unit", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
+        "positions": ["target", "descriptions"],
+        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "threshold"],
+        "pricing_rules": ["id", "price_per_unit", "conditions"],
+        "products": ["target", "descriptions"],
+        "transactions": ["target", "status", "transaction_date", "product", "materials", "sold to", "quantity", "price_per_unit", "amount", "colour", "size", "employee", "note"]
     }
 }
 

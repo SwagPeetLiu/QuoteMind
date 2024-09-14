@@ -130,6 +130,8 @@
     "pricings": "定价",
     "conditions": "条件",
     "rules": "金额规则",
+    "pricing_rules": "定价金额",
+    "pricing_conditions": "定价条件",
     "transactions": "交易"
   },
   "dialog": {
@@ -162,13 +164,6 @@
   },
   "dashboard":{
     "welcome": "QuoteMind 欢迎您!",
-    "total employees": "工作人员",
-    "total clients": "个体客户",
-    "total companies": "公司客户",
-    "total products": "商品",
-    "total materials": "材质",
-    "total conditions": "定价条件",
-    "total rules": "定价条款",
     "access your transaction quotations": "使用我的简易试报价",
     "transaction automation justifications": "自动化交易报价将减少处理时间，最大限度地减少人为错误，并使您的企业能够处理大量交易",
     "use now": "立即使用",
@@ -280,7 +275,15 @@
     "note": "备注",
     "status": "状态",
     "transaction_date": "交易日期",
-    "width": "宽度"
+    "width": "宽度",
+    "descriptions":"详细描述",
+    "tax_number":"税号",
+    "addresses": "地址",
+    "en_unit": "单位",
+    "ch_unit": "单位",
+    "quantity_unit": "数量单位",
+    "size_unit": "尺寸单位",
+    "threshold": "阈值"
   },
   "others":{
     "remains": "是"

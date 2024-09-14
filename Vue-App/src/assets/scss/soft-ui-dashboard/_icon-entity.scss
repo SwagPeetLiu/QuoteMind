@@ -1,13 +1,25 @@
-.icon-container{
+.icon-container {
+    --icon-size: 40px; // Default value
+    --icon-margin-top: 0px; // Default value
+    --icon-margin-bottom: 0px; // Default value
+    --icon-margin-left: 10px; // Default value
+    --icon-margin-right: 10px; // Default value
     height: 42px;
     width: 42px;
     opacity: 0.9;
-    div{
+
+    div {
         height: 40px;
         width: 40px;
+        min-width: 40px;
+        min-height: 40px;
     }
-    i{
-        font-size: 1.2rem;
+    i {
+        margin-top: var(--icon-margin-top);
+        margin-bottom: var(--icon-margin-bottom);
+        margin-left: var(--icon-margin-left);
+        margin-right: var(--icon-margin-right);
+        font-size: calc(var(--icon-size) * 0.45);
     }
 }
 .name-container{

@@ -47,8 +47,13 @@
           <tbody v-if="!isLoading && isDataAvailable">
             <tr v-for="(record, index) in records" :key="index" class="table-row">
               <td>
-                <IconEntity :theme="themeColour" :icon="getIcon(quoteTarget)" :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
-                  :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id" />
+                <IconEntity 
+                  :theme="themeColour"
+                  :icon="getIcon(quoteTarget)"
+                  :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
+                  :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id"
+                  :target="quoteTarget" 
+                />
               </td>
               <td class="align-middle text-center font-weight-bold d-none d-md-table-cell">
                 <span>{{ $i18n.locale === "en" ? "$" : "¥" }}</span>

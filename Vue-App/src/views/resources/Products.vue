@@ -1,8 +1,8 @@
 <template>
   <div class="py-2 container-fluid">
-    <div class="d-flex flex-column min-vh-80">
+    <div class="d-flex flex-column">
       <SearchController :target="'products'"/>
-      <div class="pt-3" style="min-height: 600px; max-height: 820px">
+      <div class="pt-3 overflow-hidden" style="height: 65vh;">
         <GeneralEntityTable :target="'products'"/>
       </div>
     </div>

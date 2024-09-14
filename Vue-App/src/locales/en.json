@@ -128,6 +128,8 @@
     "pricings": "Pricings",
     "conditions": "Conditions",
     "rules": "Rules",
+    "pricing_rules": "Pricing Rules",
+    "pricing_conditions": "Pricing Conditions",
     "transactions": "Transactions"
   },
   "dialog":{
@@ -160,13 +162,6 @@
   },
   "dashboard":{
     "welcome": "Welcome Back!",
-    "total employees": "Working Employees",
-    "total clients": "Clients",
-    "total companies": "Companies",
-    "total products": "Products",
-    "total materials": "Materials",
-    "total conditions": "Pricing Conditions",
-    "total rules": "Pricing Rules",
     "access your transaction quotations": "Access my Transaction Quotations",
     "transaction automation justifications": "Automating transaction quotations will reduce the processing time, minimise human errors and enabling your business to handle high volume of transactions",
     "use now": "Use now",
@@ -277,7 +272,15 @@
     "note": "Note",
     "status": "Status",
     "transaction_date": "Transaction Date",
-    "width": "Width"
+    "width": "Width",
+    "descriptions":"Descriptions",
+    "tax_number":"Tax Number",
+    "addresses": "Addresses",
+    "en_unit": "Unit",
+    "ch_unit": "Unit",
+    "quantity_unit": "Quantity Unit",
+    "size_unit": "Size Unit",
+    "threshold": "Threshold"
   },
   "others":{
     "remains": " remains "

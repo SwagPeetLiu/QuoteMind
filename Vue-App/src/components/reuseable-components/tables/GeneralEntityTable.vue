@@ -3,30 +3,61 @@
         <div class="card-body px-2 py-2">
             <div 
                 v-if="!isInitialisedLoading"
-                class="table-responsive h-100 overflow-x-hidden overflow-y-auto thin-scrollbar"
+                class="table-responsive h-100"
             >
                 <table class="table align-items-center mb-0 table-hover custom-width-columns">
 
                     <!-- header -->
                     <thead>
                         <tr>
-                            <!-- <th 
-                                v-for="(column, index) in entityColumns"
-                                :key="index"
-                                class="text-uppercase text-secondary font-weight-bolder opacity-8 col-target"
+                            <th 
+                                v-for="(column, colIndex) in entityColumns"
+                                :key="colIndex"
+                                class="text-uppercase text-secondary font-weight-bolder opacity-8"
                             >
-                                <div class="d-flex align-items-center justify-content-center mx-1">
-                                    <span class="ms-2 mt-1 text-xs">{{ column }}</span>
+                                <div class="d-flex align-items-start justify-content-start mx-1">
+                                    <span :class="[column === 'target' ? 'ms-5' : '']">
+                                        {{ column === 'target' ? t(`routes.${target}`) : t(`columns.${column}`) }}
+                                    </span>
                                 </div>
-                            </th> -->
+                            </th>
                         </tr>
                     </thead>
 
                     <!-- content -->
                     <tbody>
-                        <!-- <tr v-for="entities">
-                            <div></div>
-                        </tr> -->
+                        <tr 
+                            v-for="(record, rowIndex) in entities"
+                            :key="rowIndex"
+                            class="table-row"
+                        >
+                            <td 
+                                v-for="(column, colIndex) in entityColumns"
+                                :key="colIndex"
+                            >
+                                <!-- Record Identification -->
+                                <IconEntity 
+                                    v-if="column === 'target'"
+                                    :theme="themeColour" 
+                                    :icon="getIcon(target)" 
+                                    :name="record[getRecordName(target, $i18n.locale)]"
+                                    :id="record.id"
+                                />
+
+                                <!-- Reference Identification -->
+                                <span v-if="mapColumnType(column) == 'reference'">
+                                    {{ record[column] }}
+                                </span>
+
+                                <!-- ordinary field -->
+                                <span 
+                                    v-if="mapColumnType(column) == 'ordinary'"
+                                    class="text-dark"
+                                >
+                                    {{ record[column] }}
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -43,7 +74,10 @@ import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import search from "@/api/search";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
+import { getRecordName, mapColumnType } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
+import { getIcon } from "@/utils/iconMapper.js";
+import IconEntity from "@/components/reuseable-components/IconEntity.vue";
 
 export default{
     name: "GeneralEntityTable",
@@ -54,7 +88,8 @@ export default{
         },
     },
     components:{
-        DashLoader
+        DashLoader,
+        IconEntity
     },
     data(){
         const { t } = useI18n();
@@ -68,10 +103,12 @@ export default{
             totalCount: null,
             orderBy: null,
             entities: [],
-            entityColumns: [],
         }
     },
     methods:{
+        getIcon,
+        getRecordName,
+        mapColumnType,
         fetchData(type){
             console.log("calleed");
             // manage the current status of loading:
@@ -121,6 +158,12 @@ export default{
     computed:{
         isThereMoreData(){
             return true;
+        },
+        entityColumns(){
+            return config.defaultListings[this.target];
+        },
+        themeColour(){
+            return this.$store.getters.getMainTheme;
         }
     },
     created(){

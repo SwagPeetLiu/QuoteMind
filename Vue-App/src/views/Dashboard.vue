@@ -11,33 +11,33 @@
 
         <div class="row mb-xs-0 mb-md-3">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total products')" type="sum" target="products" to="/resources/products"
+            <StatsCard :title="t('routes.products')" type="sum" target="products" to="/resources/products"
               :icon="getIcon('products')" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total materials')" type="sum" target="materials" to="/resources/materials"
+            <StatsCard :title="t('routes.materials')" type="sum" target="materials" to="/resources/materials"
               :icon="getIcon('materials')" />
           </div>
         </div>
 
         <div class="row mb-xs-0 mb-md-3">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total companies')" type="sum" to="/customers/companies" target="companies"
+            <StatsCard :title="t('routes.companies')" type="sum" to="/customers/companies" target="companies"
               :icon="getIcon('companies')" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total clients')" type="sum" to="/customers/clients" target="clients"
+            <StatsCard :title="t('routes.clients')" type="sum" to="/customers/clients" target="clients"
               :icon="getIcon('clients')" />
           </div>
         </div>
 
         <div class="row">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total rules')" type="sum" to="/pricings/pricing_rules" target="pricing_rules"
+            <StatsCard :title="t('routes.rules')" type="sum" to="/pricings/pricing_rules" target="pricing_rules"
               :icon="getIcon('pricing_rules')" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('dashboard.total conditions')" type="sum" to="/pricings/pricing_conditions" target="pricing_conditions"
+            <StatsCard :title="t('routes.pricing_conditions')" type="sum" to="/pricings/pricing_conditions" target="pricing_conditions"
               :icon="getIcon('pricing_conditions')" />
           </div>
         </div>

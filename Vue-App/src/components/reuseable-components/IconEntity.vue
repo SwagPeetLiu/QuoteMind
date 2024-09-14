@@ -4,10 +4,17 @@
         <div 
             class="icon-container d-flex align-items-center justify-content-center rounded-circle z-1"
             :class="`bg-gradient-${theme}`"
+            :style="{ 
+                '--icon-size': `${styler.iconSize}px`,
+                '--icon-margin-top': `${styler.mt}px`,
+                '--icon-margin-bottom': `${styler.mb}px`,
+                '--icon-margin-left': `${styler.ml}px`,
+                '--icon-margin-right': `${styler.mr}px`,
+            }"
         >
             <div class="position-absolute bg-white z-2 rounded-circle"></div>
             <i 
-                class="text-gradient my-0 mx-3 z-3" 
+                class="text-gradient z-3" 
                 :class="`text-${theme} ${icon}`"
             ></i>
         </div>
@@ -40,6 +47,27 @@ export default {
             type: String,
             required: true,
             default: "id",
+        },
+        target:{
+            type: String,
+            required: true,
+        }
+    },
+    computed:{
+        // Stylers to adjust the icon based on each entity
+        styler(){
+            if (this.target === "companies" || this.target === "company") {
+                return{ iconSize: 40, mt: 0, mb: 0, ml: 10, mr: 10 }
+            }
+            else if (this.target === "clients" || this.target === "client") {
+                return{ iconSize: 45, mt: 0, mb: 0, ml: 11, mr: 10 }
+            }
+            else if (this.target === "products" || this.target === "product") {
+                return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
+            }
+            else{
+                return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
+            }
         }
     }
 }
