@@ -10,7 +10,7 @@
                     <!-- header -->
                     <thead>
                         <tr>
-                            <th 
+                            <!-- <th 
                                 v-for="(column, index) in entityColumns"
                                 :key="index"
                                 class="text-uppercase text-secondary font-weight-bolder opacity-8 col-target"
@@ -18,15 +18,15 @@
                                 <div class="d-flex align-items-center justify-content-center mx-1">
                                     <span class="ms-2 mt-1 text-xs">{{ column }}</span>
                                 </div>
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
 
                     <!-- content -->
                     <tbody>
-                        <tr v-for="entities">
+                        <!-- <tr v-for="entities">
                             <div></div>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -42,7 +42,7 @@
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import search from "@/api/search";
-import DashLoader from "@/components/reuseable-components/loaders/DashLoader.vue";
+import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
 
 export default{
@@ -72,7 +72,6 @@ export default{
         }
     },
     methods:{
-        getIcon,
         fetchData(type){
             console.log("calleed");
             // manage the current status of loading:
