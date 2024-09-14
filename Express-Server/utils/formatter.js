@@ -210,14 +210,12 @@ function mapDefaultQueryColumns(table, detailed = false) {
             `;
     }
     else if (table === "materials" || table === "products"){
-        const defaultColumns = 
-                    `${mapQueryPrefix(table)}.id, 
-                    ${mapQueryPrefix(table)}.ch_name, 
-                    ${mapQueryPrefix(table)}.en_name
-                    `;
-        const details = 
-                    `, ${mapQueryPrefix(table)}.descriptions`;
-        return detailed ? defaultColumns + details : defaultColumns;
+        return`
+                ${mapQueryPrefix(table)}.id, 
+                ${mapQueryPrefix(table)}.ch_name, 
+                ${mapQueryPrefix(table)}.en_name,
+                ${mapQueryPrefix(table)}.descriptions
+                `;
     }
     else if (table === "employees"){
         return `

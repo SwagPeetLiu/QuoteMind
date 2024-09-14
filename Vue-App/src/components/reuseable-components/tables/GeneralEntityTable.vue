@@ -25,7 +25,7 @@
                     <!-- content -->
                     <tbody>
                         <tr v-for="entities">
-
+                            <div></div>
                         </tr>
                     </tbody>
                 </table>
