@@ -256,11 +256,14 @@ export default {
             }
         }
     },
-    beforeMount() {
+    created(){
         this.mapSelections();
+        this.parseUrlParams();
+        window.addEventListener('popstate', this.parseUrlParams); // on back & forward re-parse the query
     },
     beforeUnmount() {
         document.removeEventListener('click', this.handleClickOutside, true);
+        window.removeEventListener('popstate', this.parseUrlParams);
     },
     watch:{
         existingInputs:{
@@ -268,9 +271,6 @@ export default {
                 this.updateUrlParams();
             },
             deep: true
-        },
-        '$route'() {
-            this.parseUrlParams();
         }
     }
 };

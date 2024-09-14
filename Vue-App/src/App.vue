@@ -50,8 +50,8 @@ import Navbar from "@/components/page-layouts/TopNav/Navbar.vue";
 import AppFooter from "@/components/page-layouts/AppFooter.vue";
 import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
-import ErrorDialog from "@/components/reuseable-components/ErrorDialog.vue";
-import SlideToast from "@/components/reuseable-components/SlideToast.vue";
+import ErrorDialog from "@/components/reuseable-components/pop-ups/ErrorDialog.vue";
+import SlideToast from "@/components/reuseable-components/pop-ups/SlideToast.vue";
 import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
 
 export default {

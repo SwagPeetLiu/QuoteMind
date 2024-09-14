@@ -48,7 +48,8 @@
 
 <script>
 import ReportsBarChart from "@/components/statistical-components/ReportsBarChart.vue";
-import { getRecentSalesPerformanceBody, FormatMonthAndYear } from "@/utils/helpers.js";
+import { getRecentSalesPerformanceBody } from "@/utils/formatters.js";
+import { FormatMonthAndYear } from "@/utils/helpers.js";
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import HorizontalTimeline from "@/components/reuseable-components/Horizontal-Timeline.vue";

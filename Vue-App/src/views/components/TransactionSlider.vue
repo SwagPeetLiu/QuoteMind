@@ -103,11 +103,8 @@ import DoughnutChart from "@/components/statistical-components/DoughnutChart.vue
 import DotLoader from "../../components/reuseable-components/loader/DotLoader.vue";
 import search from "@/api/search";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import {
-getYearlyTransactionCountsBody,
-getyearlyTransactionDistributionBody,
-FormatMonthAndYear,
-} from "../../utils/helpers";
+import { getYearlyTransactionCountsBody, getyearlyTransactionDistributionBody } from "../../utils/formatters";
+import { FormatMonthAndYear } from "../../utils/helpers";
 import { useI18n } from "vue-i18n";
 
 export default {

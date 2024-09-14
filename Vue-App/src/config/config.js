@@ -33,6 +33,17 @@ const config = {
     },
     search: {
         pageSize: 15,
+        defaultOrder:{
+            "companies": { column : "full_name", order: "ASC" },
+            "clients": { column : "full_name", order: "ASC" },
+            "positions": { column : "name", order: "ASC" },
+            "materials": { column : "ch_name", order: "ASC" },
+            "products": { column : "ch_name", order: "ASC" },
+            "employees": { column : "name", order: "ASC" },
+            "pricing_conditions": { column : "id", order: "ASC" },
+            "pricing_rules": { column : "price_per_unit", order: "DESC" },
+            "transactions": { column : "modified_date", order: "DESC" }
+        }
     },
     session: {
         LOGOUT_TIME: 60 * 1000 * 15, // 15 minutes before atuo logout
@@ -57,6 +68,17 @@ const config = {
         "companies": ['id', "full_name", "phone", "email"],
         "employees": ["id", "name", "phone", "wechat_contact", "qq_contact", "position", "email"],
         "materials": ["id", "ch_name", "en_name"],
+        "positions": ["id", "name"],
+        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"],
+        "pricing_rules": ["id", "price_per_unit"],
+        "products": ["id", "ch_name", "en_name"],
+        "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "size_unit", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
+    },
+    defaultListings:{
+        "clients": ["target", "phone", "qq_contact", "wechat_contact", "email", "company"],
+        "companies": ["target", "phone", "email"],
+        "employees": ["target", "phone", "wechat_contact", "qq_contact", "position", "email"],
+        "materials": ["target", "descriptions"],
         "positions": ["id", "name"],
         "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "size_unit"],
         "pricing_rules": ["id", "price_per_unit"],

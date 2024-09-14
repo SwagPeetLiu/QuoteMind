@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 import { setToken, clearToken } from "../utils/apiSetter";
 import { startLoginTimer, startLogoutTimer, clearLogoutTimer, clearPreviousTimers } from "../utils/sessionManager";
-import { generateSearchQueryWhereClause } from "../utils/helpers";
+import { generateSearchQueryWhereClause } from "../utils/formatters";
 
 // centralised state management over the application
 export default createStore({

@@ -209,6 +209,9 @@ export default {
             }, 100);
         }
     },
+    beforeUnmount() {
+        this.$store.commit("setSearchWhereBody", {conditions: {}, operators: {}});
+    },
     watch:{
         mappedWhereClauses: {
             handler(newValue){
