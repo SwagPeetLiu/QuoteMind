@@ -14,7 +14,7 @@
             <tr>
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8 col-target">
                 <div class="d-flex align-items-center justify-content-start ms-1">
-                  <img :src="getTargetImage(quoteTarget)" alt="Total Transactions" style="width: 32px; height: 32px" />
+                  <img :src="getTargetImage(quoteTarget)" alt="Total Transactions" class="table-header-image"/>
                   <span class="ms-3 mt-1 text-xs">{{ t(`routes.${quoteTarget}`) }}</span>
                 </div> 
               </th>
@@ -26,7 +26,7 @@
                 :title="t('stats.unpaid explanations')"
               >
                 <div class="d-flex align-items-center justify-content-center">
-                  <img src="../../assets/img/icons/total-transactions.png" alt="Total Transactions" style="width: 32px; height: 32px" />
+                  <img src="../../assets/img/icons/total-transactions.svg" alt="Total Transactions" class="table-header-image" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.unpaid') }}</span>
                 </div>
               </th>
@@ -36,7 +36,7 @@
                 :title="t('stats.quoted explanations')"
               >
                 <div class="d-flex align-items-center justify-content-center">
-                  <img src="../../assets/img/icons/percentage.png" alt="Percentage" style="width: 32px; height: 32px" />
+                  <img src="../../assets/img/icons/percentage.svg" alt="Percentage" class="table-header-image" />
                   <span class="ms-2 mt-1 text-xs">{{ t('stats.quoted') }}</span>
                 </div>
               </th>
@@ -174,7 +174,7 @@ export default {
     },
     getTargetImage(target){
       try{
-        return require(`../../assets/img/icons/${target}.png`);
+        return require(`../../assets/img/icons/${target}.svg`);
       }
       catch(err){
         console.error(err)

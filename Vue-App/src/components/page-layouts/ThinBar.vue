@@ -72,20 +72,12 @@
 </template>
 
 <script>
-import downArrWhite from "@/assets/img/down-arrow-white.svg";
-import downArrBlack from "@/assets/img/down-arrow-dark.svg";
 import { useI18n } from "vue-i18n";
 import { useRoute } from 'vue-router';
 import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "thinBar",
-  data() {
-    return {
-      downArrWhite,
-      downArrBlack,
-    };
-  },
   setup() {
     const { t } = useI18n();
     const route = useRoute();

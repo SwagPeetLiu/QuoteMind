@@ -149,3 +149,15 @@
     }
   }
 }
+
+
+// Custom table styles
+.table-header{
+  background-color: $white;
+  box-shadow: $box-shadow-sm;
+}
+
+.table-header-image{
+  width: 32px; 
+  height: 32px;
+}

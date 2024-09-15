@@ -2,7 +2,7 @@
     <div class="d-flex align-items-end justify-content-start my-1 ms-3 overflow-hidden">
 
         <div 
-            class="icon-container d-flex align-items-center justify-content-center rounded-circle z-1"
+            class="icon-container position-relative d-flex align-items-center justify-content-center rounded-circle z-1"
             :class="`bg-gradient-${theme}`"
             :style="{ 
                 '--icon-size': `${styler.iconSize}px`,
@@ -12,7 +12,9 @@
                 '--icon-margin-right': `${styler.mr}px`,
             }"
         >
-            <div class="position-absolute bg-white z-2 rounded-circle"></div>
+            <div class="position-absolute bg-white z-2 rounded-circle">
+
+            </div>
             <i 
                 class="text-gradient z-3" 
                 :class="`text-${theme} ${icon}`"

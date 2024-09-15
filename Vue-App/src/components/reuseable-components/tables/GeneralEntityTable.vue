@@ -1,22 +1,23 @@
 <template>
-    <div class="card h-100 w-100">
-        <div class="card-body px-2 py-2">
+    <div class="card h-100 w-100 overflow-hidden">
+        <div class="card-body px-2 pt-0 h-100">
             <div 
                 v-if="!isInitialisedLoading"
-                class="table-responsive h-100"
+                class="table-responsive h-100 thin-scrollbar overflow-x-hidden overflow-y-auto"
             >
                 <table class="table align-items-center mb-0 table-hover custom-width-columns">
 
                     <!-- header -->
-                    <thead>
+                    <thead class="z-2 sticky-top table-header" style="position: sticky">
                         <tr>
                             <th 
                                 v-for="(column, colIndex) in entityColumns"
                                 :key="colIndex"
-                                class="text-uppercase text-secondary font-weight-bolder opacity-8"
+                                class="text-uppercase text-gradient text-dark text-shadow-lg font-weight-bolder"
                             >
-                                <div class="d-flex align-items-start justify-content-start mx-1">
-                                    <span :class="[column === 'target' ? 'ms-5' : '']">
+                                <div class="d-flex align-items-center justify-content-start" :class="[column === 'target' ? 'ms-2' : '']">
+                                    <img src="@/assets/img/icons/products.svg" alt="Icon" class="table-header-image me-2"/>
+                                    <span>
                                         {{ column === 'target' ? t(`routes.${target}`) : t(`columns.${column}`) }}
                                     </span>
                                 </div>
@@ -29,7 +30,7 @@
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
-                            class="table-row"
+                            class="table-row z-1"
                         >
                             <td 
                                 v-for="(column, colIndex) in entityColumns"
