@@ -98,7 +98,7 @@ import IconEntity from "@/components/reuseable-components/IconEntity.vue";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";
-import { calculatePercentage } from "@/utils/helpers";
+import { calculatePercentage, getTargetImage } from "@/utils/helpers";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
 import initTooltips  from "@/assets/js/tooltip.js";
 import { getIcon } from "@/utils/iconMapper.js";
@@ -151,6 +151,7 @@ export default {
     }
   },
   methods:{
+    getTargetImage,
     getIcon: getIcon,
     // function used to get the companies that reuiqre user's attntion on transaction quotations
     getTopComapnies(){
@@ -171,14 +172,6 @@ export default {
             this.isLoading = false;
           }, 300);
         });
-    },
-    getTargetImage(target){
-      try{
-        return require(`../../assets/img/icons/${target}.svg`);
-      }
-      catch(err){
-        console.error(err)
-      }
     },
     updateWindowWidth() {
       this.windowWidth = window.innerWidth;

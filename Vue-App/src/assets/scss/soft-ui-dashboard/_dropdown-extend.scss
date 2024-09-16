@@ -4,7 +4,7 @@
   padding: 4px;
   border-radius: $border-radius-md;
   transition: scale 0.3s ease-in-out;
-  z-index: 1;
+  z-index: 110;
 
   &:hover {
     scale: 1.02;
@@ -24,6 +24,7 @@
   }
 
   .target-menu {
+    z-index: 110;
     display: block;
     position: absolute;
     width: 100%;
@@ -51,10 +52,10 @@
 
     .target-menu {
       display: block;
+      pointer-events: auto;
       transform: translateY(0);
       opacity: 1;
-      pointer-events: auto;
-      z-index: 9999 !important;
+      
       transition:
         transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
         opacity 0.2s ease-in-out 0.05s; // Delay opacity increase
@@ -62,7 +63,7 @@
       .target-item {
         border-radius: $border-radius-md;
         cursor: pointer;
-        z-index: 9999 !important;
+        
 
         &:hover {
           background-color: $gray-200;

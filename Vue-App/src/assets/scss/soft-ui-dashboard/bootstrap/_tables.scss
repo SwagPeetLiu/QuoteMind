@@ -153,8 +153,15 @@
 
 // Custom table styles
 .table-header{
+  z-index: 10;
+  position: sticky;
+  top: 0;
   background-color: $white;
   box-shadow: $box-shadow-sm;
+}
+
+.table-row{
+  z-index: 1;
 }
 
 .table-header-image{

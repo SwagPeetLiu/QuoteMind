@@ -202,6 +202,11 @@ function getUniqueObjects(array) {
     return Array.from(uniqueMap.values());
 }
 
+/**
+ * ==================================================================================
+ * Sections of Functions used to assist in mapping informations
+ * ==================================================================================
+ */
 // function used to describe the use of indicator in the search pannel
 // (i.e., xxx attribuite contains / named as "yyy")
 function mappIndicator(target) {
@@ -275,6 +280,16 @@ function mapColumnType(column){
     }
 }
 
+// function used to mpa the svg icons to the icons folders
+function getTargetImage(target){
+    try{
+        return require(`@/assets/img/icons/${target}.svg`);
+    }
+    catch(err){
+        console.error(err);
+    }
+}
+
 module.exports = {
     generateDateRange,
     generateTimeRange,
@@ -288,5 +303,6 @@ module.exports = {
     formatDate,
     mappIndicator,
     getRecordName,
-    mapColumnType
+    mapColumnType,
+    getTargetImage
 }

@@ -12,7 +12,7 @@
                             <span class="text-gradient text-dark font-weight-bold">{{ t(`columns.${currentSelection.name}`) }}</span>
                             <i class="fa-solid fa-caret-down ms-auto me-2 toggle-arrow"></i>
                         </div>
-                        <ul class="target-menu thin-scrollbar">
+                        <ul v-if="isSlideOut" class="target-menu thin-scrollbar">
                             <li 
                                 v-for="item in targets"
                                 :key="item.name" 

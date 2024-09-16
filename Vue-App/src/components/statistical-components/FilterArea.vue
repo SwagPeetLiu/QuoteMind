@@ -41,7 +41,7 @@
                 <!-- input Contents (time-based) -->
                 <div 
                     v-if="mappedTargetType(mappedWhereClauses[target]).includes('date')"
-                    class="text-white clause-text-lg ms-2 my-1 d-flex align-items-center"
+                    class="text-white clause-text-lg mx-2 my-1 d-flex align-items-center"
                 >
                     <span class="my-0" v-if="mappedWhereClauses[target].values[0].start">
                         {{ formatDate(mappedWhereClauses[target].values[0].start, $i18n.locale) }}
@@ -83,7 +83,7 @@
 
                 <!-- remove button -->
                 <i 
-                    class="text-white ms-auto me-1 mt-1 clause-text-lg cursor-pointer" 
+                    class="text-white ms-auto ps-2 me-1 mt-1 clause-text-lg cursor-pointer" 
                     :class="getIcon('cancel')"
                     @click="removeClause(target)"
                 >
@@ -92,8 +92,8 @@
         </div>
 
         <!-- if no whereClauses are present -->
-        <div v-if="!isWhereClausePresents && !isLoading" class="z-n1 bg-transparent w-100 h-100 d-flex align-items-center justify-content-center">
-            <p class="my-0 h6 font-weight-bold text-gradient text-dark">{{ t("apiMessage.search.add your filter") }}
+        <div v-if="!isWhereClausePresents && !isLoading" class="bg-transparent w-100 h-100 d-flex align-items-center justify-content-center">
+            <p class="my-0 h6 font-weight-bold text-gradient text-dark z-0">{{ t("apiMessage.search.add your filter") }}
             </p>
         </div>
     </div>

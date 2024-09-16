@@ -2,7 +2,7 @@
     <div class="d-flex align-items-end justify-content-start my-1 ms-3 overflow-hidden">
 
         <div 
-            class="icon-container position-relative d-flex align-items-center justify-content-center rounded-circle z-1"
+            class="icon-container d-flex align-items-center justify-content-center rounded-circle"
             :class="`bg-gradient-${theme}`"
             :style="{ 
                 '--icon-size': `${styler.iconSize}px`,
@@ -12,17 +12,13 @@
                 '--icon-margin-right': `${styler.mr}px`,
             }"
         >
-            <div class="position-absolute bg-white z-2 rounded-circle">
-
+            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center">
+                <i class="text-gradient" :class="`text-${theme} ${icon}`"></i>
             </div>
-            <i 
-                class="text-gradient z-3" 
-                :class="`text-${theme} ${icon}`"
-            ></i>
         </div>
 
         <!-- Name & id -->
-        <p class="name-container d-flex flex-column ms-2 my-0">
+        <p class="name-container d-flex flex-column ms-2 my-0 ">
             <span class="icon-name text-gradient text-dark font-weight-bold text-truncate">{{ name }}</span>
             <span class="icon-id text-secondary text-truncate">#{{ id }}</span>
         </p>

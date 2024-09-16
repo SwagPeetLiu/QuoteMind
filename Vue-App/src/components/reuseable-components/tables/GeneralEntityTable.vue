@@ -8,7 +8,7 @@
                 <table class="table align-items-center mb-0 table-hover custom-width-columns">
 
                     <!-- header -->
-                    <thead class="z-2 sticky-top table-header" style="position: sticky">
+                    <thead class="table-header">
                         <tr>
                             <th 
                                 v-for="(column, colIndex) in entityColumns"
@@ -16,8 +16,12 @@
                                 class="text-uppercase text-gradient text-dark text-shadow-lg font-weight-bolder"
                             >
                                 <div class="d-flex align-items-center justify-content-start" :class="[column === 'target' ? 'ms-2' : '']">
-                                    <img src="@/assets/img/icons/products.svg" alt="Icon" class="table-header-image me-2"/>
-                                    <span>
+                                    <img 
+                                        :src="getTargetImage(column === 'target' ? target : column)" 
+                                        alt="Icon" 
+                                        class="table-header-image me-2 my-0"
+                                    />
+                                    <span class="mt-1">
                                         {{ column === 'target' ? t(`routes.${target}`) : t(`columns.${column}`) }}
                                     </span>
                                 </div>
@@ -30,7 +34,7 @@
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
-                            class="table-row z-1"
+                            class="table-row"
                         >
                             <td 
                                 v-for="(column, colIndex) in entityColumns"
@@ -43,6 +47,7 @@
                                     :icon="getIcon(target)" 
                                     :name="record[getRecordName(target, $i18n.locale)]"
                                     :id="record.id"
+                                    :target="target"
                                 />
 
                                 <!-- Reference Identification -->
@@ -75,7 +80,7 @@ import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import search from "@/api/search";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
-import { getRecordName, mapColumnType } from "@/utils/helpers";
+import { getRecordName, mapColumnType, getTargetImage } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/IconEntity.vue";
@@ -110,6 +115,7 @@ export default{
         getIcon,
         getRecordName,
         mapColumnType,
+        getTargetImage,
         fetchData(type){
             console.log("calleed");
             // manage the current status of loading:
