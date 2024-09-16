@@ -1,24 +1,25 @@
 <template>
+  <div class="w-100 h-100">
+      <div class="px-4 d-flex justify-content-between align-items-center">
+      <!-- Title of the chart -->
+      <p class="chart-title text-shadow-lg mt-2">{{ title }}</p>
 
-  <div class="px-4 d-flex justify-content-between align-items-center w-100">
-    <!-- Title of the chart -->
-    <p class="chart-title text-shadow-lg">{{ title }}</p>
-
-    <!-- eslint-disable vue/no-v-html -->
-    <div v-if="isDataAvailable" class="h6 chart-description">
-      <span class="d-none d-xxl-inline" v-if="!isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
-      <i v-if="isIncreasing.isUp" :class="getIcon('periodic increase')" class='text-gradient text-success px-1'></i>
-      <i v-else :class="getIcon('periodic decrease')" class='text-gradient text-danger px-1'></i>
-      <span class='font-weight-bold'>{{ isIncreasing.value }}</span>
-      <span class="d-none d-xxl-inline" v-if="isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
+      <!-- eslint-disable vue/no-v-html -->
+      <div v-if="isDataAvailable" class="h6 chart-description">
+        <span class="d-none d-xxl-inline" v-if="!isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
+        <i v-if="isIncreasing.isUp" :class="getIcon('periodic increase')" class='text-gradient text-success px-1'></i>
+        <i v-else :class="getIcon('periodic decrease')" class='text-gradient text-danger px-1'></i>
+        <span class='font-weight-bold'>{{ isIncreasing.value }}</span>
+        <span class="d-none d-xxl-inline" v-if="isCurrentLanEnglish">{{ t('stats.time.in this period') }}</span>
+      </div>
     </div>
-  </div>
 
-  <!-- linear line chart -->
-  <canvas v-if="isDataAvailable" id="line-chart" ref="gradientLineChart" class="chart-canvas" style="max-height: 290px;">
-  </canvas>
-  <div v-else class="pb-7 w-100 d-flex justify-content-center align-items-center">
-    <p class="text-gradient text-dark display-5 font-weight-bold">{{ t('stats.no data available') }}</p>
+    <!-- linear line chart -->
+    <canvas v-if="isDataAvailable" id="line-chart" ref="gradientLineChart" class="chart-canvas" style="max-height: 290px;">
+    </canvas>
+    <div v-else class="pb-7 w-100 h-100 d-flex justify-content-center align-items-center">
+      <p class="text-gradient text-dark display-5 font-weight-bold">{{ t('stats.no data available') }}</p>
+    </div>
   </div>
 </template>
 

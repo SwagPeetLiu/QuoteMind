@@ -23,7 +23,6 @@ const search = {
                 });
         }
     },
-
     // route to post searches across entities
     getSearchResults: (data) => {
         if (!data || !data.table || !data.body ){
@@ -47,7 +46,7 @@ const search = {
         return axios
             .post(`/search/${data.table}`, data.body)
             .then((response) => {
-                return response.data;
+                return { isCompleted: true, data: response.data };
             })
             .catch((error) => {
                 store.commit("setToastMessage", { message: t("apiMessage.search.failed to search"), type: "error" });

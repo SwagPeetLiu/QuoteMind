@@ -168,3 +168,22 @@
   width: 32px; 
   height: 32px;
 }
+
+.table-header-sort-button{
+  transition: scale 0.2s ease-in-out;
+  .up-arrow {
+    margin: 0px;
+    height: 20px;
+    width: 16px;
+  }
+  .down-arrow{
+    height: 20px;
+    width: 16px;
+    margin-top: -8px;
+  }
+
+  &:hover{
+    cursor: pointer;
+    scale: 1.2;
+  }
+}

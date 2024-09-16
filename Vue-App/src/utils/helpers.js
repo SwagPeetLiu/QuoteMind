@@ -289,6 +289,29 @@ function getTargetImage(target){
         console.error(err);
     }
 }
+// function used to map out the order sort SVGs
+function getSortImage(column, order){
+    try{
+        const svgDirection = "up" === order ? "ASC" : "DESC";
+        // ordinary sort match ups:
+        if (column === this.orderBy.column && svgDirection === this.orderBy.order) {
+            return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+        }
+        else if (
+            column === "target" && 
+            (this.orderBy.column === "id" || this.orderBy.column.includes("name")) 
+            && svgDirection === this.orderBy.order
+        ){
+            return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+        }
+        else{
+            return require(`@/assets/img/icons/sort-${order}-line.svg`);
+        }
+    }
+    catch(err){
+        console.error(err);
+    }
+}
 
 module.exports = {
     generateDateRange,
@@ -304,5 +327,6 @@ module.exports = {
     mappIndicator,
     getRecordName,
     mapColumnType,
-    getTargetImage
+    getTargetImage,
+    getSortImage
 }

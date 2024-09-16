@@ -2,7 +2,7 @@
     <div class="card h-100 w-100 overflow-hidden">
         <div class="card-body px-2 pt-0 h-100">
             <div 
-                v-if="!isInitialisedLoading"
+                
                 class="table-responsive h-100 thin-scrollbar overflow-x-hidden overflow-y-auto"
                 ref="tableContainer"
                 @scroll="handleScroll"
@@ -21,18 +21,28 @@
                                     <img 
                                         :src="getTargetImage(column === 'target' ? target : column)" 
                                         alt="Icon" 
-                                        class="table-header-image me-2 my-0"
+                                        class="table-header-image my-0 me-2"
                                     />
                                     <span class="mt-1">
                                         {{ column === 'target' ? t(`routes.${target}`) : t(`columns.${column}`) }}
                                     </span>
+
+                                    <!-- sort button -->
+                                    <div 
+                                        v-if="isSortingAllowed(column, $store.state.dbReferences).valid"
+                                        class="d-flex flex-column justify-content-center align-items-center table-header-sort-button ms-1"
+                                        @click="handleSort(column)"
+                                    >
+                                        <img :src="getSortImage(column, 'up')" class="up-arrow"/>
+                                        <img :src="getSortImage(column, 'down')" class="down-arrow"/>
+                                    </div>
                                 </div>
                             </th>
                         </tr>
                     </thead>
 
                     <!-- content -->
-                    <tbody v-if="isCurrentDataAvaialble">
+                    <tbody v-if="isCurrentDataAvaialble && !isInitialisedLoading">
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
@@ -71,10 +81,10 @@
                         <tr v-if="isScrolledLoading">
                             <td 
                                 :colspan="entityColumns.length"
-                                class="text-center"
+                                class="text-center pt-2"
                                 style="height: 65px;"
                             >
-                                <DotLoader :size="60"/>
+                                <DotLoader :size="40"/>
                             </td>
                         </tr>
                     </tbody>
@@ -82,15 +92,16 @@
                     <!-- indicator for no data matchings -->
                     <p 
                         class="w-100 h-100 mt-n5 position-absolute d-flex justify-content-center align-items-center h2 text-gradient text-dark text-shadow-lg" 
-                        v-if="!isCurrentDataAvaialble"
+                        v-if="!isCurrentDataAvaialble && !isInitialisedLoading"
                     >
                         {{ t("stats.no data available") }}
                     </p>
-                </table>
-            </div>
 
-            <div v-else class="d-flex h-100 justify-content-center align-items-center">
-                <DashLoader :size="80"/>
+                    <!-- loading indicator -->
+                    <div v-if="isInitialisedLoading" class="position-absolute d-flex w-100 h-100 mt-n5 justify-content-center align-items-center">
+                        <DashLoader :size="80"/>
+                    </div>
+                </table>
             </div>
         </div>
     </div>
@@ -102,8 +113,10 @@ import { config } from "@/config/config";
 import search from "@/api/search";
 import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
-import { getRecordName, mapColumnType, getTargetImage } from "@/utils/helpers";
+import { getRecordName, mapColumnType, getTargetImage, getSortImage } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
+import { useValidators } from '@/utils/useValidators';
+const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/IconEntity.vue";
 
@@ -128,7 +141,6 @@ export default{
             isInitialisedLoading: true,
             isScrolledLoading: false,
             currentPage: null, // initialised to ask the server if there are more data (counts)
-            pageSize: config.search.pageSize,
             totalCount: null,
             orderBy: null,
             entities: [],
@@ -139,6 +151,8 @@ export default{
         getRecordName,
         mapColumnType,
         getTargetImage,
+        getSortImage,
+        isSortingAllowed,
         fetchData(type){
             // manage the current status of loading:
             if (type == "initialise") {
@@ -159,20 +173,22 @@ export default{
             
             // get search results
             search.getSearchResults(serachBody)
-                .then(response => {
-                    // manage the entities to display
-                    if (type == "initialise") {
-                        this.currentPage = 1;
-                        this.totalCount = response.count;
-                        this.entities = response.results;
-                    }
-                    else{
-                        setTimeout(()=>{
-                            this.isScrolledLoading = false;
-                            this.entities.push(...response.results);
-                            this.currentPage += 1;
-                            console.log("finished loading page", this.currentPage);
-                        }, this.$store.state.loadingDelay);
+                .then(res => {
+                    if (res.isCompleted) {
+                        const response = res.data;
+                        // manage the entities to display
+                        if (type == "initialise") {
+                            this.currentPage = 1;
+                            this.totalCount = response.count;
+                            this.entities = response.results;
+                        }
+                        else{
+                            setTimeout(()=>{
+                                this.isScrolledLoading = false;
+                                this.entities.push(...response.results);
+                                this.currentPage += 1; // only update page once load was successful
+                            }, this.$store.state.loadingDelay);
+                        }
                     }
                 })
                 .catch((error) => {
@@ -182,16 +198,34 @@ export default{
                     if(type == "initialise") {
                         setTimeout(()=>{
                             this.isInitialisedLoading = false;
-                            console.log("finished loading page", this.currentPage);
                         }, this.$store.state.loadingDelay);
                     }
                 });
         },
+        handleSort(column){
+            // if the to be sorted column is already sorted, then reverse the order
+            if (column === this.orderBy.column || 
+                (column === "target" && (this.orderBy.column === "id" || this.orderBy.column.includes("name")))
+            ) {
+                this.orderBy.order = this.orderBy.order === "ASC" ? "DESC" : "ASC";
+            }
+
+            // else select the newly sortby Column and fetch with DESC order by default:
+            else{
+                if (column === "target") {
+                    this.orderBy = config.search.defaultOrder[this.target];
+                }
+                else{
+                    this.orderBy = {column: column, order: "DESC"}
+                }
+            }
+            this.fetchData("initialise");
+        },
+        // function used to control the scrolling effects on lazy loading
         handleScroll(){
             const container = this.$refs.tableContainer;
             if (container) {
                 if (container.scrollTop + container.clientHeight >= container.scrollHeight){
-                    console.log("triggered");
                     if (this.isThereMoreData && !this.isInitialisedLoading && !this.isScrolledLoading) {
                         this.fetchData("scroll");
                     }

@@ -160,15 +160,19 @@ export default {
                 search.getSearchResults(quotedQuery),
                 search.getSearchResults(countQuery)
             ])
-                .then(([quotedData, countData]) => {
+                .then(([quotedRes, countRes]) => {
+                    if (quotedRes.isCompleted && countRes.isCompleted) {
+                        const quotedData = quotedRes.data;
+                        const countData = countRes.data;
 
-                    // formatting data arraies
-                    countData.results.forEach(item => {
-                        labels.push(FormatMonthAndYear(item.month, item.year));
-                        countsArray.push(item.no_of_transaction);
-                        const quotedItem = quotedData.results.find(i => i.month === item.month && i.year === item.year);
-                        quotedArray.push(quotedItem ? quotedItem.no_of_transaction : 0);
-                    });
+                        // formatting data arraies
+                        countData.results.forEach(item => {
+                            labels.push(FormatMonthAndYear(item.month, item.year));
+                            countsArray.push(item.no_of_transaction);
+                            const quotedItem = quotedData.results.find(i => i.month === item.month && i.year === item.year);
+                            quotedArray.push(quotedItem ? quotedItem.no_of_transaction : 0);
+                        });
+                    }
                     this.transactionCounterData = { labels: labels, counts: countsArray, quoted: quotedArray };
                 })
                 .catch(err => {
@@ -197,20 +201,23 @@ export default {
             let backgroundColors = [];
 
             search.getSearchResults(query)
-                .then(response => {
-                    response.results.forEach(item => {
-                        labels.push(item.status);
-                        data.push(parseInt(item.count));
-                        if (item.status === "quoted") {
-                            backgroundColors.push("theme");
-                        }
-                        else if (item.status === "paid") {
-                            backgroundColors.push("opposite");
-                        }
-                        else {
-                            backgroundColors.push("secondary");
-                        }
-                    });
+                .then(res => {
+                    if (res.isCompleted) {
+                        const response = res.data;
+                        response.results.forEach(item => {
+                            labels.push(item.status);
+                            data.push(parseInt(item.count));
+                            if (item.status === "quoted") {
+                                backgroundColors.push("theme");
+                            }
+                            else if (item.status === "paid") {
+                                backgroundColors.push("opposite");
+                            }
+                            else {
+                                backgroundColors.push("secondary");
+                            }
+                        });
+                    }
                     this.transactionDistributionData = { labels: labels, data: data, backgroundColors: backgroundColors };
                 })
                 .catch((error) => {

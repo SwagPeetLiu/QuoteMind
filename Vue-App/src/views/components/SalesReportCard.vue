@@ -76,13 +76,15 @@ export default {
         getRecentSalesPerformance() {
             const queryBody = getRecentSalesPerformanceBody();
             search.getSearchResults(queryBody)
-                .then(response => {
-                    const data = response.results;
-                    if (data && data.length > 0) {
-                        data.forEach(item => {
-                            this.labels.push(FormatMonthAndYear(item.month, item.year));
-                            this.dataArray.push(item.sales);
-                        });
+                .then(res => {
+                    if (res.isCompleted){
+                        const data = res.data.results;
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                this.labels.push(FormatMonthAndYear(item.month, item.year));
+                                this.dataArray.push(item.sales);
+                            });
+                        }
                     }
                 })
                 .catch((error) => {
