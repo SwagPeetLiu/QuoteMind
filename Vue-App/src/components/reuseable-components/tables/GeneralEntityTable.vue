@@ -4,6 +4,8 @@
             <div 
                 v-if="!isInitialisedLoading"
                 class="table-responsive h-100 thin-scrollbar overflow-x-hidden overflow-y-auto"
+                ref="tableContainer"
+                @scroll="handleScroll"
             >
                 <table class="table align-items-center mb-0 table-hover custom-width-columns">
 
@@ -30,7 +32,7 @@
                     </thead>
 
                     <!-- content -->
-                    <tbody>
+                    <tbody v-if="isCurrentDataAvaialble">
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
@@ -64,11 +66,30 @@
                                 </span>
                             </td>
                         </tr>
+                        
+                        <!-- indicator for lazy-loading -->
+                        <tr v-if="isScrolledLoading">
+                            <td 
+                                :colspan="entityColumns.length"
+                                class="text-center"
+                                style="height: 65px;"
+                            >
+                                <DotLoader :size="60"/>
+                            </td>
+                        </tr>
                     </tbody>
+
+                    <!-- indicator for no data matchings -->
+                    <p 
+                        class="w-100 h-100 mt-n5 position-absolute d-flex justify-content-center align-items-center h2 text-gradient text-dark text-shadow-lg" 
+                        v-if="!isCurrentDataAvaialble"
+                    >
+                        {{ t("stats.no data available") }}
+                    </p>
                 </table>
             </div>
 
-            <div v-else class="d-flex justify-content-center align-items-center">
+            <div v-else class="d-flex h-100 justify-content-center align-items-center">
                 <DashLoader :size="80"/>
             </div>
         </div>
@@ -79,6 +100,7 @@
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import search from "@/api/search";
+import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
 import { getRecordName, mapColumnType, getTargetImage } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
@@ -95,6 +117,7 @@ export default{
     },
     components:{
         DashLoader,
+        DotLoader,
         IconEntity
     },
     data(){
@@ -117,7 +140,6 @@ export default{
         mapColumnType,
         getTargetImage,
         fetchData(type){
-            console.log("calleed");
             // manage the current status of loading:
             if (type == "initialise") {
                 this.totalCount = null;
@@ -133,44 +155,67 @@ export default{
             const orderbyClause = 
                 this.orderBy == config.search.defaultOrder[this.target] 
                 ? "default": generateOrderByClause(this.orderBy);
-            const serachBody = mapGeneralListingBody(this.whereClauses, orderbyClause, this.currentPage, this.target);
+            const serachBody = mapGeneralListingBody(this.whereClauses, orderbyClause, this.currentPage === null ? null : this.currentPage + 1, this.target);
             
             // get search results
             search.getSearchResults(serachBody)
                 .then(response => {
-                    this.entities = response.results;
-                    if (this.currentPage == null) {
-                        this.currentPage = 1;
-                        this.totalCount = response.count;
-                    }
-
                     // manage the entities to display
                     if (type == "initialise") {
+                        this.currentPage = 1;
+                        this.totalCount = response.count;
                         this.entities = response.results;
                     }
                     else{
-                        this.entities.push(...response.results);
+                        setTimeout(()=>{
+                            this.isScrolledLoading = false;
+                            this.entities.push(...response.results);
+                            this.currentPage += 1;
+                            console.log("finished loading page", this.currentPage);
+                        }, this.$store.state.loadingDelay);
                     }
                 })
                 .catch((error) => {
                     console.error("failed to get search results", error);
                 })
                 .finally(() => {
-                    this.isInitialisedLoading = false;
-                    this.isScrolledLoading = false;
-                    console.log(this.entities);
+                    if(type == "initialise") {
+                        setTimeout(()=>{
+                            this.isInitialisedLoading = false;
+                            console.log("finished loading page", this.currentPage);
+                        }, this.$store.state.loadingDelay);
+                    }
                 });
+        },
+        handleScroll(){
+            const container = this.$refs.tableContainer;
+            if (container) {
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight){
+                    console.log("triggered");
+                    if (this.isThereMoreData && !this.isInitialisedLoading && !this.isScrolledLoading) {
+                        this.fetchData("scroll");
+                    }
+                }
+            }
         }
     },
     computed:{
         isThereMoreData(){
-            return true;
+            if (this.totalCount == null || typeof this.totalCount !== "number") {
+                return false;
+            }
+            else{
+                return this.totalCount > this.entities.length;
+            }
         },
         entityColumns(){
             return config.defaultListings[this.target];
         },
         themeColour(){
             return this.$store.getters.getMainTheme;
+        },
+        isCurrentDataAvaialble(){
+            return this.entities.length > 0;
         }
     },
     created(){

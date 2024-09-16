@@ -42,6 +42,7 @@
                     v-if="currentSearchType !== 'timestamp'" 
                     :target="currentSelection.name"
                     @update-search-value="setSearchValue"
+                    @enter-key-pressed="addFilter()"
                     :clearingInput="clearInput"
                 />
 
@@ -174,12 +175,15 @@ export default {
         },
         // pushing in the value of a new filter for filtration Area to deal with
         addFilter(){
-            this.clearInput = true;
-            this.existingInputs.push({...this.searchValue, target: this.currentSelection.name});
-            this.searchValue = {value: null, type: null, isValid: false};
-            setTimeout(() => {
-                this.clearInput = false;
-            }, 100);
+            // only adding the filter if the input is valid (handles children's enter signals)
+            if (this.searchValue.isValid){
+                this.clearInput = true;
+                this.existingInputs.push({...this.searchValue, target: this.currentSelection.name});
+                this.searchValue = {value: null, type: null, isValid: false};
+                setTimeout(() => {
+                    this.clearInput = false;
+                }, 100);
+            }
         },
         // manages the input updates from children component (filter calibrations)
         filterClauses(modifiedInputs){
