@@ -28,21 +28,36 @@
     </ol>
 
     <!-- current page name determination -->
-    <h5 class="mb-0 font-weight-bolder" :class="{ 'text-white': isCurrentLinkProfile }">
-      {{ currentPage }}
-    </h5>
+    <p 
+      class="mb-0 mt-1 font-weight-bolder h5 d-flex align-items-center" 
+      :class="{ 'text-white': isCurrentLinkProfile }"
+    >
+      <span>{{ currentPage }}</span>
+      <span 
+        class="mx-1"
+        v-if="isCurrentRouteResourceful && isCurrentResourcesCounted">:</span>
+      <IncrementNumber 
+        v-if="isCurrentRouteResourceful && isCurrentResourcesCounted" 
+        :endValue="$store.state.searchTarget.counts"
+        :duration="$store.state.loadingDelay"
+      />
+    </p>
   </nav>
 </template>
 
 <script>
 import { useI18n } from "vue-i18n";
 import { getIcon } from "@/utils/iconMapper.js";
+import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 
 export default {
   name: "breadcrumbs",
   setup() {
     const { t } = useI18n();
     return { t }
+  },
+  components:{
+    IncrementNumber
   },
   computed: {
     isCurrentLinkProfile() {
@@ -94,6 +109,25 @@ export default {
       }
       else {
         return this.$route.name;
+      }
+    },
+    isCurrentRouteResourceful(){
+      const name = this.$route.name;
+      if (name == "/" || name == "Dashboard" || name == "Profile") {
+        return false;
+      }
+      else{
+        return true;
+      }
+    },
+    isCurrentResourcesCounted(){
+      if (this.$store.state.searchTarget.counts !== null && 
+          this.$store.state.searchTarget.counts !== 0 &&
+          this.$store.state.searchTarget.target) {
+        return true;
+      }
+      else{
+        return false;
       }
     }
   },

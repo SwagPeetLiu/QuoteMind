@@ -3,10 +3,14 @@
 </template>
 
 <script>
-
 export default {
     name: 'count-up',
     props: {
+        startValue:{
+            type: Number,
+            required: false,
+            default: 0
+        },
         endValue: {
             type: Number,
             required: true
@@ -18,7 +22,7 @@ export default {
     },
     data(){
         return{
-            count : 0,
+            count : this.startValue,
         }
     },
     computed: {

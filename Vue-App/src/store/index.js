@@ -46,7 +46,8 @@ export default createStore({
     toastMessage: { message: "", type: "" },
 
     // Entity Representation Messages:
-    searchWhereBody: null
+    searchWhereBody: null,
+    searchTarget: {target: null, counts: null},
   },
   mutations: {
     // function to toggle the config button at the right bottom of the screen
@@ -205,6 +206,10 @@ export default createStore({
     setSearchWhereBody(state, payload) {
       state.searchWhereBody = generateSearchQueryWhereClause(payload.conditions, payload.operators);
       //console.log("store: setting WhereClause:", state.searchWhereBody);
+    },
+    setSearchTarget(state, payload) {
+      state.searchTarget = payload;
+      console.log("store: setting SearchTarget:", state.searchTarget);
     }
   },
   actions: {

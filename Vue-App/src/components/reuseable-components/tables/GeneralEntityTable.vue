@@ -167,11 +167,14 @@ export default{
                 this.currentPage = null;
                 this.isInitialisedLoading = true;
                 this.isScrolledLoading = false;
+                
+                // update the counts in total to be resetted
+                this.$store.commit("setSearchTarget", {target: null, counts: null});
             }
             else{
                 this.isScrolledLoading = true;
             }
-            
+
             // use default if user did not modify the order by clause, else map to user-defined
             const orderbyClause = 
                 this.orderBy == config.search.defaultOrder[this.target] 
@@ -205,6 +208,8 @@ export default{
                     if(type == "initialise") {
                         setTimeout(()=>{
                             this.isInitialisedLoading = false;
+                            // Update the count references:
+                            this.$store.commit("setSearchTarget", {target: this.target, counts: this.totalCount});
                         }, this.$store.state.loadingDelay);
                     }
                 });
@@ -309,6 +314,9 @@ export default{
         this.$nextTick(() => {
             initTooltips();
         });
+    },
+    beforeUnmount() {
+        this.$store.commit("setSearchTarget", {target: null, counts: null});
     },
     watch:{
         '$store.state.searchWhereBody': {
