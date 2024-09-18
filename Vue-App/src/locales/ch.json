@@ -204,6 +204,10 @@
     "unquoted": "未报价",
     "total": "总计",
     "in total of": "总计",
+    "sorting": "排序",
+    "descendingly": "降序",
+    "ascendingly": "升序",
+    "by": "按照",
     "time": {
       "starts from": "开始于",
       "before": "截止于",

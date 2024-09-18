@@ -100,7 +100,7 @@ import search from "@/api/search";
 import { useI18n } from "vue-i18n";
 import { calculatePercentage, getTargetImage } from "@/utils/helpers";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
-import initTooltips  from "@/assets/js/tooltip.js";
+import { initTooltips }  from "@/assets/js/tooltip.js";
 import { getIcon } from "@/utils/iconMapper.js";
 
 export default {

@@ -101,16 +101,14 @@ export function useValidators() {
 
     // function to deem if the 
     function isSortingAllowed(column, dbReferences){
-        console.log("triggered");
         if (typeof column !== 'string' || !column.trim()) return { valid: false, message: `${t('validation.sorting column')}${t('validation.is invalid')}` };
-        console.log("column:", column);
+
         // if sortign based on table's orioginal target, then it is allowed automatically:
         if (column === 'target') return { valid: true };
-        console.log("validating other than target:", column);
+
         // only proceed for table validation if initialised (account for initial user login)
         if (dbReferences){
             const isValid = Object.values(dbReferences).some(ref => ref.column === column);
-            console.log("isValid:", isValid);
             if (!isValid) return { valid: false, message: `${t('validation.sorting column')}${t('validation.is invalid')}` };
         }
         return { valid: true };

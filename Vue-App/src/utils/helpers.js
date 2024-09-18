@@ -290,17 +290,17 @@ function getTargetImage(target){
     }
 }
 // function used to map out the order sort SVGs
-function getSortImage(column, order){
+function getSortImage(column, order, existingOrderBy){
     try{
         const svgDirection = "up" === order ? "ASC" : "DESC";
         // ordinary sort match ups:
-        if (column === this.orderBy.column && svgDirection === this.orderBy.order) {
+        if (column === existingOrderBy.column && svgDirection === existingOrderBy.order) {
             return require(`@/assets/img/icons/sort-${order}-solid.svg`);
         }
         else if (
             column === "target" && 
-            (this.orderBy.column === "id" || this.orderBy.column.includes("name")) 
-            && svgDirection === this.orderBy.order
+            (existingOrderBy.column === "id" || existingOrderBy.column.includes("name")) 
+            && svgDirection === existingOrderBy.order
         ){
             return require(`@/assets/img/icons/sort-${order}-solid.svg`);
         }

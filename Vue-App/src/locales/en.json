@@ -202,6 +202,10 @@
     "unpaid explanations": "Quoted but not paid yet",
     "total": "Total",
     "in total of": "In total of ",
+    "sorting": "Sorting ",
+    "descendingly": "Descendingly ",
+    "ascendingly": "Ascendingly ",
+    "by": "by ",
     "time": {
       "starts from": "Starts From",
       "before": "Before",

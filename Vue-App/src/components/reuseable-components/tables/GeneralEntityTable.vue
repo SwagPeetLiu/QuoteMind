@@ -17,7 +17,10 @@
                                 :key="colIndex"
                                 class="text-uppercase text-gradient text-dark text-shadow-lg font-weight-bolder"
                             >
-                                <div class="d-flex align-items-center justify-content-start" :class="[column === 'target' ? 'ms-2' : '']">
+                                <div 
+                                    class="d-flex align-items-center justify-content-start" 
+                                    :class="[column === 'target' ? 'ms-2' : '']"
+                                >
                                     <img 
                                         :src="getTargetImage(column === 'target' ? target : column)" 
                                         alt="Icon" 
@@ -32,9 +35,12 @@
                                         v-if="isSortingAllowed(column, $store.state.dbReferences).valid"
                                         class="d-flex flex-column justify-content-center align-items-center table-header-sort-button ms-1"
                                         @click="handleSort(column)"
+                                        :data-bs-toggle="isSortingNow(column) ? 'tooltip' : ''"
+                                        data-bs-placement="top"
+                                        :title="sortingTooltips"
                                     >
-                                        <img :src="getSortImage(column, 'up')" class="up-arrow"/>
-                                        <img :src="getSortImage(column, 'down')" class="down-arrow"/>
+                                        <img :src="getSortImage(column, 'up', orderBy)" class="up-arrow"/>
+                                        <img :src="getSortImage(column, 'down', orderBy)" class="down-arrow"/>
                                     </div>
                                 </div>
                             </th>
@@ -119,6 +125,7 @@ import { useValidators } from '@/utils/useValidators';
 const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/IconEntity.vue";
+import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 
 export default{
     name: "GeneralEntityTable",
@@ -203,23 +210,31 @@ export default{
                 });
         },
         handleSort(column){
-            // if the to be sorted column is already sorted, then reverse the order
-            if (column === this.orderBy.column || 
-                (column === "target" && (this.orderBy.column === "id" || this.orderBy.column.includes("name")))
-            ) {
-                this.orderBy.order = this.orderBy.order === "ASC" ? "DESC" : "ASC";
-            }
 
-            // else select the newly sortby Column and fetch with DESC order by default:
-            else{
-                if (column === "target") {
-                    this.orderBy = config.search.defaultOrder[this.target];
+            // only proceed to sorting if the column is sortable
+            if (isSortingAllowed(column, this.$store.state.dbReferences).valid){
+
+                removeExistingTooltips();
+                
+                // if the to be sorted column is already sorted, then reverse the order
+                if (column === this.orderBy.column || 
+                    (column === "target" && (this.orderBy.column === "id" || this.orderBy.column.includes("name")))
+                ) {
+                    this.orderBy.order = this.orderBy.order === "ASC" ? "DESC" : "ASC";
                 }
+
+                // else select the newly sortby Column and fetch with DESC order by default:
                 else{
-                    this.orderBy = {column: column, order: "DESC"}
+                    
+                    if (column === "target") {
+                        this.orderBy = config.search.defaultOrder[this.target];
+                    }
+                    else{
+                        this.orderBy = {column: column, order: "DESC"}
+                    }
                 }
+                this.fetchData("initialise");
             }
-            this.fetchData("initialise");
         },
         // function used to control the scrolling effects on lazy loading
         handleScroll(){
@@ -230,6 +245,26 @@ export default{
                         this.fetchData("scroll");
                     }
                 }
+            }
+        },
+        isSortingNow(column){
+            if (this.orderBy){
+                if (column === this.orderBy.column && !this.isInitialisedLoading) {
+                    return true;
+                }
+                else if (
+                    column === "target" && 
+                    (this.orderBy.column === "id" || this.orderBy.column.includes("name") &&
+                    !this.isInitialisedLoading)
+                ) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else{
+                return false;
             }
         }
     },
@@ -250,12 +285,30 @@ export default{
         },
         isCurrentDataAvaialble(){
             return this.entities.length > 0;
+        },
+        sortingTooltips(){
+            if (this.orderBy){
+                if (this.$store.getters.getLanguage === "en") {
+                    return `${this.t("stats.sorting")}${this.t(`stats.${this.orderBy.order === "ASC" ? "ascendingly" : "descendingly"}`)} ${this.t("stats.by")}${this.t(`columns.${this.orderBy.column}`)}`;
+                }
+                else{
+                    return `${this.t("stats.by")}${this.t(`columns.${this.orderBy.column}`)}${this.t(`stats.${this.orderBy.order === "ASC" ? "ascendingly" : "descendingly"}`)}${this.t("stats.sorting")}`;
+                }
+            }
+            else{
+                return "";
+            }
         }
     },
     created(){
         this.whereClauses = this.$store.state.searchWhereBody;
         this.orderBy = config.search.defaultOrder[this.target];
         this.fetchData("initialise");
+    },
+    updated() {
+        this.$nextTick(() => {
+            initTooltips();
+        });
     },
     watch:{
         '$store.state.searchWhereBody': {
