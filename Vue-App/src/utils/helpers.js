@@ -283,7 +283,27 @@ function mapColumnType(column){
 // function used to mpa the svg icons to the icons folders
 function getTargetImage(target){
     try{
-        return require(`@/assets/img/icons/${target}.svg`);
+        if (target === "company" || target === "companies"){
+            return require(`@/assets/img/icons/companies.svg`);
+        }
+        else if (target === "client" || target === "clients"){
+            return require(`@/assets/img/icons/clients.svg`);
+        }
+        else if(target === "employee" || target === "employees"){
+            return require(`@/assets/img/icons/employees.svg`);
+        }
+        else if (target === "product" || target === "products"){
+            return require(`@/assets/img/icons/products.svg`);
+        }
+        else if (target === "material" || target === "materials"){
+            return require(`@/assets/img/icons/materials.svg`);
+        }
+        else if (target === "position" || target === "positions"){
+            return require(`@/assets/img/icons/positions.svg`);
+        }
+        else{
+            return require(`@/assets/img/icons/${target}.svg`);
+        }
     }
     catch(err){
         console.error(err);

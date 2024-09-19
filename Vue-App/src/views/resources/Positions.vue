@@ -1,17 +1,22 @@
 <template>
-    <button @click="$store.commit('setToastMessage', { message: 'sadssa', type: 'error' })">
-        positions to be developed
-    </button>
+  <div class="py-2 container-fluid">
+    <div class="d-flex flex-column">
+      <SearchController :target="'positions'"/>
+      <div class="pt-3" style="height: 65vh;">
+        <GeneralEntityTable :target="'positions'"/>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import { useI18n } from 'vue-i18n';
-
+import SearchController from '@/components/reuseable-components/SearchController.vue';
+import GeneralEntityTable from '@/components/reuseable-components/tables/GeneralEntityTable.vue';
 export default {
-    name: "Positions",
-    setup() {
-        const { t } = useI18n();
-        return { t };
-    }
+  name: "Positions",
+  components:{
+    SearchController,
+    GeneralEntityTable
+  }
 };
 </script>

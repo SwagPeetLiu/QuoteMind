@@ -63,6 +63,9 @@ export default {
             else if (this.target === "products" || this.target === "product") {
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
             }
+            else if(this.target === "employees" || this.target === "employee"){
+                return{ iconSize: 40, mt: 2, mb: 0, ml: 12, mr: 10 }
+            }
             else{
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
             }

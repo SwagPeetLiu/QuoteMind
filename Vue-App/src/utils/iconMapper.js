@@ -26,6 +26,7 @@ function getIcon(target) {
         case "wechat_contact":
             return "fa-brands fa-weixin";
         case "position":
+        case "positions":
             return "fa-solid fa-address-card";
         
         case "color":
@@ -56,7 +57,8 @@ function getIcon(target) {
         case "transaction_date":
             return "fa-solid fa-calendar-check";
 
-        case "employee" || "employees":
+        case "employee":
+        case "employees":
             return "fa-solid fa-user-gear";
         case "height":
             return "fa-solid fa-ruler-vertical";

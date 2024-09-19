@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import SoftProgress from "@/components/soft-components/SoftProgress.vue";
+import SoftProgress from "@/components/statistical-components/SoftProgress.vue";
 import IconEntity from "@/components/reuseable-components/IconEntity.vue";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import search from "@/api/search";

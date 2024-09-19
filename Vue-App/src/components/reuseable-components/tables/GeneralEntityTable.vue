@@ -18,8 +18,12 @@
                                 class="text-uppercase text-gradient text-dark text-shadow-lg font-weight-bolder"
                             >
                                 <div 
-                                    class="d-flex align-items-center justify-content-start" 
-                                    :class="[column === 'target' ? 'ms-2' : '']"
+                                    class="d-flex align-items-center" 
+                                    :class="[
+                                        column === 'target' ||  mapColumnType(column) == 'reference' 
+                                        ? 'justify-content-start ms-2' 
+                                        : 'justify-content-center'
+                                    ]"
                                 >
                                     <img 
                                         :src="getTargetImage(column === 'target' ? target : column)" 
@@ -52,11 +56,15 @@
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
-                            class="table-row"
                         >
                             <td 
                                 v-for="(column, colIndex) in entityColumns"
                                 :key="colIndex"
+                                :class="[
+                                    column === 'target' ||  
+                                    (mapColumnType(column) == 'reference' && record[column])? 
+                                    '' : 'text-center'
+                                ]"
                             >
                                 <!-- Record Identification -->
                                 <IconEntity 
@@ -69,9 +77,16 @@
                                 />
 
                                 <!-- Reference Identification -->
-                                <span v-if="mapColumnType(column) == 'reference'">
-                                    {{ record[column] }}
-                                </span>
+                                <div v-if="mapColumnType(column) == 'reference'">
+                                    <IconEntity 
+                                        v-if="record[column]"
+                                        :theme="themeColour" 
+                                        :icon="getIcon(column)" 
+                                        :name="record[column][getRecordName(target, $i18n.locale)]"
+                                        :id="record[column].id"
+                                        :target="column"
+                                    />
+                                </div>
 
                                 <!-- ordinary field -->
                                 <span 
