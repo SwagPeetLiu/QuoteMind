@@ -205,11 +205,9 @@ export default createStore({
     // transformative function used to map filtration Area into API where clauses:
     setSearchWhereBody(state, payload) {
       state.searchWhereBody = generateSearchQueryWhereClause(payload.conditions, payload.operators);
-      //console.log("store: setting WhereClause:", state.searchWhereBody);
     },
     setSearchTarget(state, payload) {
       state.searchTarget = payload;
-      console.log("store: setting SearchTarget:", state.searchTarget);
     }
   },
   actions: {

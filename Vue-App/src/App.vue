@@ -26,6 +26,9 @@
     <!-- Footer -->
     <app-footer v-show="this.$store.state.showFooter" />
 
+    <!-- buttons used to add on instances -->
+    <InstanceAddButton @add-instance="addInstance"/>
+
     <!-- Configurator toggler -->
     <configurator
       :toggle="toggleConfigurator"
@@ -53,6 +56,7 @@ import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 import ErrorDialog from "@/components/reuseable-components/pop-ups/ErrorDialog.vue";
 import SlideToast from "@/components/reuseable-components/pop-ups/SlideToast.vue";
 import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
+import InstanceAddButton from "@/components/page-layouts/InstanceAddButton.vue";
 
 export default {
   name: "App",
@@ -63,7 +67,8 @@ export default {
     AppFooter,
     ErrorDialog,
     SlideToast,
-    ColouringCubeOverlay
+    ColouringCubeOverlay,
+    InstanceAddButton
   },
   data(){
     return {
@@ -73,11 +78,14 @@ export default {
   methods: {
     ...mapMutations(["toggleConfigurator"]),
     showModal() {
-            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
-                keyboard: false
-            })
-            myModal.show()
-        }
+      var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+        keyboard: false
+      })
+      myModal.show()
+    },
+    addInstance(target) {
+      console.log("add instance", target);
+    }
   },
   computed: {
     // function used to control the top nav bar's displays
