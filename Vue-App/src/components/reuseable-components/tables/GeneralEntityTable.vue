@@ -298,8 +298,12 @@ export default{
             if (!this.$refs.tableContainer) return;
 
             const containerWidth = this.$refs.tableContainer.offsetWidth;
-            const minColumnWidth = 250; // adjustable
-            const maxVisibleColumns = Math.floor(containerWidth / minColumnWidth);
+            const minColumnWidth = 250;
+            const minVisibleColumns = 2; // Ensure at least 2 columns are always visible
+            const maxVisibleColumns = Math.max(
+                minVisibleColumns,
+                Math.floor(containerWidth / minColumnWidth)
+            );
 
             this.visibleColumns = this.entityColumns.slice(0, maxVisibleColumns);
         }
