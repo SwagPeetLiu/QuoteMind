@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex align-items-end justify-content-start my-1 ms-3 overflow-hidden">
+    <div class="icon-entity my-1 ms-3 overflow-hidden">
 
         <div 
             class="icon-container d-flex align-items-center justify-content-center rounded-circle"
@@ -18,9 +18,9 @@
         </div>
 
         <!-- Name & id -->
-        <p class="name-container d-flex flex-column ms-2 my-0 ">
+        <p class="name-container ms-2 my-0 ">
             <span class="icon-name text-gradient text-dark font-weight-bold text-truncate">{{ name }}</span>
-            <span class="icon-id text-secondary text-truncate">#{{ id }}</span>
+            <span class="icon-id text-secondary">#{{ id }}</span>
         </p>
     </div>
 </template>
@@ -57,14 +57,17 @@ export default {
             if (this.target === "companies" || this.target === "company") {
                 return{ iconSize: 40, mt: 0, mb: 0, ml: 10, mr: 10 }
             }
-            else if (this.target === "clients" || this.target === "client") {
-                return{ iconSize: 45, mt: 0, mb: 0, ml: 11, mr: 10 }
+            else if (this.target.includes("client")) {
+                return{ iconSize: 46, mt: -1, mb: 0, ml: 12, mr: 10 }
             }
-            else if (this.target === "products" || this.target === "product") {
+            else if (this.target.includes("product")) {
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
             }
-            else if(this.target === "employees" || this.target === "employee"){
+            else if(this.target.includes("employee")){
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 12, mr: 10 }
+            }
+            else if(this.target.includes("position")){
+                return{ iconSize: 40, mt: 1, mb: 0, ml: 9, mr: 10 }
             }
             else{
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }

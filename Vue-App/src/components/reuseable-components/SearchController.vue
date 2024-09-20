@@ -32,7 +32,11 @@
                         @click="addFilter()"
                     >
                         <i class="me-sm-2 my-0" :class="getIcon('add')"></i>
-                        <span class="d-none d-sm-block">{{ t("apiMessage.search.add filter") }}</span>
+                        <span 
+                            class="d-none d-sm-block text-nowrap"
+                        >
+                            {{ t("apiMessage.search.add filter") }}
+                        </span>
                     </button>
                 </div>
 

@@ -82,7 +82,7 @@ const config = {
         - size: will be mapped & rendered with all dimensions (units, length, width, height)
     */
     defaultListings:{
-        "clients": ["target", "phone", "qq_contact", "wechat_contact", "email", "company"],
+        "clients": ["target", "phone", "wechat_contact", "qq_contact", "company", "email"],
         "companies": ["target", "phone", "email"],
         "employees": ["target", "phone", "wechat_contact", "qq_contact", "position", "email"],
         "materials": ["target", "descriptions"],

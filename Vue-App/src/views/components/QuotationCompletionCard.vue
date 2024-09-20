@@ -15,7 +15,7 @@
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8 col-target">
                 <div class="d-flex align-items-center justify-content-start ms-1">
                   <img :src="getTargetImage(quoteTarget)" alt="Total Transactions" class="table-header-image"/>
-                  <span class="ms-3 mt-1 text-xs">{{ t(`routes.${quoteTarget}`) }}</span>
+                  <span class="ms-3 mt-1">{{ t(`routes.${quoteTarget}`) }}</span>
                 </div> 
               </th>
               <th 
@@ -27,7 +27,7 @@
               >
                 <div class="d-flex align-items-center justify-content-center">
                   <img src="../../assets/img/icons/total-transactions.svg" alt="Total Transactions" class="table-header-image" />
-                  <span class="ms-2 mt-1 text-xs">{{ t('stats.unpaid') }}</span>
+                  <span class="ms-2 mt-1">{{ t('stats.unpaid') }}</span>
                 </div>
               </th>
               <th class="text-uppercase text-secondary font-weight-bolder opacity-8 col-quoted"
@@ -37,7 +37,7 @@
               >
                 <div class="d-flex align-items-center justify-content-center">
                   <img src="../../assets/img/icons/percentage.svg" alt="Percentage" class="table-header-image" />
-                  <span class="ms-2 mt-1 text-xs">{{ t('stats.quoted') }}</span>
+                  <span class="ms-2 mt-1">{{ t('stats.quoted') }}</span>
                 </div>
               </th>
             </tr>

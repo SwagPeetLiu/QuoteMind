@@ -1,35 +1,82 @@
-.icon-container {
-    --icon-size: 40px; // Default value
-    --icon-margin-top: 0px; // Default value
-    --icon-margin-bottom: 0px; // Default value
-    --icon-margin-left: 10px; // Default value
-    --icon-margin-right: 10px; // Default value
-    height: 42px;
-    width: 42px;
+.icon-entity {
+    display: flex;
+    align-items: center; // align to middle when no ID is presenting
+    justify-content: flex-start;
 
-    div {
-        height: 40px;
-        width: 40px;
-        min-width: 40px;
-        min-height: 40px;
+    .icon-container {
+        --icon-size: 40px; // Default value
+        --icon-margin-top: 0px; // Default value
+        --icon-margin-bottom: 0px; // Default value
+        --icon-margin-left: 10px; // Default value
+        --icon-margin-right: 10px; // Default value
+        height: 42px;
+        width: 42px;
+        min-width: 42px;
+        min-height: 42px;
+
+        div {
+            height: 40px;
+            width: 40px;
+            min-width: 40px;
+            min-height: 40px;
+        }
+
+        i {
+            padding-top: 2px;
+            margin-top: var(--icon-margin-top);
+            margin-bottom: var(--icon-margin-bottom);
+            margin-left: var(--icon-margin-left);
+            margin-right: var(--icon-margin-right);
+            font-size: calc(var(--icon-size) * 0.45);
+        }
     }
-    i {
-        margin-top: var(--icon-margin-top);
-        margin-bottom: var(--icon-margin-bottom);
-        margin-left: var(--icon-margin-left);
-        margin-right: var(--icon-margin-right);
-        font-size: calc(var(--icon-size) * 0.45);
+
+    .name-container {
+        display: flex;
+        .icon-name {
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 0.8rem;
+            margin-top: 0;
+            margin-bottom: 0px;
+        }
+
+        .icon-id {
+            display: none;
+        }
     }
 }
-.name-container{
-    .icon-name{
-        font-size: 0.9rem;
-        margin-top: 0;
-        margin-bottom: -4px;
-    }
-    .icon-id{
-        margin-top: 2px;
-        margin-bottom: 0;
-        font-size: 0.7rem;
+
+/* Responsive Design of Icon Entity */
+@media (min-width: 992px) {
+    .icon-entity {
+        display: flex;
+        align-items: flex-end; // align all contents to the end
+        justify-content: flex-start;
+
+        .name-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            
+            /* Align text to the left */
+
+            .icon-name {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                margin-bottom: -4px;
+                font-size: 0.85rem;
+            }
+
+            .icon-id {
+                display: block;
+                margin-top: 2px;
+                margin-bottom: 0;
+                font-size: 0.7rem;
+            }
+        }
     }
 }

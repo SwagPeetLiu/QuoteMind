@@ -16,7 +16,7 @@
                     <thead class="table-header">
                         <tr>
                             <th 
-                                v-for="(column, colIndex) in entityColumns"
+                                v-for="(column, colIndex) in visibleColumns"
                                 :key="colIndex"
                                 class="text-uppercase text-gradient text-dark text-shadow-lg font-weight-bolder"
                             >
@@ -62,7 +62,7 @@
                             class="table-row h-100"
                         >
                             <td 
-                                v-for="(column, colIndex) in entityColumns"
+                                v-for="(column, colIndex) in visibleColumns"
                                 :key="colIndex"
                                 style="min-height: 80px;"
                             >
@@ -107,7 +107,7 @@
                         <!-- indicator for lazy-loading -->
                         <tr v-if="isScrolledLoading">
                             <td 
-                                :colspan="entityColumns.length"
+                                :colspan="visibleColumns.length"
                                 class="text-center pt-2"
                                 style="height: 65px;"
                             >
@@ -172,6 +172,7 @@ export default{
             totalCount: null,
             orderBy: null,
             entities: [],
+            visibleColumns: []
         }
     },
     methods:{
@@ -292,6 +293,15 @@ export default{
             else{
                 return false;
             }
+        },
+        updateVisibleColumns() {
+            if (!this.$refs.tableContainer) return;
+
+            const containerWidth = this.$refs.tableContainer.offsetWidth;
+            const minColumnWidth = 250; // adjustable
+            const maxVisibleColumns = Math.floor(containerWidth / minColumnWidth);
+
+            this.visibleColumns = this.entityColumns.slice(0, maxVisibleColumns);
         }
     },
     computed:{
@@ -331,12 +341,17 @@ export default{
         this.orderBy = config.search.defaultOrder[this.target];
         this.fetchData("initialise");
     },
+    mounted() {
+        this.updateVisibleColumns();
+        window.addEventListener('resize', this.updateVisibleColumns);
+    },
     updated() {
         this.$nextTick(() => {
             initTooltips();
         });
     },
     beforeUnmount() {
+        window.removeEventListener('resize', this.updateVisibleColumns);
         this.$store.commit("setSearchTarget", {target: null, counts: null});
     },
     watch:{
