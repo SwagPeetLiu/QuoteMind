@@ -161,7 +161,12 @@
 }
 
 .table-row{
-  z-index: 1;
+  .info-span{
+    max-width: 650px; /* Adjust this value as needed */
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 .table-header-image{

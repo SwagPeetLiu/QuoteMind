@@ -7,7 +7,10 @@
                 ref="tableContainer"
                 @scroll="handleScroll"
             >
-                <table class="table align-items-center mb-0 table-hover custom-width-columns">
+                <table 
+                    class="table align-items-center mb-0 table-hover custom-width-columns"
+                    style="height: 1px;"
+                >
 
                     <!-- header -->
                     <thead class="table-header">
@@ -56,28 +59,29 @@
                         <tr 
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
+                            class="table-row h-100"
                         >
                             <td 
                                 v-for="(column, colIndex) in entityColumns"
                                 :key="colIndex"
-                                :class="[
-                                    column === 'target' ||  
-                                    (mapColumnType(column) == 'reference' && record[column])? 
-                                    '' : 'text-center'
-                                ]"
+                                style="min-height: 80px;"
                             >
                                 <!-- Record Identification -->
-                                <IconEntity 
-                                    v-if="column === 'target'"
-                                    :theme="themeColour" 
-                                    :icon="getIcon(target)" 
-                                    :name="record[getRecordName(target, $i18n.locale)]"
-                                    :id="record.id"
-                                    :target="target"
-                                />
-
+                                
+                                    <IconEntity 
+                                        v-if="column === 'target'"
+                                        :theme="themeColour" 
+                                        :icon="getIcon(target)" 
+                                        :name="record[getRecordName(target, $i18n.locale)]"
+                                        :id="record.id"
+                                        :target="target"
+                                    />
+                                
                                 <!-- Reference Identification -->
-                                <div v-if="mapColumnType(column) == 'reference'">
+                                <div 
+                                    v-if="mapColumnType(column) == 'reference'"
+                                    class="d-flex align-items-center"
+                                >
                                     <IconEntity 
                                         v-if="record[column]"
                                         :theme="themeColour" 
@@ -89,12 +93,14 @@
                                 </div>
 
                                 <!-- ordinary field -->
-                                <span 
-                                    v-if="mapColumnType(column) == 'ordinary'"
-                                    class="text-dark"
-                                >
-                                    {{ record[column] }}
-                                </span>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <span 
+                                        v-if="mapColumnType(column) == 'ordinary'"
+                                        class="text-gradient text-dark info-span"
+                                    >
+                                        {{ record[column] }}
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                         

@@ -20,8 +20,15 @@
   </template>
 
 <script>
+import { useI18n } from 'vue-i18n';
 export default {
     name: "InstanceAddButton",
+    data(){
+      const { t } = useI18n({});
+      return {
+        t
+      }
+    },
     computed:{
         isCurrentRouteResourceful(){
             const name = this.$route.name;
@@ -33,7 +40,7 @@ export default {
             }
         },
         currentResource(){
-            return this.$store.state.searchTarget.target;
+            return this.t(`routes.${this.$store.state.searchTarget.target}`);
         }
     }
 }
