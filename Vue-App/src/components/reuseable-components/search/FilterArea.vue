@@ -28,13 +28,14 @@
                 <u class="text-white clause-text-lg me-1 my-0 badge-target">{{ t(`columns.${target}`) }}</u>
 
                 <!-- indicator (dynamic depending on the filtration type)-->
-                <div class="text-white clause-text-lg me-1 my-0" v-if="mappedTargetType(mappedWhereClauses[target]) == 'date'">
+                <div class="text-white clause-text-lg my-0" v-if="mappedTargetType(mappedWhereClauses[target]) === 'date'">
                     {{ mappedWhereClauses[target].values[0].end == null? t('stats.time.starts from') : t('stats.time.before') }}
                 </div>
                 <div 
                     v-if="!mappedTargetType(mappedWhereClauses[target]).includes('date')"
                     class="text-white clause-text-lg mx-2 my-0">
                     <span v-if="mappedTargetType(mappedWhereClauses[target]) == 'number'">=</span>
+                    <span v-else-if="mappedTargetType(mappedWhereClauses[target]) == 'categorical'">{{ t(`stats.${mappIndicator(target)}`) }}</span>
                     <span v-else>{{ t(`stats.${mappIndicator(target)}`) }}</span>
                 </div>
 
@@ -144,10 +145,21 @@ export default {
                         acc[target] = { values: [], type: type };
                     }
                     
+                    // For timestamp, only keep the last value
                     if (type.includes("timestamp")) {
-                        // For timestamp, only keep the last value
                         acc[target].values = [value];
-                    } else {
+                    } 
+                    // for categorical inputs, transform the object into values
+                    else if (target === "status"){
+                        acc[target].values = [];
+                        Object.keys(value)
+                            .forEach((category) => {
+                                if (value[category] == true) {
+                                    acc[target].values.push(category); // only return selected
+                                }
+                        });
+                    }
+                    else {
                         acc[target].values.push(value);
                     }
                     
@@ -166,19 +178,17 @@ export default {
         getIcon,
         formatDate,
         mappIndicator,
-        mapArrayToCategorizedObject(arr){
-            return arr
-        },
         // toggle between the or and and connector for a specific column 
         changeConnector(connector, target) {
-            if (this.connectorMap.has(target)) {
+            if (this.connectorMap.has(target)
+                && target !== "status") {
                 this.connectorMap.set(target, connector);
             }
         },
         mappedTargetType(targetObject){
             if (targetObject.type.includes('timestamp') && 
-                (targetObject.values[0].start != null || 
-                targetObject.values[0].end != null)
+                targetObject.values[0].start !== null && 
+                targetObject.values[0].end !== null
             ){
                 return "ranged date";
             }
@@ -187,6 +197,9 @@ export default {
             }
             else if(targetObject.type.includes('numeric') || targetObject.type.includes('integer')) {
                 return "number";
+            }
+            else if(targetObject.type.includes('USER-DEFINED')) {
+                return "categorical";
             }
             else {
                 return "text";

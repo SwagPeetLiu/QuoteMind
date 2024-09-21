@@ -43,15 +43,29 @@
                 <!-- mapping different types of inputs for users to control the serach mechanism -->
                 <SearchTextInput 
                     class="w-100 h-50"
-                    v-if="currentSearchType !== 'timestamp'" 
+                    v-if="currentSearchType !== 'timestamp' && currentSearchType !== 'categorical'" 
                     :target="currentSelection.name"
                     @update-search-value="setSearchValue"
                     @enter-key-pressed="addFilter()"
                     :clearingInput="clearInput"
                 />
 
-                <div v-else class="w-100 h-50 px-sm-4">
+                <div 
+                    v-if="currentSearchType == 'timestamp'" 
+                    class="w-100 h-50 px-sm-4"
+                >
                     <RangedCalendar 
+                        :target="currentSelection.name"
+                        @update-search-value="setSearchValue"
+                        :clearingInput="clearInput"
+                    />
+                </div>
+
+                <div 
+                    v-if="currentSearchType == 'categorical'" 
+                    class="w-100 h-50"
+                >
+                    <SearchCategoricalInput
                         :target="currentSelection.name"
                         @update-search-value="setSearchValue"
                         :clearingInput="clearInput"
@@ -73,9 +87,10 @@
 <script>
 import { useI18n } from "vue-i18n";
 import { getIcon } from "@/utils/iconMapper.js";
-import SearchTextInput from "@/components/reuseable-components/SearchTextInput.vue";
-import RangedCalendar from "@/components/statistical-components/RangedCalendar.vue";
-import FilterArea from "@/components/statistical-components/FilterArea.vue";
+import SearchTextInput from "@/components/reuseable-components/search/SearchTextInput.vue";
+import RangedCalendar from "@/components/reuseable-components/search/RangedCalendar.vue";
+import SearchCategoricalInput from "@/components/reuseable-components/search/SearchCategoricalInput.vue";
+import FilterArea from "@/components/reuseable-components/search/FilterArea.vue";
 import { config } from "@/config/config";
 
 export default {
@@ -89,6 +104,7 @@ export default {
     components: {
         RangedCalendar,
         SearchTextInput,
+        SearchCategoricalInput,
         FilterArea
     },
     data(){
@@ -182,6 +198,11 @@ export default {
             // only adding the filter if the input is valid (handles children's enter signals)
             if (this.searchValue.isValid){
                 this.clearInput = true;
+
+                // if the choice is categorical or time-based input, then we will replace any existing:
+                if (this.currentSearchType == "categorical" || this.currentSearchType == "timestamp"){
+                    this.existingInputs = this.existingInputs.filter(input => input.target !== this.currentSelection.name);
+                }
                 this.existingInputs.push({...this.searchValue, target: this.currentSelection.name});
                 this.searchValue = {value: null, type: null, isValid: false};
                 setTimeout(() => {

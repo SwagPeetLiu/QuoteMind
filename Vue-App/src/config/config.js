@@ -91,6 +91,12 @@ const config = {
         "pricing_rules": ["id", "price_per_unit", "conditions"],
         "products": ["target", "descriptions"],
         "transactions": ["target", "status", "transaction_date", "product", "materials", "sold to", "quantity", "price_per_unit", "amount", "colour", "size", "employee", "note"]
+    },
+
+    // categorical choices
+    multipleOptions:{
+        "status": ['created', 'quoted', 'paid'],
+        "address-type": ['home', 'work', 'other'],
     }
 }
 

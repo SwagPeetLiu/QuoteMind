@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import SearchController from '@/components/reuseable-components/SearchController.vue';
+import SearchController from '@/components/reuseable-components/search/SearchController.vue';
 import GeneralEntityTable from '@/components/reuseable-components/tables/GeneralEntityTable.vue';
 export default {
   name: "Materials",

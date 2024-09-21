@@ -222,6 +222,9 @@ function mappIndicator(target) {
     ){
         return "named";
     }
+    else if(target === "status"){
+        return "as";
+    }
     else{
         return "contains";
     }

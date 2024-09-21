@@ -10,19 +10,22 @@ export function useValidators() {
     function mapValidation(target, value) {
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
-        if (target === 'password'){
-            if (value === config.passwordOverlay){
+        if (target === 'password') {
+            if (value === config.passwordOverlay) {
                 return { valid: true };
             }
             return isPasswordValid(value);
         };
 
         // general search validations:
-        if (target === "textInput"){
+        if (target === "textInput") {
             return isTextInputValid(value);
         }
-        if (target === "rangedDateInput"){
+        if (target === "rangedDateInput") {
             return isRangedDateInputValid(value);
+        }
+        if (target === "status") {
+            return isStatusValid(value);
         }
 
         return { valid: true };
@@ -75,24 +78,23 @@ export function useValidators() {
         return { valid: true };
     }
 
-    function isSearchTableValid(tableName, dbReferences){
+    function isSearchTableValid(tableName, dbReferences) {
         if (typeof tableName !== 'string' || !tableName.trim()) return { valid: false, message: `${t('validation.search target')}${t('validation.is invalid')}` };
-        
+
         // only proceed for table validation if initialised (account for initial user login)
-        if (dbReferences){
+        if (dbReferences) {
             const isValid = Object.values(dbReferences).some(ref => ref.table === tableName);
             if (!isValid) return { valid: false, message: `${t('validation.search target')}${t('validation.is invalid')}` };
         }
         return { valid: true };
     }
 
-    function isSearchBodyValid(body){
+    function isSearchBodyValid(body) {
         if (!('searchQuery' in body) || !('page' in body)) return { valid: false, message: `${t('validation.search query')}${t('validation.has incomplete information')}` };
-        
+
         const searchQuery = body.searchQuery;
-        if (!('fields' in searchQuery) || !('whereClause' in searchQuery) || !('groupByClause' in searchQuery) || 
-        !("orderByClause" in searchQuery))
-        {
+        if (!('fields' in searchQuery) || !('whereClause' in searchQuery) || !('groupByClause' in searchQuery) ||
+            !("orderByClause" in searchQuery)) {
             return { valid: false, message: `${t('validation.search query')}${t('validation.has incomplete information')}` };
         }
 
@@ -100,14 +102,14 @@ export function useValidators() {
     }
 
     // function to deem if the 
-    function isSortingAllowed(column, dbReferences){
+    function isSortingAllowed(column, dbReferences) {
         if (typeof column !== 'string' || !column.trim()) return { valid: false, message: `${t('validation.sorting column')}${t('validation.is invalid')}` };
 
         // if sortign based on table's orioginal target, then it is allowed automatically:
         if (column === 'target') return { valid: true };
 
         // only proceed for table validation if initialised (account for initial user login)
-        if (dbReferences){
+        if (dbReferences) {
             const isValid = Object.values(dbReferences).some(ref => ref.column === column);
             if (!isValid) return { valid: false, message: `${t('validation.sorting column')}${t('validation.is invalid')}` };
         }
@@ -116,49 +118,79 @@ export function useValidators() {
 
     // general string based search
     function isTextInputValid(textInput) {
-        if (!textInput || typeof textInput !== 'string' || !textInput.trim()){
-            return { 
-                valid: false, 
-                message: `${t('validation.search value')}${t('validation.cannot be empty')}` 
+        if (!textInput || typeof textInput !== 'string' || !textInput.trim()) {
+            return {
+                valid: false,
+                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
             };
         }
         else if (textInput.length > config.limitations.Max_Name_Length) {
-            return { 
-                valid: false, 
-                message: `${t('validation.search value')}${t('validation.too long')}` 
+            return {
+                valid: false,
+                message: `${t('validation.search value')}${t('validation.too long')}`
             };
         }
-        else{
+        else {
             return { valid: true };
         }
     }
 
     // general date transactions
     function isRangedDateInputValid(dateObject) {
-    if (!dateObject || (typeof dateObject !== 'object')) {
-        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        if (!dateObject || (typeof dateObject !== 'object')) {
+            return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        }
+
+        const { start, end } = dateObject;
+
+        if (!start && !end) {
+            return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        }
+
+        if (start && !(start instanceof Date)) {
+            return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        }
+
+        if (end && !(end instanceof Date)) {
+            return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        }
+
+        if (start && end && start >= end) {
+            return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+        }
+
+        return { valid: true };
     }
 
-    const { start, end } = dateObject;
-
-    if (!start && !end) {
-        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
+    function isStatusValid(status) {
+        const allowedOptions = config.multipleOptions["status"];
+        if (!status){
+            return { valid: false, message: `${t('validation.status')}${t('validation.cannot be empty')}` };
+        }
+        
+        // at least a single categroy is selected:
+        if (typeof status === 'object') {
+            let isSingleConditionSelected = false;
+            for (const option of allowedOptions){
+                if (status[option]) {
+                    if (status[option] === true) {
+                        isSingleConditionSelected = true;
+                        return { valid: true };
+                    }
+                }
+            }
+            if (!isSingleConditionSelected) {
+                return { valid: false, message: `${t('validation.status')}${t('validation.must be selected')}` };
+            }
+        }
+        // allow textual inputs
+        if (typeof status === 'string') {
+            if (!allowedOptions.includes(status)) {
+                return { valid: false, message: `${t('validation.status')}${t('validation.is invalid')}` };
+            }
+        }
+        return { valid: true };
     }
-
-    if (start && !(start instanceof Date)) {
-        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
-    }
-
-    if (end && !(end instanceof Date)) {
-        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
-    }
-
-    if (start && end && start >= end) {
-        return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
-    }
-
-    return { valid: true };
-}
 
     return {
         mapValidation,
@@ -168,6 +200,7 @@ export function useValidators() {
         isRegisterTokenValid,
         isSearchTableValid,
         isSearchBodyValid,
-        isSortingAllowed
+        isSortingAllowed,
+        isStatusValid
     };
 }

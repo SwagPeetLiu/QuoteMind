@@ -147,12 +147,14 @@
     "too long": "过长",
     "has incomplete information": "不全",
     "is invalid": "无效",
+    "must be selected": "必须选择",
 
     "username": "用户名",
     "email": "邮箱",
     "password": "密码",
     "token": "注册码",
     "date range": "日期范围",
+    "status": "交易状态",
 
     "search query": "搜索内容",
     "search target": "搜索目标",
@@ -190,6 +192,7 @@
     "account your transactions": "准确记录以及保存您的收款情况"
   },
   "stats":{
+    "as": "为",
     "or": "或者",
     "and": "并且",
     "contains": "包含",
@@ -288,6 +291,13 @@
     "quantity_unit": "数量单位",
     "size_unit": "尺寸单位",
     "threshold": "阈值"
+  },
+  "multipleOptions": {
+    "status":{
+      "quoted": "已报价",
+      "paid": "已付款",
+      "created": "已创立"
+    }
   },
   "others":{
     "remains": "是"

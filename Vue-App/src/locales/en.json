@@ -145,12 +145,14 @@
     "too long": "too long",
     "has incomplete information": "has incomplete information",
     "is invalid": "is invalid",
+    "must be selected": "must be selected",
     
     "username": "Username ",
     "email": "Email ",
     "password": "Password ",
     "token": "Register Token ",
     "date range": "Date Range ",
+    "status": "Transaction Status ",
 
     "search query": "Search Query ",
     "search target": "Search Target ",
@@ -188,6 +190,7 @@
     "account your transactions": "Keep track of the payment status of your transactions"
   },
   "stats":{
+    "as": "as",
     "or": "OR",
     "and": "AND",
     "contains": "contains",
@@ -285,6 +288,13 @@
     "quantity_unit": "Quantity Unit",
     "size_unit": "Size Unit",
     "threshold": "Threshold"
+  },
+  "multipleOptions": {
+    "status":{
+      "quoted": "Quoted",
+      "paid": "Paid",
+      "created": "Created"
+    }
   },
   "others":{
     "remains": " remains "
