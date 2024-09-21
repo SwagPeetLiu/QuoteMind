@@ -270,13 +270,15 @@ function mapColumnType(column){
         column === "employee" || 
         column === "employees" ||
         column === "positions" || 
-        column === "position" ||
         column === "product" || 
         column === "products" ||
         column === "material" ||
         column === "materials"
     ) {
         return "reference";
+    }
+    else if (column === "status" || column === "position"){
+        return "categorical";
     }
     else {
         return "ordinary";

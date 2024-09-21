@@ -1,9 +1,9 @@
 <template>
   <div class="py-2 container-fluid">
     <div class="d-flex flex-column">
-      <SearchController :target="'transactions'"/>
+      <SearchController :target="'products'"/>
       <div class="pt-3" style="height: 65vh;">
-        <GeneralEntityTable :target="'transactions'"/>
+        <GeneralEntityTable :target="'products'"/>
       </div>
     </div>
   </div>

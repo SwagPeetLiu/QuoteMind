@@ -9,7 +9,6 @@
             >
                 <table 
                     class="table align-items-center mb-0 table-hover custom-width-columns"
-                    style="height: 1px;"
                 >
 
                     <!-- header -->
@@ -92,6 +91,18 @@
                                     />
                                 </div>
 
+                                <!-- categorical field -->
+                                <div 
+                                    v-if="mapColumnType(column) == 'categorical'"
+                                    class="d-flex align-items-center justify-content-center"
+                                >
+                                    <CategoricalBadge 
+                                        v-if="record[column]"
+                                        :target="column"
+                                        :category="record[column]" 
+                                    />
+                                </div>
+
                                 <!-- ordinary field -->
                                 <div class="d-flex align-items-center justify-content-center">
                                     <span 
@@ -146,6 +157,7 @@ import { useValidators } from '@/utils/useValidators';
 const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/IconEntity.vue";
+import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 
 export default{
@@ -159,7 +171,8 @@ export default{
     components:{
         DashLoader,
         DotLoader,
-        IconEntity
+        IconEntity,
+        CategoricalBadge
     },
     data(){
         const { t } = useI18n();

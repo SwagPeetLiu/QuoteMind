@@ -97,6 +97,18 @@ const config = {
     multipleOptions:{
         "status": ['created', 'quoted', 'paid'],
         "address-type": ['home', 'work', 'other'],
+    },
+    optionsColouring:{
+        "status":{
+            "created": "danger",
+            "quoted": "info",
+            "paid": "success"
+        },
+        "position":{
+            "Assembler": "primary",
+            "Designer": "warning",
+            "Installer": "info",
+        }
     }
 }
 

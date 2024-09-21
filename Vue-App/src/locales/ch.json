@@ -297,6 +297,11 @@
       "quoted": "已报价",
       "paid": "已付款",
       "created": "已创立"
+    },
+    "position":{
+      "Assembler": "组装",
+      "Designer": "设计",
+      "Installer": "安装配送"
     }
   },
   "others":{

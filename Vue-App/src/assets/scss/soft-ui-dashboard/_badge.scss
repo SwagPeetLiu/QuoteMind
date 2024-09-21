@@ -28,7 +28,7 @@
 }
 
 @media (max-width: 250px) {
-  .clause-badge{
+  .clause-badge {
     height: fit-content;
   }
 }
@@ -68,4 +68,15 @@
       font-size: 0.9vw;
     }
   }
+}
+
+/*
+Badges for the categorical informations
+*/
+.categorical-badge {
+  padding: 0.25rem 0.5rem;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

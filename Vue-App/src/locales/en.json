@@ -294,6 +294,11 @@
       "quoted": "Quoted",
       "paid": "Paid",
       "created": "Created"
+    },
+    "position":{
+      "Assembler": "Assembler",
+      "Designer": "Designer",
+      "Installer": "Installer"
     }
   },
   "others":{
