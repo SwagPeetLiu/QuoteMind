@@ -280,6 +280,12 @@ function mapColumnType(column){
     else if (column === "status" || column === "position"){
         return "categorical";
     }
+    else if(column.includes("date")){
+        return "date";
+    }
+    else if (column === "product & materials" || column === "sold to"){
+        return 'custom reference'
+    }
     else {
         return "ordinary";
     }
@@ -291,13 +297,13 @@ function getTargetImage(target){
         if (target === "company" || target === "companies"){
             return require(`@/assets/img/icons/companies.svg`);
         }
-        else if (target === "client" || target === "clients"){
+        else if (target === "client" || target === "clients" || target === "sold to"){
             return require(`@/assets/img/icons/clients.svg`);
         }
         else if(target === "employee" || target === "employees"){
             return require(`@/assets/img/icons/employees.svg`);
         }
-        else if (target === "product" || target === "products"){
+        else if (target === "product" || target === "products" || target === "product & materials"){
             return require(`@/assets/img/icons/products.svg`);
         }
         else if (target === "material" || target === "materials"){

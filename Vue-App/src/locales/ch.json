@@ -162,7 +162,8 @@
 
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符",
-    "invalid performance target": "此报价衡量无效"
+    "invalid performance target": "此报价衡量无效",
+    "missing product": "未选商品"
   },
   "dashboard":{
     "welcome": "QuoteMind 欢迎您!",
@@ -290,13 +291,15 @@
     "ch_unit": "单位",
     "quantity_unit": "数量单位",
     "size_unit": "尺寸单位",
-    "threshold": "阈值"
+    "threshold": "阈值",
+    "product & materials": "产品和材质",
+    "sold to": "买家"
   },
   "multipleOptions": {
     "status":{
       "quoted": "已报价",
       "paid": "已付款",
-      "created": "已创立"
+      "created": "未报价"
     },
     "position":{
       "Assembler": "组装",

@@ -90,7 +90,7 @@ const config = {
         "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "threshold"],
         "pricing_rules": ["id", "price_per_unit", "conditions"],
         "products": ["target", "descriptions"],
-        "transactions": ["target", "status", "transaction_date", "product", "materials", "sold to", "quantity", "price_per_unit", "amount", "colour", "size", "employee", "note"]
+        "transactions": ["target", "status", "transaction_date", "product & materials", "sold to", "quantity", "price_per_unit", "amount", "size", "colour", "employee", "note"]
     },
 
     // categorical choices

@@ -48,8 +48,10 @@ function getIcon(target) {
             return "fa-solid fa-coins";
         case "amount":
         case "account":
+        case "transactions":
+        case "transaction":
             return "fa-solid fa-money-bill-wave";
-
+            
         case "creation_date":
             return "fa-solid fa-clock-rotate-left";
         case "modified_date":

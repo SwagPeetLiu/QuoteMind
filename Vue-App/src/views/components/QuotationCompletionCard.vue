@@ -94,7 +94,7 @@
 
 <script>
 import SoftProgress from "@/components/statistical-components/SoftProgress.vue";
-import IconEntity from "@/components/reuseable-components/IconEntity.vue";
+import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import search from "@/api/search";
 import { useI18n } from "vue-i18n";

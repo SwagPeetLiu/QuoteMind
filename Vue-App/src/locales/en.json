@@ -160,7 +160,8 @@
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character",
-    "invalid performance target": "Performance Target invalid"
+    "invalid performance target": "Performance Target invalid",
+    "missing product": "Missing Product"
   },
   "dashboard":{
     "welcome": "Welcome Back!",
@@ -287,13 +288,15 @@
     "ch_unit": "Unit",
     "quantity_unit": "Quantity Unit",
     "size_unit": "Size Unit",
-    "threshold": "Threshold"
+    "threshold": "Threshold",
+    "product & materials": "Product & Materials",
+    "sold to": "Sold To"
   },
   "multipleOptions": {
     "status":{
       "quoted": "Quoted",
       "paid": "Paid",
-      "created": "Created"
+      "created": "Unquoted"
     },
     "position":{
       "Assembler": "Assembler",

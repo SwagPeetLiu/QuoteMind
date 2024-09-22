@@ -22,7 +22,7 @@
                                 <div 
                                     class="d-flex align-items-center" 
                                     :class="[
-                                        column === 'target' ||  mapColumnType(column) == 'reference' 
+                                        column === 'target' ||  mapColumnType(column).includes('reference') 
                                         ? 'justify-content-start ms-2' 
                                         : 'justify-content-center'
                                     ]"
@@ -66,15 +66,14 @@
                                 style="min-height: 80px;"
                             >
                                 <!-- Record Identification -->
-                                
-                                    <IconEntity 
-                                        v-if="column === 'target'"
-                                        :theme="themeColour" 
-                                        :icon="getIcon(target)" 
-                                        :name="record[getRecordName(target, $i18n.locale)]"
-                                        :id="record.id"
-                                        :target="target"
-                                    />
+                                <IconEntity 
+                                    v-if="column === 'target'"
+                                    :theme="themeColour" 
+                                    :icon="getIcon(target)" 
+                                    :name="record[getRecordName(target, $i18n.locale)]"
+                                    :id="record.id"
+                                    :target="target"
+                                />
                                 
                                 <!-- Reference Identification -->
                                 <div 
@@ -104,13 +103,44 @@
                                 </div>
 
                                 <!-- ordinary field -->
-                                <div class="d-flex align-items-center justify-content-center">
+                                <div 
+                                    v-if="mapColumnType(column) == 'ordinary'"
+                                    class="d-flex align-items-center justify-content-center"
+                                >
                                     <span 
-                                        v-if="mapColumnType(column) == 'ordinary'"
+                                        v-if="record[column]"
                                         class="text-gradient text-dark info-span"
                                     >
                                         {{ record[column] }}
                                     </span>
+                                </div>
+
+                                <!-- Date field -->
+                                 <div 
+                                    v-if="mapColumnType(column) == 'date'"
+                                    class="d-flex align-items-center justify-content-center"
+                                    >
+                                    <span 
+                                        v-if="record[column]"
+                                        class="text-gradient text-dark info-span">
+                                        {{ formatDate(record[column], $i18n.locale) }}
+                                    </span>
+                                    <span v-else class="text-gradient text-danger font-weight-bolder">
+                                        -- 
+                                    </span>
+                                 </div>
+
+                                 <!-- customised reference field -->
+                                <div
+                                    v-if="mapColumnType(column) == 'custom reference'"
+                                    class="d-flex align-items-center"
+                                >
+                                    <CustomProductsMaterial
+                                        v-if="column === 'product & materials'"
+                                        :product="record['product']"
+                                        :materials="record['materials']"
+                                        :themeColour="themeColour"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -151,12 +181,13 @@ import { config } from "@/config/config";
 import search from "@/api/search";
 import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
-import { getRecordName, mapColumnType, getTargetImage, getSortImage } from "@/utils/helpers";
+import { getRecordName, mapColumnType, getTargetImage, getSortImage, formatDate } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
 import { useValidators } from '@/utils/useValidators';
 const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
-import IconEntity from "@/components/reuseable-components/IconEntity.vue";
+import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
+import CustomProductsMaterial from "@/components/reuseable-components/tables/CustomProductsMaterial.vue";
 import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 
@@ -172,7 +203,8 @@ export default{
         DashLoader,
         DotLoader,
         IconEntity,
-        CategoricalBadge
+        CategoricalBadge,
+        CustomProductsMaterial
     },
     data(){
         const { t } = useI18n();
@@ -195,6 +227,7 @@ export default{
         getTargetImage,
         getSortImage,
         isSortingAllowed,
+        formatDate,
         fetchData(type){
             // manage the current status of loading:
             if (type == "initialise") {

@@ -19,8 +19,13 @@
 
         <!-- Name & id -->
         <p class="name-container ms-2 my-0 ">
-            <span class="icon-name text-gradient text-dark font-weight-bold text-truncate">{{ name }}</span>
-            <span class="icon-id text-secondary">#{{ id }}</span>
+            <span 
+                class="icon-name text-gradient font-weight-bold text-truncate"
+                :class="[!name? 'text-danger': 'text-dark']"
+            >
+                {{ name ? name : "???" }}
+            </span>
+            <span class="icon-id text-secondary">#{{ id? id : "- -" }}</span>
         </p>
     </div>
 </template>
@@ -58,7 +63,7 @@ export default {
                 return{ iconSize: 40, mt: 0, mb: 0, ml: 10, mr: 10 }
             }
             else if (this.target.includes("client")) {
-                return{ iconSize: 46, mt: -1, mb: 0, ml: 12, mr: 10 }
+                return{ iconSize: 46, mt: -1, mb: 0, ml: 11, mr: 10 }
             }
             else if (this.target.includes("product")) {
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
@@ -68,6 +73,9 @@ export default {
             }
             else if(this.target.includes("position")){
                 return{ iconSize: 40, mt: 1, mb: 0, ml: 9, mr: 10 }
+            }
+            else if(this.target.includes("transaction")) {
+                return{ iconSize: 42, mt: 0, mb: 0, ml: 10, mr: 10 }
             }
             else{
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }

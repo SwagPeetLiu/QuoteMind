@@ -25,7 +25,7 @@
                 },
                 {
                     color: 'info',
-                    icon: getIcon('quote trnasaction'),
+                    icon: getIcon('quote transactions'),
                     title: t('transactions.quote'),
                     description: t('transactions.quote your transactions'),
                 },
