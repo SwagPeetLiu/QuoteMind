@@ -101,8 +101,8 @@ const config = {
     optionsColouring:{
         "status":{
             "created": "danger",
-            "quoted": "info",
-            "paid": "success"
+            "quoted": "success",
+            "paid": "dark"
         },
         "position":{
             "Assembler": "primary",

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isProductAvailable" class="d-flex flex-column align-items-start">
+    <div v-if="isProductAvailable" class="d-flex flex-column align-items-start custom-product-materials">
         <IconEntity 
             :theme="themeColour"
             :icon="getIcon('product')"
@@ -7,6 +7,20 @@
             :id="product.id" 
             target="product"
         />
+
+        <!-- Related Materials -->
+        <div 
+            v-if="isMaterialsAvailable" 
+            class="d-flex flex-wrap align-items-center materials-container ms-2 mb-1"
+        >
+            <span
+                v-for="(material, index) in materials"
+                :key="index"
+                class="text-gradient text-dark ms-2 mt-2"
+                >
+                    {{ material[getRecordName('material', $i18n.locale)] }}
+                </span>
+        </div>
     </div>
     <p v-else class="text-gradient text-danger font-weight-bolder">
         {{ t('validation.missing product') }}
@@ -39,6 +53,12 @@ export default {
     computed: {
         isProductAvailable() {
             return this.product !== null;
+        },
+        isMaterialsAvailable(){
+            if (!this.materials || !Array.isArray(this.materials) || this.materials.length === 0) {
+                return false;
+            }
+            return true;
         }
     },
     methods: {
