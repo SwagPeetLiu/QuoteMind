@@ -141,6 +141,12 @@
                                         :materials="record['materials']"
                                         :themeColour="themeColour"
                                     />
+                                    <CustomPurchaser
+                                        v-if="column === 'sold to'"
+                                        :client="record['client']"
+                                        :company="record['company']"
+                                        :themeColour="themeColour"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -188,6 +194,7 @@ const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
 import CustomProductsMaterial from "@/components/reuseable-components/tables/CustomProductsMaterial.vue";
+import CustomPurchaser from "@/components/reuseable-components/tables/CustomPurchaser.vue";
 import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 
@@ -204,7 +211,8 @@ export default{
         DotLoader,
         IconEntity,
         CategoricalBadge,
-        CustomProductsMaterial
+        CustomProductsMaterial,
+        CustomPurchaser
     },
     data(){
         const { t } = useI18n();
@@ -313,7 +321,8 @@ export default{
         handleScroll(){
             const container = this.$refs.tableContainer;
             if (container) {
-                if (container.scrollTop + container.clientHeight >= container.scrollHeight){
+                if (container.scrollTop + container.clientHeight + 50 >= container.scrollHeight){
+                    console.log("scrolled to bottom");
                     if (this.isThereMoreData && !this.isInitialisedLoading && !this.isScrolledLoading) {
                         this.fetchData("scroll");
                     }
