@@ -1,7 +1,7 @@
 <template>
     <div v-if="isProductAvailable" class="d-flex flex-column align-items-start custom-product-materials">
         <IconEntity 
-            :theme="themeColour"
+            theme="dark"
             :icon="getIcon('product')"
             :name="product[getRecordName('product', $i18n.locale)]"
             :id="product.id" 
@@ -44,10 +44,6 @@ export default {
         },
         materials: {
             type: [Array, null],
-            required: true
-        },
-        themeColour: {
-            type: String,
             required: true
         }
     },

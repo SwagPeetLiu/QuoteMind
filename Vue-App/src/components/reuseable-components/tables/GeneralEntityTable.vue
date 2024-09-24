@@ -22,7 +22,7 @@
                                 <div 
                                     class="d-flex align-items-center" 
                                     :class="[
-                                        column === 'target' ||  mapColumnType(column).includes('reference') 
+                                        column === 'target' ||  mapColumnType(column).includes('reference')
                                         ? 'justify-content-start ms-2' 
                                         : 'justify-content-center'
                                     ]"
@@ -134,18 +134,24 @@
                                 <div
                                     v-if="mapColumnType(column) == 'custom reference'"
                                     class="d-flex align-items-center"
-                                >
+                                >   
                                     <CustomProductsMaterial
                                         v-if="column === 'product & materials'"
                                         :product="record['product']"
                                         :materials="record['materials']"
                                         :themeColour="themeColour"
                                     />
-                                    <CustomPurchaser
-                                        v-if="column === 'sold to'"
+
+                                    <TransactionDetails
+                                        v-if="column === 'transaction details'"
+                                        :transaction="
+                                            record.id && getRecordName(target, $i18n.locale) ? 
+                                            {id: record.id, [getRecordName(target, $i18n.locale)]: record[getRecordName(target, $i18n.locale)]}
+                                            : null"
+                                        :themeColour="themeColour"
                                         :client="record['client']"
                                         :company="record['company']"
-                                        :themeColour="themeColour"
+                                        :status="record['status']"
                                     />
                                 </div>
                             </td>
@@ -194,7 +200,7 @@ const { isSortingAllowed } = useValidators();
 import { getIcon } from "@/utils/iconMapper.js";
 import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
 import CustomProductsMaterial from "@/components/reuseable-components/tables/CustomProductsMaterial.vue";
-import CustomPurchaser from "@/components/reuseable-components/tables/CustomPurchaser.vue";
+import TransactionDetails from "@/components/reuseable-components/tables/TransactionDetails.vue";
 import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 
@@ -212,7 +218,7 @@ export default{
         IconEntity,
         CategoricalBadge,
         CustomProductsMaterial,
-        CustomPurchaser
+        TransactionDetails
     },
     data(){
         const { t } = useI18n();
@@ -353,7 +359,7 @@ export default{
             if (!this.$refs.tableContainer) return;
 
             const containerWidth = this.$refs.tableContainer.offsetWidth;
-            const minColumnWidth = 250;
+            const minColumnWidth = 200;
             const minVisibleColumns = 2; // Ensure at least 2 columns are always visible
             const maxVisibleColumns = Math.max(
                 minVisibleColumns,

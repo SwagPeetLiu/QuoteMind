@@ -42,7 +42,7 @@ const config = {
             "employees": { column : "name", order: "ASC" },
             "pricing_conditions": { column : "id", order: "ASC" },
             "pricing_rules": { column : "price_per_unit", order: "DESC" },
-            "transactions": { column : "modified_date", order: "DESC" }
+            "transactions": { column : "transaction_date", order: "DESC" }
         }
     },
     session: {
@@ -90,7 +90,7 @@ const config = {
         "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour", "threshold"],
         "pricing_rules": ["id", "price_per_unit", "conditions"],
         "products": ["target", "descriptions"],
-        "transactions": ["target", "status", "transaction_date", "product & materials", "sold to", "quantity", "price_per_unit", "amount", "size", "colour", "employee", "note"]
+        "transactions": ["transaction details", "transaction_date", "product & materials", "quantity", "price_per_unit", "amount", "dimension", "colour", "employee", "note"]
     },
 
     // categorical choices

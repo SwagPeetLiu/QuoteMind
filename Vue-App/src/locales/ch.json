@@ -275,6 +275,7 @@
     "product": "产品",
     "quantity": "数量",
     "size": "尺寸",
+    "dimension": "尺寸",
     "price_per_unit": "单价",
     "amount": "金额",
     "creation_date": "创建日期",
@@ -295,7 +296,7 @@
     "size_unit": "尺寸单位",
     "threshold": "阈值",
     "product & materials": "产品和材质",
-    "sold to": "买家"
+    "transaction details": "交易详情"
   },
   "multipleOptions": {
     "status":{

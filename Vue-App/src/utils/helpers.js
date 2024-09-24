@@ -277,13 +277,13 @@ function mapColumnType(column){
     ) {
         return "reference";
     }
-    else if (column === "status" || column === "position"){
+    else if (column === "position"){
         return "categorical";
     }
     else if(column.includes("date")){
         return "date";
     }
-    else if (column === "product & materials" || column === "sold to"){
+    else if (column === "transaction details" || column === "dimension" || column === "product & materials"){
         return 'custom reference'
     }
     else {
@@ -311,6 +311,12 @@ function getTargetImage(target){
         }
         else if (target === "position" || target === "positions"){
             return require(`@/assets/img/icons/positions.svg`);
+        }
+        else if (target === "dimension"){
+            return require(`@/assets/img/icons/size.svg`);
+        }
+        else if (target === "transaction details"){
+            return require(`@/assets/img/icons/transactions.svg`);
         }
         else{
             return require(`@/assets/img/icons/${target}.svg`);

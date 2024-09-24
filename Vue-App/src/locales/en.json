@@ -272,6 +272,7 @@
     "product": "Product",
     "quantity": "Quantity",
     "size": "Size",
+    "dimension": "Dimension",
     "price_per_unit": "Price Per Unit",
     "amount": "Amount",
     "creation_date": "Creation Date",
@@ -292,7 +293,7 @@
     "size_unit": "Size Unit",
     "threshold": "Threshold",
     "product & materials": "Product & Materials",
-    "sold to": "Sold To"
+    "transaction details": "Transaction Details"
   },
   "multipleOptions": {
     "status":{
