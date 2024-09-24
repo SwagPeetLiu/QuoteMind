@@ -146,6 +146,7 @@
     "has incomplete information": "has incomplete information",
     "is invalid": "is invalid",
     "must be selected": "must be selected",
+    "missing": "Missing ",
     
     "username": "Username ",
     "email": "Email ",
@@ -153,6 +154,8 @@
     "token": "Register Token ",
     "date range": "Date Range ",
     "status": "Transaction Status ",
+    "product": "Product",
+    "purchaser": "Purchaser",
 
     "search query": "Search Query ",
     "search target": "Search Target ",
@@ -160,8 +163,7 @@
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character",
-    "invalid performance target": "Performance Target invalid",
-    "missing product": "Missing Product"
+    "invalid performance target": "Performance Target invalid"
   },
   "dashboard":{
     "welcome": "Welcome Back!",

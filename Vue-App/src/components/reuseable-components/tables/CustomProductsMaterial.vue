@@ -9,12 +9,13 @@
         />
     </div>
     <p v-else class="text-gradient text-danger font-weight-bolder">
-        {{ t('validation.missing product') }}
+        {{ `${t('validation.missing')}${t('validation.product')}` }}
     </p>
 </template>
 
 <script>
 import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
+import { useI18n } from "vue-i18n";
 import { getRecordName } from "@/utils/helpers";
 import { getIcon } from "@/utils/iconMapper.js";
 export default {
@@ -24,16 +25,22 @@ export default {
     },
     props: {
         product: {
-            type: Object,
+            type: [Object, null],
             required: true
         },
         materials: {
-            type: Array,
+            type: [Array, null],
             required: true
         },
         themeColour: {
             type: String,
             required: true
+        }
+    },
+    data(){
+        const { t } = useI18n({});
+        return {
+            t
         }
     },
     computed: {

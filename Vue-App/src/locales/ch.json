@@ -148,6 +148,7 @@
     "has incomplete information": "不全",
     "is invalid": "无效",
     "must be selected": "必须选择",
+    "missing": "缺失",
 
     "username": "用户名",
     "email": "邮箱",
@@ -155,6 +156,8 @@
     "token": "注册码",
     "date range": "日期范围",
     "status": "交易状态",
+    "product":"产品",
+    "purchaser":"客户",
 
     "search query": "搜索内容",
     "search target": "搜索目标",
@@ -162,8 +165,7 @@
 
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符",
-    "invalid performance target": "此报价衡量无效",
-    "missing product": "未选商品"
+    "invalid performance target": "此报价衡量无效"
   },
   "dashboard":{
     "welcome": "QuoteMind 欢迎您!",
