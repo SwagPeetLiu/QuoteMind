@@ -47,5 +47,15 @@
 // Customised styling:
 .table-row{
   cursor: pointer;
+
+  .tabe-cell{
+    min-height: 80px;
+    width: 300px; 
+    max-width: 300px; 
+    padding-top: 4px; 
+    padding-bottom: 4px; 
+    padding-left: 2px; 
+    padding-bottom: 2px;
+  }
 }
 

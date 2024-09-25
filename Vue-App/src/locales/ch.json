@@ -308,6 +308,16 @@
       "Assembler": "组装",
       "Designer": "设计",
       "Installer": "安装配送"
+    },
+    "dimension_unit":{
+      "mm": "毫米",
+      "cm": "厘米",
+      "m": "米"
+    },
+    "size_unit":{
+      "mm²": "mm²",
+      "cm²": "cm²",
+      "m²": "平米"
     }
   },
   "others":{

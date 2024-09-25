@@ -277,6 +277,21 @@ function mapColumnType(column){
     ) {
         return "reference";
     }
+    else if(
+        column === "quantity" ||
+        column === "width"  ||
+        column === "length" ||
+        column === "height" ||
+        column === "size"
+    ){
+        return "numeric(ordinary)";
+    }
+    else if (
+        column === "price_per_unit" || 
+        column === "amount"
+    ){
+        return "numeric monetary(ordinary)";
+    }
     else if (column === "position"){
         return "categorical";
     }
@@ -350,6 +365,11 @@ function getSortImage(column, order, existingOrderBy){
     }
 }
 
+// function used to map out the product dimension unit
+function getProductDimensionUnit(locale){
+    return `${locale}_unit`;
+}
+
 module.exports = {
     generateDateRange,
     generateTimeRange,
@@ -365,5 +385,6 @@ module.exports = {
     getRecordName,
     mapColumnType,
     getTargetImage,
-    getSortImage
+    getSortImage,
+    getProductDimensionUnit
 }

@@ -109,6 +109,12 @@ const config = {
             "Designer": "warning",
             "Installer": "info",
         }
+    },
+    units:{
+        "default-size": "m²",
+        "default-diem": "mm",
+        "diemsion": ["mm","cm","m"],
+        "size": ["mm²","cm²","m²"],
     }
 }
 

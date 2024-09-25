@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="transaction"
-        class="d-flex flex-column align-items-start my-1"
+        class="d-flex flex-column align-items-start my-2"
     >
         <!-- Transaction ID -->
         <IconEntity
@@ -12,7 +12,7 @@
             target="transaction"
         />
         
-        <div class="d-flex align-items-center font-weight-bold my-1 ms-6">
+        <div class="d-flex align-items-center font-weight-bold my-2 ms-4">
 
             <!-- Transaction Status -->
             <span 
@@ -34,20 +34,18 @@
                 </span>
             </p>
 
-            <!-- company relations -->
-            <p v-if="company" class="ms-3 my-1 d-flex align-items-center text-gradient text-dark font-weight-bold related-entity">
-                <i class="me-2" :class="getIcon('company')"></i>
-                <span>
-                    {{ company[getRecordName('company', $i18n.locale)] }}
-                </span>
-            </p>
-            
             <!-- missing client AND company -->
             <span v-if="!client && !company" class="ms-3 my-0 text-gradient text-danger font-weight-bold">
                 {{ `${t('validation.missing')}${t('routes.clients')}` }}
             </span>
         </div>
-
+        <!-- company relations -->
+        <p v-if="company" class="ms-4 mb-2 d-flex align-items-center text-gradient text-dark font-weight-bold related-entity">
+            <i class="me-2" :class="getIcon('company')"></i>
+            <span>
+                {{ company[getRecordName('company', $i18n.locale)] }}
+            </span>
+        </p>
     </div>
 
     <p v-else class="text-gradient text-danger font-weight-bolder">
@@ -67,10 +65,6 @@ export default {
     props:{
         transaction: {
             type: [Object, null],
-            required: true
-        },
-        themeColour:{
-            type: String,
             required: true
         },
         client:{

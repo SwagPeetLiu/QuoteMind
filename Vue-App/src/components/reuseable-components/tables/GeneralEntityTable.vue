@@ -2,7 +2,6 @@
     <div class="card h-100 w-100 overflow-hidden">
         <div class="card-body px-2 pt-0 h-100">
             <div 
-                
                 class="table-responsive h-100 thin-scrollbar overflow-x-hidden overflow-y-auto"
                 ref="tableContainer"
                 @scroll="handleScroll"
@@ -63,7 +62,7 @@
                             <td 
                                 v-for="(column, colIndex) in visibleColumns"
                                 :key="colIndex"
-                                style="min-height: 80px;"
+                                class="tabe-cell"
                             >
                                 <!-- Record Identification -->
                                 <IconEntity 
@@ -104,15 +103,25 @@
 
                                 <!-- ordinary field -->
                                 <div 
-                                    v-if="mapColumnType(column) == 'ordinary'"
+                                    v-if="mapColumnType(column).includes('ordinary')"
                                     class="d-flex align-items-center justify-content-center"
                                 >
-                                    <span 
-                                        v-if="record[column]"
-                                        class="text-gradient text-dark info-span"
-                                    >
-                                        {{ record[column] }}
-                                    </span>
+                                    <div v-if="record[column]" class="text-gradient text-dark info-span font-weight-bold">
+
+                                        <!-- numeric field -->
+                                        <div 
+                                            class="d-flex align-items-center justify-content-center"
+                                            v-if="mapColumnType(column).includes('numeric')"
+                                        >
+                                            <span v-if="mapColumnType(column).includes('monetary')">
+                                                {{ $i18n.locale === "en" ? "$" : "¥" }}
+                                            </span>
+                                            <IncrementNumber :endValue = "record[column]"/>
+                                        </div>
+
+                                        <!-- string field -->
+                                        <span v-else>{{ record[column] }}</span>
+                                    </div>
                                 </div>
 
                                 <!-- Date field -->
@@ -148,10 +157,19 @@
                                             record.id && getRecordName(target, $i18n.locale) ? 
                                             {id: record.id, [getRecordName(target, $i18n.locale)]: record[getRecordName(target, $i18n.locale)]}
                                             : null"
-                                        :themeColour="themeColour"
                                         :client="record['client']"
                                         :company="record['company']"
                                         :status="record['status']"
+                                    />
+
+                                    <DimensionDetails
+                                        v-if="column === 'dimension'"
+                                        :length="record['length']"
+                                        :width="record['width']"
+                                        :height="record['height']"
+                                        :size_unit="record['size_unit']"
+                                        :dimension_unit="record[`${$i18n.locale}_unit`]"
+                                        :themeColour="themeColour"
                                     />
                                 </div>
                             </td>
@@ -202,7 +220,9 @@ import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue"
 import CustomProductsMaterial from "@/components/reuseable-components/tables/CustomProductsMaterial.vue";
 import TransactionDetails from "@/components/reuseable-components/tables/TransactionDetails.vue";
 import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
+import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
+import DimensionDetails from "@/components/reuseable-components/tables/DimensionDetails.vue";
 
 export default{
     name: "GeneralEntityTable",
@@ -218,7 +238,9 @@ export default{
         IconEntity,
         CategoricalBadge,
         CustomProductsMaterial,
-        TransactionDetails
+        TransactionDetails,
+        IncrementNumber,
+        DimensionDetails
     },
     data(){
         const { t } = useI18n();

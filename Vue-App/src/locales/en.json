@@ -305,6 +305,16 @@
       "Assembler": "Assembler",
       "Designer": "Designer",
       "Installer": "Installer"
+    },
+    "dimension_unit":{
+      "mm": "mili-meter",
+      "cm": "centi-meter",
+      "m": "meter"
+    },
+    "size_unit":{
+      "mm²": "mm²",
+      "cm²": "cm²",
+      "m²": "m²"
     }
   },
   "others":{

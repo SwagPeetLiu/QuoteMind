@@ -22,13 +22,18 @@
 
 
 .related-entity {
-    span{
+    span {
         border-bottom: 2px solid transparent;
         transition: border-bottom 0.2s ease-in-out;
+        max-width: 240px; /* Adjust this value as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
     }
     &:hover {
         transform: scale(1.05);
-        span{
+        span {
             border-bottom: 2px solid $dark;
         }
     }
