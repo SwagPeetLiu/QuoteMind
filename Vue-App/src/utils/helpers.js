@@ -298,8 +298,11 @@ function mapColumnType(column){
     else if(column.includes("date")){
         return "date";
     }
-    else if (column === "transaction details" || column === "dimension" || column === "product & materials"){
+    else if (column === "transaction details" || column === "product & materials"){
         return 'custom reference'
+    }
+    else if (column === "dimension"){
+        return "custom entity";
     }
     else {
         return "ordinary";

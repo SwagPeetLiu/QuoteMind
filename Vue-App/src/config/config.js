@@ -111,8 +111,8 @@ const config = {
         }
     },
     units:{
-        "default-size": "m²",
-        "default-diem": "mm",
+        "defaultSize": "m²",
+        "defaultDiem": "mm",
         "diemsion": ["mm","cm","m"],
         "size": ["mm²","cm²","m²"],
     }

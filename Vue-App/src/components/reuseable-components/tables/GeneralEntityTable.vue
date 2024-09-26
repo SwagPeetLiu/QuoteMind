@@ -22,7 +22,7 @@
                                     class="d-flex align-items-center" 
                                     :class="[
                                         column === 'target' ||  mapColumnType(column).includes('reference')
-                                        ? 'justify-content-start ms-2' 
+                                        ? 'justify-content-start' 
                                         : 'justify-content-center'
                                     ]"
                                 >
@@ -140,10 +140,7 @@
                                  </div>
 
                                  <!-- customised reference field -->
-                                <div
-                                    v-if="mapColumnType(column) == 'custom reference'"
-                                    class="d-flex align-items-center"
-                                >   
+                                <div v-if="mapColumnType(column).includes('custom')">   
                                     <CustomProductsMaterial
                                         v-if="column === 'product & materials'"
                                         :product="record['product']"
@@ -166,7 +163,6 @@
                                         v-if="column === 'dimension'"
                                         :length="record['length']"
                                         :width="record['width']"
-                                        :height="record['height']"
                                         :size_unit="record['size_unit']"
                                         :dimension_unit="record[`${$i18n.locale}_unit`]"
                                         :themeColour="themeColour"

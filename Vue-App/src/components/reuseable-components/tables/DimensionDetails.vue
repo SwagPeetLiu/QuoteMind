@@ -1,24 +1,27 @@
 <template>
-    <div class="d-flex flex-column align-items-start">
+    <div class="w-100 h-100 d-flex flex-column align-items-center">
         <!-- total size -->
         <p 
-            class="d-flex align-items-center text-gradient"
+            class="d-flex align-items-center text-gradient mt-1 mb-0 font-weight-bolder"
             :class="`text-${themeColour}`"
-            v-if="isSizeAvailable"
+            v-if="isSizeAvailable || mappedSize"
         >
             <i :class="getIcon('size')"></i>
-            <span class="ms-2">{{ `${size} ${mappedSizeUnit}`}}</span>
+            <span class="ms-2">{{ `${ size ? size : mappedSize }${mappedSizeUnit}`}}</span>
         </p>
 
         <!-- dimension details -->
-        <p v-if="isLengthAvailable" class="text-gradient text-dark">
-            {{ `${t('columns.length')} : ${length} ${mappedDimensionUnit}` }}
+        <p 
+            v-else-if="isLengthAvailable && isWidthAvailable" 
+            class="text-gradient text-dark my-1 d-flex flex-column"
+        >
+            <span>{{ `${t('columns.length')}: ${length}${dimension_unit}` }}</span>
+            <span class="mt-1">{{ `${t('columns.width')}: ${width}${dimension_unit}` }}</span>
         </p>
-        <p v-if="isWidthAvailable" class="text-gradient text-dark">
-            {{ `${t('columns.width')} : ${width} ${mappedDimensionUnit}` }}
-        </p>
-        <p v-if="isHeightAvailable" class="text-gradient text-dark">
-            {{ `${t('columns.height')} : ${height} ${mappedDimensionUnit}` }}
+
+        <!-- missing diemsnions & size -->
+        <p v-else class="text-gradient text-danger font-weight-bold my-0">
+            {{ t('validation.missing') }}
         </p>
     </div>
 </template>
@@ -36,10 +39,6 @@ export default {
             required: true
         },
         width:{
-            type: [Number, null],
-            required: true
-        },
-        height:{
             type: [Number, null],
             required: true
         },
@@ -77,6 +76,14 @@ export default {
                 return false;
             }
         },
+        mappedSize(){
+            if (this.isLengthAvailable && this.isWidthAvailable){
+                return this.length * this.width;
+            }
+            else{
+                return null;
+            }
+        },
         isLengthAvailable(){
             if (this.length && this.dimension_unit) {
                 return true;
@@ -93,17 +100,12 @@ export default {
                 return false;
             }
         },
-        isHeightAvailable(){
-            if (this.height && this.dimension_unit) {
-                return true;
-            }
-            else{
-                return false;
-            }
-        },
         mappedSizeUnit(){
             if (this.size_unit && config.units.diemsion.includes(this.size_unit)){
                 return this.t(`multipleOptions.size_unit.${this.size_unit}`);
+            }
+            else if (this.mappedSize){
+                return this.t(`multipleOptions.size_unit.${config.units.defaultSize}`);
             }
             else{
                 return "N/A";
