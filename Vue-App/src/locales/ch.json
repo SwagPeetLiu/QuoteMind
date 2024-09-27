@@ -295,7 +295,10 @@
     "size_unit": "尺寸单位",
     "threshold": "阈值",
     "product & materials": "产品和材质",
-    "transaction details": "交易详情"
+    "transaction details": "交易详情",
+    "conditions": "定价条件",
+    "listed_conditions": "定价条件",
+    "category": "类别"
   },
   "multipleOptions": {
     "status":{
@@ -317,6 +320,10 @@
       "mm²": "mm²",
       "cm²": "cm²",
       "m²": "平米"
+    },
+    "conditions":{
+      "general": "通用型",
+      "individual": "个别型"
     }
   },
   "others":{

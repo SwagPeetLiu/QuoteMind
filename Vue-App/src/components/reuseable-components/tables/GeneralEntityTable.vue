@@ -168,6 +168,33 @@
                                         :dimension_unit="record[`${$i18n.locale}_unit`]"
                                         :themeColour="themeColour"
                                     />
+
+                                    <div 
+                                        v-if="column === 'id'"
+                                        class="font-weight-bold text-gradient text-dark ms-4 d-flex align-items-center text-shadow-lg h-100"
+                                    >
+                                        <i :class="getIcon('id')"></i>
+                                        <span class="ms-2" style="font-size: 0.9rem">{{ record.id }}</span>
+                                    </div>
+
+                                    <PricingConditionDetails
+                                        v-if="column === 'conditions'"
+                                        :quantity="record['quantity']"
+                                        :quantity_unit="record['quantity_unit']"
+                                        :materials="record['materials']"
+                                        :size="record['size']"
+                                        :size_unit="record['size_unit']"
+                                        :threshold="record['threshold']"
+                                        :client="record['client']"
+                                        :company="record['company']"
+                                        :colour="record['colour']"
+                                    />
+
+                                    <ConditionCategoryTag
+                                        v-if="column === 'category'"
+                                        :client="record['client']"
+                                        :company="record['company']"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -220,6 +247,8 @@ import CategoricalBadge from "@/components/reuseable-components//text/Categorica
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
 import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 import DimensionDetails from "@/components/reuseable-components/tables/DimensionDetails.vue";
+import ConditionCategoryTag from "@/components/reuseable-components/tables/ConditionCategoryTag.vue";
+import PricingConditionDetails from "@/components/reuseable-components/tables/PricingConditionDetails.vue";
 
 export default{
     name: "GeneralEntityTable",
@@ -237,7 +266,9 @@ export default{
         CustomProductsMaterial,
         TransactionDetails,
         IncrementNumber,
-        DimensionDetails
+        DimensionDetails,
+        PricingConditionDetails,
+        ConditionCategoryTag
     },
     data(){
         const { t } = useI18n();
@@ -349,7 +380,6 @@ export default{
             const container = this.$refs.tableContainer;
             if (container) {
                 if (container.scrollTop + container.clientHeight + 50 >= container.scrollHeight){
-                    console.log("scrolled to bottom");
                     if (this.isThereMoreData && !this.isInitialisedLoading && !this.isScrolledLoading) {
                         this.fetchData("scroll");
                     }

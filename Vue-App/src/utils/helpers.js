@@ -274,7 +274,7 @@ function mapColumnType(column){
         column === "products" ||
         column === "material" ||
         column === "materials"
-    ) {
+    ){
         return "reference";
     }
     else if(
@@ -298,10 +298,20 @@ function mapColumnType(column){
     else if(column.includes("date")){
         return "date";
     }
-    else if (column === "transaction details" || column === "product & materials"){
+    // custom references that you would like the content to be aligned to the start
+    else if (
+        column === "transaction details" || 
+        column === "product & materials" ||
+        column === "id" ||
+        column === "conditions" ||
+        column === "listed_conditions"
+    ){
         return 'custom reference'
     }
-    else if (column === "dimension"){
+    // custom references that you would like the content to be centered
+    else if (
+        column === "dimension" || column === "category"
+    ){
         return "custom entity";
     }
     else {
@@ -433,6 +443,27 @@ function mapDimensionUnitToSizeUnit(unit) {
     }
 }
 
+// function used to map the thresholod to the indicator:
+function mapThresholdOperator(operator) {
+    switch (operator) {
+        case "eq":
+            return "=";
+        case "ne":
+            return "!=";
+        case "lt":
+            return "<";
+        case "gt":
+            return ">";
+        case "le":
+            return "<=";
+        case "ge":
+            return ">=";
+        default:
+            return null;
+    }
+}
+
+
 module.exports = {
     generateDateRange,
     generateTimeRange,
@@ -451,5 +482,6 @@ module.exports = {
     getSortImage,
     getProductDimensionUnit,
     mapDefaultDimensions,
-    mapDimensionUnitToSizeUnit
+    mapDimensionUnitToSizeUnit,
+    mapThresholdOperator
 }

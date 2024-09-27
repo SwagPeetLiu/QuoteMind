@@ -13,7 +13,7 @@
     >
         <span class="button-content">
           <i class="py-2 fa fa-plus"></i>
-          <span class="resource-text">{{ currentResource }}</span>
+          <span class="resource-text font-weight-bold">{{ currentResource }}</span>
         </span>
       </a>
     </div>

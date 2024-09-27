@@ -292,7 +292,10 @@
     "size_unit": "Size Unit",
     "threshold": "Threshold",
     "product & materials": "Product & Materials",
-    "transaction details": "Transaction Details"
+    "transaction details": "Transaction Details",
+    "conditions": "Conditions",
+    "listed_conditions": "Involved Conditions",
+    "category": "Category"
   },
   "multipleOptions": {
     "status":{
@@ -314,6 +317,10 @@
       "mm²": "mm²",
       "cm²": "cm²",
       "m²": "m²"
+    },
+    "conditions":{
+      "general": "General",
+      "individual": "Individual"
     }
   },
   "others":{

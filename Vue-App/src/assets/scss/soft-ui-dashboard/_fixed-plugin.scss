@@ -71,7 +71,7 @@
     z-index: $fixed-plugin-button-z-index;
     box-shadow: $fixed-plugin-box-shadow;
     cursor: pointer;
-    transition: all 0.4s ease;
+    transition: border-radius 0.4s ease, padding 0.4s ease;
     overflow: hidden;
     white-space: nowrap;
 
@@ -91,18 +91,19 @@
     .resource-text {
       opacity: 0;
       max-width: 0;
-      transition: all 0.4s ease;
+      transition: max-width 0.4s ease;
     }
 
     &:hover {
-      border-radius: 18px;
+      border-radius: 12px;
       padding-left: 30px !important;
       padding-right: 30px !important;
 
       .resource-text {
         opacity: 1;
-        max-width: fit-content;
         margin-left: 8px;
+        max-width: fit-content;
+        margin-left: opacity 0.2s ease 0.2s, max-width 0.2s ease;
       }
     }
   }

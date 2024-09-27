@@ -32,7 +32,6 @@
         display: inline-block;
     }
     &:hover {
-        transform: scale(1.05);
         span {
             border-bottom: 2px solid $dark;
         }

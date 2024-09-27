@@ -99,7 +99,6 @@ export default {
                 const mappedSizeUnit = mapDimensionUnitToSizeUnit(this.dimension_unit);
                 mappedSize = mapDefaultDimensions(size, mappedSizeUnit, config.units.defaultSize);
             }
-            console.log(givenSize, mappedSize);
             return givenSize ? givenSize : mappedSize;
         },
         mappedSizeUnit(){
