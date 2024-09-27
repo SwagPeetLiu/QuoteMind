@@ -4,15 +4,16 @@
         <p 
             class="d-flex align-items-center text-gradient mt-1 mb-0 font-weight-bolder"
             :class="`text-${themeColour}`"
-            v-if="isSizeAvailable || mappedSize"
+            v-if="mappedSize"
         >
             <i :class="getIcon('size')"></i>
-            <span class="ms-2">{{ `${ size ? size : mappedSize }${mappedSizeUnit}`}}</span>
+            <span class="ms-2">{{ `${mappedSize}${mappedSizeUnit}`}}</span>
         </p>
+
 
         <!-- dimension details -->
         <p 
-            v-else-if="isLengthAvailable && isWidthAvailable" 
+            v-if="isDimensionsAvailable" 
             class="text-gradient text-dark my-1 d-flex flex-column"
         >
             <span>{{ `${t('columns.length')}: ${length}${dimension_unit}` }}</span>
@@ -20,7 +21,7 @@
         </p>
 
         <!-- missing diemsnions & size -->
-        <p v-else class="text-gradient text-danger font-weight-bold my-0">
+        <p v-if="!isSizeAvailable && !isDimensionsAvailable" class="text-gradient text-danger font-weight-bold my-0">
             {{ t('validation.missing') }}
         </p>
     </div>
@@ -30,6 +31,7 @@
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import { getIcon } from "@/utils/iconMapper.js";
+import { mapDefaultDimensions, mapDimensionUnitToSizeUnit } from "@/utils/helpers";
 
 export default {
     name: "DimensionDetails",
@@ -48,12 +50,12 @@ export default {
         },
         // unit of the dimension (length, width, height)
         dimension_unit:{
-            type: String,
+            type: [String, null],
             required: true
         },
         // unit of the total size of the product
         size_unit:{
-            type: String,
+            type: [String, null],
             required: true
         },
         themeColour:{
@@ -76,40 +78,32 @@ export default {
                 return false;
             }
         },
+        isDimensionsAvailable(){
+            if (this.length && this.width && this.dimension_unit) {
+                return true;
+            }
+            else{
+                return false;
+            }
+        },
         mappedSize(){
-            if (this.isLengthAvailable && this.isWidthAvailable){
-                return this.length * this.width;
+            let givenSize = null;
+            let mappedSize = null;
+            // if size provided, map with default size unit
+            if (this.isSizeAvailable){
+                givenSize = mapDefaultDimensions(this.size, this.size_unit, config.units.defaultSize);
             }
-            else{
-                return null;
+            // if only dimensions are provided, then calculate and map to default size unit
+            if (this.isDimensionsAvailable){
+                const size = this.length * this.width;
+                const mappedSizeUnit = mapDimensionUnitToSizeUnit(this.dimension_unit);
+                mappedSize = mapDefaultDimensions(size, mappedSizeUnit, config.units.defaultSize);
             }
-        },
-        isLengthAvailable(){
-            if (this.length && this.dimension_unit) {
-                return true;
-            }
-            else{
-                return false;
-            }
-        },
-        isWidthAvailable(){
-            if (this.width && this.dimension_unit) {
-                return true;
-            }
-            else{
-                return false;
-            }
+            console.log(givenSize, mappedSize);
+            return givenSize ? givenSize : mappedSize;
         },
         mappedSizeUnit(){
-            if (this.size_unit && config.units.diemsion.includes(this.size_unit)){
-                return this.t(`multipleOptions.size_unit.${this.size_unit}`);
-            }
-            else if (this.mappedSize){
-                return this.t(`multipleOptions.size_unit.${config.units.defaultSize}`);
-            }
-            else{
-                return "N/A";
-            }
+            return this.t(`multipleOptions.size_unit.${config.units.defaultSize}`);
         }
     },
     methods:{

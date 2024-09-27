@@ -106,7 +106,7 @@ export function useValidators() {
         if (typeof column !== 'string' || !column.trim()) return { valid: false, message: `${t('validation.sorting column')}${t('validation.is invalid')}` };
 
         // if sortign based on table's orioginal target, then it is allowed automatically:
-        if (column === 'target') return { valid: true };
+        if (column === 'target' || column === 'dimension') return { valid: true };
 
         // only proceed for table validation if initialised (account for initial user login)
         if (dbReferences) {

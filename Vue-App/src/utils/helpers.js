@@ -348,19 +348,33 @@ function getTargetImage(target){
 function getSortImage(column, order, existingOrderBy){
     try{
         const svgDirection = "up" === order ? "ASC" : "DESC";
-        // ordinary sort match ups:
-        if (column === existingOrderBy.column && svgDirection === existingOrderBy.order) {
-            return require(`@/assets/img/icons/sort-${order}-solid.svg`);
-        }
-        else if (
-            column === "target" && 
-            (existingOrderBy.column === "id" || existingOrderBy.column.includes("name")) 
-            && svgDirection === existingOrderBy.order
-        ){
-            return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+    
+        // check on the matching order:
+        if (svgDirection !== existingOrderBy.order){
+            return require(`@/assets/img/icons/sort-${order}-line.svg`);
         }
         else{
-            return require(`@/assets/img/icons/sort-${order}-line.svg`);
+            // ordinary sort match ups:
+            if (column === existingOrderBy.column) {
+                return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+            }
+            // reference sort match ups
+            else if (
+                column === "target" && 
+                (existingOrderBy.column === "id" || existingOrderBy.column.includes("name"))
+            ){
+                return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+            }
+            //custom reference match ups
+            else if (
+                column === "dimension" && 
+                existingOrderBy.column === "size"
+            ){
+                return require(`@/assets/img/icons/sort-${order}-solid.svg`);
+            }
+            else{
+                return require(`@/assets/img/icons/sort-${order}-line.svg`);
+            }
         }
     }
     catch(err){
@@ -371,6 +385,52 @@ function getSortImage(column, order, existingOrderBy){
 // function used to map out the product dimension unit
 function getProductDimensionUnit(locale){
     return `${locale}_unit`;
+}
+
+// function used to convert dimensions between the diemsnion and size metrics:
+function mapDefaultDimensions(providedValue, currentUnit, defaultUnit) {
+    const conversionFactors = {
+        // Linear measurements
+        "mm": 0.001,
+        "毫米": 0.001,
+        "cm": 0.01,
+        "厘米": 0.01,
+        "m": 1,
+        "米": 1,
+
+        // Area measurements
+        "mm²": 0.000001,
+        "平方毫米": 0.000001,
+        "cm²": 0.0001,
+        "平方厘米": 0.0001,
+        "m²": 1,
+        "平米": 1
+    };
+
+    if (!(currentUnit in conversionFactors) || !(defaultUnit in conversionFactors)) {
+        return null;
+    }
+    const valueInMeters = providedValue * conversionFactors[currentUnit];
+    const result = valueInMeters / conversionFactors[defaultUnit];
+    return parseFloat(result.toFixed(3));
+}
+
+// function used to map dimension units to size units:
+function mapDimensionUnitToSizeUnit(unit) {
+    switch (unit) {
+        case "mm":
+        case "cm":
+        case "m":
+            return `${unit}²`;
+        case "毫米":
+            return "mm²";
+        case "厘米":
+            return "cm²";
+        case "米":
+            return "m²";
+        default:
+            return "N/A";
+    }
 }
 
 module.exports = {
@@ -389,5 +449,7 @@ module.exports = {
     mapColumnType,
     getTargetImage,
     getSortImage,
-    getProductDimensionUnit
+    getProductDimensionUnit,
+    mapDefaultDimensions,
+    mapDimensionUnitToSizeUnit
 }

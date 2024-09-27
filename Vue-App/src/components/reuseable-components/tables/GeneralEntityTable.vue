@@ -163,6 +163,7 @@
                                         v-if="column === 'dimension'"
                                         :length="record['length']"
                                         :width="record['width']"
+                                        :size="record['size']"
                                         :size_unit="record['size_unit']"
                                         :dimension_unit="record[`${$i18n.locale}_unit`]"
                                         :themeColour="themeColour"
@@ -315,7 +316,6 @@ export default{
                 });
         },
         handleSort(column){
-
             // only proceed to sorting if the column is sortable
             if (isSortingAllowed(column, this.$store.state.dbReferences).valid){
 
@@ -323,16 +323,19 @@ export default{
                 
                 // if the to be sorted column is already sorted, then reverse the order
                 if (column === this.orderBy.column || 
-                    (column === "target" && (this.orderBy.column === "id" || this.orderBy.column.includes("name")))
+                    (column === "target" && (this.orderBy.column === "id" || this.orderBy.column.includes("name")) ||
+                    (column === "dimension" && this.orderBy.column === "size"))
                 ) {
                     this.orderBy.order = this.orderBy.order === "ASC" ? "DESC" : "ASC";
                 }
 
                 // else select the newly sortby Column and fetch with DESC order by default:
                 else{
-                    
                     if (column === "target") {
                         this.orderBy = config.search.defaultOrder[this.target];
+                    }
+                    else if (column === "dimension") {
+                        this.orderBy = {column: "size", order: "DESC"}
                     }
                     else{
                         this.orderBy = {column: column, order: "DESC"}
@@ -355,14 +358,19 @@ export default{
         },
         isSortingNow(column){
             if (this.orderBy){
-                if (column === this.orderBy.column && !this.isInitialisedLoading) {
+                if (!this.isInitialisedLoading) {
+                    return false;
+                }
+                else if (column === this.orderBy.column) {
                     return true;
                 }
                 else if (
                     column === "target" && 
-                    (this.orderBy.column === "id" || this.orderBy.column.includes("name") &&
-                    !this.isInitialisedLoading)
-                ) {
+                    (this.orderBy.column === "id" || this.orderBy.column.includes("name"))
+                ){
+                    return true;
+                }
+                else if (column === "dimension" && this.orderBy.column === "size") {
                     return true;
                 }
                 else {
