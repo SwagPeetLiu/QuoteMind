@@ -149,6 +149,7 @@
     "is invalid": "无效",
     "must be selected": "必须选择",
     "missing": "缺失",
+    "must be positive": "必须大于0",
 
     "username": "用户名",
     "email": "邮箱",
@@ -158,6 +159,7 @@
     "status": "交易状态",
     "product":"产品",
     "purchaser":"客户",
+    "record": "记录",
 
     "search query": "搜索内容",
     "search target": "搜索目标",

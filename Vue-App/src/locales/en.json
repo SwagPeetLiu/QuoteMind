@@ -147,6 +147,7 @@
     "is invalid": "is invalid",
     "must be selected": "must be selected",
     "missing": "Missing ",
+    "must be positive": "must be positive",
     
     "username": "Username ",
     "email": "Email ",
@@ -156,6 +157,7 @@
     "status": "Transaction Status ",
     "product": "Product",
     "purchaser": "Purchaser",
+    "record": "Record ",
 
     "search query": "Search Query ",
     "search target": "Search Target ",

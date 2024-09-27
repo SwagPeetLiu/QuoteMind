@@ -79,7 +79,7 @@ const config = {
     /*
         - target: mapped to id & name (full_name, ch_name, en_nane) & icon
         - name: mapped to ch_name & en_name
-        - size: will be mapped & rendered with all dimensions (units, length, width, height)
+        - dimension: will be mapped & rendered with all dimensions (units, length, width, height)
     */
     defaultListings:{
         "clients": ["target", "phone", "wechat_contact", "qq_contact", "company", "email"],

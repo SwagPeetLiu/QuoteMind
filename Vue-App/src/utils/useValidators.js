@@ -192,6 +192,58 @@ export function useValidators() {
         return { valid: true };
     }
 
+    // centrialised validator for numerical records displayed in tables
+    function isNumericalRecordValid(record, target, column, providedValue){
+        if (!record || typeof record !== 'object' || !target || typeof target !== 'string' || !column || typeof column !== 'string'){
+            return { valid: false, message: `${t('validation.record')}${t('validation.is invalid')}` };
+        }
+        if (column === 'price_per_unit' && column === 'amount'){
+
+            // unprovided value in pricing rules
+            if (!providedValue && target === 'pricing_rules'){
+                return { valid: false, message: `${t('validation.missing')}` };
+            }
+
+            // unprovided value in quoted transactions:
+            if (!providedValue && target === 'transactions'){
+                if (record.status !== 'created'){
+                    return { valid: false, message: `${t('validation.missing')}` };
+                }
+            }
+        }
+        if (column === 'quantity'){
+            if (!providedValue && target === 'transactions'){
+                return { valid: false, message: `${t('validation.missing')}` };
+            }
+        }
+        // only allow positive numbers for the records
+        if (providedValue && !isNumericPositive(providedValue).valid){
+            return { valid: false };
+        }
+        return { valid: true };
+    }
+
+    function isNumericPositive(input){
+        let valid = false;
+        if (typeof input === 'number' && !isNaN(input)) {
+            valid = input > 0;
+        }
+        if (typeof input === 'string'){
+            // Float validation
+            const parsed = parseFloat(input);
+            if (!isNaN(parsed) && isFinite(input)) {
+                valid =  parsed > 0;
+            }
+
+            //Integer validation
+            const parsedInt = parseInt(input, 10);
+            if (!isNaN(parsedInt) && isFinite(input)) {
+                valid = parsedInt > 0;
+            }
+        }
+        return { valid: valid, message: `${valid ? '' : t('validation.is invalid')}` };
+    }
+
     return {
         mapValidation,
         isUsernameValid,
@@ -201,6 +253,8 @@ export function useValidators() {
         isSearchTableValid,
         isSearchBodyValid,
         isSortingAllowed,
-        isStatusValid
+        isStatusValid,
+        isNumericalRecordValid,
+        isNumericPositive
     };
 }

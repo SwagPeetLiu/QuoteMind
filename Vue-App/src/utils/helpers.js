@@ -90,7 +90,6 @@ function FormatMonthAndYear(month, year) {
  * @param {*} date - Date opbject / ISO string (URL decodeed version)
  * @param {*} locale - en / ch
  */
-
 function formatDate(date, locale) {
     // convert to date object if input date is a string
     let convertedDate = date;

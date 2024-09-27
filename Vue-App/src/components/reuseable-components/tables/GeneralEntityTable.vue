@@ -83,7 +83,7 @@
                                         v-if="record[column]"
                                         :theme="themeColour" 
                                         :icon="getIcon(column)" 
-                                        :name="record[column][getRecordName(target, $i18n.locale)]"
+                                        :name="record[column][getRecordName(column, $i18n.locale)]"
                                         :id="record[column].id"
                                         :target="column"
                                     />
@@ -106,18 +106,16 @@
                                     v-if="mapColumnType(column).includes('ordinary')"
                                     class="d-flex align-items-center justify-content-center"
                                 >
-                                    <div v-if="record[column]" class="text-gradient text-dark info-span font-weight-bold">
+                                    <div class="text-gradient text-dark info-span font-weight-bold">
 
                                         <!-- numeric field -->
-                                        <div 
-                                            class="d-flex align-items-center justify-content-center"
+                                        <NumericalCell
                                             v-if="mapColumnType(column).includes('numeric')"
-                                        >
-                                            <span v-if="mapColumnType(column).includes('monetary')">
-                                                {{ $i18n.locale === "en" ? "$" : "¥" }}
-                                            </span>
-                                            <IncrementNumber :endValue = "record[column]"/>
-                                        </div>
+                                            :record="record"
+                                            :column="column"
+                                            :columnType="mapColumnType(column)"
+                                            :target="target"
+                                        />
 
                                         <!-- string field -->
                                         <span v-else>{{ record[column] }}</span>
@@ -125,19 +123,10 @@
                                 </div>
 
                                 <!-- Date field -->
-                                 <div 
+                                 <FormattedDate 
                                     v-if="mapColumnType(column) == 'date'"
-                                    class="d-flex align-items-center justify-content-center"
-                                    >
-                                    <span 
-                                        v-if="record[column]"
-                                        class="text-gradient text-dark info-span">
-                                        {{ formatDate(record[column], $i18n.locale) }}
-                                    </span>
-                                    <span v-else class="text-gradient text-danger font-weight-bolder">
-                                        -- 
-                                    </span>
-                                 </div>
+                                    :date="record[column]"
+                                />
 
                                  <!-- customised reference field -->
                                 <div v-if="mapColumnType(column).includes('custom')">   
@@ -188,12 +177,21 @@
                                         :client="record['client']"
                                         :company="record['company']"
                                         :colour="record['colour']"
+                                        :useBorder="false"
                                     />
-
+                                    
+                                    <!-- single price condition -->
                                     <ConditionCategoryTag
                                         v-if="column === 'category'"
                                         :client="record['client']"
                                         :company="record['company']"
+                                    />
+
+                                    <!-- group of pricing conditions -->
+                                    <ConditionListing
+                                        v-if="column === 'listed_conditions'"
+                                        :conditions="record['conditions']"
+                                        :themeColour="themeColour"
                                     />
                                 </div>
                             </td>
@@ -235,20 +233,23 @@ import { config } from "@/config/config";
 import search from "@/api/search";
 import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import DashLoader from "@/components/reuseable-components/loader/DashLoader.vue";
-import { getRecordName, mapColumnType, getTargetImage, getSortImage, formatDate } from "@/utils/helpers";
+import { getRecordName, mapColumnType, getTargetImage, getSortImage } from "@/utils/helpers";
 import { generateOrderByClause, mapGeneralListingBody } from "@/utils/formatters";
 import { useValidators } from '@/utils/useValidators';
 const { isSortingAllowed } = useValidators();
+import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 import { getIcon } from "@/utils/iconMapper.js";
+
 import IconEntity from "@/components/reuseable-components/tables/IconEntity.vue";
 import CustomProductsMaterial from "@/components/reuseable-components/tables/CustomProductsMaterial.vue";
 import TransactionDetails from "@/components/reuseable-components/tables/TransactionDetails.vue";
 import CategoricalBadge from "@/components/reuseable-components//text/CategoricalBadge.vue";
-import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
-import { initTooltips, removeExistingTooltips }  from "@/assets/js/tooltip.js";
 import DimensionDetails from "@/components/reuseable-components/tables/DimensionDetails.vue";
 import ConditionCategoryTag from "@/components/reuseable-components/tables/ConditionCategoryTag.vue";
 import PricingConditionDetails from "@/components/reuseable-components/tables/PricingConditionDetails.vue";
+import ConditionListing from "@/components/reuseable-components/tables/ConditionListing.vue";
+import FormattedDate from "@/components/reuseable-components/tables/FormattedDate.vue";
+import NumericalCell from "@/components/reuseable-components/tables//NumericalCell.vue";
 
 export default{
     name: "GeneralEntityTable",
@@ -265,10 +266,12 @@ export default{
         CategoricalBadge,
         CustomProductsMaterial,
         TransactionDetails,
-        IncrementNumber,
         DimensionDetails,
         PricingConditionDetails,
-        ConditionCategoryTag
+        ConditionCategoryTag,
+        ConditionListing,
+        FormattedDate,
+        NumericalCell
     },
     data(){
         const { t } = useI18n();
@@ -291,7 +294,6 @@ export default{
         getTargetImage,
         getSortImage,
         isSortingAllowed,
-        formatDate,
         fetchData(type){
             // manage the current status of loading:
             if (type == "initialise") {

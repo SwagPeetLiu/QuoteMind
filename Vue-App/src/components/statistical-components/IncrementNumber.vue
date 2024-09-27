@@ -7,12 +7,12 @@ export default {
     name: 'count-up',
     props: {
         startValue:{
-            type: Number,
+            type: [Number, String],
             required: false,
             default: 0
         },
         endValue: {
-            type: Number,
+            type: [Number, String],
             required: true
         },
         duration: {

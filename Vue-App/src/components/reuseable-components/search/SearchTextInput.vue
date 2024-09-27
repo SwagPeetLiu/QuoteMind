@@ -50,8 +50,9 @@ export default {
     },
     watch: {
         textValue(newValue){
-            const inputValidation = mapValidation("textInput", newValue);
-            this.$emit('update-search-value', this.target, newValue, inputValidation.valid);
+            const trimmedValue = newValue.trim();
+            const inputValidation = mapValidation("textInput", trimmedValue);
+            this.$emit('update-search-value', this.target, trimmedValue, inputValidation.valid);
         },
         clearingInput(newValue){
             if(newValue == true){

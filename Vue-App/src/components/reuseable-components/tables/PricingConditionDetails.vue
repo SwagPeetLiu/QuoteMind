@@ -1,5 +1,8 @@
 <template>
-    <div class="w-100 h-100 d-flex flex-column my-3 ms-4 custom-product-materials">
+    <div class="d-flex flex-column my-3 custom-product-materials"
+        :class="[useBorder ? 'border border-2 rounded border-dark py-2 px-3 mx-2' : 'ms-4']"
+        :style="{ width: 'fit-content' }"
+    >
         <!-- quantity -->
         <div 
             class="d-flex align-items-center text-gradient text-dark font-weight-bold my-1"
@@ -103,6 +106,10 @@ export default{
         },
         colour:{
             type:[String, null],
+            required: true
+        },
+        useBorder:{
+            type: Boolean,
             required: true
         }
     },

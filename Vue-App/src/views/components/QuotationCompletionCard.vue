@@ -48,14 +48,14 @@
             <tr v-for="(record, index) in records" :key="index" class="table-row">
               <td>
                 <IconEntity 
-                  :theme="themeColour"
+                  :theme="'dark'"
                   :icon="getIcon(quoteTarget)"
                   :name="record[quoteTarget == 'companies' ? 'company' : 'client'].full_name"
                   :id="record[quoteTarget == 'companies' ? 'company' : 'client'].id"
                   :target="quoteTarget" 
                 />
               </td>
-              <td class="align-middle text-center font-weight-bold d-none d-md-table-cell">
+              <td class="align-middle text-gradient text-dark text-center text-shadow-lg font-weight-bold d-none d-md-table-cell">
                 <span>{{ $i18n.locale === "en" ? "$" : "¥" }}</span>
                 <IncrementNumber :endValue="record.unpaid" :duration="500" />
               </td>
@@ -65,7 +65,7 @@
                   :title="`${t('stats.in total of')}${record.total_transactions}${t('units.transactionUnit')}, ${record.created_transactions}${t('units.transactionUnit')}${t('others.remains')}${t('stats.unquoted')}`"
               >
                 <div class="d-flex align-items-center justify-content-center">
-                  <span class="font-weight-bold mx-2">{{record.percentage}}%</span>
+                  <span class="text-shadow-lg text-gradient text-dark font-weight-bold mx-2">{{record.percentage}}%</span>
                   <div class="d-none d-lg-inline">
                     <soft-progress 
                       :color="themeColour" 

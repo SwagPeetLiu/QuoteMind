@@ -1,5 +1,7 @@
 <template>
-    <div class='h-100 w-100 d-flex justify-content-center align-items-center'>
+    <div 
+        class='h-100 w-100 d-flex justify-content-center align-items-center'
+    >
         <span class="categorical-badge font-weight-bold ms-3"
             :class="`gradient-border-${categoricalColour} text-gradient text-${categoricalColour}`"
         >
