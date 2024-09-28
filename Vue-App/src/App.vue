@@ -30,13 +30,10 @@
     <InstanceAddButton @add-instance="addInstance"/>
 
     <!-- Configurator toggler -->
-    <configurator
-      :toggle="toggleConfigurator"
-      :class="[
-        this.$store.state.showConfig ? 'show' : '',
-        this.$store.state.hideConfigButton ? 'd-none' : '',
-      ]"
-    />
+    <configurator/>
+
+    <!-- Instance slider -->
+    <InstanceSlider/>
   </main>
 
   <!-- Overlays components -->
@@ -51,12 +48,12 @@ import Sidenav from "@/components/page-layouts/Sidenav";
 import Configurator from "@/components/page-layouts/Configurator.vue";
 import Navbar from "@/components/page-layouts/TopNav/Navbar.vue";
 import AppFooter from "@/components/page-layouts/AppFooter.vue";
-import { mapMutations } from "vuex";
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js';
 import ErrorDialog from "@/components/reuseable-components/pop-ups/ErrorDialog.vue";
 import SlideToast from "@/components/reuseable-components/pop-ups/SlideToast.vue";
 import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
 import InstanceAddButton from "@/components/page-layouts/InstanceAddButton.vue";
+import InstanceSlider from "@/components/page-layouts/InstanceSlider.vue";
 
 export default {
   name: "App",
@@ -68,7 +65,8 @@ export default {
     ErrorDialog,
     SlideToast,
     ColouringCubeOverlay,
-    InstanceAddButton
+    InstanceAddButton,
+    InstanceSlider
   },
   data(){
     return {
@@ -76,7 +74,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["toggleConfigurator"]),
     showModal() {
       var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
         keyboard: false

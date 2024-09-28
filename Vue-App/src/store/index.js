@@ -15,8 +15,10 @@ export default createStore({
     dbReferences: null, // object of objects
 
     // controls the display of the configurator:
-    hideConfigButton: false,
     showConfig: false,
+
+    // controls the display of instance Slider:
+    showInstanceSlider: { display: false, id: null, target: null },
 
     // control the display of the sidenav menu
     isTransparent: "bg-transparent",
@@ -116,9 +118,9 @@ export default createStore({
       state.showFooter = !state.showFooter;
     },
 
-    // toggle to Hide config button
-    toggleHideConfig(state) {
-      state.hideConfigButton = !state.hideConfigButton;
+    // toggle to show and hide the instance slider
+    toggleInstanceSlider(state, payload) {
+      state.showInstanceSlider = { ...payload };
     },
 
     // Language Selection:

@@ -1,5 +1,9 @@
 <template>
-  <div class="fixed-plugin" ref="configuratorContainer">
+  <div 
+    class="fixed-plugin"
+    ref="configuratorContainer"
+    :class="{ 'show' : this.$store.state.showConfig }"
+  >
     <a class="px-3 py-2 fixed-plugin-button text-dark position-fixed" @click.prevent="toggleConfig">
       <i class="py-2 fa fa-cog"> </i>
     </a>
@@ -19,6 +23,7 @@
           </button>
         </div>
       </div>
+
       <hr class="my-1 horizontal dark" />
       <div class="pt-0 card-body pt-sm-3">
 
@@ -132,7 +137,7 @@ export default {
     return { t, isLoading };
   },
   methods: {
-    ...mapMutations(["navbarMinimize", "sidebarType", "navbarFixed"]),
+    ...mapMutations(["navbarMinimize", "sidebarType", "navbarFixed", "toggleConfigurator"]),
     ...mapActions(["toggleSidebarColor"]),
 
     // funciton used to set the theme colours of the app
@@ -172,7 +177,7 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
-      this.toggle();
+      this.toggleConfigurator();
     },
     // functions used to handle configurator closure:
     handleClickOutside(event) {

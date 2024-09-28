@@ -58,6 +58,7 @@
                             v-for="(record, rowIndex) in entities"
                             :key="rowIndex"
                             class="table-row h-100"
+                            @click="toggleInstanceSlider({display: true, id: record.id, target: target})"
                         >
                             <td 
                                 v-for="(column, colIndex) in visibleColumns"
@@ -228,6 +229,7 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import search from "@/api/search";
@@ -294,6 +296,7 @@ export default{
         getTargetImage,
         getSortImage,
         isSortingAllowed,
+        ...mapMutations(["toggleInstanceSlider"]),
         fetchData(type){
             // manage the current status of loading:
             if (type == "initialise") {

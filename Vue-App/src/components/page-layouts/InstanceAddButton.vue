@@ -1,10 +1,7 @@
 <template>
     <div 
       class="fixed-add-on"
-      :class="[
-        this.$store.state.hideConfigButton ? 'd-none' : '',
-        !isCurrentRouteResourceful ? 'd-none' : ''
-      ]"
+      :class="[!isCurrentRouteResourceful ? 'd-none' : '']"
     >
       <a 
         class="px-3 py-2 fixed-plugin-button text-white position-fixed"

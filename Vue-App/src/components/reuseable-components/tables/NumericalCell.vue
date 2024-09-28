@@ -6,7 +6,7 @@
         <IncrementNumber :endValue="providedValue" />
         <span v-if="column === 'quantity'">{{ record['quantity_unit'] }}</span>
     </div>
-    <div v-else class="d-flex align-items-center justify-content-center text-gradient text-danger font-weight-bold">
+    <div v-if="!valueValidated" class="d-flex align-items-center justify-content-center text-gradient text-danger font-weight-bold">
         {{  t('validation.missing') }}
     </div>
 </template>

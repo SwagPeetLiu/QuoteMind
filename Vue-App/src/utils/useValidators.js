@@ -203,11 +203,15 @@ export function useValidators() {
             if (!providedValue && target === 'pricing_rules'){
                 return { valid: false, message: `${t('validation.missing')}` };
             }
-
             // unprovided value in quoted transactions:
-            if (!providedValue && target === 'transactions'){
+            else if (!providedValue && target === 'transactions'){
                 if (record.status !== 'created'){
                     return { valid: false, message: `${t('validation.missing')}` };
+                }
+            }
+            else{
+                if (!isNumericPositive(providedValue).valid){
+                    return { valid: false };
                 }
             }
         }
@@ -215,10 +219,11 @@ export function useValidators() {
             if (!providedValue && target === 'transactions'){
                 return { valid: false, message: `${t('validation.missing')}` };
             }
-        }
-        // only allow positive numbers for the records
-        if (providedValue && !isNumericPositive(providedValue).valid){
-            return { valid: false };
+            else{
+                if (!isNumericPositive(providedValue).valid){
+                    return { valid: false };
+                }
+            }
         }
         return { valid: true };
     }
