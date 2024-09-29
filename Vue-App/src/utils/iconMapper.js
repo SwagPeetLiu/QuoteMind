@@ -99,7 +99,7 @@ function getIcon(target) {
         case "between":
             return "fa-solid fa-arrow-right-arrow-left";
 
-        // controls:
+        // routes:
         case "home":
             return "fa fa-home";
         case "sign out":
@@ -122,7 +122,7 @@ function getIcon(target) {
             return "fa-solid fa-shield-halved";
         
 
-        // Others:
+        // controls:
         case "create transaction":
             return "fa-solid fa-cart-plus";
         case "quote transactions":
@@ -137,6 +137,8 @@ function getIcon(target) {
             return "fa-solid fa-xmark";
         case "switch":
             return "fa-solid fa-repeat";
+        case "close":
+            return "fa-solid fa-xmark";
         default:
             return "fa-solid fa-circle-info";
     }

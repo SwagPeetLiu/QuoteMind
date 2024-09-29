@@ -302,6 +302,23 @@
     "listed_conditions": "定价条件",
     "category": "类别"
   },
+  "detailedListings":{
+    "general": "基本信息",
+    "related companys": "所属公司",
+    "related clients": "名下客户",
+    "addresses": "地址",
+    "assigned position": "岗位",
+    "pricing product": "定价产品",
+    "condition": "定价条件",
+    "individual specific": "个体定价",
+    "listed_conditions": "所需条件",
+    "time": "时间详情",
+    "details": "交易信息",
+    "product details": "交易产品",
+    "dimensions": "尺寸信息",
+    "client details": "客户信息",
+    "others": "其他"
+  },
   "multipleOptions": {
     "status":{
       "quoted": "已报价",
@@ -329,6 +346,7 @@
     }
   },
   "others":{
-    "remains": "是"
+    "remains": "是",
+    "loading": "加载中"
   }
 }

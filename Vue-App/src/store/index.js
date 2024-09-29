@@ -161,6 +161,7 @@ export default createStore({
       state.user = { username: "", email: "", role: "", session: ""};
       state.isAuthenticated = false;
       state.dbReferences = null;
+      state.showInstanceSlider = { display: false, id: null, target: null };
 
       // if testing, then clear the login credentials in prior:
       if (process.env.NODE_ENV === 'test') {

@@ -53,7 +53,7 @@ import ErrorDialog from "@/components/reuseable-components/pop-ups/ErrorDialog.v
 import SlideToast from "@/components/reuseable-components/pop-ups/SlideToast.vue";
 import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
 import InstanceAddButton from "@/components/page-layouts/InstanceAddButton.vue";
-import InstanceSlider from "@/components/page-layouts/InstanceSlider.vue";
+import InstanceSlider from "@/components/page-layouts/InstanceSlider";
 
 export default {
   name: "App",

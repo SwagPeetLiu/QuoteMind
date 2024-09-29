@@ -299,6 +299,23 @@
     "listed_conditions": "Involved Conditions",
     "category": "Category"
   },
+  "detailedListings":{
+    "general": "General Information",
+    "related companys": "Related Companies",
+    "related clients": "Related Clients",
+    "addresses": "Addresses",
+    "assigned position": "Assigned Position",
+    "pricing product": "Pricing Product",
+    "condition": "Pricing Condition",
+    "individual specific": "Individuals",
+    "listed_conditions": "Combinational Conditions",
+    "time": "Time Details",
+    "details": "Transaction Details",
+    "product details": "Product Details",
+    "dimensions": "Dimension Details",
+    "client details": "Client Details",
+    "others": "Other Details"
+  },
   "multipleOptions": {
     "status":{
       "quoted": "Quoted",
@@ -326,6 +343,7 @@
     }
   },
   "others":{
-    "remains": " remains "
+    "remains": " remains ",
+    "loading": "Loading"
   }
 } 

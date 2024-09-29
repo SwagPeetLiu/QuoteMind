@@ -207,7 +207,7 @@ import setNavPills from "@/assets/js/nav-pills.js";
 import { useI18n } from "vue-i18n";
 import { fadeOutSlideRight } from "@/utils/styler";
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
-import EditableInfo from "@/components/reuseable-components/EditableInfo.vue";
+import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
 import { config } from '@/config/config';
 import profile from "@/api/profile";
 import LanguageDropDown from "@/components/reuseable-components/styler/languageDropDown.vue";
