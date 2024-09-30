@@ -4,7 +4,7 @@
     >
         <!-- input icon -->
         <i 
-            class="me-2 text-lg text-gradient input-icon" 
+            class="me-2 text-gradient input-icon" 
             :class="
                 [
                     icon, isEditing? 'editing': '', 
@@ -25,7 +25,7 @@
         <!-- current value -->
         <LoadInText 
             v-if="!isEditing" 
-            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : 'text-lg'}`" 
+            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`" 
             :text="value"
             :spaceWidth="7" 
         />
@@ -68,10 +68,6 @@ export default {
         name: {
             type: String,
             default: "username",
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
         },
         value: {
             type: String,
@@ -127,7 +123,7 @@ export default {
         },
         // changing inputs when the form is in editing mode
         inputValue(newValue){
-            const inputValidation = mapValidation(this.name, newValue);
+            const inputValidation = mapValidation(this.name, newValue, this.isRequired);
             this.isValid = inputValidation.valid;
             if (!this.isValid){
                 this.validationTips = inputValidation.message;

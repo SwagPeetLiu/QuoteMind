@@ -247,7 +247,8 @@
     "tester": "Tester",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "enter": "Enter Your "
   },
   "units":{
     "transactionUnit": ""

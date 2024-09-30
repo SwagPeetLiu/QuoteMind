@@ -4,10 +4,11 @@
 import { useTranslation } from '../utils/I18n';
 const { global: { t } } = useTranslation();
 import { config } from "@/config/config";
+const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u;
 
 export function useValidators() {
     // centralised validator on the client side:
-    function mapValidation(target, value) {
+    function mapValidation(target, value, required = true) {
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
         if (target === 'password') {
@@ -19,7 +20,7 @@ export function useValidators() {
 
         // general search validations:
         if (target === "textInput") {
-            return isTextInputValid(value);
+            return isTextInputValid(value, required);
         }
         if (target === "rangedDateInput") {
             return isRangedDateInputValid(value);
@@ -28,6 +29,10 @@ export function useValidators() {
             return isStatusValid(value);
         }
 
+        // Entity Attribute validations:
+        if (target.includes("name")) {
+            return isTextInputValid(value, required);
+        }
         return { valid: true };
     }
 
@@ -117,11 +122,32 @@ export function useValidators() {
     }
 
     // general string based search
-    function isTextInputValid(textInput) {
-        if (!textInput || typeof textInput !== 'string' || !textInput.trim()) {
+    function isTextInputValid(textInput, required) {
+        // if text is required but no value is provided
+        if (required && !textInput) {
             return {
                 valid: false,
                 message: `${t('validation.search value')}${t('validation.cannot be empty')}`
+            };
+        }
+        // if text is the wrong type
+        if (textInput && typeof textInput !== 'string') {
+            return {
+                valid: false,
+                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
+            };
+        }
+        // if text is an empty string
+        if (!textInput.trim()) {
+            return {
+                valid: false,
+                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
+            };
+        }
+        else if (!unicodeRegex.test(textInput)) {
+            return {
+                valid: false,
+                message: `${t('validation.search value')}${t('validation.is invalid')}`
             };
         }
         else if (textInput.length > config.limitations.Max_Name_Length) {

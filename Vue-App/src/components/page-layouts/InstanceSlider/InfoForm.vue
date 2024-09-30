@@ -21,8 +21,7 @@
                 <div 
                     v-for="(attribute, index) in detailedListings[section]" 
                     :key="index"
-                    class="w-100 px-1"
-                    :class="{'my-2': formStatus === 'editing'}"
+                    class="w-100 px-1 mt-2"
                 >
                     <!-- oridnary input field -->
                     <EditableInfo
@@ -36,9 +35,20 @@
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                         :size="'lg'"
+                        :class="'mb-2'"
                     />
-                    <span v-else>{{ attribute }} </span>
-                    
+
+                    <EditableDescriptions
+                        v-if="mapFormSubmissionType(attribute) === 'descriptions'"
+                        :icon="getIcon(attribute)"
+                        :name="attribute"
+                        :isDisabled="mapDisabled(attribute, $i18n.locale)"
+                        :isRequired="mapMandatory(attribute)"
+                        :value="formData[attribute].value"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                    />
+
                 </div>
             </div>
         </form>
@@ -54,12 +64,11 @@
             >
                 {{ t('form.cancel') }}
             </button>
-            
             <button 
                 class="btn form-button active" 
                 :class="`bg-gradient-${$store.state.themeColor}`"
                 @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
-                :disabled="formStatus === 'saving' || (formStatus === 'editing' && isInputInvalid)"
+                :disabled="formStatus === 'saving' || (formStatus === 'editing' && !isInputInvalid)"
             >
                 <Spinner v-if="formStatus === 'saving'" :size="1"/>
                 <span v-else>
@@ -89,8 +98,9 @@ import { config } from "@/config/config";
 import instance from "@/api/instance";
 import FoldLoader from "@/components/reuseable-components/loader/FoldLoader.vue";
 import FadeInElement from "@/components/reuseable-components/styler/FadeInElement.vue";
-import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
 import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
+import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
+import EditableDescriptions from "@/components/reuseable-components/forms/EditableDescriptions.vue";
 
 export default {
     name: "InfoForm",
@@ -117,7 +127,8 @@ export default {
         FoldLoader,
         FadeInElement,
         EditableInfo,
-        Spinner
+        Spinner,
+        EditableDescriptions
     },
     computed:{
         detailedListings(){
@@ -128,6 +139,9 @@ export default {
         },
         isDataAvailable(){
             return this.formData !== null;
+        },
+        isInputInvalid() {
+            return Object.values(this.formData).some((input) => !input.isValidated);
         }
     },
     methods:{
@@ -145,7 +159,6 @@ export default {
                 .then((response) => {
                     if (response.isCompleted) {
                         this.formData = mapFormData(Object.values(response.data)[0], true);
-                        console.log(this.formData);
                     }
                 })
                 .catch((error) => {
@@ -166,10 +179,12 @@ export default {
                 this.formStatus = status;
             }
         },
+        // function used to submit the form
         submitform(){
             this.formStatus = "display";
         },
         validateInputUpdate(name, value, isValid) {
+            console.log(name, value, isValid);
             this.formData[name] = { value: value, isvaldiated: isValid };
         }
     },

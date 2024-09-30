@@ -159,6 +159,8 @@
           <div class="card-body mt-n5 mt-md-n4">
             <div class="row g-3 mx-2">
               <div class="col-12 col-md-6 mt-4 mt-md-0 d-flex align-items-center justify-content-center">
+                  
+                  <!-- Side Menu Fixed -->
                   <div class="d-flex align-items-center">
                     <i 
                       class="my-0 h4 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
@@ -172,6 +174,7 @@
                   </div>
               </div>
 
+              <!-- Language settings -->
               <div class="col-12 col-md-6 mt-2 mt-md-0 d-flex align-items-center justify-content-center">
                   <div class="d-flex align-items-center">
                     <i 
@@ -182,6 +185,8 @@
                   </div>
                   <LanguageDropDown :class="['mt-3 ps-4']"/>
               </div>
+
+              <!-- Colouring Changes -->
               <p class="col-12 mt-1 text-center mb-0 h4 text-gradient text-dark font-weight-bold">
                 {{ t("configurator.SideBar Colours") }}
               </p>

@@ -250,7 +250,8 @@
     "tester": "测试员",
     "edit": "编辑",
     "save": "保存",
-    "cancel": "取消"
+    "cancel": "取消",
+    "enter": "输入您的"
   },
   "units":{
     "transactionUnit": "笔"
