@@ -75,7 +75,7 @@
             <div class="row g-3">
               <div class="col-12 col-lg-6">
                 <EditableInfo
-                  :icon="'fa-solid fa-shield-halved'"
+                  :icon="getIcon('role')"
                   name="role"
                   :isDisabled="true"
                   :isRequired="true"
@@ -88,7 +88,7 @@
 
               <div class="col-12 col-lg-6">
                 <EditableInfo
-                  :icon="'fa-solid fa-envelope-open-text'"
+                  :icon="getIcon('email')"
                   name="email"
                   :isDisabled="true"
                   :isRequired="true"
@@ -101,7 +101,7 @@
               
               <div class="col-12 col-lg-6">
                 <EditableInfo
-                  :icon="'fa-solid fa-user-tag'"
+                  :icon="getIcon('username')"
                   name="username"
                   :isDisabled="false"
                   :isRequired="true"
@@ -114,7 +114,7 @@
               
               <div class="col-12 col-lg-6">
                 <EditableInfo
-                  :icon="'fa-solid fa-unlock-keyhole'"
+                  :icon="getIcon('password')"
                   name="password"
                   :isDisabled="false"
                   :isRequired="true"
@@ -161,8 +161,8 @@
               <div class="col-12 col-md-6 mt-4 mt-md-0 d-flex align-items-center justify-content-center">
                   <div class="d-flex align-items-center">
                     <i 
-                      class="fa-solid fa-sliders my-0 h4 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
-                      :class="`text-${$store.state.themeColor}`"
+                      class="my-0 h4 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
+                      :class="[`text-${$store.state.themeColor}`, getIcon('setting menu')]">
                     ></i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Side Menu Fixed") }}</h6>
                   </div>
@@ -175,8 +175,8 @@
               <div class="col-12 col-md-6 mt-2 mt-md-0 d-flex align-items-center justify-content-center">
                   <div class="d-flex align-items-center">
                     <i 
-                      class="fa-solid fa-language my-0 h3 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
-                      :class="`text-${$store.state.themeColor}`"
+                      class="my-0 h3 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
+                      :class="[`text-${$store.state.themeColor}`, getIcon('language')]">
                     ></i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Language") }}</h6>
                   </div>
@@ -186,12 +186,12 @@
                 {{ t("configurator.SideBar Colours") }}
               </p>
               <div class="col-12 mt-2 d-flex align-items-center justify-content-center colour-pickers">
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-primary text-shadow-lg" :class="{'active': $store.state.themeColor === 'primary'}" @click="themeColor('primary')"></i>
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-dark text-shadow-lg" :class="{'active': $store.state.themeColor === 'dark'}" @click="themeColor('dark')"></i>
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-info text-shadow-lg" :class="{'active': $store.state.themeColor === 'info'}" @click="themeColor('info')"></i>
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-success text-shadow-lg" :class="{'active': $store.state.themeColor === 'success'}" @click="themeColor('success')"></i>
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-warning text-shadow-lg" :class="{'active': $store.state.themeColor === 'warning'}" @click="themeColor('warning')"></i>
-                <i class="fa-solid fa-earth-asia h4 px-3 my-0 text-gradient text-danger text-shadow-lg" :class="{'active': $store.state.themeColor === 'danger'}" @click="themeColor('danger')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-primary text-shadow-lg" :class="[$store.state.themeColor === 'primary' ? 'active' : '', getIcon('locale')]" @click="themeColor('primary')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-dark text-shadow-lg" :class="[$store.state.themeColor === 'dark' ? 'active' : '', getIcon('locale')]" @click="themeColor('dark')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-info text-shadow-lg" :class="[$store.state.themeColor === 'info' ? 'active' : '', getIcon('locale')]" @click="themeColor('info')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-success text-shadow-lg" :class="[$store.state.themeColor === 'success' ? 'active' : '', getIcon('locale')]" @click="themeColor('success')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-warning text-shadow-lg" :class="[$store.state.themeColor === 'warning' ? 'active' : '', getIcon('locale')]" @click="themeColor('warning')"></i>
+                <i class="h4 px-3 my-0 text-gradient text-danger text-shadow-lg" :class="[$store.state.themeColor === 'danger' ? 'active' : '', getIcon('locale')]" @click="themeColor('danger')"></i>
               </div>
             </div>
           </div>
@@ -211,6 +211,7 @@ import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.v
 import { config } from '@/config/config';
 import profile from "@/api/profile";
 import LanguageDropDown from "@/components/reuseable-components/styler/languageDropDown.vue";
+import { getIcon } from "@/utils/iconMapper.js";
 
 export default {
   name: "ProfileOverview",
@@ -253,6 +254,7 @@ export default {
     }
   },
   methods: {
+    getIcon,
     setMenuFixed() {
       this.$store.commit("setMenuFixed", !this.$store.state.isMenuFixed);
     },

@@ -4,27 +4,28 @@
     >
         <!-- input icon -->
         <i 
-            class="me-2 text-2xl text-gradient input-icon" 
+            class="me-2 text-lg text-gradient input-icon" 
             :class="
                 [
                     icon, isEditing? 'editing': '', 
-                    isEditing? `text-${$store.state.themeColor}`: 'text-dark'
+                    isEditing? `text-${$store.state.themeColor}`: 'text-dark',
+                    size === 'large' ? 'text-2xl' : 'text-lg'
                 ]"
         >
         </i>
         <!-- input label -->
         <p 
-            class="me-2 me-3 text-2xl my-0 font-weight-bold text-dark input-label"
-            :class="{'editing': isEditing}"
+            class="me-2 me-3 my-0 font-weight-bold text-dark input-label"
+            :class="[isEditing ? 'editing': '', size === 'large' ? 'text-2xl' : 'text-lg']"
         >
-            {{ t(`form.${name}`) }}
+            {{ t(`columns.${name}`) }}
             <span v-if="!isEditing" class="ms-n1">:</span>
         </p>
 
         <!-- current value -->
         <LoadInText 
             v-if="!isEditing" 
-            inputClass="text-2xl text-dark my-0" 
+            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : 'text-lg'}`" 
             :text="value"
             :spaceWidth="7" 
         />
@@ -92,6 +93,10 @@ export default {
         isDisabled: {
             type: Boolean,
             default: false
+        },
+        size:{
+            type: String,
+            default: "large"
         }
     },
     data(){

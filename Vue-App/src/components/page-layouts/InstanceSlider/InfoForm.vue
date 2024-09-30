@@ -1,37 +1,96 @@
 <template>
-    <form 
-        class="w-100 was-validated overflow-x-hidden overflow-y-auto thin-scrollbar"
-        :class="{'needs-validation': formStatus === 'editing'}"
-        name="form"
-        novalidate
-    >
-        <!-- display by sections -->
-        <div class="my-2 w-100 d-flex flex-wrap" v-for="(section, index) in sections" :key="index">
-            
-            <!-- Section title -->
-            <p class="w-100 text-gradient text-dark font-weight-bolder text-shadow-md h5 mt-0 mb-2">
-                {{ t(`detailedListings.${section}`) }}
-            </p>
-
-            <!-- display by attributes -->
+    <FadeInElement v-if="!isLoading && isDataAvailable">
+        <form 
+            class="w-100 slider-form was-validated overflow-x-hidden overflow-y-auto thin-scrollbar my-0 slider-form"
+            :class="{'needs-validation': formStatus === 'editing'}"
+            name="form"
+            novalidate
+        >
+            <!-- display by sections -->
             <div 
-                v-for="(attribute, index) in detailedListings[section]" 
+                class="my-2 w-100 d-flex flex-wrap" 
+                v-for="(section, index) in sections" 
                 :key="index"
-                class="w-100 px-2"
             >
-                {{ attribute }}
+                <!-- Section title -->
+                <p class="w-100 text-gradient text-dark font-weight-bolder text-shadow-md h5 mt-0 mb-2">
+                    {{ t(`detailedListings.${section}`) }}
+                </p>
+                
+                <!-- display by attributes -->
+                <div 
+                    v-for="(attribute, index) in detailedListings[section]" 
+                    :key="index"
+                    class="w-100 px-1"
+                    :class="{'my-2': formStatus === 'editing'}"
+                >
+                    <!-- oridnary input field -->
+                    <EditableInfo
+                        v-if="mapFormSubmissionType(attribute) === 'text'"
+                        :icon="getIcon(attribute)"
+                        :name="attribute"
+                        :isDisabled="mapDisabled(attribute, $i18n.locale)"
+                        :isRequired="mapMandatory(attribute)"
+                        :value="formData[attribute].value"
+                        :type="'text'"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        :size="'lg'"
+                    />
+                    <span v-else>{{ attribute }} </span>
+                    
+                </div>
             </div>
-            <!-- <hr v-if="sections.length !== 1 && index" class="mt-2 mb-0 horizontal dark" /> -->
-            {{ formData }}
+        </form>
+    </FadeInElement>
+
+    <FadeInElement v-if="!isLoading && isDataAvailable">
+        <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end"
+        >
+            <button 
+                v-if="formStatus === 'editing'" 
+                class="btn btn-secondary form-button" 
+                @click.prevent="updateStatus('cancel')"
+            >
+                {{ t('form.cancel') }}
+            </button>
+            
+            <button 
+                class="btn form-button active" 
+                :class="`bg-gradient-${$store.state.themeColor}`"
+                @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
+                :disabled="formStatus === 'saving' || (formStatus === 'editing' && isInputInvalid)"
+            >
+                <Spinner v-if="formStatus === 'saving'" :size="1"/>
+                <span v-else>
+                    {{ formStatus === 'editing' ? t('form.save') : t('form.edit') }}
+                </span>
+            </button>
         </div>
-    </form>
+    </FadeInElement>
+
+    <!-- loading indicator -->
+    <FoldLoader v-if="isLoading"/>
+
+    <!-- errors on fetching & displaying data -->
+    <p 
+        class="d-flex align-items-center justify-content-center w-100 h-100 mt-n6 text-gradient text-danger font-weight-bolder h3 text-shadow-md" 
+        v-if="!isLoading && !isDataAvailable"
+    >
+        <FadeInElement>{{ t('stats.no data available') }}</FadeInElement>
+    </p>
 </template>
 
 <script>
 import { getIcon } from "@/utils/iconMapper.js";
+import { mapFormData, mapFormSubmissionType, mapMandatory, mapDisabled } from "@/utils/helpers";
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import instance from "@/api/instance";
+import FoldLoader from "@/components/reuseable-components/loader/FoldLoader.vue";
+import FadeInElement from "@/components/reuseable-components/styler/FadeInElement.vue";
+import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
+import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
 
 export default {
     name: "InfoForm",
@@ -54,6 +113,12 @@ export default {
             required: true
         }
     },
+    components:{
+        FoldLoader,
+        FadeInElement,
+        EditableInfo,
+        Spinner
+    },
     computed:{
         detailedListings(){
             return config.detailedListings[this.target];
@@ -61,13 +126,16 @@ export default {
         sections(){
             return Object.keys(this.detailedListings);
         },
-        isDataAvaialble(){
+        isDataAvailable(){
             return this.formData !== null;
         }
     },
     methods:{
         getIcon,
-        
+        mapMandatory,
+        mapFormSubmissionType,
+        mapDisabled,
+
         // fetching data based on the provided ID:
         fetchData(){
             this.formData = null;
@@ -76,16 +144,33 @@ export default {
                 .getSpecificEntity({target: this.target, id: this.id})
                 .then((response) => {
                     if (response.isCompleted) {
-                        this.formData = response.data;
+                        this.formData = mapFormData(Object.values(response.data)[0], true);
+                        console.log(this.formData);
                     }
                 })
                 .catch((error) => {
                     console.error(error);
                 })
                 .finally(() => {
-                    this.isLoading= false;
-                    this.formStatus = "display";
+                    setTimeout(() => {
+                        this.isLoading= false;
+                        this.formStatus = "display";
+                    }, 1600);
                 });
+        },
+        // function used to update the form's status:
+        updateStatus(status) {
+            if (status === "saving") {
+                this.submitform();
+            }else{
+                this.formStatus = status;
+            }
+        },
+        submitform(){
+            this.formStatus = "display";
+        },
+        validateInputUpdate(name, value, isValid) {
+            this.formData[name] = { value: value, isvaldiated: isValid };
         }
     },
     mounted(){
@@ -93,3 +178,12 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.slider-form{
+    max-height: 90%;
+}
+.slider-controls{
+    height: 10%;
+}
+</style>

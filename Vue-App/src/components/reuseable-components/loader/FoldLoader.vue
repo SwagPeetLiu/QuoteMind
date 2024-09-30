@@ -6,7 +6,7 @@
             <span class="leaf3"></span>
             <span class="leaf4"></span>
         </div>
-        <span class="loading" data-name="Loading">
+        <span class="loading text-shadow-lg" data-name="Loading">
             {{ t('others.loading') }}
         </span>
     </div>

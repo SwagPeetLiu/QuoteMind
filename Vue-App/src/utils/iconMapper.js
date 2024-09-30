@@ -10,8 +10,6 @@ function getIcon(target) {
         case "company":
         case "companies":
             return "fa-solid fa-city";
-        case "email":
-            return "fa-solid fa-envelope";
 
         case "full_name":
         case "name":
@@ -72,7 +70,23 @@ function getIcon(target) {
             return "fa-solid fa-note-sticky";
         case "status":
             return "fa-solid fa-feather-pointed";
-        
+
+        // user management
+        case "email":
+            return "fa-solid fa-envelope-open-text";
+        case "role":
+            return "fa-solid fa-shield-halved";
+        case "username":
+            return "fa-solid fa-user-tag";
+        case "password":
+            return 'fa-solid fa-unlock-keyhole';
+        case "language":
+            return "fa-solid fa-language";
+        case "locale":
+            return "fa-solid fa-earth-asia";
+        case "setting menu":
+            return "fa-solid fa-sliders";
+
         // tables
         case "rules":
         case "rule":

@@ -24,38 +24,38 @@
 
             <!-- Slider Header -->
             <div class="instance-header ms-1 mt-2 text-white font-weight-bolder">
-                <p class="d-flex align-items-center text-white font-weight-bolder my-0">
+                <p class="d-flex align-items-center text-white font-weight-bolder my-0 text-shadow-lg">
                     <i class="me-2" :class="getIcon('id')"></i>
                     <span>{{ t('columns.id') }}</span>
                 </p>
-                <p class="my-0 font-weight-bolder text-sm">
+                <p class="my-0 font-weight-bolder text-sm text-shadow-lg">
                     {{ this.$store.state.showInstanceSlider.id }}
                 </p>
 
                 <!-- Close Button -->
                 <i 
-                    class="close-button"
+                    class="close-button text-shadow-md"
                     :class="getIcon('cancel')" 
                     @click="closeInstanceSlider">
                 </i>
 
                 <!-- instance Icon -->
                 <i 
-                    class="instance-icon text-shadow"
+                    class="instance-icon text-shadow-md"
                     :class="getIcon(this.$store.state.showInstanceSlider.target)"
                 >
                 </i>
 
                 <!-- Category of the instance -->
                 <div class="instance-target">
-                    <p class="text-gradient text-shadow" :class="`text-${themeColour}`">
+                    <p class="text-gradient text-shadow-md" :class="`text-${themeColour}`">
                         {{ t(`routes.${this.$store.state.showInstanceSlider.target}`) }}
                     </p>
                 </div>
             </div>
 
             <!-- Slider Content -->
-            <div class="mt-5 mb-2 mx-1 w-100" v-if="this.$store.state.showInstanceSlider.display">
+            <div class="mt-5 mb-2 mx-1 w-100 h-100" v-if="this.$store.state.showInstanceSlider.display">
                 <InfoForm 
                     :target="this.$store.state.showInstanceSlider.target"
                     :id="this.$store.state.showInstanceSlider.id"

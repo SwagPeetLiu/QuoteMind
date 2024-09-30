@@ -1,6 +1,6 @@
 /*
 * ==============================================================================
-*  Sections of helper functions shared across the Vue-app
+*  Mathematical Helpers
 * ==============================================================================
 */
 function generateDateRange(duration) {
@@ -41,6 +41,86 @@ function generateTimeRange(duration) {
     };
 }
 
+// function used to calculate the changes in the recent data points (returned value
+// can be relative or absolute)
+function calculateRelativeChanges(dataArray) {
+
+    // calculate for relative changes
+    if (dataArray.length >= 2) {
+        const lastValue = dataArray[dataArray.length - 1];
+        const previousValue = dataArray[dataArray.length - 2];
+        const relativeChange = (lastValue - previousValue) / previousValue * 100;
+        if (relativeChange < 0) {
+            return { isUp: false, value: `${Math.abs(relativeChange).toFixed(2)}%` };
+        }
+        else {
+            return { isUp: true, value: `${Math.abs(relativeChange).toFixed(2)}%` };
+        }
+    }
+    // calculate for absolute changes
+    else if (dataArray === 1) {
+        return { isUp: true, value: `${dataArray[0]}` };
+    }
+    else {
+        return { isUp: false, value: "- -" };
+    }
+}
+
+function calculatePercentage(base, total) {
+    return (base / total * 100).toFixed(0);
+}
+
+// function used to convert dimensions between the diemsnion and size metrics:
+function mapDefaultDimensions(providedValue, currentUnit, defaultUnit) {
+    const conversionFactors = {
+        // Linear measurements
+        "mm": 0.001,
+        "毫米": 0.001,
+        "cm": 0.01,
+        "厘米": 0.01,
+        "m": 1,
+        "米": 1,
+
+        // Area measurements
+        "mm²": 0.000001,
+        "平方毫米": 0.000001,
+        "cm²": 0.0001,
+        "平方厘米": 0.0001,
+        "m²": 1,
+        "平米": 1
+    };
+
+    if (!(currentUnit in conversionFactors) || !(defaultUnit in conversionFactors)) {
+        return null;
+    }
+    const valueInMeters = providedValue * conversionFactors[currentUnit];
+    const result = valueInMeters / conversionFactors[defaultUnit];
+    return parseFloat(result.toFixed(3));
+}
+
+// function used to map dimension units to size units:
+function mapDimensionUnitToSizeUnit(unit) {
+    switch (unit) {
+        case "mm":
+        case "cm":
+        case "m":
+            return `${unit}²`;
+        case "毫米":
+            return "mm²";
+        case "厘米":
+            return "cm²";
+        case "米":
+            return "m²";
+        default:
+            return "N/A";
+    }
+}
+
+/**
+ * ==================================================================================
+ * Sections of Functions used to assist in mapping informations & Displaying on the UI
+ * ==================================================================================
+ */
 // Function used to map the month and year to the correct language translation
 function FormatMonthAndYear(month, year) {
     let convertedMonth = "";
@@ -123,6 +203,7 @@ function createGradient(ctx, colorStops) {
     gradient.addColorStop(1, colorStops[1]);
     return gradient;
 }
+
 // function used to map the stroke graduate colours for line charts 
 function createLinearGradient(ctx, hexColor) {
     // Convert hex to RGB
@@ -160,35 +241,6 @@ function getContrastColour(colour) {
     }
 }
 
-// function used to calculate the changes in the recent data points (returned value
-// can be relative or absolute)
-function calculateRelativeChanges(dataArray) {
-
-    // calculate for relative changes
-    if (dataArray.length >= 2) {
-        const lastValue = dataArray[dataArray.length - 1];
-        const previousValue = dataArray[dataArray.length - 2];
-        const relativeChange = (lastValue - previousValue) / previousValue * 100;
-        if (relativeChange < 0) {
-            return { isUp: false, value: `${Math.abs(relativeChange).toFixed(2)}%` };
-        }
-        else {
-            return { isUp: true, value: `${Math.abs(relativeChange).toFixed(2)}%` };
-        }
-    }
-    // calculate for absolute changes
-    else if (dataArray === 1) {
-        return { isUp: true, value: `${dataArray[0]}` };
-    }
-    else {
-        return { isUp: false, value: "- -" };
-    }
-}
-
-function calculatePercentage(base, total) {
-    return (base / total * 100).toFixed(0);
-}
-
 function getUniqueObjects(array) {
     const uniqueMap = new Map();
 
@@ -201,11 +253,6 @@ function getUniqueObjects(array) {
     return Array.from(uniqueMap.values());
 }
 
-/**
- * ==================================================================================
- * Sections of Functions used to assist in mapping informations
- * ==================================================================================
- */
 // function used to describe the use of indicator in the search pannel
 // (i.e., xxx attribuite contains / named as "yyy")
 function mappIndicator(target) {
@@ -260,35 +307,22 @@ function getRecordName(target, locale){
     }
 }
 
+// function used to map out the displaying column type in general listings
 function mapColumnType(column){
     if (
-        column === "company" || 
-        column === "client" ||
-        column === "companies" ||
-        column === "clients" || 
-        column === "employee" || 
-        column === "employees" ||
-        column === "positions" || 
-        column === "product" || 
-        column === "products" ||
-        column === "material" ||
-        column === "materials"
+        column === "company" || column === "client" || column === "companies" || column === "clients" || 
+        column === "employee" || column === "employees" || column === "positions" || 
+        column === "product" || column === "products" || column === "material" || column === "materials"
     ){
         return "reference";
     }
     else if(
-        column === "quantity" ||
-        column === "width"  ||
-        column === "length" ||
-        column === "height" ||
+        column === "quantity" || column === "width"  || column === "length" || column === "height" || 
         column === "size"
     ){
         return "numeric(ordinary)";
     }
-    else if (
-        column === "price_per_unit" || 
-        column === "amount"
-    ){
+    else if (column === "price_per_unit" || column === "amount"){
         return "numeric monetary(ordinary)";
     }
     else if (column === "position"){
@@ -299,26 +333,76 @@ function mapColumnType(column){
     }
     // custom references that you would like the content to be aligned to the start
     else if (
-        column === "transaction details" || 
-        column === "product & materials" ||
-        column === "id" ||
-        column === "conditions" ||
-        column === "listed_conditions"
+        column === "transaction details" || column === "product & materials" ||
+        column === "id" || column === "conditions" || column === "listed_conditions"
     ){
         return 'custom reference'
     }
     // custom references that you would like the content to be centered
-    else if (
-        column === "dimension" || column === "category"
-    ){
+    else if (column === "dimension" || column === "category"){
         return "custom entity";
     }
     else {
         return "ordinary";
     }
+    
 }
 
-// function used to mpa the svg icons to the icons folders
+// function used to map out the form submission types on entity's attributes (to map into differnet 
+// form controls ONLY)
+//  - note the validation will be manually handled in separate validation functions upon value changes
+function mapFormSubmissionType(column){
+    if (
+        column === "company" || column === "client" || column === "companies" || column === "clients" || 
+        column === "employee" || column === "employees" || column === "positions" || column === "position" || 
+        column === "product" || column === "products" || column === "material" || column === "materials"
+    ){
+        return "reference dropdown";
+    }
+    else if(
+        column === "quantity" || column === "width"  || column === "length" || column === "height" || 
+        column === "size"
+    ){
+        return "unit number";
+    }
+    else if (column === "price_per_unit" || column === "amount"){
+        return "monetary number";
+    }
+    else if(column.includes("date")){
+        return "date";
+    }
+    else if(column === "descriptions" || column === "note"){
+        return "descriptions";
+    }
+    else return 'text';
+}
+
+// function used to determine if certain column is mandatory upon form submissions
+function mapMandatory(column){
+    // if column is non-essential values:
+    if (column === "descriptions" || column === "note" || column === "phone" ||
+        column === "wechat_contact" || column === "qq_contact" || column === "colour"
+    ){
+        return false;
+    }
+    return true;
+}
+
+// function used to determine
+function mapDisabled(column, locale){
+    // columns that are not editable
+    if (column === "creation_date" || column === "modified_date"){
+        return true;
+    }
+    // columns that are not editable based on the language locale:
+    const oppositeLocale = locale === "en" ? "ch" : "en";
+    if (column.includes(oppositeLocale)){
+        return true;
+    }
+    return false;
+}
+
+// function used to map the svg icons to the icons folders
 function getTargetImage(target){
     try{
         if (target === "company" || target === "companies"){
@@ -396,52 +480,6 @@ function getProductDimensionUnit(locale){
     return `${locale}_unit`;
 }
 
-// function used to convert dimensions between the diemsnion and size metrics:
-function mapDefaultDimensions(providedValue, currentUnit, defaultUnit) {
-    const conversionFactors = {
-        // Linear measurements
-        "mm": 0.001,
-        "毫米": 0.001,
-        "cm": 0.01,
-        "厘米": 0.01,
-        "m": 1,
-        "米": 1,
-
-        // Area measurements
-        "mm²": 0.000001,
-        "平方毫米": 0.000001,
-        "cm²": 0.0001,
-        "平方厘米": 0.0001,
-        "m²": 1,
-        "平米": 1
-    };
-
-    if (!(currentUnit in conversionFactors) || !(defaultUnit in conversionFactors)) {
-        return null;
-    }
-    const valueInMeters = providedValue * conversionFactors[currentUnit];
-    const result = valueInMeters / conversionFactors[defaultUnit];
-    return parseFloat(result.toFixed(3));
-}
-
-// function used to map dimension units to size units:
-function mapDimensionUnitToSizeUnit(unit) {
-    switch (unit) {
-        case "mm":
-        case "cm":
-        case "m":
-            return `${unit}²`;
-        case "毫米":
-            return "mm²";
-        case "厘米":
-            return "cm²";
-        case "米":
-            return "m²";
-        default:
-            return "N/A";
-    }
-}
-
 // function used to map the thresholod to the indicator:
 function mapThresholdOperator(operator) {
     switch (operator) {
@@ -462,6 +500,15 @@ function mapThresholdOperator(operator) {
     }
 }
 
+// function used to map out Specific entity's response to formData Controls
+// Outputs: {column: {value: xxxx, isValidated: true}}
+function mapFormData(data, isValidated = true) {
+    const result = {};
+    for (const [key, value] of Object.entries(data)) {
+        result[key] = { value, isValidated: isValidated };
+    }
+    return result;
+}
 
 module.exports = {
     generateDateRange,
@@ -482,5 +529,9 @@ module.exports = {
     getProductDimensionUnit,
     mapDefaultDimensions,
     mapDimensionUnitToSizeUnit,
-    mapThresholdOperator
+    mapThresholdOperator,
+    mapFormData,
+    mapFormSubmissionType,
+    mapMandatory,
+    mapDisabled
 }
