@@ -161,7 +161,7 @@
 
     "search query": "Search Query ",
     "search target": "Search Target ",
-    "search value": "Search Value ",
+    "input value": "Input Value",
 
     "invalid email": "Email must be a valid email",
     "invalid password": "Password must contains at least 3 digits, 3 letters, 1 uppcase letter and special character",

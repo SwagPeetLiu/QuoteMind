@@ -54,6 +54,7 @@
         </form>
     </FadeInElement>
 
+    <!-- form controls -->
     <FadeInElement v-if="!isLoading && isDataAvailable">
         <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end"
         >
@@ -68,7 +69,7 @@
                 class="btn form-button active" 
                 :class="`bg-gradient-${$store.state.themeColor}`"
                 @click.prevent="updateStatus(`${formStatus === 'editing' ? 'saving' : 'editing'}`)"
-                :disabled="formStatus === 'saving' || (formStatus === 'editing' && !isInputInvalid)"
+                :disabled="formStatus === 'saving' || (formStatus === 'editing' && isInputInvalid)"
             >
                 <Spinner v-if="formStatus === 'saving'" :size="1"/>
                 <span v-else>
@@ -141,6 +142,9 @@ export default {
             return this.formData !== null;
         },
         isInputInvalid() {
+            if (this.formData === null) {
+                return false;
+            }
             return Object.values(this.formData).some((input) => !input.isValidated);
         }
     },
@@ -184,8 +188,7 @@ export default {
             this.formStatus = "display";
         },
         validateInputUpdate(name, value, isValid) {
-            console.log(name, value, isValid);
-            this.formData[name] = { value: value, isvaldiated: isValid };
+            this.formData[name] = { value: value, isValidated: isValid };
         }
     },
     mounted(){

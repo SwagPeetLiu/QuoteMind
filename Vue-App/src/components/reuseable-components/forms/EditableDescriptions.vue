@@ -1,7 +1,10 @@
 <template>
     <div class="editable-descriptions">
         <!-- input Label -->
-        <div class="d-flex align-items-center justify-content-start input-header font-weight-bold">
+        <div 
+            class="input-header d-flex align-items-center justify-content-start font-weight-bold"
+            :class="[isEditing ? 'editing' : '']"
+        >
             <i :class="[icon, 'text-gradient me-2 my-0 text-lg', `text-${isEditing ? $store.state.themeColor : 'dark'}`]"></i>
             <span class="text-gradient text-dark my-0 text-lg">{{ t(`columns.${name}`) }}</span>
         </div>
@@ -9,16 +12,27 @@
         <!-- description values -->
         <div 
             class="display-section position-relative mt-1" 
-            :class="[isEditing ? 'editing border border-2 border-dark' : '']"
+            :class="{'editing border border-2 border-dark' : isEditing, 'invalid': !isValid}"
         >
             <textarea 
                 class="form-control overflow-x-hidden overflow-y-auto thin-scrollbar"
                 v-if="isEditing" 
                 v-model="inputValue" :maxlength="inputUpperLimitations"
                 :placeholder="`${t('form.enter')}${t('columns.' + name)}`"
+                :class="{'is-invalid': !isValid}"
             >
             </textarea>
-            <p class="text-secondary position-absolute end-0 me-2 mt-n1 text-sm" v-if="isEditing">{{ currentLength }}/{{ inputUpperLimitations }}</p>
+
+            <!-- invalid tooltips -->
+            <!-- validation tooltip -->
+            <div v-if="isEditing" class="invalid-tooltip fs-7">
+                {{ validationTips }}
+            </div>
+
+            <!-- input length tips -->
+            <p class="text-secondary position-absolute end-0 me-2 mt-n1 text-sm" v-if="isEditing">
+                {{ currentLength }}/{{ inputUpperLimitations }}
+            </p>
 
             <SlideUpElement v-else>
                 <p class="text-dark text-gradient ms-1">

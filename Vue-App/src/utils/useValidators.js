@@ -20,7 +20,10 @@ export function useValidators() {
 
         // general search validations:
         if (target === "textInput") {
-            return isTextInputValid(value, required);
+            return isTextInputValid(value, required, "input");
+        }
+        if (target === "descriptions" || target === "note"){
+            return isTextInputValid(value, required, "descriptions");
         }
         if (target === "rangedDateInput") {
             return isRangedDateInputValid(value);
@@ -121,39 +124,34 @@ export function useValidators() {
         return { valid: true };
     }
 
-    // general string based search
-    function isTextInputValid(textInput, required) {
-        // if text is required but no value is provided
-        if (required && !textInput) {
-            return {
-                valid: false,
-                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
-            };
-        }
+    // general string based validations
+    function isTextInputValid(textInput, required, textType = 'input') {
         // if text is the wrong type
         if (textInput && typeof textInput !== 'string') {
             return {
                 valid: false,
-                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
+                message: `${t('validation.input value')}${t('validation.cannot be empty')}`
             };
         }
-        // if text is an empty string
-        if (!textInput.trim()) {
+        // if text is required but no value is provided
+        if (required && !textInput.trim()) {
             return {
                 valid: false,
-                message: `${t('validation.search value')}${t('validation.cannot be empty')}`
+                message: `${t('validation.input value')}${t('validation.cannot be empty')}`
             };
         }
         else if (!unicodeRegex.test(textInput)) {
             return {
                 valid: false,
-                message: `${t('validation.search value')}${t('validation.is invalid')}`
+                message: `${t('validation.input value')}${t('validation.is invalid')}`
             };
         }
-        else if (textInput.length > config.limitations.Max_Name_Length) {
+        else if (
+            textInput.length > (textType == 'input' ? config.limitations.Max_Name_Length : config.limitations.Max_Descriptions_Length)
+        ) {
             return {
                 valid: false,
-                message: `${t('validation.search value')}${t('validation.too long')}`
+                message: `${t('validation.input value')}${t('validation.too long')}`
             };
         }
         else {

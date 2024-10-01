@@ -163,7 +163,7 @@
 
     "search query": "搜索内容",
     "search target": "搜索目标",
-    "search value": "搜索内容",
+    "input value": "输入内容",
 
     "invalid email": "邮箱格式错误",
     "invalid password": "密码必须包含3个数字，3个字母，1个大写字母和特殊字符",

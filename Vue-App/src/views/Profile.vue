@@ -236,10 +236,10 @@ export default {
       initialised: false,
       formStatus: "display",
       formData: {
-        role: { value: this.$store.state.user.role, isvaldiated: true },
-        email: { value: this.$store.state.user.email, isvaldiated: true },
-        username: { value: this.$store.state.user.username, isvaldiated: true },
-        password: { value: config.samePasswordIndicator, isvaldiated: true },
+        role: { value: this.$store.state.user.role, isValidated: true },
+        email: { value: this.$store.state.user.email, isValidated: true },
+        username: { value: this.$store.state.user.username, isValidated: true },
+        password: { value: config.samePasswordIndicator, isValidated: true },
       },
       passwordOverlay: passwordOverlay
     };
@@ -255,7 +255,7 @@ export default {
   },
   computed: {
     isInputInvalid() {
-      return Object.values(this.formData).some((input) => !input.isvaldiated);
+      return Object.values(this.formData).some((input) => !input.isValidated);
     }
   },
   methods: {
@@ -311,10 +311,10 @@ export default {
     validateInputUpdate(name, value, isValid) {
       // the special cases that user not to change their password
       if (name === "password" && value === this.passwordOverlay) {
-        this.formData[name] = { value: config.samePasswordIndicator, isvaldiated: true };
+        this.formData[name] = { value: config.samePasswordIndicator, isValidated: true };
       }
       else{
-        this.formData[name] = { value: value, isvaldiated: isValid };
+        this.formData[name] = { value: value, isValidated: isValid };
       }
     },
     submitform() {
