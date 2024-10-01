@@ -396,7 +396,7 @@ function mapDisabled(column, locale){
     }
     // columns that are not editable based on the language locale:
     const oppositeLocale = locale === "en" ? "ch" : "en";
-    if (column.includes(oppositeLocale)){
+    if (column.startsWith(`${oppositeLocale}_`)){
         return true;
     }
     return false;
@@ -509,6 +509,13 @@ function mapFormData(data, isValidated = true) {
     }
     return result;
 }
+function reverseFormatData(data) {
+    const result = {};
+    for (const [key, value] of Object.entries(data)) {
+        result[key] = value.value;
+    }
+    return result;
+}
 
 module.exports = {
     generateDateRange,
@@ -531,6 +538,7 @@ module.exports = {
     mapDimensionUnitToSizeUnit,
     mapThresholdOperator,
     mapFormData,
+    reverseFormatData,
     mapFormSubmissionType,
     mapMandatory,
     mapDisabled

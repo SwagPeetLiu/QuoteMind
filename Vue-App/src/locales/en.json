@@ -79,6 +79,12 @@
       "email cannot be changed": "Email cannot be changed",
       "success": "Sucessfullly Updated profile",
       "failed": "Failed to Update profile"
+    },
+    "instance":{
+      "failed to fetch": "Failed to fetch ",
+      "successfully updated": "Successfully updated ",
+      "failed to update": "Failed to update ",
+      "failed to delete": "Failed to delete "
     }
   },
   "thinBar":{
@@ -344,6 +350,7 @@
   },
   "others":{
     "remains": " remains ",
-    "loading": "Loading"
+    "loading": "Loading",
+    "space":" "
   }
 } 

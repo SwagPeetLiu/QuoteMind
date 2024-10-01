@@ -36,6 +36,12 @@ export function useValidators() {
         if (target.includes("name")) {
             return isTextInputValid(value, required);
         }
+        if (target === "phone"){
+            return isPhoneValid(value, required);
+        }
+        if (target === "qq_contact" || target === "wechat_contact"){
+            return isSocialValid(value, target, required);
+        }
         return { valid: true };
     }
 
@@ -164,7 +170,6 @@ export function useValidators() {
         if (!dateObject || (typeof dateObject !== 'object')) {
             return { valid: false, message: `${t('validation.date range')}${t('validation.is invalid')}` };
         }
-
         const { start, end } = dateObject;
 
         if (!start && !end) {
@@ -271,6 +276,83 @@ export function useValidators() {
             }
         }
         return { valid: valid, message: `${valid ? '' : t('validation.is invalid')}` };
+    }
+
+    function isPhoneValid(phone, required) {
+        if (phone) {
+            if (typeof phone !== "string") {
+                return ({ valid: false, message:  `${t('columns.phone')}${t('others.space')}${t('validation.is invalid')}` });
+            }
+            if (!phone.trim()) {
+                return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.is invalid')}` });
+            }
+            if (phone.length < config.limitations.Min_Phone_Length ) {
+                return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.too short')}` });
+            }
+            if (phone.length > config.limitations.Max_Phone_Length) {
+                return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.too long')}` });
+            }
+            // if it does not satisfy both landline or mobile, it is invalid
+            // Regex for Chinese mobile numbers
+            // Formats: 13xxxxxxxxx, 14xxxxxxxxx, 15xxxxxxxxx, 16xxxxxxxxx, 17xxxxxxxxx, 18xxxxxxxxx, 19xxxxxxxxx
+            // Also allowing: +86 prefix
+            const chineseMobileRegex = /^(\+?86)?1[3-9]\d{9}$/;
+
+            // Regex for Australian mobile numbers
+            // Formats: 04xxxxxxxx, 05xxxxxxxx (postcodes)
+            // Also allowing: +61 4xxxxxxxx, +61 5xxxxxxxx
+            const australianMobileRegex = /^(\+?61|0)?[45]\d{8}$/;
+            const LandlineRegex = /^[0-9]{2,4}-[0-9]{6,8}$/;
+
+            const isNotMobile = !chineseMobileRegex.test(phone) || !australianMobileRegex.test(phone);
+            const isNotLandLine = !LandlineRegex.test(phone);
+            if (isNotMobile && isNotLandLine) {
+                return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.is invalid')}` });
+            }
+        }
+        else if (required) {
+            return ({ valid: false, message: `${t('validation.cannot be empty')}` });
+        }
+        else return { valid: true };
+    }
+
+    function isSocialValid(contacts, target, required) {
+        if (contacts) {
+            if (typeof contacts !== "string") {
+                return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.is invalid')}` };
+            }
+            if (!contacts.trim()) {
+                return ({ valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.is invalid')}` });
+            }
+            if (contacts.length < config.limitations.Min_Social_Contact_Length) {
+                return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.too short')}` };
+            }
+            if (contacts.length > config.limitations.Max_Social_Contact_Length) {
+                return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.too long')}` };
+            }
+            if (target == "qq_contact") {
+                // must be numbers with an email suffice
+                const qqRegex = /^[1-9][0-9]*$/;
+                const accountid = contacts.replace(/@qq\.com/g, '').replace(/@foxmail\.com/g, '');
+                if (!qqRegex.test(accountid)) {
+                    return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.is invalid')}` };
+                }
+                if (accountid.length < config.limitations.Min_Social_Contact_Length) {
+                    return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.is invalid')}` };
+                }
+            }
+            if (target == "wechat_contact") {
+                // must start with a letter, allows to contain contain letters, numbers, underscores, and hyphens
+                const weChatRegex = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+                if (!weChatRegex.test(contacts)) {
+                    return { valid: false, message: `${t(`columns.${target}`)}${t('others.space')}${t('validation.is invalid')}` };
+                }
+            }
+        }
+        else if (required) {
+            return { valid: false, message: `${t('validation.cannot be empty')}` };
+        }
+        return { valid: true };
     }
 
     return {

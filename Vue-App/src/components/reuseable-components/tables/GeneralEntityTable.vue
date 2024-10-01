@@ -345,8 +345,13 @@ export default{
                     if(type == "initialise") {
                         setTimeout(()=>{
                             this.isInitialisedLoading = false;
+
                             // Update the count references:
                             this.$store.commit("setSearchTarget", {target: this.target, counts: this.totalCount});
+
+                            //reset the need to refresh listings upon instance manipulations:
+                            this.$store.commit("setRefreshListing", false);
+                            
                         }, this.$store.state.loadingDelay);
                     }
                 });
@@ -487,6 +492,13 @@ export default{
                 this.fetchData("initialise");
             },
             deep: true
+        },
+        '$store.state.refreshListing': {
+            handler(newValue){
+                if (newValue) {
+                    this.fetchData("initialise");
+                }
+            }
         }
     }
 }

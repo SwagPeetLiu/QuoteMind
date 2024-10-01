@@ -15,9 +15,26 @@ const instance = {
                 return { isCompleted: true, data: response.data };
             })
             .catch((error) => {
-                store.commit("setToastMessage", { message: t("apiMessage.search.failed to fetch dbReferences"), type: "error" });
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to fetch')}${data.target}`, type: "error" });
                 console.error(`failed to fetch ${data.target}`, error);
                 return { isCompleted: false, data: null };
+            });
+    },
+    updateSpecificEntity: (data) => {
+        if (!data || !data.target || !data.id ){
+            console.warn("Incomplete information");
+            return { isCompleted: false };
+        }
+        return axios
+            .put(`/${data.target}/${data.id}`, data.body)
+            .then(() => {
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.successfully updated')}${data.target}`, type: "success" });
+                return { isCompleted: true };
+            })
+            .catch((error) => {
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to update')}${data.target}`, type: "error" });
+                console.error(`failed to fetch ${data.target}`, error);
+                return { isCompleted: false };
             });
     }
 };

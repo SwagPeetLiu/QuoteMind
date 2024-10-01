@@ -347,6 +347,7 @@
   },
   "others":{
     "remains": "是",
-    "loading": "加载中"
+    "loading": "加载中",
+    "space":""
   }
 }

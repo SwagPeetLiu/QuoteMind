@@ -19,6 +19,7 @@ export default createStore({
 
     // controls the display of instance Slider:
     showInstanceSlider: { display: false, id: null, target: null },
+    refreshListing: false,
 
     // control the display of the sidenav menu
     isTransparent: "bg-transparent",
@@ -201,6 +202,8 @@ export default createStore({
     setToastMessage(state, payload) {
       state.toastMessage = payload;
     },
+
+    // controls the resizing of the Manue Pills
     setPillResizing(state, payload) {
       state.pillResizing = payload;
     },
@@ -209,8 +212,13 @@ export default createStore({
     setSearchWhereBody(state, payload) {
       state.searchWhereBody = generateSearchQueryWhereClause(payload.conditions, payload.operators);
     },
+    // controls which instances the client is searching
     setSearchTarget(state, payload) {
       state.searchTarget = payload;
+    },
+    // controls the need to refresh the listings of the current instances
+    setRefreshListing(state, payload) {
+      state.refreshListing = payload;
     }
   },
   actions: {

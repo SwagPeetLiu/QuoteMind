@@ -93,7 +93,7 @@
 
 <script>
 import { getIcon } from "@/utils/iconMapper.js";
-import { mapFormData, mapFormSubmissionType, mapMandatory, mapDisabled } from "@/utils/helpers";
+import { mapFormData, reverseFormatData, mapFormSubmissionType, mapMandatory, mapDisabled } from "@/utils/helpers";
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import instance from "@/api/instance";
@@ -185,7 +185,35 @@ export default {
         },
         // function used to submit the form
         submitform(){
-            this.formStatus = "display";
+            this.formStatus = "saving";
+            setTimeout(() => {
+                if (!this.isInputInvalid) {
+                    instance.updateSpecificEntity({
+                        target: this.target,
+                        id: this.id,
+                        body: reverseFormatData(this.formData)
+                    })
+                    .then((response) => {
+                        if (response.isCompleted){
+                            this.formStatus = "display";
+
+                            // refresh listing upon successful update
+                            if (!this.$store.state.refreshListing){
+                                this.$store.commit("setRefreshListing", true);
+                            }
+                        }
+                        else{
+                            this.formStatus = "editing";
+                        }
+                    })
+                    .catch(() => {
+                        this.formStatus = "editing";
+                    });
+                }
+                else{
+                    this.formStatus = "editing";
+                }
+            }, 500);
         },
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
