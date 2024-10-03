@@ -80,6 +80,12 @@
       "email cannot be changed": "不能更改邮箱",
       "success": "个人信息更新成功",
       "failed": "个人信息更新失败"
+    },
+    "instance":{
+      "failed to fetch": "未能获取",
+      "successfully updated": "成功更新",
+      "failed to update": "未能更新",
+      "failed to delete": "未能删除"
     }
   },
   "thinBar": {

@@ -15,18 +15,18 @@
         <!-- Editable Reference as an dropdown search -->
         <div 
             class="reference-dropdown" 
-            :class="[isSlideOut ? 'toggle-open' : 'toggle-closed']" 
+            :class="[isSlideOut ? 'toggle-open' : '']" 
             v-if="isEditing"
         >
             <button 
-                class="btn reference-toggle" 
+                class="reference-toggle" 
                 ref="referenceToggle"
                 @click.prevent="toggleDropdown()"
                 :disabled="isDisabled"
             >
                 <span 
                     class="current-selection-indicator text-gradient text-dark"
-                    :class="[isDataAvailable ? 'font-weight-bold': '']"
+                    :class="[isDataAvailable ? `font-weight-bolder`: '']"
                 >
                     {{ isDataAvailable ? 
                         `${isTargetCategorical ? t(`multipleOptions.position.${name}`) : name}` 
@@ -36,9 +36,9 @@
                 <i class="ms-auto toggle-arrow" :class="getIcon('down arrow')"></i>
             </button>
 
-            <div v-if="isSlideOut" class="reference-menu d-flex flex-column" ref="referenceMenu">
+            <div class="reference-menu d-flex flex-column" ref="referenceMenu">
                 <div class="reference-input d-flex align-items-center"> 
-                    <i class="ms-2 me-2" :class="getIcon('search')"></i>
+                    <i class="ms-2 me-2" :class="[getIcon('search'), `text-${$store.state.themeColor}`]"></i>
                     <input @input="onInputSearch" class="flex-grow-1" type="text" v-model="searchValue"/>
                 </div>
                 <ul v-if="!isInitialisedLoading & isReferenceListingsAvailable" class="reference-list thin-scrollbar overflow-x-hidden overflow-y-auto mt-2">

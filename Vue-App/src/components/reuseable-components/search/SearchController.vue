@@ -6,13 +6,13 @@
             <div class="col-12 col-xl-6 col-xxl-5 py-2">
                 <div class="h-50 mb-2 d-flex align-items-center" style="max-height: 45px">
                     <div 
-                        ref="targetDropdownContainer" class="target-dropdown h-100 w-80" :class="[`bg-gradient-${$store.state.themeColor}`, isSlideOut ? 'toggle-open' : 'toggle-closed']">
+                        ref="targetDropdownContainer" class="target-dropdown h-100 w-80" :class="[`bg-gradient-${$store.state.themeColor}`, {'toggle-open': isSlideOut}]">
                         <div class="target-toggle d-flex align-items-center justify-content-center" @click="toggleDropdown()">
                             <i class="ms-auto me-2" :class="[currentSelection.icon, `text-gradient text-${$store.state.themeColor}`]"></i>
                             <span class="text-gradient text-dark font-weight-bold">{{ t(`columns.${currentSelection.name}`) }}</span>
                             <i class="ms-auto me-2 toggle-arrow" :class="getIcon('down arrow')"></i>
                         </div>
-                        <ul v-if="isSlideOut" class="target-menu thin-scrollbar">
+                        <ul class="target-menu thin-scrollbar">
                             <li 
                                 v-for="item in targets"
                                 :key="item.name" 
