@@ -11,6 +11,7 @@ front-end (classical SPA)
   - scss -- sass preprocessor scripting language to boost the functionality of css and organising styling codes
   - fontawsome -- efficient font & icon toolkits that are based on pure css
   - three / gsap to create appealing animation objects on the UIs
+  - lodash -- efficient Javascription operations over Array, objects, functionatlies such as debouncing
 
 back-end
   - node.js -- running express as the backend server

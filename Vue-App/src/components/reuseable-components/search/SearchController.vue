@@ -10,7 +10,7 @@
                         <div class="target-toggle d-flex align-items-center justify-content-center" @click="toggleDropdown()">
                             <i class="ms-auto me-2" :class="[currentSelection.icon, `text-gradient text-${$store.state.themeColor}`]"></i>
                             <span class="text-gradient text-dark font-weight-bold">{{ t(`columns.${currentSelection.name}`) }}</span>
-                            <i class="fa-solid fa-caret-down ms-auto me-2 toggle-arrow"></i>
+                            <i class="ms-auto me-2 toggle-arrow" :class="getIcon('down arrow')"></i>
                         </div>
                         <ul v-if="isSlideOut" class="target-menu thin-scrollbar">
                             <li 

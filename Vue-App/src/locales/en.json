@@ -254,7 +254,9 @@
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
-    "enter": "Enter Your "
+    "enter": "Enter Your ",
+    "select": "Please Select",
+    "temporarily empty": "Currently Unprovided"
   },
   "units":{
     "transactionUnit": ""

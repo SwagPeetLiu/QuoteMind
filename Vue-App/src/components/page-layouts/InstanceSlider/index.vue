@@ -6,7 +6,7 @@
     >
 
         <!-- Instance display Card -->
-        <div class="shadow-lg card blur instance-slider">
+        <div class="shadow-lg card blur instance-slider overflow-hidden">
             <div class="wavy-header" :class="`gradient-${themeColour}`">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <defs>
@@ -55,7 +55,7 @@
             </div>
 
             <!-- Slider Content -->
-            <div class="mt-5 mb-2 mx-1 w-100 h-100" v-if="this.$store.state.showInstanceSlider.display">
+            <div class="mt-5 mb-2 mx-1 w-100 h-100 overflow-hidden" v-if="this.$store.state.showInstanceSlider.display">
                 <InfoForm 
                     :target="this.$store.state.showInstanceSlider.target"
                     :id="this.$store.state.showInstanceSlider.id"

@@ -37,7 +37,7 @@
     padding: 10px;
     margin-top: 5px;
     left: -1.6px;
-    transform: translateY(-100%); // Start slightly higher
+    transform: translateY(-20px); // Start slightly higher
     transition:
       transform 0.3s ease-in-out,
       opacity 0.18s ease-in-out;
@@ -55,7 +55,7 @@
       pointer-events: auto;
       transform: translateY(0);
       opacity: 1;
-      
+
       transition:
         transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
         opacity 0.2s ease-in-out 0.05s; // Delay opacity increase
@@ -63,7 +63,7 @@
       .target-item {
         border-radius: $border-radius-md;
         cursor: pointer;
-        
+
 
         &:hover {
           background-color: $gray-200;
@@ -74,6 +74,123 @@
 
           p {
             font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}
+
+// reference-based Dropdown (Customised SCSS)
+.reference-dropdown {
+  position: static;
+  width: 100%;
+
+  .reference-toggle {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-md;
+    background-color: $white;
+    border: 2px solid $dark;
+    font-size: 0.9rem;
+
+    .toggle-arrow {
+      transform: rotate(0deg);
+      transition: transform 0.3s ease-in-out;
+    }
+  }
+
+  .reference-menu {
+    z-index: 210;
+    display: block;
+    position: fixed;
+    width: calc(100% - 36px);
+    margin-left: 4px;
+    margin-right: 5px;
+    height: 180px;
+    max-height: 250px;
+    background-color: $white;
+    border-radius: $border-radius-md;
+    box-shadow: $dropdown-box-shadow;
+    margin-top: -16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 2px;
+    transform: translateY(-100%); // Start slightly higher
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.18s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+
+    .reference-input {
+      width: 100%;
+      min-height: 40px;
+      height: 40px;
+      border-radius: 0.1rem;
+      background-color: transparent;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 4px;
+      padding-right: 4px;
+      overflow: hidden;
+      border: 2.5px solid $dark;
+
+      input{
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $dark;
+
+        &::placeholder {
+          color: $gray-500;
+        }
+
+        &:focus,
+        &:active {
+          border: none;
+          outline: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  &.toggle-open {
+    .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    .reference-menu {
+      display: block;
+      pointer-events: auto;
+      transform: translateY(0);
+      opacity: 1;
+
+      transition:
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.2s ease-in-out 0.05s; // Delay opacity increase
+      
+      .reference-list{
+        width: 100%;
+
+        .reference-item{
+          width: 100%;
+          cursor: pointer;
+          border-radius: 0.3rem;
+  
+          &:hover {
+            background-color: $gray-200;
+            span {
+              font-weight: 700;
+            }
           }
         }
       }

@@ -512,7 +512,12 @@ function mapFormData(data, isValidated = true) {
 function reverseFormatData(data) {
     const result = {};
     for (const [key, value] of Object.entries(data)) {
-        result[key] = value.value;
+        if (mapFormSubmissionType(key) === "reference dropdown") {
+            result[key] = value.value.id; // if the column is an reference to another entity, then map to its id only
+        }
+        else{
+            result[key] = value.value;
+        }
     }
     return result;
 }

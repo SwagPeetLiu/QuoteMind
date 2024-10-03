@@ -35,8 +35,11 @@
             </p>
 
             <SlideUpElement v-else>
-                <p class="text-dark text-gradient ms-1">
+                <p v-if="value" class="text-dark text-gradient ms-1">
                     {{ value }}
+                </p>
+                <p v-else class="text-dark text-gradient ms-1">
+                    {{ t('form.temporarily empty') }}
                 </p>
             </SlideUpElement>
         </div>
@@ -86,7 +89,7 @@ export default {
         return {
             t,
             inputValue: this.value,
-            originalValue: this.value,
+            originalValue: "",
             isValid: true,
             validationTips: ""
         }
@@ -104,18 +107,22 @@ export default {
         }
     },
     watch:{
-        formStatus(newValue){
+        formStatus(newValue, oldValue){
             // retur nto original value upon cancelling
             if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
-                return this.$emit("update-form", this.name, this.originalValue, false);
+                return this.$emit("update-form", this.name, this.originalValue, true);
             }
             // no need to clear it if this textarea is disabled
-            else if (newValue === "saving" || newValue === "editing"){
+            if (newValue === "saving" || newValue === "editing"){
                 if (this.isDisabled){
                     this.isValid = true;
                     return this.$emit("update-form", this.name, this.originalValue, true);
                 }
+            }
+            // upon successful udpates, update its original value
+            if (newValue === "display" &&  oldValue === "saving"){
+                this.originalValue = this.value;
             }
         },
         inputValue(newValue){
@@ -126,6 +133,9 @@ export default {
             }
             this.$emit("update-form", this.name, newValue, this.isValid);
         }
+    },
+    beforeMount(){
+        this.originalValue = this.value;
     }
 }
 </script>

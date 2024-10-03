@@ -137,6 +137,10 @@ function getIcon(target) {
         
 
         // controls:
+        case "search":
+            return "fa-solid fa-magnifying-glass";
+        case "down arrow":
+            return "fa-solid fa-caret-down";
         case "create transaction":
             return "fa-solid fa-cart-plus";
         case "quote transactions":

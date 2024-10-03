@@ -263,7 +263,7 @@ function used to map default listings with user supplied filtration
 */
 function mapGeneralListingBody(whereclauses, orderByClause, page, target) {
     return {
-        table: target,
+        table: mapSearchTable(target),
         body: {
             searchQuery: {
                 fields: "default",
@@ -275,6 +275,53 @@ function mapGeneralListingBody(whereclauses, orderByClause, page, target) {
         }
     }
 }
+function mapDropdownSearchListingBody(whereClause, recordName, page, target) {
+    return {
+        table: mapSearchTable(target),
+        body: {
+            searchQuery: {
+                fields: [
+                    {
+                        target: "id",
+                        specification: "default",
+                        as: null
+                    },
+                    {
+                        target: recordName,
+                        specification: "default",
+                        as: null
+                    }
+                ],
+                whereClause: whereClause,
+                groupByClause: null,
+                orderByClause: null
+            },
+            page: page
+        }
+    }
+}
+
+// function used to map the targetted tables (assure the fetching of the right table)
+// e.g.: 'company' -> 'companies'
+function mapSearchTable(target) {
+    switch (target) {
+        case "company":
+            return "companies";
+        case "client":
+            return "clients";
+        case "position":
+            return "positions";
+        case "material":
+            return "materials";
+        case "product":
+            return "products";
+        case "employee":
+            return "employees";
+        default:
+            return target;
+    }
+}
+
 
 module.exports= {
     getYearlyTransactionCountsBody,
@@ -282,5 +329,7 @@ module.exports= {
     getRecentSalesPerformanceBody,
     generateSearchQueryWhereClause,
     generateOrderByClause,
-    mapGeneralListingBody
+    mapGeneralListingBody,
+    mapDropdownSearchListingBody,
+    mapSearchTable
 }

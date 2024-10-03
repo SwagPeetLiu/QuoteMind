@@ -1,11 +1,13 @@
 <template>
     <FadeInElement v-if="!isLoading && isDataAvailable">
+        
         <form 
             class="w-100 slider-form was-validated overflow-x-hidden overflow-y-auto thin-scrollbar my-0 slider-form"
             :class="{'needs-validation': formStatus === 'editing'}"
             name="form"
             novalidate
         >
+
             <!-- display by sections -->
             <div 
                 class="my-2 w-100 d-flex flex-wrap" 
@@ -38,6 +40,7 @@
                         :class="'mb-2'"
                     />
 
+                    <!-- descriptions input field -->
                     <EditableDescriptions
                         v-if="mapFormSubmissionType(attribute) === 'descriptions'"
                         :icon="getIcon(attribute)"
@@ -49,6 +52,18 @@
                         @update-form="validateInputUpdate"
                     />
 
+                    <!-- reference input field -->
+                    <EditableReference
+                        v-if="mapFormSubmissionType(attribute) === 'reference dropdown'"
+                        :icon="getIcon(attribute)"
+                        :target="attribute"
+                        :id="formData[attribute].value ? formData[attribute].value.id : null"
+                        :name="formData[attribute].value? formData[attribute].value[getRecordName(target, $i18n.locale)]: null"
+                        :isDisabled="mapDisabled(attribute, $i18n.locale)"
+                        :isRequired="mapMandatory(attribute)"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                    />
                 </div>
             </div>
         </form>
@@ -61,7 +76,7 @@
             <button 
                 v-if="formStatus === 'editing'" 
                 class="btn btn-secondary form-button" 
-                @click.prevent="updateStatus('cancel')"
+                @click.stop.prevent="updateStatus('cancel')"
             >
                 {{ t('form.cancel') }}
             </button>
@@ -93,7 +108,14 @@
 
 <script>
 import { getIcon } from "@/utils/iconMapper.js";
-import { mapFormData, reverseFormatData, mapFormSubmissionType, mapMandatory, mapDisabled } from "@/utils/helpers";
+import { 
+    getRecordName,
+    mapFormData, 
+    reverseFormatData, 
+    mapFormSubmissionType, 
+    mapMandatory, 
+    mapDisabled
+} from "@/utils/helpers";
 import { useI18n } from "vue-i18n";
 import { config } from "@/config/config";
 import instance from "@/api/instance";
@@ -102,6 +124,7 @@ import FadeInElement from "@/components/reuseable-components/styler/FadeInElemen
 import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
 import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
 import EditableDescriptions from "@/components/reuseable-components/forms/EditableDescriptions.vue";
+import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
 
 export default {
     name: "InfoForm",
@@ -129,7 +152,8 @@ export default {
         FadeInElement,
         EditableInfo,
         Spinner,
-        EditableDescriptions
+        EditableDescriptions,
+        EditableReference
     },
     computed:{
         detailedListings(){
@@ -150,6 +174,7 @@ export default {
     },
     methods:{
         getIcon,
+        getRecordName,
         mapMandatory,
         mapFormSubmissionType,
         mapDisabled,
@@ -228,8 +253,10 @@ export default {
 <style scoped>
 .slider-form{
     max-height: 90%;
+    z-index: 1;
 }
 .slider-controls{
     height: 10%;
+    z-index: 1;
 }
 </style>

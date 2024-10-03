@@ -100,25 +100,29 @@ export default {
 
         return {
             inputValue: this.value,
-            originalValue: this.value,
+            originalValue: "",
             isValid: true,
             validationTips: "",
             t: t
         }
     },
     watch:{
-        formStatus(newValue){
+        formStatus(newValue, oldValue){
             // allow cancelling when the form is in editing mode
             if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
-                return this.$emit("update-form", this.name, this.originalValue, false);
+                return this.$emit("update-form", this.name, this.originalValue, true);
             }
-            else if (newValue === "saving" || newValue === "editing"){
+            if (newValue === "saving" || newValue === "editing"){
                 // direct submission if the input is disabled
                 if (this.isDisabled){
                     this.isValid = true;
                     return this.$emit("update-form", this.name, this.originalValue, true);
                 }
+            }
+            // upon successful udpates, update its original value
+            if (newValue === "display" &&  oldValue === "saving"){
+                this.originalValue = this.value;
             }
         },
         // changing inputs when the form is in editing mode
@@ -135,6 +139,9 @@ export default {
         isEditing(){
             return this.formStatus == "editing" || this.formStatus == "saving";
         }
+    },
+    beforeMount(){
+        this.originalValue = this.value;
     }
 }
 </script>

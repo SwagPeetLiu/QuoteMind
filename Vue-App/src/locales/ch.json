@@ -251,7 +251,9 @@
     "edit": "编辑",
     "save": "保存",
     "cancel": "取消",
-    "enter": "输入您的"
+    "enter": "输入您的",
+    "select": "请选择",
+    "temporarily empty": "暂未提供"
   },
   "units":{
     "transactionUnit": "笔"
