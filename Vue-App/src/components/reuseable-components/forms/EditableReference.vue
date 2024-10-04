@@ -42,7 +42,8 @@
                     >
                     </i>
                 </p>
-                <i class="ms-auto toggle-arrow" :class="getIcon('down arrow')"></i>
+                <i v-if="!isDataAvailable && isRequired" class="ms-auto text-gradient text-danger" :class="getIcon('info')"></i>
+                <i v-else class="ms-auto toggle-arrow" :class="getIcon('down arrow')"></i>
             </button>
 
             <div class="reference-menu d-flex flex-column" ref="referenceMenu">

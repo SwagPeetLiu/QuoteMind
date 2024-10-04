@@ -302,12 +302,16 @@ export function useValidators() {
             // Formats: 04xxxxxxxx, 05xxxxxxxx (postcodes)
             // Also allowing: +61 4xxxxxxxx, +61 5xxxxxxxx
             const australianMobileRegex = /^(\+?61|0)?[45]\d{8}$/;
-            const LandlineRegex = /^[0-9]{2,4}-[0-9]{6,8}$/;
+            const LandlineRegex = /^[0-9]{8,12}$/;
 
-            const isNotMobile = !chineseMobileRegex.test(phone) || !australianMobileRegex.test(phone);
+            const isNotMobile = !chineseMobileRegex.test(phone) && !australianMobileRegex.test(phone);
             const isNotLandLine = !LandlineRegex.test(phone);
+            console.log(isNotMobile, isNotLandLine);
             if (isNotMobile && isNotLandLine) {
                 return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.is invalid')}` });
+            }
+            else{
+                return { valid: true };
             }
         }
         else if (required) {
