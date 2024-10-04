@@ -24,15 +24,24 @@
                 @click.prevent="toggleDropdown()"
                 :disabled="isDisabled"
             >
-                <span 
-                    class="current-selection-indicator text-gradient text-dark"
+                <p 
+                    class="text-gradient text-dark d-flex align-items-center my-0"
                     :class="[isDataAvailable ? `font-weight-bolder`: '']"
                 >
-                    {{ isDataAvailable ? 
+                    <span>
+                        {{ isDataAvailable ? 
                         `${isTargetCategorical ? t(`multipleOptions.position.${name}`) : name}` 
                         : t('form.select')
-                    }}
-                </span>
+                        }}
+                    </span>
+                    <i 
+                        v-if="isDataAvailable"
+                        :class="getIcon('cancel')"
+                        class="clear-button cursor-pointer ms-2 text-sm"
+                        @click.stop.prevent="clearReference()"
+                    >
+                    </i>
+                </p>
                 <i class="ms-auto toggle-arrow" :class="getIcon('down arrow')"></i>
             </button>
 
@@ -263,6 +272,9 @@ export default {
         selectReference(reference){
             this.isSlideOut = false;
             this.$emit("update-form", this.target, reference, true);
+        },
+        clearReference(){
+            this.$emit("update-form", this.target, null, this.isRequired ? false : true);
         },
 
         // function used to handle Clicks outside

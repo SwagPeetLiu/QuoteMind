@@ -381,7 +381,8 @@ function mapFormSubmissionType(column){
 function mapMandatory(column){
     // if column is non-essential values:
     if (column === "descriptions" || column === "note" || column === "phone" ||
-        column === "wechat_contact" || column === "qq_contact" || column === "colour"
+        column === "wechat_contact" || column === "qq_contact" || column === "colour" ||
+        column === "position"
     ){
         return false;
     }

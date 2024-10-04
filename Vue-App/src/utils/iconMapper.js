@@ -152,11 +152,10 @@ function getIcon(target) {
         case "add":
             return "fa-solid fa-plus";
         case "cancel":
+        case "close":
             return "fa-solid fa-xmark";
         case "switch":
             return "fa-solid fa-repeat";
-        case "close":
-            return "fa-solid fa-xmark";
         default:
             return "fa-solid fa-circle-info";
     }
