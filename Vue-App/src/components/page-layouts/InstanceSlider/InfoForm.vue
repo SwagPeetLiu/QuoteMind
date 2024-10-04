@@ -1,13 +1,12 @@
 <template>
     <FadeInElement v-if="!isLoading && isDataAvailable">
-        
         <form 
             class="w-100 slider-form was-validated overflow-x-hidden overflow-y-auto thin-scrollbar my-0 slider-form"
             :class="{'needs-validation': formStatus === 'editing'}"
             name="form"
             novalidate
+            ref="sliderForm"
         >
-
             <!-- display by sections -->
             <div 
                 class="my-2 w-100 d-flex flex-wrap" 
@@ -25,7 +24,7 @@
                     :key="index"
                     class="w-100 px-1 mt-2"
                 >
-                    <!-- oridnary input field -->
+                    <!-- ordinary input field -->
                     <EditableInfo
                         v-if="mapFormSubmissionType(attribute) === 'text'"
                         :icon="getIcon(attribute)"
@@ -63,6 +62,7 @@
                         :isRequired="mapMandatory(attribute)"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
                     />
                 </div>
             </div>
@@ -71,8 +71,7 @@
 
     <!-- form controls -->
     <FadeInElement v-if="!isLoading && isDataAvailable">
-        <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end"
-        >
+        <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end">
             <button 
                 v-if="formStatus === 'editing'" 
                 class="btn btn-secondary form-button" 
@@ -128,17 +127,16 @@ import EditableReference from "@/components/reuseable-components/forms/EditableR
 
 export default {
     name: "InfoForm",
-    data(){
-        const { t } = useI18n({});
-        return{
-            t,
-            isLoading: true,
-            formStatus: "display",
-            formData: null
-        }
+    components: {
+        FoldLoader,
+        FadeInElement,
+        EditableInfo,
+        Spinner,
+        EditableDescriptions,
+        EditableReference
     },
-    props:{
-        target:{
+    props: {
+        target: {
             type: String,
             required: true
         },
@@ -147,22 +145,25 @@ export default {
             required: true
         }
     },
-    components:{
-        FoldLoader,
-        FadeInElement,
-        EditableInfo,
-        Spinner,
-        EditableDescriptions,
-        EditableReference
+    data() {
+        const { t } = useI18n({});
+        return {
+            t,
+            isLoading: true,
+            formStatus: "display",
+            formData: null,
+            lastHeight: 0,
+            resizeObserver: null
+        }
     },
-    computed:{
-        detailedListings(){
+    computed: {
+        detailedListings() {
             return config.detailedListings[this.target];
         },
-        sections(){
+        sections() {
             return Object.keys(this.detailedListings);
         },
-        isDataAvailable(){
+        isDataAvailable() {
             return this.formData !== null;
         },
         isInputInvalid() {
@@ -172,15 +173,24 @@ export default {
             return Object.values(this.formData).some((input) => !input.isValidated);
         }
     },
-    methods:{
+    methods: {
         getIcon,
         getRecordName,
         mapMandatory,
         mapFormSubmissionType,
         mapDisabled,
 
-        // fetching data based on the provided ID:
-        fetchData(){
+        // scroll down if elements are dropping down
+        scrollDown(amount) {
+            if (this.$refs.sliderForm) {
+                this.$refs.sliderForm.scrollBy({
+                    top: amount,
+                    behavior: 'smooth'
+                });
+            }
+        },
+
+        fetchData() {
             this.formData = null;
             this.isLoading = true;
             instance
@@ -195,21 +205,21 @@ export default {
                 })
                 .finally(() => {
                     setTimeout(() => {
-                        this.isLoading= false;
+                        this.isLoading = false;
                         this.formStatus = "display";
                     }, 1600);
                 });
         },
-        // function used to update the form's status:
+
         updateStatus(status) {
             if (status === "saving") {
                 this.submitform();
-            }else{
+            } else {
                 this.formStatus = status;
             }
         },
-        // function used to submit the form
-        submitform(){
+
+        submitform() {
             this.formStatus = "saving";
             setTimeout(() => {
                 if (!this.isInputInvalid) {
@@ -219,43 +229,40 @@ export default {
                         body: reverseFormatData(this.formData)
                     })
                     .then((response) => {
-                        if (response.isCompleted){
+                        if (response.isCompleted) {
                             this.formStatus = "display";
-
-                            // refresh listing upon successful update
-                            if (!this.$store.state.refreshListing){
+                            if (!this.$store.state.refreshListing) {
                                 this.$store.commit("setRefreshListing", true);
                             }
-                        }
-                        else{
+                        } else {
                             this.formStatus = "editing";
                         }
                     })
                     .catch(() => {
                         this.formStatus = "editing";
                     });
-                }
-                else{
+                } else {
                     this.formStatus = "editing";
                 }
             }, 500);
         },
+
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
         }
     },
-    mounted(){
+    mounted() {
         this.fetchData();
     }
 }
 </script>
 
 <style scoped>
-.slider-form{
+.slider-form {
     max-height: 90%;
     z-index: 1;
 }
-.slider-controls{
+.slider-controls {
     height: 10%;
     z-index: 1;
 }

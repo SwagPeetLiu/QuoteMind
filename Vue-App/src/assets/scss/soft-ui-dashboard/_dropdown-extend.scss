@@ -84,11 +84,11 @@
 
 // reference-based Dropdown (Customised SCSS)
 .reference-dropdown {
-  position: static;
+  position: relative;
   width: 100%;
 
   .reference-toggle {
-    height: 45px;
+    height: 42px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -109,10 +109,10 @@
   .reference-menu {
     z-index: 210;
     display: block;
-    position: fixed;
-    width: calc(100% - 36px);
+    position: absolute;
+    width: calc(100% - 8px);
     margin-left: 4px;
-    margin-right: 5px;
+    margin-right: 4px;
     background-color: $white;
     border-radius: $border-radius-md;
     box-shadow: $dropdown-box-shadow;
@@ -123,7 +123,6 @@
     padding-bottom: 2px;
 
     height: 0;
-    max-height: 0;
     opacity: 0;
     transition:
       height 0.3s ease-out,
@@ -177,12 +176,11 @@
       display: block;
       pointer-events: auto;
       height: 180px;
-      max-height: 250px;
       opacity: 1;
 
       transition:
-        height 0.5s ease-in-out, 
-        max-height 0.5s ease-in-out,
+        height 0.3s ease-in-out, 
+        max-height 0.3s ease-in-out,
         opacity 0.3s ease-in;
       
       .reference-list{

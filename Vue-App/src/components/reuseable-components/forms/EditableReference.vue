@@ -232,6 +232,15 @@ export default {
             this.isSlideOut = !this.isSlideOut;
             if (this.isSlideOut) {
                 this.fetchReferences("initialise");
+
+                // calculate the need to scroll to such position:
+                const sliderForm = document.querySelector(".slider-form");
+                if (sliderForm && this.$refs.referenceMenu) {
+                    setTimeout(() => {
+                        this.$emit("scroll-down", 
+                            this.$refs.referenceMenu.getBoundingClientRect().y - sliderForm.scrollTop);
+                    },400)
+                }
             }
             // clear out the current serach mechanisms and records
             else{
