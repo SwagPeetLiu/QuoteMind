@@ -336,7 +336,10 @@
     "position":{
       "Assembler": "组装",
       "Designer": "设计",
-      "Installer": "安装配送"
+      "Installer": "安装配送",
+      "组装": "组装", 
+      "设计": "设计",
+      "安装配送": "安装配送"
     },
     "dimension_unit":{
       "mm": "毫米",

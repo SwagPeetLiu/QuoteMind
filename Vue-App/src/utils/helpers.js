@@ -352,12 +352,13 @@ function mapColumnType(column){
 // form controls ONLY)
 //  - note the validation will be manually handled in separate validation functions upon value changes
 function mapFormSubmissionType(column){
-    if (
-        column === "company" || column === "client" || column === "companies" || column === "clients" || 
-        column === "employee" || column === "employees" || column === "positions" || column === "position" || 
-        column === "product" || column === "products" || column === "material" || column === "materials"
-    ){
-        return "reference dropdown";
+    // single references:
+    if (column === "company" || column === "client" || column === "position" || column === "product"){
+        return "single reference";
+    }
+    // multiple references:
+    else if(column === "clients" || column === "employee" || column === "employees" || column === "materials"){
+        return "multiple references";
     }
     else if(
         column === "quantity" || column === "width"  || column === "length" || column === "height" || 
@@ -374,19 +375,19 @@ function mapFormSubmissionType(column){
     else if(column === "descriptions" || column === "note"){
         return "descriptions";
     }
+    else if (column === "addresses"){
+        return "addresses";
+    }
     else return 'text';
 }
 
 // function used to determine if certain column is mandatory upon form submissions
 function mapMandatory(column){
     // if column is non-essential values:
-    if (column === "descriptions" || column === "note" || column === "phone" ||
-        column === "wechat_contact" || column === "qq_contact" || column === "colour" ||
-        column === "position"
-    ){
-        return false;
+    if (column === "id" || column.includes("name")){
+        return true;
     }
-    return true;
+    return false;
 }
 
 // function used to determine
@@ -513,20 +514,31 @@ function mapFormData(data, isValidated = true) {
 function reverseFormatData(data) {
     const result = {};
     for (const [key, value] of Object.entries(data)) {
-        if (mapFormSubmissionType(key) === "reference dropdown") {
 
-            // if reference exists, assign id
-            if (value.value) {
+        if (mapFormSubmissionType(key) === "single reference") {
+            if (value.value) { // if reference exists, assign id
                 result[key] = value.value.id;
             }
             else{
                 result[key] = null;
             }
         }
+
+        else if (mapFormSubmissionType(key) === "multiple references") {
+            if (value.value) { // if reference exists, assign id
+                result[key] = value.value.map((item) => item.id);
+            }
+            else{
+                result[key] = null;
+            }
+        }
+
+        // else assign the value directly
         else{
             result[key] = value.value;
         }
     }
+    console.log("reverse", result);
     return result;
 }
 

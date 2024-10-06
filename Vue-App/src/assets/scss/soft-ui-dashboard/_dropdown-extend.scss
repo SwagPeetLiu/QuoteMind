@@ -190,6 +190,24 @@
           width: 100%;
           cursor: pointer;
           border-radius: 0.3rem;
+          position: relative;
+
+          .tick-box{
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            left: 5px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 0.3rem;
+            border: 1px solid $dark;
+
+            &.checked{
+              border: none;
+            }
+          }
   
           &:hover {
             background-color: $gray-200;

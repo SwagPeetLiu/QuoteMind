@@ -15,7 +15,7 @@ const instance = {
                 return { isCompleted: true, data: response.data };
             })
             .catch((error) => {
-                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to fetch')}${data.target}`, type: "error" });
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to fetch')}${t(`routes.${data.target}`)}`, type: "error" });
                 console.error(`failed to fetch ${data.target}`, error);
                 return { isCompleted: false, data: null };
             });
@@ -28,11 +28,11 @@ const instance = {
         return axios
             .put(`/${data.target}/${data.id}`, data.body)
             .then(() => {
-                store.commit("setToastMessage", { message: `${t('apiMessage.instance.successfully updated')}${data.target}`, type: "success" });
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.successfully updated')}${t(`routes.${data.target}`)}`, type: "success" });
                 return { isCompleted: true };
             })
             .catch((error) => {
-                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to update')}${data.target}`, type: "error" });
+                store.commit("setToastMessage", { message: `${t('apiMessage.instance.failed to update')}${t(`routes.${data.target}`)}`, type: "error" });
                 console.error(`failed to fetch ${data.target}`, error);
                 return { isCompleted: false };
             });

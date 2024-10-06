@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isProductAvailable" class="d-flex flex-column align-items-start custom-product-materials">
+    <div v-if="isProductAvailable" class="d-flex flex-column align-items-start">
         <IconEntity 
             theme="dark"
             :icon="getIcon('product')"
@@ -11,15 +11,15 @@
         <!-- Related Materials -->
         <div 
             v-if="isMaterialsAvailable" 
-            class="d-flex flex-wrap align-items-center materials-container ms-2 mb-1"
+            class="d-flex flex-wrap align-items-center references-container ms-2 mb-1"
         >
-            <span
+            <div
                 v-for="(material, index) in materials"
                 :key="index"
                 class="text-gradient text-dark ms-2 mt-2"
-                >
-                    {{ material[getRecordName('material', $i18n.locale)] }}
-                </span>
+            >
+                <p>{{ material[getRecordName('material', $i18n.locale)] }}</p>
+            </div>
         </div>
     </div>
     <p v-else class="text-gradient text-danger font-weight-bolder">

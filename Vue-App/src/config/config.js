@@ -150,8 +150,11 @@ const config = {
         },
         "position":{
             "Assembler": "primary",
+            "组装": "primary",
             "Designer": "warning",
+            "设计": "warning",
             "Installer": "info",
+            "安装配送": "info"
         },
         "conditions":{
             "general": "primary",

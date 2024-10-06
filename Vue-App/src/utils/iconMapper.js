@@ -156,6 +156,8 @@ function getIcon(target) {
             return "fa-solid fa-xmark";
         case "switch":
             return "fa-solid fa-repeat";
+        case "tick":
+            return "fa-solid fa-check";
         default:
             return "fa-solid fa-circle-info";
     }

@@ -53,11 +53,23 @@
 
                     <!-- reference input field -->
                     <EditableReference
-                        v-if="mapFormSubmissionType(attribute) === 'reference dropdown'"
+                        v-if="mapFormSubmissionType(attribute) === 'single reference'"
                         :icon="getIcon(attribute)"
                         :target="attribute"
                         :id="formData[attribute].value ? formData[attribute].value.id : null"
                         :name="formData[attribute].value? formData[attribute].value[getRecordName(target, $i18n.locale)]: null"
+                        :isDisabled="mapDisabled(attribute, $i18n.locale)"
+                        :isRequired="mapMandatory(attribute)"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
+                    />
+
+                    <!-- reference list input field -->
+                    <EditableReferenceList
+                        v-if="mapFormSubmissionType(attribute) === 'multiple references'"
+                        :list="formData[attribute].value"
+                        :target="attribute"
                         :isDisabled="mapDisabled(attribute, $i18n.locale)"
                         :isRequired="mapMandatory(attribute)"
                         :formStatus="formStatus"
@@ -124,6 +136,7 @@ import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
 import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.vue";
 import EditableDescriptions from "@/components/reuseable-components/forms/EditableDescriptions.vue";
 import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
+import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
 
 export default {
     name: "InfoForm",
@@ -133,7 +146,8 @@ export default {
         EditableInfo,
         Spinner,
         EditableDescriptions,
-        EditableReference
+        EditableReference,
+        EditableReferenceList
     },
     props: {
         target: {
@@ -249,6 +263,7 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
+            console.log(this.formData);
         }
     },
     mounted() {
