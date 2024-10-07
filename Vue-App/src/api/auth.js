@@ -17,7 +17,8 @@ const auth = {
                 username: response.data.username,
                 email: response.data.email,
                 role: response.data.role,
-                session: response.data.session,
+                session: response.data.session_token,
+                access: response.data.access_token,
                 credentials: data
             });
             store.commit("setToastMessage", { message: t("apiMessage.login.success"), type: "success" });

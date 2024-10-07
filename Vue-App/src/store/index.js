@@ -10,7 +10,7 @@ export default createStore({
     // user info settings
     language: localStorage.getItem("language") || "en",
     userSessionManager: { login: null, logout: null, blurListener: null, focusListener: null},
-    user:{ username: "", email: "", role: "", session: ""},
+    user: { username: "", email: "", role: "", session: "", access: ""},
     isAuthenticated: false,
     dbReferences: null, // object of objects
 
@@ -136,7 +136,8 @@ export default createStore({
         username: payload.username,
         email: payload.email,
         role: payload.role,
-        session: payload.session
+        session: payload.session,
+        access: payload.access
       };
       state.isAuthenticated = true;
 
@@ -149,26 +150,22 @@ export default createStore({
       state.userSessionManager.focusListener = clearLogoutTimer;
 
       // set up axios header
-      setToken(payload.session);
+      setToken(payload.session, payload.access);
 
       // if testing, then remember the login credentials:
-      if (process.env.NODE_ENV === 'test') {
-        localStorage.setItem('user', JSON.stringify(state.user));
-      }
+      localStorage.setItem('user', JSON.stringify(state.user));
     },
     
     // clear the user info & session association;
     clearUser(state) {
-      state.user = { username: "", email: "", role: "", session: ""};
+      state.user = { username: "", email: "", role: "", session: "", access: ""};
       state.isAuthenticated = false;
       state.dbReferences = null;
       state.showInstanceSlider = { display: false, id: null, target: null };
 
-      // if testing, then clear the login credentials in prior:
-      if (process.env.NODE_ENV === 'test') {
-        localStorage.removeItem('user');
-        localStorage.removeItem('dbRefs');
-      }
+      // clear the login credentials in prior:
+      localStorage.removeItem('user');
+      localStorage.removeItem('dbRefs');
     
       // clear the automatic mechanism for renew session and logout:
       clearPreviousTimers();
@@ -190,9 +187,7 @@ export default createStore({
     // used to setUp the database references for application search route:
     setDBRefs(state, payload) {
       state.dbReferences = { ...payload };
-      if (process.env.NODE_ENV === 'test') {
-        localStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
-      }
+      localStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
     },
 
     // message commutes

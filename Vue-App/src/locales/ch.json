@@ -67,6 +67,9 @@
       "invalid token message": "注册码无效",
       "already registered message": "该邮箱已被注册"
     },
+    "refreshToken":{
+      "failed":"未能刷新权限"
+    },
     "search": {
       "failed to fetch dbReferences": "获取数据库结构失败",
       "failed to search": "搜索失败",

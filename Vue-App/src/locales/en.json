@@ -66,6 +66,9 @@
       "invalid token message": "Invalid Token Provided",
       "already registered message": "Email already exists"
     },
+    "refreshToken":{
+      "failed":"Failed to Refresh Access"
+    },
     "search": {
       "failed to fetch dbReferences": "Unable to fetch the database references",
       "failed to search": "Failed to search",
