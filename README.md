@@ -49,7 +49,7 @@ Currently, there are nearly 700 test cases, reaching an overall 72% of coverage 
   1. Manage and create companies/ clients/ addresses / employees/ products/ materials / transactions
   2. Ability of drag & drop of a folder with a specific naming convension for designs (i.e., folder name contains the product, materials, date, etc.)
   3. Auote and refine the business logics to auotemate further on the price determinations
-  4. User login session is automatically renewed every hour, auto logout occurs every 15 mins
+  4. User login session is automatically renewed every certain period of time, auto logout occurs every 15 mins
   5. Middleware for securities are implemented on both front-end and back-end.
 
 # Contributing & Contact
