@@ -54,6 +54,7 @@ import SlideToast from "@/components/reuseable-components/pop-ups/SlideToast.vue
 import ColouringCubeOverlay from "@/components/reuseable-components/loader/ColouringCubeOverlay.vue";
 import InstanceAddButton from "@/components/page-layouts/InstanceAddButton.vue";
 import InstanceSlider from "@/components/page-layouts/InstanceSlider";
+import { secureStorage } from "@/utils/secureStorage";
 
 export default {
   name: "App",
@@ -95,13 +96,13 @@ export default {
   },
   mounted() {
     // attach user's credentials in testing & dev env
-    const storedUserString = localStorage.getItem('user');
+    const storedUserString = secureStorage.getItem('user');
     if (storedUserString) {
       const storedUser = JSON.parse(storedUserString);
       this.$store.commit('setUser', storedUser);
     }
 
-    const storedDBRefsString = localStorage.getItem('dbRefs');
+    const storedDBRefsString = secureStorage.getItem('dbRefs');
     if (storedDBRefsString) {
       const storedDBRef = JSON.parse(storedDBRefsString);
       this.$store.commit('setDBRefs', storedDBRef);

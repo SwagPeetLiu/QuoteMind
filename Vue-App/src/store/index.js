@@ -1,15 +1,16 @@
 import { createStore } from "vuex";
 import bootstrap from "bootstrap/dist/js/bootstrap.min.js";
 import { setToken, clearToken } from "../utils/apiSetter";
-import { startLoginTimer, startLogoutTimer, clearLogoutTimer, clearPreviousTimers } from "../utils/sessionManager";
+import { startLogoutTimer, clearLogoutTimer, clearPreviousTimers } from "../utils/sessionManager";
 import { generateSearchQueryWhereClause } from "../utils/formatters";
+import { secureStorage } from "../utils/secureStorage";
 
 // centralised state management over the application
 export default createStore({
   state: {
     // user info settings
-    language: localStorage.getItem("language") || "en",
-    userSessionManager: { login: null, logout: null, blurListener: null, focusListener: null},
+    language: secureStorage.getItem("language") || "en",
+    userSessionManager: { logout: null, blurListener: null, focusListener: null},
     user: { username: "", email: "", role: "", session: "", access: ""},
     isAuthenticated: false,
     dbReferences: null, // object of objects
@@ -33,7 +34,7 @@ export default createStore({
     isRTL: false,
 
     // app vue display settings
-    themeColor: localStorage.getItem("theme") || "success",
+    themeColor: secureStorage.getItem("theme") || "success",
     showSidenav: true,
     showNavbar: true,
     showFooter: true,
@@ -93,7 +94,7 @@ export default createStore({
 
     // setting the theme colour of the app
     async setThemeColor(state, payload) {
-      localStorage.setItem("theme", payload);
+      secureStorage.setItem("theme", payload);
       state.themeColor = payload;
     },
 
@@ -127,7 +128,7 @@ export default createStore({
     // Language Selection:
     setLanguage(state, lang) {
       state.language = lang;
-      localStorage.setItem("language", lang);
+      secureStorage.setItem("language", lang);
     },
 
     // set up the user info & allow authorised queries
@@ -143,7 +144,6 @@ export default createStore({
 
       // setting the automatic mechanism for renew session and logout:
       clearPreviousTimers();
-      startLoginTimer(payload.credentials);
       window.addEventListener('blur', startLogoutTimer);
       window.addEventListener('focus', clearLogoutTimer);
       state.userSessionManager.blurListener = startLogoutTimer;
@@ -153,7 +153,7 @@ export default createStore({
       setToken(payload.session, payload.access);
 
       // if testing, then remember the login credentials:
-      localStorage.setItem('user', JSON.stringify(state.user));
+      secureStorage.setItem('user', JSON.stringify(state.user));
     },
     
     // clear the user info & session association;
@@ -164,8 +164,8 @@ export default createStore({
       state.showInstanceSlider = { display: false, id: null, target: null };
 
       // clear the login credentials in prior:
-      localStorage.removeItem('user');
-      localStorage.removeItem('dbRefs');
+      secureStorage.removeItem('user');
+      secureStorage.removeItem('dbRefs');
     
       // clear the automatic mechanism for renew session and logout:
       clearPreviousTimers();
@@ -187,7 +187,7 @@ export default createStore({
     // used to setUp the database references for application search route:
     setDBRefs(state, payload) {
       state.dbReferences = { ...payload };
-      localStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
+      secureStorage.setItem('dbRefs', JSON.stringify(state.dbReferences));
     },
 
     // message commutes

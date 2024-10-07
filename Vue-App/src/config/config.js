@@ -47,7 +47,6 @@ const config = {
     },
     session: {
         LOGOUT_TIME: 60 * 1000 * 15, // 15 minutes before atuo logout
-        LOGIN_TIME: 60 * 1000 * 55 // renew session every 55 minuetes
     },
     OVERLAY_COLOR: 'rgba(200, 200, 200, 0.7)',
     ChartColours: {

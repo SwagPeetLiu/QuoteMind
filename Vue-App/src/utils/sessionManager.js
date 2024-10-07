@@ -2,16 +2,6 @@ import store from '../store';
 import auth from '../api/auth';
 import { config } from '../config/config';
 
-// function used to autoamtically renew the session
-function startLoginTimer(data){
-    const loginTimer = setTimeout(() => {
-        console.log("re-fresh login")
-        auth.login(data);
-    }, config.session.LOGIN_TIME);
-    store.commit("setUserSessionManager", 
-        { ...store.state.userSessionManager, login: loginTimer });
-}
-
 // function used to autoamtically loggout the user when navigating away
 function startLogoutTimer(){
     const logoutTimer = setTimeout(() => {
@@ -29,6 +19,8 @@ function clearLogoutTimer(){
             { ...store.state.userSessionManager, logout: null });
     }
 }
+
+// CLear out any existing Logout timers & listeners
 function clearPreviousTimers(){
     const managers = store.state.userSessionManager;
     if(managers.login){
@@ -44,11 +36,10 @@ function clearPreviousTimers(){
         window.removeEventListener('focus', managers.focusListener);
     }
     store.commit("setUserSessionManager", 
-        { login: null, logout: null, blurListener: null, focusListener: null });
+        { logout: null, blurListener: null, focusListener: null });
 }
 
 export { 
-    startLoginTimer,
     startLogoutTimer,
     clearLogoutTimer,
     clearPreviousTimers

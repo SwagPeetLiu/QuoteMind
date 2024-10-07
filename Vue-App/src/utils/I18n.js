@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n';
+import { secureStorage } from './secureStorage';
 const i18n = createCustomisedI18n();
 
 // function used to load the locale strings
@@ -20,7 +21,7 @@ function createCustomisedI18n() {
   const i18n = createI18n({
     legacy: false, // Set to false to use Composition API
     globalInjection: true, // Inject $t and $tc to all components
-    locale: localStorage.getItem("language") || 'en',
+    locale: secureStorage.getItem("language") || 'en',
     fallbackLocale: 'en',
     messages: loadLocaleMessages(),
     silentTranslationWarn: true,

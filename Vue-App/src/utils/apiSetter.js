@@ -1,6 +1,7 @@
 import axios from 'axios';
 let interceptorId = null;
 import store from "../store";
+import { secureStorage } from "./secureStorage";
 import { useTranslation } from './I18n';
 const { global: { t } } = useTranslation(); // access the gloabal translation function
 
@@ -63,13 +64,13 @@ function setToken(session, access) {
     setupInterceptor(access);
 
     // store them accordingly in the local storage:
-    const storedUserString = localStorage.getItem('user');
+    const storedUserString = secureStorage.getItem('user');
     if (storedUserString) {
         const storedUser = JSON.parse(storedUserString);
         storedUser.session = session;
         storedUser.access = access;
-        localStorage.setItem('user', JSON.stringify(storedUser));
-      }
+        secureStorage.setItem('user', JSON.stringify(storedUser));
+    }
 }
 
 // Function to clear tokens and remove the interceptor

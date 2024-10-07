@@ -12,6 +12,10 @@ front-end (classical SPA)
   - fontawsome -- efficient font & icon toolkits that are based on pure css
   - three / gsap to create appealing animation objects on the UIs
   - lodash -- efficient Javascription operations over Array, objects, functionatlies such as debouncing
+  - vue3-storage -- to safely work with the local storage, session storage in the Vue context
+  - crypto-js -- standard Encryption and Decryption for safely storing and retriveing persistant data (to accounter XSS-based attacks)
+
+
 
 back-end
   - node.js -- running express as the backend server
