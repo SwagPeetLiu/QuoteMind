@@ -43,7 +43,7 @@ const auth = {
         }
         return axios.post('/auth/logout', {
             email: currentUser.email,
-            token: currentUser.session
+            session_token: currentUser.session
         })
         .then(() => {
             store.commit("setToastMessage", { message: t("apiMessage.logout.success"), type: "success" });
