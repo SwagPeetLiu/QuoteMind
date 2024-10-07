@@ -351,6 +351,11 @@
     "conditions":{
       "general": "General",
       "individual": "Individual"
+    },
+    "addressCategory":{
+      "delivery&install": "Delivery & Installation",
+      "bill": "Bill",
+      "mail": "Mail"
     }
   },
   "others":{

@@ -354,6 +354,11 @@
     "conditions":{
       "general": "通用型",
       "individual": "个别型"
+    },
+    "addressCategory":{
+      "delivery&install": "收货",
+      "bill": "账单",
+      "mail": "邮寄"
     }
   },
   "others":{

@@ -140,7 +140,8 @@ const config = {
     // categorical choices
     multipleOptions:{
         "status": ['created', 'quoted', 'paid'],
-        "address-type": ['home', 'work', 'other'],
+        "addressCategory": ['delivery&install', 'bill', 'mail'],
+        
     },
     optionsColouring:{
         "status":{
