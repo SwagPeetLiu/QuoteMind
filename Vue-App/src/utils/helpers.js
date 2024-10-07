@@ -511,6 +511,8 @@ function mapFormData(data, isValidated = true) {
     }
     return result;
 }
+
+// function used to revers to the API payload data needed
 function reverseFormatData(data) {
     const result = {};
     for (const [key, value] of Object.entries(data)) {
@@ -538,7 +540,6 @@ function reverseFormatData(data) {
             result[key] = value.value;
         }
     }
-    console.log("reverse", result);
     return result;
 }
 

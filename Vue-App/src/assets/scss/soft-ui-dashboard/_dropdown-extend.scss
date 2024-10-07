@@ -191,6 +191,7 @@
           cursor: pointer;
           border-radius: 0.3rem;
           position: relative;
+          background-color: transparent;
 
           .tick-box{
             position: absolute;
@@ -203,9 +204,11 @@
             height: 20px;
             border-radius: 0.3rem;
             border: 1px solid $dark;
+            transition: background-color 1s ease-in-out;
 
             &.checked{
               border: none;
+              transition: background-color 1s ease-in-out;
             }
           }
   

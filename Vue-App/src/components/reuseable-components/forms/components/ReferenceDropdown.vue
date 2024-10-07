@@ -301,7 +301,12 @@ export default {
                 if (this.currentSelection.length > 0) {
                     for (let i = 0; i < this.currentSelection.length; i++) {
                         if (this.currentSelection[i].id === referenceId) {
-                            return true;
+                            if ('message' in this.currentSelection[i]) {
+                                return this.currentSelection[i].message === "add";
+                            }
+                            else{
+                                return true;
+                            }
                         }
                     }
                 }

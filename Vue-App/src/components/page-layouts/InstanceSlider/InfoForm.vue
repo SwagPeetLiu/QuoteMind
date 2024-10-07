@@ -76,6 +76,8 @@
                         @update-form="validateInputUpdate"
                         @scroll-down="scrollDown"
                     />
+
+                    <!-- addresses reference inputs -->
                 </div>
             </div>
         </form>
@@ -263,7 +265,6 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
-            console.log(this.formData);
         }
     },
     mounted() {

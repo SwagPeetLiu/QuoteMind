@@ -4,7 +4,10 @@
             v-for="(reference, index) in currentSelection"
             :key="index"
             class="ms-2 mt-2 d-flex align-items-center"
-            :class="[isEditing ? `bg-gradient-${$store.state.themeColor} editing` : '']"
+            :class="[
+                isEditing ? `bg-gradient-${$store.state.themeColor} editing` : '',
+                isReferenceSelected(reference) ? '' : 'd-none'
+            ]"
         >
             <i class="me-1 my-0" :class="[getIcon(target), `text-${isEditing ? 'white' : 'dark'}`]"></i>
             <p 
@@ -52,6 +55,14 @@ export default {
         getIcon,
         removeReference(id){
             this.$emit('remove-reference', id);
+        },
+        isReferenceSelected(reference){
+            if('message' in reference){
+                return reference.message === "add";
+            }
+            else{
+                return true;
+            }
         }
     }
 }

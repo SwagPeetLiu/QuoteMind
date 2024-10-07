@@ -76,22 +76,45 @@ export default {
         // function used to select an listing reference:
         selectReference(reference){
             if (this.isDataAvailable){
-                this.$emit("update-form", this.target, [...this.list, reference], true);
+                // if this reference is currently in the list, update the message
+                const updatedList = [];
+                let added = false;
+                this.list.forEach((item) => {
+                    // if message already exists for the reference, update the message if there is a match
+                    if ('message' in item){
+                        if (item.id === reference.id){
+                            added = true;
+                            updatedList.push({...item, message: "add"});
+                        }
+                        else{
+                            updatedList.push(item);
+                        }
+                    }
+                    // if no message exists for the reference, add the message (Initialised list)
+                    else{
+                        updatedList.push({...item, message: "add"});
+                    }
+                });
+                if (!added){
+                    updatedList.push({...reference, message: "add"});
+                }
+                this.$emit("update-form", this.target, updatedList, true);
             }
             else{
-                this.$emit("update-form", this.target, [reference], true);
+                this.$emit("update-form", this.target, [{...reference, message: "add"}], true);
             }
         },
         removeReference(id){
-            const currentList = this.list.filter(item => item.id !== id);
-
-            // if no items are provided, then return null accordingly
-            if (currentList.length === 0){
-                this.$emit("update-form", this.target, null, this.isRequired ? false : true);
-            }
-            else{
-                this.$emit("update-form", this.target, currentList, true);
-            }
+            if (!this.isDataAvailable) return;
+            const currentList = this.list.map((item) => {
+                if (item.id === id){
+                    return {...item, message: "delete"};
+                }
+                else{
+                    return item;
+                }
+            });
+            this.$emit("update-form", this.target, currentList, true);
         }
     },
     computed: {
@@ -118,18 +141,41 @@ export default {
                 // direct submission if the input is disabled
                 if (this.isDisabled){
                     this.isValid = true;
-                    this.$emit("update-form", this.target, this.orignalList, true);
+                    this.$emit(
+                        "update-form", 
+                        this.target, 
+                        this.orignalList,
+                        true
+                    );
                     return;
                 }
             }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
-                this.orignalList = this.list;
+                if (this.isDataAvailable){
+                    const ogList = [];
+                    this.list.forEach((item) => {
+                        if ('message' in item){
+                            if (item.message === "add"){
+                                ogList.push({id: item.id, [this.targetName]: item[this.targetName]});
+                            }
+                        }
+                        else{
+                            ogList.push(item);
+                        }
+                    });
+                    this.orignalList = ogList;
+                }
+                else{
+                    this.orignalList = null;
+                }
             }
         }
     },
     beforeMount() {
-        this.orignalList = this.list;
+        if (this.isDataAvailable){
+            this.orignalList = this.list;
+        }
     },
 }
 </script>

@@ -40,7 +40,12 @@ export default {
   },
   computed: {
     spanElements() {
-      return this.text.split("");
+      try{
+        return this.text.split(" ");
+      }
+      catch(e) {
+        return ['N','/','A'];
+      }
     }
   },
   mounted() {

@@ -24,7 +24,7 @@
 
         <!-- current value -->
         <LoadInText 
-            v-if="!isEditing" 
+            v-if="!isEditing && value" 
             :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`" 
             :text="value"
             :spaceWidth="7" 

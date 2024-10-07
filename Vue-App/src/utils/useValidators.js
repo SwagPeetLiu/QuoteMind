@@ -306,7 +306,6 @@ export function useValidators() {
 
             const isNotMobile = !chineseMobileRegex.test(phone) && !australianMobileRegex.test(phone);
             const isNotLandLine = !LandlineRegex.test(phone);
-            console.log(isNotMobile, isNotLandLine);
             if (isNotMobile && isNotLandLine) {
                 return ({ valid: false, message: `${t('columns.phone')}${t('others.space')}${t('validation.is invalid')}` });
             }
