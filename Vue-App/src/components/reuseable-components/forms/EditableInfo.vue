@@ -37,13 +37,13 @@
             :class="{'is-invalid': !isValid}"
             :type="type" 
             :id="name" 
-            :required="isRequired"
             v-model="inputValue"
             :disabled="isDisabled"
+            @input="onInput"
         />
 
         <!-- validation tooltip -->
-        <div v-if="isEditing" class="invalid-tooltip fs-7">
+        <div v-if="isEditing && validationTips" class="invalid-tooltip fs-7">
             {{ validationTips }}
         </div>
     </div>
@@ -54,6 +54,7 @@ import { useI18n } from 'vue-i18n';
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import { useValidators } from '@/utils/useValidators';
 const { mapValidation } = useValidators();
+import { debounce } from 'lodash';
 
 export default {
     name: "EditableInfo",
@@ -111,6 +112,7 @@ export default {
             // allow cancelling when the form is in editing mode
             if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
+                this.isValid = true;
                 return this.$emit("update-form", this.name, this.originalValue, true);
             }
             if (newValue === "saving" || newValue === "editing"){
@@ -125,20 +127,24 @@ export default {
                 this.originalValue = this.value;
             }
         },
-        // changing inputs when the form is in editing mode
-        inputValue(newValue){
-            const inputValidation = mapValidation(this.name, newValue, this.isRequired);
-            this.isValid = inputValidation.valid;
-            if (!this.isValid){
-                this.validationTips = inputValidation.message;
-            }
-            this.$emit("update-form", this.name, newValue, this.isValid);
-        }
     },
     computed:{
         isEditing(){
             return this.formStatus == "editing" || this.formStatus == "saving";
         }
+    },
+    methods:{
+        onInput: debounce(function(){
+            const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
+            this.isValid = inputValidation.valid;
+            if (!this.isValid){
+                this.validationTips = inputValidation.message;
+            }
+            else{
+                this.validationTips = "";
+            }
+            this.$emit("update-form", this.name, this.inputValue, this.isValid);
+        }, 300),
     },
     beforeMount(){
         this.originalValue = this.value;

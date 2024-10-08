@@ -31,7 +31,8 @@ export default {
         const { t } = useI18n({});
         return {
             t,
-            originalList: null
+            originalList: null,
+            locations: null,
         }
     },
     computed:{
@@ -63,19 +64,25 @@ export default {
                 // direct submission if the input is disabled
                 if (this.isDisabled){
                     this.isValid = true;
-                    this.$emit("update-form", this.target, {id: this.originalID, [this.targetName]: this.originalName}, true);
+                    this.$emit("update-form", this.target, this.originalList, true);
                     return;
                 }
             }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
-                this.originalID = this.id;
-                this.originalName = this.name;
+                this.originalList = this.list;
             }
         }
     },
     beforeMount(){
         this.originalList = this.list;
+        if (this.isDataAvailable){
+            this.locations = this.list.map((item) => {
+                const location = new ChinaLocation(list);
+                // later on needs to initialise based on the stored name in the databases
+                return location;
+            })
+        }
     }
 }
 </script>
