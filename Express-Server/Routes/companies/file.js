@@ -49,15 +49,15 @@ module.exports = (db) => {
                     if (addresses && addresses.length > 0) {
                         for (address of addresses) {
                             if (address.message === "add") {
-                                await transaction.none('INSERT INTO public.addresses (street_address, city, state, country, postal_code, category, created_by, company) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-                                    [address.street, address.city, address.state, address.country, address.postal, address.category, owner, id]);
+                                await transaction.none('INSERT INTO public.addresses (name, address, district, city, state, country, postal_code, category, created_by, company) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+                                    [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, owner, id]);
                             }
                             else if (address.message === "delete") {
                                 await transaction.none('DELETE FROM public.addresses WHERE id = $1 AND created_by = $2 AND company = $3', [address.id, owner, id]);
                             }
                             else {
-                                await transaction.none('UPDATE public.addresses SET street_address = $1, city = $2, state = $3, country = $4, postal_code = $5, category = $6 WHERE id = $7 AND created_by = $8 AND company = $9',
-                                    [address.street, address.city, address.state, address.country, address.postal, address.category, address.id, owner, id]);
+                                await transaction.none('UPDATE public.addresses SET name = $1, address = $2, district = $3, city = $4, state = $5, country = $6, postal_code = $7, category = $8 WHERE id = $9 AND created_by = $10 AND company = $11',
+                                    [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, address.id, owner, id]);
                             }
                         }
                     }
@@ -73,7 +73,7 @@ module.exports = (db) => {
                         }
                     }
                 })
-                return res.status(200).json({ message: 'Information Updated Successfully' });
+                return res.status(200).json({ message: 'Company Updated Successfully' });
             } catch (err) {
                 console.error(error);
                 return res.status(500).json({ message: 'Internal server error' });
@@ -93,8 +93,8 @@ module.exports = (db) => {
                     if (addresses && addresses.length > 0) {
                         for (address of addresses) {
                             if (address.message === "add") {
-                                await transaction.none('INSERT INTO public.addresses (street_address, city, state, country, postal_code, category, created_by, company) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-                                    [address.street, address.city, address.state, address.country, address.postal, address.category, owner, newCompany.id]);
+                                await transaction.none('INSERT INTO public.addresses (name, address, district, city, state, country, postal_code, category, created_by, company) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+                                    [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, owner, newCompany.id]);
                             }
                         }
                     }
@@ -105,7 +105,7 @@ module.exports = (db) => {
                             }
                         }
                     }
-                    return res.status(200).json({ id : newCompany.id, message: 'Information Updated Successfully' });
+                    return res.status(200).json({ id : newCompany.id, message: 'Comapny created Successfully' });
                 });
             }
             catch (error) {
@@ -138,7 +138,7 @@ module.exports = (db) => {
                     // delete the company
                     transaction.none('DELETE FROM public.companies WHERE id = $1 AND created_by = $2', [id, owner]);
                 })
-                return res.status(200).json({ message: 'Client Deleted Successfully' });
+                return res.status(200).json({ message: 'Company Deleted Successfully' });
             }
             catch (err) {
                 console.error(error);

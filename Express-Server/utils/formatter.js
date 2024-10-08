@@ -137,7 +137,9 @@ function mapDefaultQueryColumns(table, detailed = false) {
                                 SELECT jsonb_agg(
                                     jsonb_build_object(
                                         'id', ${mapQueryPrefix("addresses")}.id, 
-                                        'street', ${mapQueryPrefix("addresses")}.street_address, 
+                                        'name', ${mapQueryPrefix("addresses")}.name, 
+                                        'address', ${mapQueryPrefix("addresses")}.address,
+                                        'district', ${mapQueryPrefix("addresses")}.district,
                                         'city', ${mapQueryPrefix("addresses")}.city, 
                                         'state', ${mapQueryPrefix("addresses")}.state, 
                                         'country', ${mapQueryPrefix("addresses")}.country, 
@@ -187,8 +189,10 @@ function mapDefaultQueryColumns(table, detailed = false) {
                             ELSE (
                                 SELECT jsonb_agg(
                                     jsonb_build_object(
-                                        'id', ${mapQueryPrefix("addresses")}.id, 
-                                        'street', ${mapQueryPrefix("addresses")}.street_address, 
+                                        'id', ${mapQueryPrefix("addresses")}.id,
+                                        'name', ${mapQueryPrefix("addresses")}.name, 
+                                        'address', ${mapQueryPrefix("addresses")}.address,
+                                        'district', ${mapQueryPrefix("addresses")}.district,
                                         'city', ${mapQueryPrefix("addresses")}.city, 
                                         'state', ${mapQueryPrefix("addresses")}.state, 
                                         'country', ${mapQueryPrefix("addresses")}.country, 
@@ -397,7 +401,9 @@ function mapDefaultQueryColumns(table, detailed = false) {
                 ELSE ( SELECT jsonb_agg(
                     jsonb_build_object(
                         'id', ${mapQueryPrefix("addresses")}.id,
-                        'street', ${mapQueryPrefix("addresses")}.street_address,
+                        'name', ${mapQueryPrefix("addresses")}.name,
+                        'address', ${mapQueryPrefix("addresses")}.address,
+                        'district', ${mapQueryPrefix("addresses")}.district,
                         'city', ${mapQueryPrefix("addresses")}.city,
                         'state', ${mapQueryPrefix("addresses")}.state,
                         'country', ${mapQueryPrefix("addresses")}.country,

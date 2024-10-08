@@ -51,16 +51,16 @@ module.exports = (db) => {
                         for (address of addresses) {
                             if (address.message === "add") {
                                 await transaction.none(`
-                                    INSERT INTO public.addresses (street_address, city, state, country, postal_code, category, created_by, client)
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-                                `, [address.street, address.city, address.state, address.country, address.postal, address.category, owner, id]);
+                                    INSERT INTO public.addresses (name, address, district, city, state, country, postal_code, category, created_by, client)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+                                `, [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, owner, id]);
                             }
                             else if (address.message === "update") {
                                 await transaction.none(`
                                     UPDATE public.addresses
-                                    SET street_address = $1, city = $2, state = $3, country = $4, postal_code = $5, category = $6
-                                    WHERE id = $7 AND created_by = $8 AND client = $9;
-                                `, [address.street, address.city, address.state, address.country, address.postal, address.category, address.id, owner, id]);
+                                    SET name = $1, address = $2, district = $3, city = $4, state = $5, country = $6, postal_code = $7, category = $8
+                                    WHERE id = $9 AND created_by = $10 AND client = $11;
+                                `, [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, address.id, owner, id]);
                             }
                             else if (address.message === "delete") {
                                 await transaction.none('DELETE FROM public.addresses WHERE id = $1 AND created_by = $2 AND client = $3', [address.id, owner, id]);
@@ -92,9 +92,9 @@ module.exports = (db) => {
                         for (address of addresses) {
                             if (address.message == "add") {
                                 await transaction.none(`
-                                    INSERT INTO public.addresses (street_address, city, state, country, postal_code, category, created_by, client)
-                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-                                `, [address.street, address.city, address.state, address.country, address.postal, address.category, owner, client.id]);
+                                    INSERT INTO public.addresses (name, address, district, city, state, country, postal_code, category, created_by, client)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+                                `, [address.name, address.address, address.district, address.city, address.state, address.country, address.postal, address.category, owner, client.id]);
                             }
                         }
                     }
