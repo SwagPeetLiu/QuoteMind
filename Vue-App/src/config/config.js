@@ -12,6 +12,8 @@ const config = {
         Max_Tax_Length: 20,
         Min_Street_Length: 5,
         Max_Street_Length: 80,
+        Min_District_Length: 2,
+        Max_District_Length: 20,
         Min_City_Length: 2,
         Max_City_Length: 40,
         Min_State_Length: 2,

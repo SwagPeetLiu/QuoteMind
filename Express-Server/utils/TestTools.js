@@ -9,7 +9,9 @@ const request = require('supertest');
 const validNewAddress = {
     message: "add",
     id: "new",
-    street: "Test Street",
+    name: "Test Name",
+    address: "Test Address",
+    district: "Test District",
     city: "Sydney",
     state: "北京市",
     country: "Australia",
@@ -506,10 +508,20 @@ const invalidTestingRange = {
         "invalid type": "string",
         "invalid value": [1],
 
-        "missing street": [{ ...validNewAddress, street: undefined }],
-        "street name is invalid type": [{ ...validNewAddress, street: 1 }],
-        "street name is too short": [{ ...validNewAddress, street: `${"t".repeat(config.limitations.Min_Address_Length - 1)}` }],
-        "street name is too long": [{ ...validNewAddress, street: `${"t".repeat(config.limitations.Max_Address_Length + 1)}` }],
+        "missing address name": [{ ...validNewAddress, name: undefined }],
+        "address name is invalid type": [{ ...validNewAddress, name: 1 }],
+        "address name is too short": [{ ...validNewAddress, name: `${"t".repeat(config.limitations.Min_Name_Length - 1)}` }],
+        "address name is too long": [{ ...validNewAddress, name: `${"t".repeat(config.limitations.Max_Name_Length + 1)}` }],
+
+        "missing street address": [{ ...validNewAddress, address: undefined }],
+        "address street is invalid type": [{ ...validNewAddress, address: 1 }],
+        "address street is too short": [{ ...validNewAddress, address: `${"t".repeat(config.limitations.Min_Address_Length - 1)}` }],
+        "address street is too long": [{ ...validNewAddress, address: `${"t".repeat(config.limitations.Max_Address_Length + 1)}` }],
+
+        "missing district": [{ ...validNewAddress, district: undefined }],
+        "district name is invalid type": [{ ...validNewAddress, district: 1 }],
+        "district name is too short": [{ ...validNewAddress, district: `${"t".repeat(config.limitations.Min_District_Length - 1)}` }],
+        "district name is too long": [{ ...validNewAddress, district: `${"t".repeat(config.limitations.Max_District_Length + 1)}` }],
 
         "missing city": [{ ...validNewAddress, city: undefined }],
         "city name is invalid type": [{ ...validNewAddress, city: 1 }],
@@ -768,7 +780,9 @@ function isSpecificCompanyValid(company) { // records in the specific route
 }
 function isSpecificAddressValid(address) {
     if ('id' in address &&
-        'street' in address &&
+        'name' in address &&
+        'address' in address &&
+        'district' in address &&
         'city' in address &&
         'state' in address &&
         'country' in address &&

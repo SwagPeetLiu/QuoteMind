@@ -692,16 +692,19 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
         if (!Array.isArray(addresses)) return { valid: false, message: 'Invalid Format of Address information' };
         if (addresses.length === 0) return { valid: true }; // allow empty array
         for (let address of addresses) {
-            if (!address || !address.street || !address.city || !address.state || !address.country ||
+            if (!address || !address.name || !address.address || !address.district || !address.city || !address.state || !address.country ||
                 !address.postal || !address.category || !address.id || !address.message) {
                 return { valid: false, message: 'Incomplete Address information' };
             }
-            if (typeof address.street !== "string" || typeof address.city !== "string" || typeof address.state !== "string" ||
-                typeof address.country !== "string" || typeof address.postal !== "string" || !Array.isArray(address.category) ||
-                typeof address.id !== "string" || typeof address.message !== "string") {
+            if ( typeof address.name !== "string" || typeof address.address !== "string" || typeof address.district !== "string" || 
+                typeof address.city !== "string" || typeof address.state !== "string" || typeof address.country !== "string" || 
+                typeof address.postal !== "string" || !Array.isArray(address.category) || typeof address.id !== "string" || 
+                typeof address.message !== "string") {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
-            if (!unicodeRegex.test(address.street) ||
+            if (!unicodeRegex.test(address.name) ||
+                !unicodeRegex.test(address.address) ||
+                !unicodeRegex.test(address.district) ||
                 !unicodeRegex.test(address.city) ||
                 !unicodeRegex.test(address.state) ||
                 !unicodeRegex.test(address.country) ||
@@ -709,7 +712,9 @@ async function validateAddresses(addresses, owner, id, target, db, req) {
                 !(address.message === "add" || address.message === "update" || address.message === "delete")) {
                 return { valid: false, message: 'Invalid Format of Address information' };
             }
-            if (!validator.isLength(address.street, { min: config.limitations.Min_Street_Length, max: config.limitations.Max_Street_Length }) ||
+            if (!validator.isLength(address.name, { min: config.limitations.Min_Name_Length, max: config.limitations.Max_Name_Length }) ||
+                !validator.isLength(address.address, { min: config.limitations.Min_Street_Length, max: config.limitations.Max_Street_Length }) ||
+                !validator.isLength(address.district, { min: config.limitations.Min_District_Length, max: config.limitations.Max_District_Length }) ||
                 !validator.isLength(address.city, { min: config.limitations.Min_City_Length, max: config.limitations.Max_City_Length }) ||
                 !validator.isLength(address.state, { min: config.limitations.Min_State_Length, max: config.limitations.Max_State_Length }) ||
                 !validator.isLength(address.country, { min: config.limitations.Min_Country_Length, max: config.limitations.Max_Country_Length }) ||
