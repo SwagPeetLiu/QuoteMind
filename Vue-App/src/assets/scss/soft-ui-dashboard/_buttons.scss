@@ -219,3 +219,13 @@
 .form-button{
   width: 120px;
 }
+
+// delete button
+.delete-button{
+  cursor: pointer;
+  
+  &:hover{
+    scale: 1.05;
+    transition: scale 0.3s ease-in-out;
+  }
+}

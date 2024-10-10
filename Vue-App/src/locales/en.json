@@ -308,7 +308,9 @@
     "transaction details": "Transaction Details",
     "conditions": "Conditions",
     "listed_conditions": "Involved Conditions",
-    "category": "Category"
+    "category": "Category",
+    "address":"Address",
+    "postal":"Post Code"
   },
   "detailedListings":{
     "general": "General Information",

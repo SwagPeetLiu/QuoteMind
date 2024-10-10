@@ -1,5 +1,5 @@
 <template>
-    <div class="reference-dropdown" :class="[isSlideOut ? 'toggle-open' : '']">
+    <div class="reference-dropdown mb-2" :class="[isSlideOut ? 'toggle-open' : '']">
 
         <!-- reference toggle -->
         <button 

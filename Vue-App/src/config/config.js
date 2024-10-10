@@ -135,14 +135,16 @@ const config = {
             "dimensions": ["length", "width", "en_unit", "ch_unit", "size", "size_unit"],
             "client details": ["client", "company", "addresses"],
             "others": ["colour", "note", "employee"],
+        },
+        "address":{
+            "general": ["name", "address", "district", "city", "state", "country", "postal", "category"],
         }
     },
 
     // categorical choices
     multipleOptions:{
         "status": ['created', 'quoted', 'paid'],
-        "addressCategory": ['delivery&install', 'bill', 'mail'],
-        
+        "addressCategory": ['delivery&install', 'bill', 'mail']
     },
     optionsColouring:{
         "status":{
@@ -161,6 +163,11 @@ const config = {
         "conditions":{
             "general": "primary",
             "individual": "info",
+        },
+        "addressCategory":{
+            "delivery&install": "primary",
+            "bill": "warning",
+            "mail": "info"
         }
     },
     units:{

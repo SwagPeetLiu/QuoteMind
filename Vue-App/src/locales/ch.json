@@ -311,7 +311,9 @@
     "transaction details": "交易详情",
     "conditions": "定价条件",
     "listed_conditions": "定价条件",
-    "category": "类别"
+    "category": "类别",
+    "address":"详细地址",
+    "postal":"邮编"
   },
   "detailedListings":{
     "general": "基本信息",

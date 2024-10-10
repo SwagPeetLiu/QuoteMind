@@ -78,6 +78,14 @@
                     />
 
                     <!-- addresses reference inputs -->
+                    <EditableAddresses
+                        v-if="mapFormSubmissionType(attribute) === 'addresses'"
+                        :list="formData[attribute].value"
+                        :isRequired="mapMandatory(attribute)"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
+                    />
                 </div>
             </div>
         </form>
@@ -139,6 +147,7 @@ import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.v
 import EditableDescriptions from "@/components/reuseable-components/forms/EditableDescriptions.vue";
 import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
 import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
+import EditableAddresses from "@/components/reuseable-components/forms/EditableAddresses.vue";
 
 export default {
     name: "InfoForm",
@@ -149,7 +158,8 @@ export default {
         Spinner,
         EditableDescriptions,
         EditableReference,
-        EditableReferenceList
+        EditableReferenceList,
+        EditableAddresses
     },
     props: {
         target: {
@@ -265,6 +275,7 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
+            console.log("update", name, value, isValid);
         }
     },
     mounted() {

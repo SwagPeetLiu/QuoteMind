@@ -1,0 +1,17 @@
+.tick-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 0.3rem;
+    border: 1px solid $dark;
+    transition: background-color 1s ease-in-out;
+    margin-right: 4px;
+    cursor: pointer;
+
+    &.checked {
+        border: none;
+        transition: background-color 1s ease-in-out;
+    }
+}

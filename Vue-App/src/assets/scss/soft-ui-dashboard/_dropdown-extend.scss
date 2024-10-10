@@ -193,6 +193,14 @@
           position: relative;
           background-color: transparent;
 
+          span{
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
+            text-align: center;
+          }
+
           .tick-box{
             position: absolute;
             display: flex;
