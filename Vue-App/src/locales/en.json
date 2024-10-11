@@ -139,7 +139,8 @@
     "rules": "Rules",
     "pricing_rules": "Pricing Rules",
     "pricing_conditions": "Pricing Conditions",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "address": "address"
   },
   "dialog":{
     "error title": "Please Note:",
@@ -259,7 +260,8 @@
     "cancel": "Cancel",
     "enter": "Enter Your ",
     "select": "Please Select",
-    "temporarily empty": "Currently Unprovided"
+    "temporarily empty": "Currently Unprovided",
+    "add": "Add"
   },
   "units":{
     "transactionUnit": ""
@@ -310,6 +312,10 @@
     "listed_conditions": "Involved Conditions",
     "category": "Category",
     "address":"Address",
+    "district":"District",
+    "city":"City",
+    "state":"State",
+    "country":"Country",
     "postal":"Post Code"
   },
   "detailedListings":{

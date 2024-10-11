@@ -173,8 +173,10 @@ export default {
         }
     },
     beforeMount() {
+        // initialise the update message if there is already references provided
         if (this.isDataAvailable){
-            this.orignalList = this.list;
+            this.orignalList = this.list.map((item) => ({...item, message: "add"}));
+            this.$emit("update-form", this.target, this.orignalList, true);
         }
     },
 }

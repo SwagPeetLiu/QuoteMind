@@ -84,7 +84,6 @@
                         :isRequired="mapMandatory(attribute)"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
-                        @scroll-down="scrollDown"
                     />
                 </div>
             </div>
@@ -93,7 +92,7 @@
 
     <!-- form controls -->
     <FadeInElement v-if="!isLoading && isDataAvailable">
-        <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end">
+        <div class="slider-controls w-100 px-3 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end">
             <button 
                 v-if="formStatus === 'editing'" 
                 class="btn btn-secondary form-button" 
@@ -275,7 +274,6 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
-            console.log("update", name, value, isValid);
         }
     },
     mounted() {

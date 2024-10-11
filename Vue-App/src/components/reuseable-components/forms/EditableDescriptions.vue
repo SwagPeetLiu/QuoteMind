@@ -5,7 +5,7 @@
             class="input-header d-flex align-items-center justify-content-start font-weight-bold"
             :class="[isEditing ? 'editing' : '']"
         >
-            <i :class="[icon, 'text-gradient me-2 my-0 text-lg', `text-${isEditing ? $store.state.themeColor : 'dark'}`]"></i>
+            <i :class="[icon, 'text-gradient me-2 my-0 text-lg text-dark', `${isEditing ? 'd-none' : ''}`]"></i>
             <span class="text-gradient text-dark my-0 text-lg">{{ t(`columns.${name}`) }}</span>
         </div>
 

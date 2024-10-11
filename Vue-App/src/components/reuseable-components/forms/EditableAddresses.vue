@@ -1,14 +1,27 @@
 <template>
     <div v-if="isDataAvailable" class="d-flex flex-column w-100">
-        <AddressFields
-            v-for="(address, index) in list"
-            :key="index"
-            :recordIndex="index"
-            :currentRecord="address"
-            :isEditing="isEditing"
-            :class="['mb-2']"
-            @update-address="updateAddress"
-        />
+        <div
+            v-for="address in list"
+            class="mb-2"
+            :key="address.id"
+        >
+            <!-- visualise every new address or address that user is updating -->
+            <AddressFields
+                v-if="address == null || address.message !== 'delete'"
+                :currentRecord="address"
+                :isEditing="isEditing"
+                :class="['mb-2']"
+                @update-address="updateAddress"
+            />
+        </div>
+    </div>
+
+    <!-- indicator on adding more addresses (regardless how many address there is)-->
+    <div v-if="isEditing" class=" mt-n2 w-100 d-flex justify-content-start" @click.stop.prevent="addAddress">
+        <button class="px-5 btn bg-gradient-dark d-flex align-items-center justify-content-center">
+            <i class="me-2 my-0" :class="getIcon('add')"></i>
+            <span>{{ `${t('form.add')}${t('others.space')}${t('routes.address')}` }}</span>
+        </button>
     </div>
 
     <!-- indicator for no data being provided -->
@@ -20,12 +33,14 @@
 <script>
 import { useI18n } from 'vue-i18n';
 import AddressFields from '@/components/reuseable-components/forms/components/AddressFields.vue';
+import { getIcon } from '@/utils/iconMapper.js';
 
 export default {
     name: "EditableAddresses",
     components: {
         AddressFields
     },
+    emits: ['update-form'],
     props:{
         list:{
             type: [Array, null],
@@ -51,31 +66,63 @@ export default {
     },
     computed:{
         isDataAvailable(){
-            if (!this.list) return false;
             if (Array.isArray(this.list) && this.list.length === 0) return false;
             return true;
         },
         isEditing(){
             return this.formStatus == "editing" || this.formStatus == "saving";
+        },
+        isAnyAddressInvalid(){
+            return Array.from(this.validityMap.values()).includes(false);
         }
     },
     methods:{
+        getIcon,
         addAddress(){
-            console.log("add address");
-        },
-        removeAddress(){
-            console.log("remove address");
-        },
-        updateAddress(index, value, isValid){
+            let newId = "";
+            let newCopy = [];
             if (this.isDataAvailable){
-                console.log("received update address", index, value, isValid);
-                const newCopy = [...this.list];
-                newCopy[index] = value;
-                this.validityMap.set(index, isValid);
+                const existingNewAddresses = this.list.filter((address) => address.id.includes("new"));
+                newId = "new" + (existingNewAddresses.length + 1);
+                newCopy = [...this.list, {id: newId, message: "add"}];
+            }
+            else{
+                newId = "new1";
+                newCopy = [{id: newId, message: "add"}];
+            }
 
-                // needs to cjheck on the validity of each address here
-                const isAnyAddressInvalid = Array.from(this.validityMap.values()).includes(false);
-                this.$emit("update-form", "addresses", newCopy, !isAnyAddressInvalid);
+            // update the validity map
+            this.validityMap.set(newId, false);
+
+            // update the list:
+            this.$emit(
+                "update-form",
+                "addresses", 
+                newCopy,
+                !this.isAnyAddressInvalid
+            );
+        },
+        updateAddress(id, value, isValid){
+            if (this.isDataAvailable){
+                const newCopy = [];
+
+                this.list.forEach((address) => {
+                    if (address.id === id){
+                        if (address.id.includes("new") && value.message=="delete"){
+                            this.validityMap.delete(address.id);
+                            return; // If it's a new address being deleted, skip it
+                        }
+                        else{
+                            this.validityMap.set(address.id, isValid);
+                            newCopy.push(value); // update the records accordingly
+                        }
+                    }
+                    // keeping the record of the other addresses
+                    else newCopy.push({...address});
+                });
+
+                // needs to check on the validity of each address here
+                this.$emit("update-form", "addresses", newCopy, !this.isAnyAddressInvalid);
             }
         }   
     },
@@ -101,9 +148,21 @@ export default {
         }
     },
     beforeMount(){
-        this.originalList = this.list;
-        for (let i = 0; i < this.list.length; i++){
-            this.validityMap.set(i, true);
+        if(this.isDataAvailable){
+            this.originalList = this.list.map((address) => ({...address, message: "update"}));
+
+            // initialise an message
+            this.$emit(
+                "update-form",
+                "addresses", 
+                this.originalList, 
+                true
+            );
+
+            // map a validity map
+            this.list.forEach((address) => {
+                this.validityMap.set(address.id, true);
+            });
         }
     }
 }

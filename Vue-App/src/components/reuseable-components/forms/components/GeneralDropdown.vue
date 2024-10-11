@@ -8,6 +8,12 @@
             @click.prevent="toggleDropdown()"
             :disabled="isDisabled"
         >
+            <!-- Input Label -->
+            <p class="dropdown-label font-weight-bold text-dark text-lg">
+                {{ t(`columns.${target}`) }}
+            </p>
+
+            <!-- current value -->
             <p 
                 class="text-gradient text-dark d-flex align-items-center my-0 text-sm"
                 :class="[currentSelection ? `font-weight-bolder` : '']"
@@ -114,10 +120,21 @@ export default {
             this.$emit("update-selection", this.target, option, true);
             this.isSlideOut = false;
         },
+
+        // function used to handle Clicks outside
+        handleClickOutside(event) {
+            if (this.isSlideOut &&
+                this.$refs.generalMenu &&
+                !this.$refs.generalMenu.contains(event.target) &&
+                this.$refs.generalToggle &&
+                !this.$refs.generalToggle.contains(event.target)
+            ) {
+                this.isSlideOut = false;
+            }
+        },
     },
     computed: {
         filteredOptions() {
-            console.log(this.searchValue) ;
             if (this.searchValue == "" || !this.searchValue.trim()) {
                 return this.selectableOptions;
             }
@@ -126,13 +143,20 @@ export default {
                     return option.toLowerCase().includes(this.searchValue.toLowerCase());
                 });
             }
-        }    
+        },
     },
-    mounted() {
-        if (!this.currentSelection && this.selectableOptions) {
-            // update the current selection
-            console.log("needs to update")
-        }
-    }
+    beforeUnmount() {
+        document.removeEventListener('click', this.handleClickOutside, true);
+    },
+    watch: {
+        isSlideOut(newValue) {
+            if (newValue) {
+                document.addEventListener('click', this.handleClickOutside, true);
+            }
+            else {
+                document.removeEventListener('click', this.handleClickOutside, true);
+            }
+        },
+    },
 }
 </script>

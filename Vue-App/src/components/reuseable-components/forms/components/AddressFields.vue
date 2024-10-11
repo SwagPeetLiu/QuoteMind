@@ -25,7 +25,7 @@
 
             <!-- display of the category of this address -->
             <div v-if="!isEditing && currentRecord.category"
-                class="w-100 my-0 d-flex align-items-center justify-content-end"
+                class="w-100 my-0 me-3 d-flex align-items-center justify-content-end"
             >
                 <span 
                     v-for="(type, index) in currentRecord.category"
@@ -51,7 +51,7 @@
                     :isDisabled="false" 
                     :isRequired="true" 
                     :name="'name'"
-                    :value="currentRecord.name" 
+                    :value="currentRecord.name ? currentRecord.name : ''" 
                     type="text" 
                     :formStatus="'editing'"
                     @update-form="updateAddressRecord"
@@ -71,13 +71,13 @@
             </div>
 
             <!-- Editing of the address detail -->
-            <div class="w-100 h-100 mb-2" v-if="isEditing">
+            <div class="w-100 h-100 mb-3" v-if="isEditing">
                 <EditableInfo
                     :name="'address'"
                     :icon="getIcon('address')" 
                     :isDisabled="false"
                     :isRequired="true"
-                    :value="currentRecord.address"
+                    :value="currentRecord.address ? currentRecord.address : ''"
                     type="text"
                     :formStatus="'editing'"
                     @update-form="updateAddressRecord"
@@ -97,7 +97,7 @@
             </div>
 
             <!-- Editing of the city selections -->
-            <div class="h-100 mb-3" style="width: 50%;" v-if="isEditing">
+            <div class="h-100 mb-3" style="width: 50%;" v-if="isEditing && !isCurrentProvinceEqualToCity">
                 <GeneralDropdown
                     target="city"
                     :currentSelection="currentCity ? currentCity.name : null"
@@ -109,7 +109,7 @@
             </div>
 
             <!-- Editing of the state/province selections -->
-            <div class="h-100 pe-1 mb-2" style="width: 50%;" v-if="isEditing">
+            <div class="h-100 mb-2" :class="{'pe-1': !isCurrentProvinceEqualToCity}" style="width: 50%;" v-if="isEditing">
                 <GeneralDropdown
                     target="state"
                     :currentSelection="currentProvince ? currentProvince.name : null"
@@ -121,13 +121,13 @@
             </div>
 
             <!-- Editing of the postal code selections -->
-            <div class="h-100 mb-2" style="width: 50%;" v-if="isEditing">
+            <div class="h-100 mb-2" :style="{width: `${isCurrentProvinceEqualToCity ? '100%' : '50%'}`}" v-if="isEditing">
                 <EditableInfo
                     :name="'postal'"
                     :icon="getIcon('postal')"
                     :isDisabled="false"
                     :isRequired="true"
-                    :value="currentRecord.postal"
+                    :value="currentRecord.postal ? currentRecord.postal : '100020'"
                     type="text"
                     :formStatus="'editing'"
                     @update-form="updateAddressRecord"
@@ -173,15 +173,11 @@ export default {
     },
     props: {
         currentRecord: {
-            type: [Object, null],
+            type: Object,
             required: true
         },
         isEditing: {
             type: Boolean,
-            required: true
-        },
-        recordIndex: {
-            type: Number,
             required: true
         }
     },
@@ -218,6 +214,9 @@ export default {
         currentDistrict() {
             return this.location.getCurrentAddress()["district"];
         },
+        isCurrentProvinceEqualToCity() {
+            return this.currentProvince.name == this.currentCity.name;
+        },
         currentSelectedCategory() {
             const selectedCategory = [];
             for(const [key, value] of this.categories){
@@ -226,6 +225,9 @@ export default {
                 }
             }
             return selectedCategory;
+        },
+        isAnyFieldInvalid() {
+            return Array.from(this.validityMap.values()).includes(false);
         }
     },
     methods: {
@@ -233,13 +235,12 @@ export default {
         
         // function used to update the curretn selected address info
         updateAddressRecord(attribute, value, isValid) {
-            console.log("updateAddressRecord", this.recordIndex, attribute, value, isValid);
             // if the input is in valid in this case
             this.validityMap.set(attribute, isValid);
             if (!isValid){
                 this.$emit(
                     "update-address", 
-                    this.recordIndex, 
+                    this.currentRecord.id, 
                     { ...this.currentRecord, [attribute]: value }, 
                     isValid
                 );
@@ -247,13 +248,24 @@ export default {
             // if this update of this specific address is valid, 
             // check on all other fields to update the overall validity of this address
             else{
-                const isAnyFieldInvalid = Array.from(this.validityMap.values()).includes(false);
                 this.$emit(
                     "update-address", 
-                    this.recordIndex, 
+                    this.currentRecord.id, 
                     { ...this.currentRecord, [attribute]: value }, 
-                    !isAnyFieldInvalid
+                    !this.isAnyFieldInvalid
                 );
+            }
+
+            // systematic updates on the sectors if their superior level is updateed:
+            if (attribute === "state") {
+                setTimeout(() => {
+                    this.updateCity();
+                }, 100);
+            }
+            if (attribute === "city") {
+                setTimeout(() => {
+                    this.updateDistrict();
+                }, 100);
             }
         },
         getCategoricalColour(category) {
@@ -266,17 +278,35 @@ export default {
         },
 
         updateAddressCategory(category, isSelected) {
-            console.log("updateAddressCategory", category, isSelected);
             this.categories.set(category, isSelected);
             this.updateAddressRecord(
                 "category", 
                 this.currentSelectedCategory, 
                 this.currentSelectedCategory.length > 0);
         },
+        updateCity() {
+            this.updateAddressRecord(
+                "city",
+                this.currentCity.name,
+                !this.isAnyFieldInvalid
+            )
+        },
+        updateDistrict() {
+            this.updateAddressRecord(
+                "district",
+                this.currentDistrict.name,
+                !this.isAnyFieldInvalid
+            )
+        },
 
         // function used to remove this specific address:
         removeAddress() {
-            console.log("removeAddress", this.recordIndex);
+            this.$emit(
+                "update-address", 
+                this.currentRecord.id, 
+                { ...this.currentRecord, message: "delete" }, 
+                true
+            );
         },
 
         // functions to used to set up selections in the Location instance
@@ -318,7 +348,7 @@ export default {
         this.setUpDistricts();
 
         // if an existing record of address is provided, set up the validity map as all true
-        if (this.currentRecord) {
+        if (this.currentRecord.id && this.currentRecord.name) {
             this.validityMap = new Map();
             Object.keys(this.currentRecord).forEach((key) => {
                 this.validityMap.set(key, true);
@@ -330,13 +360,13 @@ export default {
                     this.categories.set(category, true);
                 });
             }
-            this.$emit("update-address", this.recordIndex, {...this.currentRecord, message: "update"}, true);
         }
         // if a new record is being attached, merely set up a skeleton
         else{
             this.validityMap = new Map();
-            const newRecord = {id: "new", message: "add"};
-            config.detailedListings.address.forEach((attribute) => {
+            const newRecord = {...this.currentRecord, country: "中国"};
+
+            config.detailedListings.address.general.forEach((attribute) => {
                 this.validityMap.set(attribute, true);
                 if (attribute === "district") {
                     newRecord[attribute] = this.currentDistrict.name;
@@ -344,7 +374,7 @@ export default {
                 else if (attribute === "city") {
                     newRecord[attribute] = this.currentCity.name;
                 }
-                else if (attribute === "province") {
+                else if (attribute === "state") {
                     newRecord[attribute] = this.currentProvince.name;
                 }
                 else if (attribute === "category") {
@@ -356,11 +386,11 @@ export default {
                 }
                 // else it requires an user input
                 else{
-                    newRecord[attribute] = null;
+                    newRecord[attribute] = "";
                     this.validityMap.set(attribute, false);
                 }
             });
-            this.emit("update-address", this.recordIndex, newRecord, false);
+            this.$emit("update-address", this.currentRecord.id, newRecord, false);
         }
     },
     watch: {

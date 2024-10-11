@@ -526,15 +526,6 @@ function reverseFormatData(data) {
             }
         }
 
-        else if (mapFormSubmissionType(key) === "multiple references") {
-            if (value.value) { // if reference exists, assign id
-                result[key] = value.value.map((item) => item.id);
-            }
-            else{
-                result[key] = null;
-            }
-        }
-
         // else assign the value directly
         else{
             result[key] = value.value;
