@@ -43,7 +43,10 @@
             </div>
 
             <ul v-if="!isInitialisedLoading & isReferenceListingsAvailable"
-                class="reference-list thin-scrollbar overflow-x-hidden overflow-y-auto mt-2">
+                class="reference-list thin-scrollbar overflow-x-hidden overflow-y-auto mt-2"
+                ref="referenceList"
+                @scroll="handleScroll"
+            >
 
                 <!-- reference record -->
                 <li 
@@ -67,6 +70,15 @@
                         }}
                     </span>
                 </li>
+
+                <!-- lazy Loading Indicator -->
+                <div 
+                    v-if="isScrolledLoading"
+                    class="w-100 text-center"
+                    style="height: 35px;"
+                >
+                    <DotLoader :size="30"/>
+                </div>
             </ul>
 
             <!-- indicator for no data matchings -->
@@ -90,6 +102,7 @@ import { getIcon } from "@/utils/iconMapper.js";
 import serach from "@/api/search";
 import { generateSearchQueryWhereClause, mapDropdownSearchListingBody } from "@/utils/formatters";
 import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
+import DotLoader from "@/components/reuseable-components/loader/DotLoader.vue";
 import { config } from "@/config/config";
 
 export default {
@@ -109,6 +122,7 @@ export default {
     },
     components: {
         Spinner,
+        DotLoader
     },
     props: {
         type: { // single or multiple references
@@ -146,6 +160,17 @@ export default {
                 return false;
             }
             return Array.isArray(this.referenceListings) && this.referenceListings.length > 0;
+        },
+        isThereMoreData() {
+            if (!this.isReferenceListingsAvailable){
+                return false;
+            }
+            if (this.totalCount == null || typeof this.totalCount !== "number") {
+                return false;
+            }
+            else{
+                return this.totalCount > this.referenceListings.length;
+            }
         },
         isSelectionConfirmed() {
             if (!this.currentSelection) { // if no selection is provided
@@ -262,6 +287,18 @@ export default {
                     this.isScrolledLoading = false,
                     this.totalCount = null,
                     this.currentPage = null;
+            }
+        },
+
+        // function used to control the scrolling effects on lazy loading
+        handleScroll(){
+            const container = this.$refs.referenceList;
+            if (container) {
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight){
+                    if (this.isThereMoreData && !this.isInitialisedLoading && !this.isScrolledLoading) {
+                        this.fetchReferences("scroll");
+                    }
+                }
             }
         },
 
