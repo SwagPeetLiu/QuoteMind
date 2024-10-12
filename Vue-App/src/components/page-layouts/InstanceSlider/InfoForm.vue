@@ -84,6 +84,7 @@
                         :isRequired="mapMandatory(attribute)"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
                     />
                 </div>
             </div>
@@ -256,10 +257,12 @@ export default {
                     .then((response) => {
                         if (response.isCompleted) {
                             this.formStatus = "display";
+                            this.fetchData();
                             if (!this.$store.state.refreshListing) {
                                 this.$store.commit("setRefreshListing", true);
                             }
-                        } else {
+                        }
+                        else {
                             this.formStatus = "editing";
                         }
                     })

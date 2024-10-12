@@ -38,8 +38,8 @@
                 <p v-if="value" class="text-dark text-gradient ms-1">
                     {{ value }}
                 </p>
-                <p v-else class="text-dark text-gradient ms-1">
-                    {{ t('form.temporarily empty') }}
+                <p v-else class="text-gradient text-dark w-100 mb-2 d-flex justify-content-center">
+                    -- {{ t('form.temporarily empty') }} -- 
                 </p>
             </SlideUpElement>
         </div>
@@ -115,7 +115,7 @@ export default {
                 this.validationTips = inputValidation.message;
             }
             this.$emit("update-form", this.name, this.inputValue, this.isValid);
-        }, 300),
+        }, config.UI.textDebouce),
     },
     watch:{
         formStatus(newValue, oldValue){

@@ -1,31 +1,35 @@
 <template>
     <div 
-        class="d-flex align-items-center justify-content-start position-relative editable-container"
+        class="d-flex justify-content-start position-relative editable-container"
+        :class="[isEditing ? 'align-items-center' : 'align-items-start']"
     >
-        <!-- input icon -->
-        <i 
-            class="me-2 text-gradient input-icon" 
-            :class="
-                [
-                    icon, isEditing? 'editing': '', 
-                    isEditing? `text-${$store.state.themeColor}`: 'text-dark',
-                    size === 'large' ? 'text-2xl' : 'text-lg'
-                ]"
-        >
-        </i>
-        <!-- input label -->
-        <p 
-            class="me-2 me-3 my-0 font-weight-bold text-dark input-label"
-            :class="[isEditing ? 'editing': '', size === 'large' ? 'text-2xl' : 'text-lg']"
-        >
-            {{ t(`columns.${name}`) }}
-            <span v-if="!isEditing" class="ms-n1">:</span>
-        </p>
+        <div class="d-flex align-items-center my-0">
+            <!-- input icon -->
+            <i 
+                class="me-2 text-gradient input-icon" 
+                :class="
+                    [
+                        icon, isEditing? 'editing': '', 
+                        isEditing? `text-${$store.state.themeColor}`: 'text-dark',
+                        size === 'large' ? 'text-2xl' : 'text-lg'
+                    ]"
+            >
+            </i>
+            <!-- input label -->
+            <p 
+                class="me-2 me-1 my-0 font-weight-bold text-dark input-label"
+                :class="[isEditing ? 'editing': '', size === 'large' ? 'text-2xl' : 'text-lg']"
+            >
+                {{ t(`columns.${name}`) }}
+                <span v-if="!isEditing" class="ms-n1">:</span>
+            </p>
+        </div>
 
         <!-- current value -->
         <LoadInText 
             v-if="!isEditing && value" 
-            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`" 
+            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`"
+            :style="{ paddingTop: `${size === 'large' ? '0' : '2px'}`}"
             :text="value"
             :spaceWidth="7" 
         />
@@ -55,6 +59,7 @@ import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import { useValidators } from '@/utils/useValidators';
 const { mapValidation } = useValidators();
 import { debounce } from 'lodash';
+import { config } from '@/config/config';
 
 export default {
     name: "EditableInfo",
@@ -143,7 +148,7 @@ export default {
                 this.validationTips = "";
             }
             this.$emit("update-form", this.name, this.inputValue, this.isValid);
-        }, 300),
+        }, config.UI.textDebouce),
     },
     beforeMount(){
         this.originalValue = this.value;

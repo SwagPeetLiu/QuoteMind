@@ -73,6 +73,7 @@
 <script>
 import { useI18n } from 'vue-i18n';
 import { getIcon } from "@/utils/iconMapper.js";
+import { config } from "@/config/config";
 
 export default {
     name: "GeneralDropdown",
@@ -110,9 +111,26 @@ export default {
     methods:{
         getIcon,
 
+
         // toggle the dropdown on searches
         toggleDropdown() {
             this.isSlideOut = !this.isSlideOut;
+            if (this.isSlideOut) {
+                const sliderForm = document.querySelector(".slider-form");
+                if (sliderForm && this.$refs.generalMenu) {
+                    setTimeout(() => {
+                        const menuRect = this.$refs.generalMenu.getBoundingClientRect();
+                        const toggleRect = this.$refs.generalToggle.getBoundingClientRect();
+                        const wavyHeaderHeight = 140;
+                        const ExtraSpace = 0;
+
+                        // removing the header height, current scroll relative to the view port
+                        const scrollingAmount = menuRect.y - sliderForm.scrollTop - toggleRect.height - wavyHeaderHeight - ExtraSpace;
+                        this.$emit("scroll-down", scrollingAmount);
+
+                    }, config.UI.scrollDebounce);
+                }
+            }
         },
 
         // update the selection to the parent:

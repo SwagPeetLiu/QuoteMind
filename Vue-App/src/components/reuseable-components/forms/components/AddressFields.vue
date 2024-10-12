@@ -93,6 +93,7 @@
                     :isRequired="true"
                     :isDisabled="false"
                     @update-selection="updateAddressRecord"
+                    @scroll-down="(distance) => $emit('scroll-down', distance)"
                 />
             </div>
 
@@ -105,6 +106,7 @@
                     :isRequired="true"
                     :isDisabled="false"
                     @update-selection="updateAddressRecord"
+                    @scroll-down="(distance) => $emit('scroll-down', distance)"
                 />
             </div>
 
@@ -117,6 +119,7 @@
                     :isRequired="true"
                     :isDisabled="false"
                     @update-selection="updateAddressRecord"
+                    @scroll-down="(distance) => $emit('scroll-down', distance)"
                 />
             </div>
 
@@ -164,6 +167,7 @@ import CheckBox from '@/components/reuseable-components/forms/components/CheckBo
 
 export default {
     name: "AddressFields",
+    emits: ['update-address', 'scroll-down'],
     components: {
         IconEntity,
         EditableInfo,
@@ -378,7 +382,7 @@ export default {
                     newRecord[attribute] = this.currentProvince.name;
                 }
                 else if (attribute === "category") {
-                    newRecord[attribute] = config.multipleOptions.addressCategory[0];
+                    newRecord[attribute] = [config.multipleOptions.addressCategory[0]];
                     this.categories.set(config.multipleOptions.addressCategory[0], true);
                 }
                 else if (attribute === "postal") {

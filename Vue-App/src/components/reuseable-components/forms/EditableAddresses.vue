@@ -12,6 +12,7 @@
                 :isEditing="isEditing"
                 :class="['mb-2']"
                 @update-address="updateAddress"
+                @scroll-down="(distance) => $emit('scroll-down', distance)"
             />
         </div>
     </div>
@@ -25,7 +26,10 @@
     </div>
 
     <!-- indicator for no data being provided -->
-    <div v-if="!isDataAvailable && !isEditing" class="text-gradient text-dark">
+    <div 
+        v-if="!isDataAvailable && !isEditing"
+        class="text-gradient text-dark w-100 my-2 d-flex justify-content-center"
+    >
         -- {{ t('form.temporarily empty') }} --
     </div>
 </template>
@@ -40,7 +44,7 @@ export default {
     components: {
         AddressFields
     },
-    emits: ['update-form'],
+    emits: ['update-form', 'scroll-down'],
     props:{
         list:{
             type: [Array, null],
@@ -66,6 +70,7 @@ export default {
     },
     computed:{
         isDataAvailable(){
+            if (!this.list) return false;
             if (Array.isArray(this.list) && this.list.length === 0) return false;
             return true;
         },

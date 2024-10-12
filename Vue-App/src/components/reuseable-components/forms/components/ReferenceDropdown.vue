@@ -90,6 +90,7 @@ import { getIcon } from "@/utils/iconMapper.js";
 import serach from "@/api/search";
 import { generateSearchQueryWhereClause, mapDropdownSearchListingBody } from "@/utils/formatters";
 import Spinner from "@/components/reuseable-components/loader/Spinner.vue";
+import { config } from "@/config/config";
 
 export default {
     name: "ReferenceDropdown",
@@ -213,7 +214,7 @@ export default {
                                     this.isScrolledLoading = false;
                                     this.referenceListings.push(...response.results);
                                     this.currentPage = this.currentPage + 1;
-                                }, this.$store.state.loadingDelay);
+                                }, config.UI.loadingDelay);
                             }
                         }
                     })
@@ -224,7 +225,7 @@ export default {
                         if (type == "initialise") {
                             setTimeout(() => {
                                 this.isInitialisedLoading = false;
-                            }, this.$store.state.loadingDelay);
+                            }, config.UI.loadingDelay);
                         }
                     });
             }
@@ -239,10 +240,17 @@ export default {
                 // calculate the need to scroll to such position:
                 const sliderForm = document.querySelector(".slider-form");
                 if (sliderForm && this.$refs.referenceMenu) {
+
                     setTimeout(() => {
-                        this.$emit("scroll-down",
-                            this.$refs.referenceMenu.getBoundingClientRect().y - sliderForm.scrollTop);
-                    }, 400)
+                        const menuRect = this.$refs.referenceMenu.getBoundingClientRect();
+                        const toggleRect = this.$refs.referenceToggle.getBoundingClientRect();
+                        const wavyHeaderHeight = 140;
+                        const ExtraSpace = 60;
+
+                        // removing the header height, current scroll relative to the view port
+                        const scrollingAmount = menuRect.y - sliderForm.scrollTop - toggleRect.height - wavyHeaderHeight - ExtraSpace;
+                        this.$emit("scroll-down", scrollingAmount);
+                    }, config.UI.scrollDebounce);
                 }
             }
             // clear out the current serach mechanisms and records
@@ -260,7 +268,7 @@ export default {
         // function used to manage when the user input a new search value:
         onInputSearch: debounce(function () {
             this.fetchReferences("initialise");
-        }, 800),
+        }, config.UI.textDebouce),
 
         // function used to select an listing reference:
         selectReference(reference) {

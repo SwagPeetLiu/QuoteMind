@@ -25,7 +25,7 @@
         />
 
         <!-- indicator or no current selections -->
-        <p class="text-dark text-gradient font-weight-bold mt-n2" v-if="!isDataAvailable && !isEditing">
+        <p class="text-gradient text-dark w-100 my-2 d-flex justify-content-center" v-if="!isDataAvailable && !isEditing">
             -- {{ t('form.temporarily empty') }} --
         </p>
     </div>

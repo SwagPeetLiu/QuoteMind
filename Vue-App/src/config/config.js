@@ -63,6 +63,14 @@ const config = {
     passwordOverlay: '************',
     samePasswordIndicator: 'SameAsOld0517!',
 
+    // UI Reactiveness
+    UI:{
+        "textDebouce": 300,
+        "scrollDebounce": 400,
+        "textIncrementalDuration": 500,
+        "loadingDelay": 600
+    },
+
     // arbitrary order displayed to users on filtering elements
     arbitraryAttributeOrder:{
         "clients": ["id", "full_name", "phone", "qq_contact", "wechat_contact", "email", "company", "addresses"],

@@ -45,7 +45,6 @@ export default createStore({
     bootstrap,
 
     // async loading handles
-    loadingDelay: 600,
     errorMessage: "",
     toastMessage: { message: "", type: "" },
 
