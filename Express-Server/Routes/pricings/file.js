@@ -6,7 +6,12 @@ const {
     validateString,
     validateNumeric,
 } = require('../../utils/Validator');
-
+const { 
+    mapDefaultQueryColumns,
+    mapFromClause,
+    mapQueryPrefix
+ } = require('../../utils/Formatter');
+ 
 // scripts for determining and managing the pricing strategies to improve
 // the user experience on pricing automations
 module.exports = (db) => {
