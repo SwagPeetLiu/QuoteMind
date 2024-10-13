@@ -39,7 +39,7 @@
       <IncrementNumber 
         v-if="isCurrentRouteResourceful && isCurrentResourcesCounted" 
         :endValue="$store.state.searchTarget.counts"
-        :duration="$store.state.loadingDelay"
+        :duration="textIncrementalDuration"
       />
     </p>
   </nav>
@@ -49,6 +49,7 @@
 import { useI18n } from "vue-i18n";
 import { getIcon } from "@/utils/iconMapper.js";
 import IncrementNumber from "@/components/statistical-components/IncrementNumber.vue";
+import { config } from "@/config/config";
 
 export default {
   name: "breadcrumbs",
@@ -70,6 +71,9 @@ export default {
         return this.t(`routes.${category.toLowerCase()}`);
       }
       return "";
+    },
+    textIncrementalDuration() {
+      return config.UI.textIncrementalDuration;
     },
     currentPage() {
       const name = this.$route.name;

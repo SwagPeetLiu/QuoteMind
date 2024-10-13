@@ -108,8 +108,8 @@ import { mapMutations } from "vuex";
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
 import auth from "@/api/auth";
-import store from "@/store";
 import { inject } from 'vue';
+import { config } from "@/config/config";
 
 export default {
   name: "SignIn",
@@ -167,7 +167,7 @@ export default {
                 validity.value = false;
               }
             })
-        }, store.state.loadingDelay);
+        }, config.UI.loadingDelay);
       } else {
         validity.value = true;
       }

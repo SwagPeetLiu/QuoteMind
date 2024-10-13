@@ -77,6 +77,9 @@ export default {
             else if(this.target.includes("transaction")) {
                 return{ iconSize: 42, mt: 0, mb: 0, ml: 10, mr: 10 }
             }
+            else if (this.target.includes("address")) {
+                return { iconSize: 48, mt: 1, mb: 0, ml: 10, mr: 10 }
+            }
             else{
                 return{ iconSize: 40, mt: 2, mb: 0, ml: 10, mr: 10 }
             }

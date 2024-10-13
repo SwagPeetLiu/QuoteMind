@@ -5,7 +5,7 @@
             class="input-header d-flex align-items-center justify-content-start font-weight-bold"
             :class="[isEditing ? 'editing' : '']"
         >
-            <i :class="[icon, 'text-gradient me-2 my-0 text-lg', `text-${isEditing ? $store.state.themeColor : 'dark'}`]"></i>
+            <i :class="[icon, 'text-gradient me-2 my-0 text-lg text-dark', `${isEditing ? 'd-none' : ''}`]"></i>
             <span class="text-gradient text-dark my-0 text-lg">{{ t(`columns.${name}`) }}</span>
         </div>
 
@@ -19,13 +19,13 @@
                 v-if="isEditing" 
                 v-model="inputValue" :maxlength="inputUpperLimitations"
                 :placeholder="`${t('form.enter')}${t('columns.' + name)}`"
-                :class="{'is-invalid': !isValid}"
+                :class="{'is-invalid': !isValid && validationTips}"
+                @input="onInput"
             >
             </textarea>
 
-            <!-- invalid tooltips -->
             <!-- validation tooltip -->
-            <div v-if="isEditing" class="invalid-tooltip fs-7">
+            <div v-if="isEditing && validationTips" class="invalid-tooltip fs-7">
                 {{ validationTips }}
             </div>
 
@@ -38,8 +38,8 @@
                 <p v-if="value" class="text-dark text-gradient ms-1">
                     {{ value }}
                 </p>
-                <p v-else class="text-dark text-gradient ms-1">
-                    {{ t('form.temporarily empty') }}
+                <p v-else class="text-gradient text-dark w-100 mb-2 d-flex justify-content-center">
+                    -- {{ t('form.temporarily empty') }} -- 
                 </p>
             </SlideUpElement>
         </div>
@@ -52,6 +52,7 @@ import { useI18n } from "vue-i18n";
 import { useValidators } from '@/utils/useValidators';
 const { mapValidation } = useValidators();
 import SlideUpElement from "@/components/reuseable-components/styler/SlideUpElement.vue";
+import { debounce } from 'lodash';
 
 export default {
     name: "EditableDescriptions",
@@ -106,11 +107,22 @@ export default {
             return this.inputValue.length;
         }
     },
+    methods:{
+        onInput: debounce(function(){
+            const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
+            this.isValid = inputValidation.valid;
+            if (!this.isValid){
+                this.validationTips = inputValidation.message;
+            }
+            this.$emit("update-form", this.name, this.inputValue, this.isValid);
+        }, config.UI.textDebouce),
+    },
     watch:{
         formStatus(newValue, oldValue){
             // retur nto original value upon cancelling
             if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
+                this.isValid = true;
                 return this.$emit("update-form", this.name, this.originalValue, true);
             }
             // no need to clear it if this textarea is disabled
@@ -124,14 +136,6 @@ export default {
             if (newValue === "display" &&  oldValue === "saving"){
                 this.originalValue = this.value;
             }
-        },
-        inputValue(newValue){
-            const inputValidation = mapValidation(this.name, newValue, this.isRequired);
-            this.isValid = inputValidation.valid;
-            if (!this.isValid){
-                this.validationTips = inputValidation.message;
-            }
-            this.$emit("update-form", this.name, newValue, this.isValid);
         }
     },
     beforeMount(){

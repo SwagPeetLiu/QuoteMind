@@ -88,6 +88,7 @@
   width: 100%;
 
   .reference-toggle {
+    position: relative;
     height: 42px;
     width: 100%;
     display: flex;
@@ -100,6 +101,16 @@
     padding-left: 15px;
     padding-right: 15px;
     
+    .dropdown-label {
+      position: absolute;
+      background-color: $white;
+      padding-left: 3px;
+      padding-right: 3px;
+      z-index: 1;
+      scale: 0.78;
+      translate: -46px -14px;
+    }
+
     .toggle-arrow {
       transform: rotate(0deg);
       transition: transform 0.3s ease-in-out;
@@ -192,6 +203,14 @@
           border-radius: 0.3rem;
           position: relative;
           background-color: transparent;
+
+          span{
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
+            text-align: center;
+          }
 
           .tick-box{
             position: absolute;

@@ -13,7 +13,7 @@
                     </p>
                     <p class="mb-n1 font-weight-bolder h3 text-truncate">
                         <DotLoader :size="40" v-if="isLoading" />
-                        <IncrementNumber v-else :endValue="statsValue" :duration="500" />
+                        <IncrementNumber v-else :endValue="statsValue" :duration="textIncrementalDuration" />
                     </p>
                 </div>
 
@@ -31,6 +31,7 @@
 import counter from "@/api/counter";
 import DotLoader from '../reuseable-components/loader/DotLoader.vue';
 import IncrementNumber from "./IncrementNumber.vue";
+import { config } from "@/config/config";
 
 export default {
     name: "StatsCard",
@@ -82,6 +83,9 @@ export default {
         currentMainTheme() {
             const maintheme = this.$store.getters.getMainTheme;
             return `bg-gradient-${maintheme}`;
+        },
+        textIncrementalDuration(){
+            return config.UI.textIncrementalDuration;
         }
     },
     methods:{

@@ -334,7 +334,7 @@ export default{
                                 this.isScrolledLoading = false;
                                 this.entities.push(...response.results);
                                 this.currentPage += 1; // only update page once load was successful
-                            }, this.$store.state.loadingDelay);
+                            }, config.UI.loadingDelay);
                         }
                     }
                 })
@@ -352,7 +352,7 @@ export default{
                             //reset the need to refresh listings upon instance manipulations:
                             this.$store.commit("setRefreshListing", false);
                             
-                        }, this.$store.state.loadingDelay);
+                        }, config.UI.loadingDelay);
                     }
                 });
         },

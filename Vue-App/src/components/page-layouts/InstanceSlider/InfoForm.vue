@@ -78,6 +78,14 @@
                     />
 
                     <!-- addresses reference inputs -->
+                    <EditableAddresses
+                        v-if="mapFormSubmissionType(attribute) === 'addresses'"
+                        :list="formData[attribute].value"
+                        :isRequired="mapMandatory(attribute)"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
+                    />
                 </div>
             </div>
         </form>
@@ -85,7 +93,7 @@
 
     <!-- form controls -->
     <FadeInElement v-if="!isLoading && isDataAvailable">
-        <div class="slider-controls w-100 px-4 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end">
+        <div class="slider-controls w-100 px-3 my-0 gap-2 overflow-hidden d-flex align-items-center justify-content-end">
             <button 
                 v-if="formStatus === 'editing'" 
                 class="btn btn-secondary form-button" 
@@ -139,6 +147,7 @@ import EditableInfo from "@/components/reuseable-components/forms/EditableInfo.v
 import EditableDescriptions from "@/components/reuseable-components/forms/EditableDescriptions.vue";
 import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
 import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
+import EditableAddresses from "@/components/reuseable-components/forms/EditableAddresses.vue";
 
 export default {
     name: "InfoForm",
@@ -149,7 +158,8 @@ export default {
         Spinner,
         EditableDescriptions,
         EditableReference,
-        EditableReferenceList
+        EditableReferenceList,
+        EditableAddresses
     },
     props: {
         target: {
@@ -247,10 +257,12 @@ export default {
                     .then((response) => {
                         if (response.isCompleted) {
                             this.formStatus = "display";
+                            this.fetchData();
                             if (!this.$store.state.refreshListing) {
                                 this.$store.commit("setRefreshListing", true);
                             }
-                        } else {
+                        }
+                        else {
                             this.formStatus = "editing";
                         }
                     })

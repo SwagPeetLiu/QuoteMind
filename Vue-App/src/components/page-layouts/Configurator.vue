@@ -123,6 +123,7 @@ import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import auth from "@/api/auth";
 import languageDropDown from "@/components/reuseable-components/styler/languageDropDown.vue";
+import { config } from "@/config/config";
 
 export default {
   name: "configurator",
@@ -221,7 +222,7 @@ export default {
                 this.$store.commit("setErrorMessage", this.t('apiMessage.logout.failed'));
               }
             });
-        }, this.$store.state.loadingDelay);
+        }, config.UI.loadingDelay);
       }
     }
   },

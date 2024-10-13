@@ -70,6 +70,11 @@ function getIcon(target) {
             return "fa-solid fa-note-sticky";
         case "status":
             return "fa-solid fa-feather-pointed";
+        case "address":
+        case "addresses":
+            return "fa-solid fa-location-dot";
+        case "postal":
+            return "fa-solid fa-location-arrow";
 
         // user management
         case "email":
@@ -135,7 +140,6 @@ function getIcon(target) {
         case "privacy":
             return "fa-solid fa-shield-halved";
         
-
         // controls:
         case "search":
             return "fa-solid fa-magnifying-glass";
@@ -154,6 +158,8 @@ function getIcon(target) {
         case "cancel":
         case "close":
             return "fa-solid fa-xmark";
+        case "delete":
+            return "fa-solid fa-trash-can";
         case "switch":
             return "fa-solid fa-repeat";
         case "tick":

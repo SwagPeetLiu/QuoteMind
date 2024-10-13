@@ -1,8 +1,7 @@
 <template>
   <p 
     :class="inputClass" 
-    class="hide-scrollbar" 
-    style="white-space: nowrap; overflow: hidden; text-overflow: clip;" 
+    class="hide-scrollbar d-flex flex-wrap" 
     ref="line1Ref"
   >
       <span 

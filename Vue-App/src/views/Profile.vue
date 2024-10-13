@@ -165,7 +165,7 @@
                     <i 
                       class="my-0 h4 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
                       :class="[`text-${$store.state.themeColor}`, getIcon('setting menu')]">
-                    ></i>
+                    </i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Side Menu Fixed") }}</h6>
                   </div>
                   <div class="form-check form-switch">
@@ -180,7 +180,7 @@
                     <i 
                       class="my-0 h3 text-gradient fopnt-weight-bolder d-none d-sm-inline" 
                       :class="[`text-${$store.state.themeColor}`, getIcon('language')]">
-                    ></i>
+                    </i>
                     <h6 class="my-0 ms-3 h5">{{ t("configurator.Language") }}</h6>
                   </div>
                   <LanguageDropDown :class="['mt-3 ps-4']"/>

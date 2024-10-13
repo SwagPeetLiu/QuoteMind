@@ -1,8 +1,11 @@
 //Editable text inputs
 .editable-container {
     max-width: 100%;
-    text-overflow: clip;
-    white-space: nowrap;
+    text-wrap: normal;
+    word-wrap: break-word;
+    white-space: nowrap; 
+    overflow: wrap;
+    //overflow: clip;
 
     input {
         padding-left: 38px;
@@ -44,10 +47,10 @@
         // transitions to take difference spaces
         &.editing {
             position: absolute;
-            scale: 0.75;
+            scale: 0.82;
             z-index: 1;
             background-color: $white;
-            translate: 2px -15px;
+            translate: 8px -15px;
             padding-left: 3px;
             padding-right: 3px;
         }

@@ -20,8 +20,7 @@ const config = {
         Max_State_Length: 50,
         Min_Country_Length: 2,
         Max_Country_Length: 50,
-        Min_Postal_Length: 2,
-        Max_Postal_Length: 20,
+        Postal_Length: 6,
         Min_Name_Length: 1,
         Max_Name_Length: 50,
         Min_Social_Contact_Length: 4,
@@ -63,6 +62,14 @@ const config = {
     },
     passwordOverlay: '************',
     samePasswordIndicator: 'SameAsOld0517!',
+
+    // UI Reactiveness
+    UI:{
+        "textDebouce": 300,
+        "scrollDebounce": 400,
+        "textIncrementalDuration": 500,
+        "loadingDelay": 600
+    },
 
     // arbitrary order displayed to users on filtering elements
     arbitraryAttributeOrder:{
@@ -135,14 +142,16 @@ const config = {
             "dimensions": ["length", "width", "en_unit", "ch_unit", "size", "size_unit"],
             "client details": ["client", "company", "addresses"],
             "others": ["colour", "note", "employee"],
+        },
+        "address":{
+            "general": ["name", "address", "district", "city", "state", "postal", "category"],
         }
     },
 
     // categorical choices
     multipleOptions:{
         "status": ['created', 'quoted', 'paid'],
-        "addressCategory": ['delivery&install', 'bill', 'mail'],
-        
+        "addressCategory": ['delivery&install', 'bill', 'mail']
     },
     optionsColouring:{
         "status":{
@@ -161,6 +170,11 @@ const config = {
         "conditions":{
             "general": "primary",
             "individual": "info",
+        },
+        "addressCategory":{
+            "delivery&install": "primary",
+            "bill": "warning",
+            "mail": "info"
         }
     },
     units:{

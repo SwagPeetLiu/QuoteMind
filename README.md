@@ -14,7 +14,7 @@ front-end (classical SPA)
   - lodash -- efficient Javascription operations over Array, objects, functionatlies such as debouncing
   - vue3-storage -- to safely work with the local storage, session storage in the Vue context
   - crypto-js -- standard Encryption and Decryption for safely storing and retriveing persistant data (to accounter XSS-based attacks)
-
+  - China-location -- for Chinese Speicfied Addresses Searches
 
 
 back-end

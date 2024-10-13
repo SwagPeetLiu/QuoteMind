@@ -22,7 +22,7 @@ export function useValidators() {
         if (target === "textInput") {
             return isTextInputValid(value, required, "input");
         }
-        if (target === "descriptions" || target === "note"){
+        if (target === "descriptions" || target === "note" || target === "address"){
             return isTextInputValid(value, required, "descriptions");
         }
         if (target === "rangedDateInput") {
@@ -41,6 +41,9 @@ export function useValidators() {
         }
         if (target === "qq_contact" || target === "wechat_contact"){
             return isSocialValid(value, target, required);
+        }
+        if (target === "postal"){
+            return isPostalValid(value);
         }
         return { valid: true };
     }
@@ -358,6 +361,22 @@ export function useValidators() {
         return { valid: true };
     }
 
+    function isPostalValid(value){
+        if (value) {
+            if (typeof value !== "string") {
+                return { valid: false, message: `${t('columns.postal')}${t('others.space')}${t('validation.is invalid')}` };
+            }
+            if (!value.trim()) {
+                return { valid: false, message: `${t('columns.postal')}${t('others.space')}${t('validation.cannot be empty')}` };
+            }
+            if (value.trim().length !== config.limitations.Postal_Length) {
+                return { valid: false, message: `${t('columns.postal')}${t('others.space')}${t('validation.is invalid')}` };
+            }
+            return { valid: true };
+        }
+        return { valid: false };
+    }
+    
     return {
         mapValidation,
         isUsernameValid,

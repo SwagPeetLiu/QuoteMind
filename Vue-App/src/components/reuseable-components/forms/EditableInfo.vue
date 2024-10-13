@@ -1,31 +1,35 @@
 <template>
     <div 
-        class="d-flex align-items-center justify-content-start position-relative editable-container"
+        class="d-flex justify-content-start position-relative editable-container"
+        :class="[isEditing ? 'align-items-center' : 'align-items-start']"
     >
-        <!-- input icon -->
-        <i 
-            class="me-2 text-gradient input-icon" 
-            :class="
-                [
-                    icon, isEditing? 'editing': '', 
-                    isEditing? `text-${$store.state.themeColor}`: 'text-dark',
-                    size === 'large' ? 'text-2xl' : 'text-lg'
-                ]"
-        >
-        </i>
-        <!-- input label -->
-        <p 
-            class="me-2 me-3 my-0 font-weight-bold text-dark input-label"
-            :class="[isEditing ? 'editing': '', size === 'large' ? 'text-2xl' : 'text-lg']"
-        >
-            {{ t(`columns.${name}`) }}
-            <span v-if="!isEditing" class="ms-n1">:</span>
-        </p>
+        <div class="d-flex align-items-center my-0">
+            <!-- input icon -->
+            <i 
+                class="me-2 text-gradient input-icon" 
+                :class="
+                    [
+                        icon, isEditing? 'editing': '', 
+                        isEditing? `text-${$store.state.themeColor}`: 'text-dark',
+                        size === 'large' ? 'text-2xl' : 'text-lg'
+                    ]"
+            >
+            </i>
+            <!-- input label -->
+            <p 
+                class="me-2 me-1 my-0 font-weight-bold text-dark input-label"
+                :class="[isEditing ? 'editing': '', size === 'large' ? 'text-2xl' : 'text-lg']"
+            >
+                {{ t(`columns.${name}`) }}
+                <span v-if="!isEditing" class="ms-n1">:</span>
+            </p>
+        </div>
 
         <!-- current value -->
         <LoadInText 
             v-if="!isEditing && value" 
-            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`" 
+            :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`"
+            :style="{ paddingTop: `${size === 'large' ? '0' : '2px'}`}"
             :text="value"
             :spaceWidth="7" 
         />
@@ -37,13 +41,13 @@
             :class="{'is-invalid': !isValid}"
             :type="type" 
             :id="name" 
-            :required="isRequired"
             v-model="inputValue"
             :disabled="isDisabled"
+            @input="onInput"
         />
 
         <!-- validation tooltip -->
-        <div v-if="isEditing" class="invalid-tooltip fs-7">
+        <div v-if="isEditing && validationTips" class="invalid-tooltip fs-7">
             {{ validationTips }}
         </div>
     </div>
@@ -54,6 +58,8 @@ import { useI18n } from 'vue-i18n';
 import LoadInText from '@/components/reuseable-components/text/LoadInText.vue';
 import { useValidators } from '@/utils/useValidators';
 const { mapValidation } = useValidators();
+import { debounce } from 'lodash';
+import { config } from '@/config/config';
 
 export default {
     name: "EditableInfo",
@@ -72,7 +78,6 @@ export default {
         value: {
             type: String,
             required: true,
-            default: "InputValue",
         },
         type: {
             type: String,
@@ -111,6 +116,7 @@ export default {
             // allow cancelling when the form is in editing mode
             if (newValue === "cancel"){
                 this.inputValue = this.originalValue;
+                this.isValid = true;
                 return this.$emit("update-form", this.name, this.originalValue, true);
             }
             if (newValue === "saving" || newValue === "editing"){
@@ -125,20 +131,24 @@ export default {
                 this.originalValue = this.value;
             }
         },
-        // changing inputs when the form is in editing mode
-        inputValue(newValue){
-            const inputValidation = mapValidation(this.name, newValue, this.isRequired);
-            this.isValid = inputValidation.valid;
-            if (!this.isValid){
-                this.validationTips = inputValidation.message;
-            }
-            this.$emit("update-form", this.name, newValue, this.isValid);
-        }
     },
     computed:{
         isEditing(){
             return this.formStatus == "editing" || this.formStatus == "saving";
         }
+    },
+    methods:{
+        onInput: debounce(function(){
+            const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
+            this.isValid = inputValidation.valid;
+            if (!this.isValid){
+                this.validationTips = inputValidation.message;
+            }
+            else{
+                this.validationTips = "";
+            }
+            this.$emit("update-form", this.name, this.inputValue, this.isValid);
+        }, config.UI.textDebouce),
     },
     beforeMount(){
         this.originalValue = this.value;

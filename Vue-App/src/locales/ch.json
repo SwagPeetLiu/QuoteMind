@@ -141,7 +141,8 @@
     "rules": "金额规则",
     "pricing_rules": "定价金额",
     "pricing_conditions": "定价条件",
-    "transactions": "交易"
+    "transactions": "交易",
+    "address": "地址"
   },
   "dialog": {
     "error title": "请注意：",
@@ -262,7 +263,8 @@
     "cancel": "取消",
     "enter": "输入您的",
     "select": "请选择",
-    "temporarily empty": "暂未提供"
+    "temporarily empty": "暂未提供",
+    "add": "添加"
   },
   "units":{
     "transactionUnit": "笔"
@@ -311,7 +313,13 @@
     "transaction details": "交易详情",
     "conditions": "定价条件",
     "listed_conditions": "定价条件",
-    "category": "类别"
+    "category": "类别",
+    "address":"详细地址",
+    "district":"城区",
+    "city":"城市",
+    "state":"省份",
+    "country":"国家",
+    "postal":"邮编"
   },
   "detailedListings":{
     "general": "基本信息",
