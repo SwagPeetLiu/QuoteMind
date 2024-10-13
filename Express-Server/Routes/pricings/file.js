@@ -13,6 +13,22 @@ module.exports = (db) => {
     
     // manipulations on the records of pricing conditions
     router.route("/conditions/:id")
+        .get(async (req, res) => {
+            const owner = req.sessionEmail;
+            const id = req.params.id;
+            let query = "SELECT";
+            try{
+                query += ` ${mapDefaultQueryColumns("pricing_conditions", true)}`;
+                query += ` ${mapFromClause("pricing_conditions")}`;
+                query += ` WHERE ${mapQueryPrefix("pricing_conditions")}.id = $1 AND ${mapQueryPrefix("pricing_conditions")}.created_by = $2;`;
+                const condition = await db.oneOrNone(query, [id, owner]);
+                return res.status(200).json({ condition: condition });
+            }
+            catch (err) {
+                console.error(err);
+                return res.status(500).json({ condition: null, message: "failed to fetch condition" });
+            }
+        })
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
@@ -87,6 +103,22 @@ module.exports = (db) => {
 
     // manipulations on a specific record of pricing rule
     router.route("/rules/:id")
+        .get(async (req, res) => {
+            const owner = req.sessionEmail;
+            const id = req.params.id;
+            let query = "SELECT";
+            try{
+                query += ` ${mapDefaultQueryColumns("pricing_rules", true)}`;
+                query += ` ${mapFromClause("pricing_rules")}`;
+                query += ` WHERE ${mapQueryPrefix("pricing_rules")}.id = $1 AND ${mapQueryPrefix("pricing_rules")}.created_by = $2;`;
+                const rule = await db.oneOrNone(query, [id, owner]);
+                return res.status(200).json({ rule: rule });
+            }
+            catch (err) {
+                console.error(err);
+                return res.status(500).json({ rule: null, message: "failed to fetch rule" });
+            }
+        })
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
