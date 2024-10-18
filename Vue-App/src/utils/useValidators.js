@@ -54,7 +54,7 @@ export function useValidators() {
             return isNumberValid(value, false);
         }
         else{
-            return isTextInputValid(value, required, "input"); 
+            return isTextInputValid(value, false, "input"); 
         }
     }
 
@@ -145,6 +145,11 @@ export function useValidators() {
 
     // general string based validations
     function isTextInputValid(textInput, required, textType = 'input') {
+        // if null and not required, then ignore
+        if (textInput == null && !required) {
+            return { valid: true };
+        }
+
         // if text is the wrong type
         if (textInput && typeof textInput !== 'string') {
             return {
@@ -152,6 +157,7 @@ export function useValidators() {
                 message: `${t('validation.input value')}${t('validation.cannot be empty')}`
             };
         }
+
         // if text is required but no value is provided
         if (required && !textInput.trim()) {
             return {
@@ -159,19 +165,26 @@ export function useValidators() {
                 message: `${t('validation.input value')}${t('validation.cannot be empty')}`
             };
         }
-        else if (!unicodeRegex.test(textInput)) {
-            return {
-                valid: false,
-                message: `${t('validation.input value')}${t('validation.is invalid')}`
-            };
-        }
-        else if (
-            textInput.length > (textType == 'input' ? config.limitations.Max_Name_Length : config.limitations.Max_Descriptions_Length)
-        ) {
-            return {
-                valid: false,
-                message: `${t('validation.input value')}${t('validation.too long')}`
-            };
+        
+        // testing non-empty string
+        if (textInput.trim()){
+            if (!unicodeRegex.test(textInput)) {
+                return {
+                    valid: false,
+                    message: `${t('validation.input value')}${t('validation.is invalid')}`
+                };
+            }
+            else if (
+                textInput.length > (textType == 'input' ? config.limitations.Max_Name_Length : config.limitations.Max_Descriptions_Length)
+            ) {
+                return {
+                    valid: false,
+                    message: `${t('validation.input value')}${t('validation.too long')}`
+                };
+            }
+            else {
+                return { valid: true };
+            }
         }
         else {
             return { valid: true };

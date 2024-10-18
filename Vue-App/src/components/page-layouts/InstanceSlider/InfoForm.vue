@@ -98,6 +98,16 @@
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                     />
+
+                    <!-- Individual Specific condition control field -->
+                    <EditableClientCondition
+                        v-if="mapFormSubmissionType(attribute) === 'client condition'"
+                        :client="formData['client'].value"
+                        :company="formData['company'].value"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
+                    />
                 </div>
             </div>
         </form>
@@ -162,6 +172,7 @@ import EditableReference from "@/components/reuseable-components/forms/EditableR
 import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
 import EditableAddresses from "@/components/reuseable-components/forms/EditableAddresses.vue";
 import EditableNumericalCondition from "@/components/reuseable-components/forms/EditableNumericalCondition.vue";
+import EditableClientCondition from "@/components/reuseable-components/forms/EditableClientCondition.vue";
 
 export default {
     name: "InfoForm",
@@ -174,7 +185,8 @@ export default {
         EditableReference,
         EditableReferenceList,
         EditableAddresses,
-        EditableNumericalCondition
+        EditableNumericalCondition,
+        EditableClientCondition
     },
     props: {
         target: {

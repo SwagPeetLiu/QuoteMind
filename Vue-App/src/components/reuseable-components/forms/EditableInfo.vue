@@ -150,7 +150,12 @@ export default {
                 }
             }
             else{
-                validateValue = this.inputValue;
+                if (this.inputValue.trim() === ""){
+                    validateValue = null;
+                }
+                else{
+                    validateValue = this.inputValue.trim();
+                }
             }
 
             // map out the input validations

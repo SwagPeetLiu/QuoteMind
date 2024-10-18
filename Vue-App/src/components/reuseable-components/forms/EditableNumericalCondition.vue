@@ -21,7 +21,7 @@
         </SlideUpElement>
 
         <!-- Editing Mode -->
-        <div class="w-100 d-flex flex-wrap align-items-center mb-2" v-if="isEditing">
+        <div class="w-100 d-flex flex-wrap align-items-center" v-if="isEditing">
             <!-- Dropdowns for numerical condition on quantity and size -->
             <div class="w-50 h-100 mb-3 pe-1">
                 <GeneralDropdown
@@ -88,7 +88,7 @@
 
             <!-- showing what the condition will look like -->
             <div class="w-100 d-flex align-items-center text-gradient text-dark mb-1">
-                <P>{{ t('form.generated condition as follows') }}</P>
+                <p>{{ t('form.generated condition as follows') }}</p>
             </div>
             <div class="w-100 d-flex align-items-center justify-content-center text-gradient text-dark mt-n2">
                 <span class="mt-n4 me-2">{{ $i18n.locale === 'en' ? '"' : '“' }}</span>
@@ -247,7 +247,46 @@ export default {
             else{
                 this.$emit("update-form", target, value, isValid);
             }
+        },
+        revertoOriginal(){
+            this.isValid = true;
+            this.$emit("update-form", "quantity", this.originalQuantity, true);
+            this.$emit("update-form", "quantity_unit", this.originalQuantityUnit, true);
+            this.$emit("update-form", "size", this.originalSize, true);
+            this.$emit("update-form", "size_unit", this.originalSizeUnit, true);
+            this.$emit("update-form", "threshold", this.originalThreshold, true);
         }
+    },
+    watch:{
+        formStatus(newValue, oldValue){
+            // allow cancelling when the form is in editing mode
+            if (newValue === "cancel"){
+                this.revertoOriginal();
+                return;
+            }
+            // direct submission if the input is disabled
+            if (newValue === "saving" || newValue === "editing"){
+                if (this.isDisabled){
+                    this.revertoOriginal();
+                    return;
+                }
+            }
+            // upon successful udpates, update its original value
+            if (newValue === "display" &&  oldValue === "saving"){
+                this.originalQuantity = this.quantity;
+                this.originalQuantityUnit = this.quantityUnit;
+                this.originalSize = this.size;
+                this.originalSizeUnit = this.sizeUnit;
+                this.originalThreshold = this.threshold;
+            }
+        },
+    },
+    beforeMount(){
+        this.originalQuantity = this.quantity;
+        this.originalQuantityUnit = this.quantityUnit;
+        this.originalSize = this.size;
+        this.originalSizeUnit = this.sizeUnit;
+        this.originalThreshold = this.threshold;
     }
 }
 </script>

@@ -20,7 +20,7 @@
                     }}
                 </span>
                 <i v-if="isSelectionConfirmed" :class="getIcon('cancel')"
-                    class="clear-button cursor-pointer ms-2 text-sm" @click.stop.prevent="clearReference()">
+                    class="clear-button cursor-pointer mx-2 text-sm" @click.stop.prevent="clearReference()">
                 </i>
             </p>
 

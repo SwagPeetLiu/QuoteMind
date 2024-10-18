@@ -558,11 +558,27 @@ function reverseFormatData(data) {
     const result = {};
     for (const [key, value] of Object.entries(data)) {
 
+        // handling reference field selection
         if (mapFormSubmissionType(key) === "single reference") {
             if (value.value) { // if reference exists, assign id
                 result[key] = value.value.id;
             }
             else{
+                result[key] = null;
+            }
+        }
+
+        // handle the spcial case of material listings where the only value would need is id:
+        else if (key === "materials") {
+            if (value.value) {
+                result[key] = [];
+                for (const material of value.value) {
+                    if (material.message !== "delete"){ // only keep those that are not being deleted
+                        result[key].push(material.id);
+                    }
+                }
+            }
+            else{ // null if current update is irrelevant to the materials field
                 result[key] = null;
             }
         }
