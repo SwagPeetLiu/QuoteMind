@@ -22,7 +22,7 @@
                 <div 
                     v-for="(attribute, index) in detailedListings[section]" 
                     :key="index"
-                    class="w-100 px-1 mt-2"
+                    class="w-100 px-1 mt-1"
                 >
                     <!-- ordinary input field -->
                     <EditableInfo
@@ -50,14 +50,14 @@
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                     />
-
+                    
                     <!-- reference input field -->
                     <EditableReference
                         v-if="mapFormSubmissionType(attribute) === 'single reference'"
                         :icon="getIcon(attribute)"
                         :target="attribute"
                         :id="formData[attribute].value ? formData[attribute].value.id : null"
-                        :name="formData[attribute].value? formData[attribute].value[getRecordName(target, $i18n.locale)]: null"
+                        :name="formData[attribute].value? formData[attribute].value[getRecordName(attribute, $i18n.locale)]: null"
                         :isDisabled="mapDisabled(attribute, $i18n.locale)"
                         :isRequired="mapMandatory(attribute)"
                         :formStatus="formStatus"
@@ -85,6 +85,18 @@
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                         @scroll-down="scrollDown"
+                    />
+
+                    <!-- Unit based numerical input field -->
+                    <EditableNumericalCondition
+                        v-if="mapFormSubmissionType(attribute) === 'numerical threshold'"
+                        :quantity="formData['quantity'].value? formData['quantity'].value : null"
+                        :quantityUnit="formData[getRecordUnit('quantity', $i18n.locale)].value ? formData[getRecordUnit('quantity', $i18n.locale)].value : null"
+                        :size="formData['size'].value? formData['size'].value : null"
+                        :sizeUnit="formData[getRecordUnit('size', $i18n.locale)].value ? formData[getRecordUnit('size', $i18n.locale)].value : null"
+                        :threshold="formData['threshold'].value"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
                     />
                 </div>
             </div>
@@ -131,6 +143,7 @@
 import { getIcon } from "@/utils/iconMapper.js";
 import { 
     getRecordName,
+    getRecordUnit,
     mapFormData, 
     reverseFormatData, 
     mapFormSubmissionType, 
@@ -148,6 +161,7 @@ import EditableDescriptions from "@/components/reuseable-components/forms/Editab
 import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
 import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
 import EditableAddresses from "@/components/reuseable-components/forms/EditableAddresses.vue";
+import EditableNumericalCondition from "@/components/reuseable-components/forms/EditableNumericalCondition.vue";
 
 export default {
     name: "InfoForm",
@@ -159,7 +173,8 @@ export default {
         EditableDescriptions,
         EditableReference,
         EditableReferenceList,
-        EditableAddresses
+        EditableAddresses,
+        EditableNumericalCondition
     },
     props: {
         target: {
@@ -205,6 +220,7 @@ export default {
         mapMandatory,
         mapFormSubmissionType,
         mapDisabled,
+        getRecordUnit,
 
         // scroll down if elements are dropping down
         scrollDown(amount) {
@@ -277,6 +293,7 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
+            console.log("validateInputUpdate", name, value, isValid);
         }
     },
     mounted() {

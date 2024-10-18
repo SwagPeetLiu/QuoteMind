@@ -45,7 +45,17 @@ export function useValidators() {
         if (target === "postal"){
             return isPostalValid(value);
         }
-        return { valid: true };
+        if (target === "quantity"){
+            return isIntegerValid(value, true);
+        }
+        if (target === "price_per_unit" || target === "amount" || target === "size"
+            || target === "length" || target === "width" || target === "height"
+        ){
+            return isNumberValid(value, false);
+        }
+        else{
+            return isTextInputValid(value, required, "input"); 
+        }
     }
 
     function isUsernameValid(username) {
@@ -375,6 +385,55 @@ export function useValidators() {
             return { valid: true };
         }
         return { valid: false };
+    }
+
+    function isIntegerValid(value, required = false) {
+        if (value) {
+            if (typeof value === 'number'){
+                if (Number.isInteger(value)) {
+                    if (value < config.limitations.MIN_NUMBER) {
+                        return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too small')}`};
+                    }
+                    else if (value > config.limitations.MAX_NUMBER) {
+                        return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too large')}`};
+                    }
+                    else{
+                        return { valid: true };
+                    }
+                }
+                else{
+                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
+                }
+            }
+            else{
+                return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
+            }
+        }
+        else{
+            return { valid: required ? false : true, message: `${t('validation.cannot be empty')}`};
+        }
+    }
+
+    function isNumberValid(value, required = false){
+        if (value) {
+            if (typeof value === 'number'){
+                if (value < config.limitations.MIN_NUMBER) {
+                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too small')}`};
+                }
+                else if (value > config.limitations.MAX_NUMBER) {
+                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too large')}`};
+                }
+                else{
+                    return { valid: true };
+                }
+            }
+            else{
+                return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
+            }
+        }
+        else{
+            return { valid: required ? false : true, message: `${t('validation.cannot be empty')}`};
+        }
     }
     
     return {

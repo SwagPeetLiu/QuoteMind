@@ -155,6 +155,8 @@
     "cannot be empty": "不能填空",
     "too short": "过短",
     "too long": "过长",
+    "too small": "过小",
+    "too large": "过大",
     "has incomplete information": "不全",
     "is invalid": "无效",
     "must be selected": "必须选择",
@@ -264,7 +266,8 @@
     "enter": "输入您的",
     "select": "请选择",
     "temporarily empty": "暂未提供",
-    "add": "添加"
+    "add": "添加",
+    "generated condition as follows": "生成条件如下:"
   },
   "units":{
     "transactionUnit": "笔"
@@ -328,6 +331,7 @@
     "addresses": "地址",
     "assigned position": "岗位",
     "pricing product": "定价产品",
+    "pricing materials": "应用材质",
     "condition": "定价条件",
     "individual specific": "个体定价",
     "listed_conditions": "所需条件",
@@ -370,6 +374,14 @@
       "delivery&install": "收货",
       "bill": "账单",
       "mail": "邮寄"
+    },
+    "threshold":{
+      "=": "等于",
+      ">": "大于",
+      ">=": "大于或等于",
+      "<": "小于",
+      "<=": "小于或等于",
+      "≠": "不等于"
     }
   },
   "others":{

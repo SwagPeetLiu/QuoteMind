@@ -28,15 +28,15 @@
         <!-- materials -->
         <div 
             v-if="isMaterialsAvailable" 
-            class="d-flex flex-wrap align-items-center materials-container mt-0 mb-1 ms-n2"
+            class="d-flex flex-wrap align-items-center references-container mt-0 mb-1 ms-n2"
         >
-            <span
+            <div
                 v-for="(material, index) in materials"
                 :key="index"
                 class="text-gradient text-dark ms-2 mt-1"
             >
-                {{ material[getRecordName('material', $i18n.locale)] }}
-            </span>
+                <p>{{ material[getRecordName('material', $i18n.locale)] }}</p>
+            </div>
         </div>
 
         <!-- client -->

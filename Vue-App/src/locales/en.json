@@ -153,6 +153,8 @@
     "cannot be empty": "cannot be empty",
     "too short": "too short",
     "too long": "too long",
+    "too small": "too small",
+    "too large": "too large",
     "has incomplete information": "has incomplete information",
     "is invalid": "is invalid",
     "must be selected": "must be selected",
@@ -261,7 +263,8 @@
     "enter": "Enter Your ",
     "select": "Please Select",
     "temporarily empty": "Currently Unprovided",
-    "add": "Add"
+    "add": "Add",
+    "generated condition as follows": "Generated Condition as follows:"
   },
   "units":{
     "transactionUnit": ""
@@ -325,6 +328,7 @@
     "addresses": "Addresses",
     "assigned position": "Assigned Position",
     "pricing product": "Pricing Product",
+    "pricing materials": "Applied Materials",
     "condition": "Pricing Condition",
     "individual specific": "Individuals",
     "listed_conditions": "Combinational Conditions",
@@ -367,6 +371,14 @@
       "delivery&install": "Delivery & Installation",
       "bill": "Bill",
       "mail": "Mail"
+    },
+    "threshold":{
+      "=": "equals",
+      ">": "greater than",
+      ">=": "greater than or equal to",
+      "<": "less than",
+      "<=": "less than or equal to",
+      "≠": "not equal to"
     }
   },
   "others":{

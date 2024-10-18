@@ -39,7 +39,6 @@
             v-if="isEditing" 
             class="form-control overflow-hidden border border-2 border-dark"
             :class="{'is-invalid': !isValid}"
-            :type="type" 
             :id="name" 
             v-model="inputValue"
             :disabled="isDisabled"
@@ -76,7 +75,7 @@ export default {
             default: "username",
         },
         value: {
-            type: String,
+            type: [String, Number, null],
             required: true,
         },
         type: {
@@ -104,7 +103,7 @@ export default {
         const { t } = useI18n({});
 
         return {
-            inputValue: this.value,
+            inputValue: this.value ? this.value : "",
             originalValue: "",
             isValid: true,
             validationTips: "",
@@ -139,15 +138,32 @@ export default {
     },
     methods:{
         onInput: debounce(function(){
-            const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
+            // validating value based on the type
+            let validateValue;
+            if (this.type == "number"){
+                try{
+                    validateValue = Number(this.inputValue);
+                }
+                catch(error){
+                    console.error(error, this.inputValue);
+                    validateValue = this.inputValue
+                }
+            }
+            else{
+                validateValue = this.inputValue;
+            }
+
+            // map out the input validations
+            const inputValidation = mapValidation(this.name, validateValue, this.isRequired);
             this.isValid = inputValidation.valid;
+            
             if (!this.isValid){
                 this.validationTips = inputValidation.message;
             }
             else{
                 this.validationTips = "";
             }
-            this.$emit("update-form", this.name, this.inputValue, this.isValid);
+            this.$emit("update-form", this.name, validateValue, this.isValid);
         }, config.UI.textDebouce),
     },
     beforeMount(){

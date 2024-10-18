@@ -307,6 +307,19 @@ function getRecordName(target, locale){
     }
 }
 
+// function used to map numerical records' unit attribute:
+function getRecordUnit(target, locale){
+    if (target === "quantity" || target === "size"){
+        return `${target}_unit`;
+    }
+    else if(target === "width" || target === "length" || target === "height"){
+        return `${locale}_unit`;
+    }
+    else{
+        return "unit";
+    }
+}
+
 // function used to map out the displaying column type in general listings
 function mapColumnType(column){
     if (
@@ -369,6 +382,10 @@ function mapFormSubmissionType(column){
     else if (column === "price_per_unit" || column === "amount"){
         return "monetary number";
     }
+    // customised form input will be managed individually in different components
+    else if (column === "numerical threshold" || column === "client condition"){
+        return column;
+    }
     else if(column.includes("date")){
         return "date";
     }
@@ -382,10 +399,16 @@ function mapFormSubmissionType(column){
 }
 
 // function used to determine if certain column is mandatory upon form submissions
-function mapMandatory(column){
+function mapMandatory(column, table = null){
     // if column is non-essential values:
     if (column === "id" || column.includes("name")){
         return true;
+    }
+    if (column === "quantity"){
+        return table === "transactions" ? true : false;
+    }
+    if (column === 'size'){
+        return table === "transactions" ? true : false;
     }
     return false;
 }
@@ -488,7 +511,7 @@ function mapThresholdOperator(operator) {
         case "eq":
             return "=";
         case "ne":
-            return "!=";
+            return "≠";
         case "lt":
             return "<";
         case "gt":
@@ -497,6 +520,24 @@ function mapThresholdOperator(operator) {
             return "<=";
         case "ge":
             return ">=";
+        default:
+            return null;
+    }
+}
+function reverseThresholdOperator(operator) {
+    switch (operator) {
+        case "=":
+            return "eq";
+        case "!=":
+            return "ne";
+        case "<":
+            return "lt";
+        case ">":
+            return "gt";
+        case "<=":
+            return "le";
+        case ">=":
+            return "ge";
         default:
             return null;
     }
@@ -547,6 +588,7 @@ module.exports = {
     formatDate,
     mappIndicator,
     getRecordName,
+    getRecordUnit,
     mapColumnType,
     getTargetImage,
     getSortImage,
@@ -554,6 +596,7 @@ module.exports = {
     mapDefaultDimensions,
     mapDimensionUnitToSizeUnit,
     mapThresholdOperator,
+    reverseThresholdOperator,
     mapFormData,
     reverseFormatData,
     mapFormSubmissionType,

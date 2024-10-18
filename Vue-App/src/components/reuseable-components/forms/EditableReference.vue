@@ -9,7 +9,7 @@
             :id="id"
             :theme="'dark'"
             :target="target"
-            :class="['ms-n1', 'mt-n1']"
+            :class="['ms-n1', 'mt-n1', 'mb-2']"
         />
 
         <!-- reference dropdown -->
