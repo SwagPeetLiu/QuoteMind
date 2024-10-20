@@ -75,6 +75,8 @@ function getIcon(target) {
             return "fa-solid fa-location-dot";
         case "postal":
             return "fa-solid fa-location-arrow";
+        case "unit":
+            return "fa-brands fa-unity";
 
         // user management
         case "email":

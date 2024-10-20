@@ -3,7 +3,7 @@
     max-width: 100%;
     text-wrap: normal;
     word-wrap: break-word;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: wrap;
     //overflow: clip;
 
@@ -40,8 +40,8 @@
 // editable-descriptions
 .editable-descriptions {
     width: 100%;
-    
-    .input-header{
+
+    .input-header {
         transition: all 0.3s ease;
 
         // transitions to take difference spaces
@@ -70,9 +70,10 @@
         &.editing {
             height: 200px;
         }
-        &.invalid{
+
+        &.invalid {
             margin-bottom: 30px;
         }
     }
-    
+
 }

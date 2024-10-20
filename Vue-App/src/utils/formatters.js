@@ -322,6 +322,15 @@ function mapSearchTable(target) {
     }
 }
 
+// function used to map the instance route from the back-end:
+function mapInstanceRoute(target) {
+    let route = target;
+    if (target == "pricing_rules" || target == "pricing_conditions") {
+        route = "pricings/";
+        route += target.split("_")[1];
+    }
+    return route;
+}
 
 module.exports= {
     getYearlyTransactionCountsBody,
@@ -331,5 +340,6 @@ module.exports= {
     generateOrderByClause,
     mapGeneralListingBody,
     mapDropdownSearchListingBody,
-    mapSearchTable
+    mapSearchTable,
+    mapInstanceRoute
 }

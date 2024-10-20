@@ -30,7 +30,9 @@ const config = {
         Min_Token_Length: 5,
         Max_Token_Length: 165,
         MAX_ADDRESS_CATEGORY_LENGTH: 3,
-        MAX_YEAR_RELEVANCY: 5
+        MAX_YEAR_RELEVANCY: 5,
+        MIN_NUMBER: 0,
+        MAX_NUMBER: 10000000
     },
     search: {
         pageSize: 15,
@@ -125,8 +127,9 @@ const config = {
         },
         "pricing_conditions": {
             "pricing product": ["product"],
-            "condition": ["quantity", "quantity_unit", "size", "size_unit", "colour", "materials"], // later using threshold to match
-            "individual specific": ["client", "company"],
+            "pricing materials": ["materials"],
+            "condition": ["numerical threshold", "colour"],
+            "individual specific": ["client condition"],
         },
         "pricing_rules": {
             "general": ["price_per_unit"],
@@ -151,7 +154,8 @@ const config = {
     // categorical choices
     multipleOptions:{
         "status": ['created', 'quoted', 'paid'],
-        "addressCategory": ['delivery&install', 'bill', 'mail']
+        "addressCategory": ['delivery&install', 'bill', 'mail'],
+        "threshold": ["=", ">", ">=", "<", "<=", "≠"],
     },
     optionsColouring:{
         "status":{
@@ -177,9 +181,15 @@ const config = {
             "mail": "info"
         }
     },
+    defaultValue:{
+        "size": 1,
+        "quantity": 100
+    },
     units:{
         "defaultSize": "m²",
         "defaultDiemsion": "mm",
+        "defaultQuantityENUnit": "units",
+        "defaultQuantityCHUnit": "个",
         "diemsion": ["m","cm","mm"],
         "size": ["m²","cm²","mm²","cun","inch"],
     }

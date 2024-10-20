@@ -100,15 +100,22 @@
     font-size: 0.9rem;
     padding-left: 15px;
     padding-right: 15px;
+    p,span{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     
     .dropdown-label {
       position: absolute;
+      scale: 0.82;
+      z-index: 1;
       background-color: $white;
+      left: 10px;
+      top: -16px;
       padding-left: 3px;
       padding-right: 3px;
-      z-index: 1;
-      scale: 0.78;
-      translate: -46px -14px;
+      padding-top: 0;
     }
 
     .toggle-arrow {
@@ -122,6 +129,7 @@
     display: block;
     position: absolute;
     width: calc(100% - 8px);
+    min-width: 150px;
     margin-left: 4px;
     margin-right: 4px;
     background-color: $white;
