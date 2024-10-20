@@ -58,14 +58,12 @@ describe("/pricings testing", () => {
             ...pricingConditionObject,
             validTestingObject: {
                 ...pricingConditionObject.validTestingObject,
-                product: existingProduct.id,
                 materials: [exsitingMaterial.id],
                 client: existingClient.id,
                 company: existingCompany.id
             },
             updateTestingObject: {
                 ...pricingConditionObject.updateTestingObject,
-                product: existingProduct.id,
                 materials: [exsitingMaterial.id],
                 client: existingClient.id,
                 company: existingCompany.id
@@ -75,10 +73,12 @@ describe("/pricings testing", () => {
             ...pricingRuleObject,
             validTestingObject: {
                 ...pricingRuleObject.validTestingObject,
+                product: existingProduct.id,
                 conditions: [existingPricingCondition.id]
             },
             updateTestingObject: {
                 ...pricingRuleObject.updateTestingObject,
+                product: existingProduct.id,
                 conditions: [existingPricingCondition.id]
             }
         };

@@ -4,7 +4,7 @@ const {
     validatePricingThreshold,
     validateInstances,
     validateString,
-    validateNumeric,
+    validateNumeric
 } = require('../../utils/Validator');
 const { 
     mapDefaultQueryColumns,
@@ -37,7 +37,7 @@ module.exports = (db) => {
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
-            const {quantity, size, size_unit, quantity_unit,colour, threshold, materials, product, client, company} = req.body;
+            const {quantity, size, size_unit, quantity_unit,colour, threshold, materials, client, company} = req.body;
             try{
                 await db.none(`
                     UPDATE public.pricing_conditions
@@ -49,12 +49,11 @@ module.exports = (db) => {
                         colour = $5,
                         threshold = $6,
                         materials = $7::uuid[],
-                        product = $8::uuid,
-                        client = $9::uuid,
-                        company = $10::uuid
-                    WHERE id = $11
-                    AND created_by = $12
-                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, id, owner]);
+                        client = $8::uuid,
+                        company = $9::uuid
+                    WHERE id = $10
+                    AND created_by = $11
+                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, client, company, id, owner]);
                 return res.status(200).json({ message: "condition updated successfully" });
             }
             catch (err) {
@@ -64,16 +63,15 @@ module.exports = (db) => {
         })
         .post(async (req, res) => {
             const owner = req.sessionEmail;
-            const id = req.params.id;
-            const {quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company} = req.body;
+            const {quantity, size, size_unit, quantity_unit, colour, threshold, materials, client, company} = req.body;
             try{
                 const condition = await db.oneOrNone(`
                     INSERT INTO public.pricing_conditions
-                    (quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, created_by)
+                    (quantity, size, size_unit, quantity_unit, colour, threshold, materials, client, company, created_by)
                     VALUES
-                    ($1, $2, $3, $4, $5, $6, $7::uuid[], $8::uuid, $9::uuid, $10::uuid, $11)
+                    ($1, $2, $3, $4, $5, $6, $7::uuid[], $8::uuid, $9::uuid, $10)
                     RETURNING id
-                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, product, client, company, owner]);
+                `, [quantity, size, size_unit, quantity_unit, colour, threshold, materials, client, company, owner]);
                 return res.status(200).json({ id: condition.id, message: "condition created successfully" });
             }
             catch (err) {
@@ -86,7 +84,7 @@ module.exports = (db) => {
             const id = req.params.id;
             try{
                 await db.tx(async (transaction) => {
-                    // deleting the condition from the pricing rules:
+                    // delete the related pricing rules to ensure the integrity of the pricings:
                     transaction.none(`DELETE FROM public.pricing_rules
                         WHERE created_by = $1
                         AND EXISTS (
@@ -127,16 +125,17 @@ module.exports = (db) => {
         .put(async (req, res) => {
             const owner = req.sessionEmail;
             const id = req.params.id;
-            const {price_per_unit, conditions} = req.body;
+            const {product, price_per_unit, conditions} = req.body;
             try{
                 await db.none(`
                     UPDATE public.pricing_rules
                     SET
-                        price_per_unit = $1,
-                        conditions = $2::UUID[]
-                    WHERE id = $3
-                    AND created_by = $4
-                `, [price_per_unit, conditions, id, owner]);
+                        product = $1::UUID,
+                        price_per_unit = $2,
+                        conditions = $3::UUID[]
+                    WHERE id = $4
+                    AND created_by = $5
+                `, [product, price_per_unit, conditions, id, owner]);
                 return res.status(200).json({ message: "rule updated successfully" });
             }
             catch (err) {
@@ -146,16 +145,15 @@ module.exports = (db) => {
         })
         .post(async (req, res) => {
             const owner = req.sessionEmail;
-            const id = req.params.id;
-            const {price_per_unit, conditions} = req.body;
+            const { product, price_per_unit, conditions } = req.body;
             try{
                 const rule = await db.oneOrNone(`
                     INSERT INTO public.pricing_rules
-                    (price_per_unit, conditions, created_by)
+                    (product, price_per_unit, conditions, created_by)
                     VALUES
-                    ($1, $2::UUID[], $3)
+                    ($1::UUID, $2, $3::UUID[], $4)
                     RETURNING id
-                `, [price_per_unit, conditions, owner]);
+                `, [product, price_per_unit, conditions, owner]);
                 return res.status(200).json({ id : rule.id, message: "rule created successfully" });
             }
             catch (err) {
@@ -194,12 +192,10 @@ module.exports = (db) => {
         // validate the payloads:
         if (req.method === "POST" || req.method === "PUT") {
             if (target === "pricing_conditions") {
-                const {quantity, quantity_unit, size, size_unit, colour, threshold, materials, product, client, company} = req.body;
-                if (!product) return res.status(400).json({ message: "product is required" });
+                const { quantity, quantity_unit, size, size_unit, colour, threshold, materials, client, company } = req.body;
                 const validations = [
                     validatePricingThreshold(quantity, quantity_unit, size, size_unit, threshold),
                     await validateInstances(materials, owner, "materials", db),
-                    await validateInstances([product], owner, "products", db),
                     await validateInstances(client ? [client] : null, owner, "clients", db),
                     await validateInstances(company ? [company] : null, owner, "companies", db),
                     validateString(colour)
@@ -207,10 +203,12 @@ module.exports = (db) => {
                 for (const validation of validations) if (!validation.valid) return res.status(400).json({ message: validation.message });
             }
             else if (target === "pricing_rules") {
-                const {price_per_unit, conditions} = req.body;
+                const { product, price_per_unit, conditions } = req.body;
+                if (!product) return res.status(400).json({ message: "product is required" });
                 if (!price_per_unit) return res.status(400).json({ message: "price per unit is required" });
                 if (!conditions || conditions.length === 0) return res.status(400).json({ message: "conditions are required" });
                 const validations = [
+                    await validateInstances([product], owner, "products", db),
                     await validateInstances(conditions, owner, "pricing_conditions", db),
                     validateNumeric(price_per_unit, "price_per_unit")
                 ];

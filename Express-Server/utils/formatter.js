@@ -250,13 +250,6 @@ function mapDefaultQueryColumns(table, detailed = false) {
                 ${mapQueryPrefix(table)}.size_unit,
                 ${mapQueryPrefix(table)}.colour,
                 ${mapQueryPrefix(table)}.threshold,
-                (SELECT jsonb_build_object(
-                    'id', ${mapQueryPrefix("products")}.id,
-                    'en_name', ${mapQueryPrefix("products")}.en_name,
-                    'ch_name', ${mapQueryPrefix("products")}.ch_name
-                )
-                FROM public.products ${mapQueryPrefix("products")}
-                WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix(table)}.product) as product,
                 CASE
                     WHEN ${mapQueryPrefix(table)}.materials IS NULL OR array_length(${mapQueryPrefix(table)}.materials, 1) = 0 THEN NULL
                         ELSE (
@@ -288,6 +281,13 @@ function mapDefaultQueryColumns(table, detailed = false) {
     else if (table === "pricing_rules"){
         return `
                 ${mapQueryPrefix(table)}.id,
+                (SELECT jsonb_build_object(
+                    'id', ${mapQueryPrefix("products")}.id,
+                    'en_name', ${mapQueryPrefix("products")}.en_name,
+                    'ch_name', ${mapQueryPrefix("products")}.ch_name
+                )
+                FROM public.products ${mapQueryPrefix("products")}
+                WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix(table)}.product) as product,
                 ${mapQueryPrefix(table)}.price_per_unit,
                 (
                     SELECT json_agg(
@@ -299,15 +299,6 @@ function mapDefaultQueryColumns(table, detailed = false) {
                             'quantity_unit', ${mapQueryPrefix("pricing_conditions")}.quantity_unit,
                             'colour', ${mapQueryPrefix("pricing_conditions")}.colour,
                             'threshold', ${mapQueryPrefix("pricing_conditions")}.threshold,
-                            'product', (
-                                SELECT jsonb_build_object(
-                                    'id', ${mapQueryPrefix("products")}.id,
-                                    'en_name', ${mapQueryPrefix("products")}.en_name,
-                                    'ch_name', ${mapQueryPrefix("products")}.ch_name
-                                )
-                                FROM public.products ${mapQueryPrefix("products")}
-                                WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix("pricing_conditions")}.product
-                            ),
                             'materials', (
                                 CASE WHEN ${mapQueryPrefix("pricing_conditions")}.materials IS NULL THEN NULL
                                 ELSE (

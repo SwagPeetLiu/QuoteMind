@@ -571,26 +571,25 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
         // numeric validations on quantity and size
         const numericValidations = [validateInteger(quantity, 'quantity'), validateNumeric(size, 'size')];
         if (numericValidations.some((validation) => !validation.valid)) {
-            return { valid: false, message: 'Invalid Pricing Threshold' };
+            return { valid: false, message: 'Invalid Numeric Input' };
         }
         if (quantity && quantity <= 0) return { valid: false, message: "Invalid Pricing Quantity" };
         if (size && size <= 0) return { valid: false, message: "Invalid Pricing Size" };
 
         // validate the threshold operator
         if (!threshold || typeof threshold !== "string") return { valid: false, message: 'Invalid Pricing Threshold' };
-        if (!validator.isAlpha(threshold)) return { valid: false, message: 'Invalid Pricing Threshold' };
         if (threshold !== "eq" && threshold !== "gt" && threshold !== "ge" && threshold !== "lt" && threshold !== "le") {
             return { valid: false, message: 'Invalid Pricing Threshold' };
         }
 
         // validate unit
         if (size) {
-            const stringValidation = validateName(size_unit);
-            if (!stringValidation.valid) return { valid: false, message: 'Invalid Pricing Threshold' };
+            const stringValidation = validateSizeUnit(size_unit);
+            if (!stringValidation.valid) return { valid: false, message: 'Invalid Size Unit' };
         }
         if (quantity) {
             const stringValidation = validateName(quantity_unit);
-            if (!stringValidation.valid) return { valid: false, message: 'Invalid Pricing Threshold' };
+            if (!stringValidation.valid) return { valid: false, message: 'Invalid Quantity Unit' };
         }
     }
     if (threshold && !quantity && !size) return { valid: false, message: 'Invalid Pricing Threshold for size or quantity' };
@@ -633,6 +632,37 @@ function validateTransformation(specification, transformType) {
     if (transformType !== "integer" && integerTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
     if (transformType !== "text" && stringTransformations.includes(specification)) return { valid: false, message: 'Invalid Function' };
     if (transformType !== "numeric" && transformType !== "integer" && transformType !== "text") return { valid: false, message: 'Invalid Function' };
+    return { valid: true };
+}
+
+// function used to validate the size unit (only for size = length * width)
+function validateSizeUnit(unit) {
+    if (unit) {
+        if (typeof unit !== "string") {
+            return ({ valid: false, message: 'Invalid Size Unit provided' });
+        }
+        if (!unicodeRegex.test(unit) ||
+            !validator.isLength(unit, { max: config.limitations.Max_Name_Length }) ||
+            !config.limitations.size_unit.includes(unit)
+        ) {
+            return ({ valid: false, message: 'Invalid Size Unit provided' });
+        }
+    }
+    return { valid: true };
+}
+
+function validateDimensionUnit(unit){
+    if (unit) {
+        if (typeof unit !== "string") {
+            return ({ valid: false, message: 'Invalid Dimension Unit provided' });
+        }
+        if (!unicodeRegex.test(unit) ||
+            !validator.isLength(unit, { max: config.limitations.Max_Name_Length }) ||
+            !config.limitations.dimension_unit.includes(unit)
+        ) {
+            return ({ valid: false, message: 'Invalid Dimension Unit provided' });
+        }
+    }
     return { valid: true };
 }
 
@@ -802,5 +832,7 @@ module.exports = {
     validateString,
     validatePricingThreshold,
     validateTableExistence,
-    validateToken
+    validateToken,
+    validateSizeUnit,
+    validateDimensionUnit
 };

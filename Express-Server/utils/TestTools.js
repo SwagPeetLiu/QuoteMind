@@ -124,7 +124,6 @@ const testObject = {
             quantity: "250个", // allow searches by numbe & units
             size: "5", // allow searches by number
             colour: "red",
-            product: "宣传",
             materials: "Acrylic",
             client: "two",
             company: "CUNTY"
@@ -134,7 +133,6 @@ const testObject = {
             quantity: "9999",
             size: "9999",
             colour: "!@#$%^&*",
-            product: "!@#$%^&*",
             materials: "!@#$%^&*",
             client: "!@#$%^&*",
             company: "!@#$%^&*"
@@ -145,7 +143,6 @@ const testObject = {
             size: 5,
             size_unit: "平米",
             colour: "red",
-            product: null, // to be attached
             material: null, // to be attached
             client: null, // to be attached
             company: null, // to be attached
@@ -157,7 +154,6 @@ const testObject = {
             size: 10,
             size_unit: "平",
             colour: "blue",
-            product: null, // to be attached
             material: null, // to be attached
             client: null, // to be attached
             company: null, // to be attached
@@ -167,18 +163,22 @@ const testObject = {
     pricing_rule: {
         validSearchObject: {
             id: "c7a7c",
-            price_per_unit: "50.1"
+            price_per_unit: "50.1",
+            product: "宣传",
         },
         invalidSearchObject: {
             id: "!@#$%^&*",
-            price_per_unit: "999"
+            price_per_unit: "999",
+            product: "!@#$%^&*",
         },
         validTestingObject: {
             price_per_unit: 95,
+            product: null, // to be attached
             conditions: null // to be attached
         },
         updateTestingObject: {
             price_per_unit: 70,
+            product: null, // to be attached
             conditions: null // to be attached
         }
     },
@@ -887,19 +887,16 @@ function isConditionValid(condition) {
         'quantity_unit' in condition &&
         'colour' in condition &&
         'threshold' in condition &&
-        'product' in condition &&
         'materials' in condition &&
         'client' in condition &&
         'company' in condition
     ) {
         // validate asociations
-        const isPValid = isProductValid(condition.product);
         const isMValid = condition.materials ? isMaterialValid(condition.materials[0]) : true;
         const isCValid = condition.client ? isAssociatedClientValid(condition.client) : true;
         const isCOValid = condition.company ? isAssociatedCompanyValid(condition.company) : true;
 
-        if (isPValid &&
-            isMValid &&
+        if (isMValid &&
             isCValid &&
             isCOValid) {
             return true;
@@ -910,9 +907,11 @@ function isConditionValid(condition) {
 
 function isRuleValid(rule) {
     if ('id' in rule &&
+        'product' in rule &&
         'price_per_unit' in rule) {
         const isValidCondition = isConditionValid(rule.conditions[0]);
-        if (isValidCondition) return true;
+        const isPValid = isProductValid(condition.product);
+        if (isValidCondition & isPValid) return true;
     }
     return false;
 }
