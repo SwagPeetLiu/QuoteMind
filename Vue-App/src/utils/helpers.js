@@ -80,6 +80,10 @@ function mapDefaultDimensions(providedValue, currentUnit, defaultUnit) {
         "厘米": 0.01,
         "m": 1,
         "米": 1,
+        "cun": 0.0333333,
+        "寸": 0.0333333, // Chinese cun is approximately 3.33333 cm
+        "inch": 0.0254,
+        "英寸": 0.0254,  // 1 inch is 2.54 cm
 
         // Area measurements
         "mm²": 0.000001,
@@ -110,6 +114,11 @@ function mapDimensionUnitToSizeUnit(unit) {
         case "厘米":
             return "cm²";
         case "米":
+            return "m²";
+        case "cun":
+        case "inch":
+        case "寸":
+        case "英寸":
             return "m²";
         default:
             return "N/A";
