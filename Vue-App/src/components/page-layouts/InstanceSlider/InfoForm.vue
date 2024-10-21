@@ -26,13 +26,16 @@
                 >
                     <!-- ordinary input field -->
                     <EditableInfo
-                        v-if="mapFormSubmissionType(attribute) === 'text'"
+                        v-if="
+                            mapFormSubmissionType(attribute) === 'text' || 
+                            mapFormSubmissionType(attribute) === 'monetary number'
+                            "
                         :icon="getIcon(attribute)"
                         :name="attribute"
                         :isDisabled="mapDisabled(attribute, $i18n.locale)"
                         :isRequired="mapMandatory(attribute)"
                         :value="formData[attribute].value"
-                        :type="'text'"
+                        :type="mapFormSubmissionType(attribute) === 'text' ? 'text' : 'number'"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                         :size="'lg'"
