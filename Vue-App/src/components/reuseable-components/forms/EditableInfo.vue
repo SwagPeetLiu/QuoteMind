@@ -30,7 +30,7 @@
             v-if="!isEditing && value" 
             :inputClass="`text-dark my-0 ${size === 'large' ? 'text-2xl' : ''}`"
             :style="{ paddingTop: `${size === 'large' ? '0' : '2px'}`}"
-            :text="value"
+            :text="value.toString()"
             :spaceWidth="7" 
         />
 

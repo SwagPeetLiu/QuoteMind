@@ -132,8 +132,8 @@ const config = {
             "individual specific": ["client condition"],
         },
         "pricing_rules": {
-            "general": ["price_per_unit"],
-            "listed_conditions": ["client", "company"],
+            "general": ["product", "price_per_unit"],
+            "listed_conditions": ["listed_conditions"],
         },
         "products": {
             "general": ["ch_name", "en_name", "descriptions"]
