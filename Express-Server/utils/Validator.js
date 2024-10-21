@@ -565,9 +565,6 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
     // if numeric limitations are specified, then threshold operator should be there
     if (quantity || size) {
 
-        // cannot post two numeric conditions at the same time:
-        if (quantity && size) return { valid: false, message: 'Invalid Pricing Threshold' };
-
         // numeric validations on quantity and size
         const numericValidations = [validateInteger(quantity, 'quantity'), validateNumeric(size, 'size')];
         if (numericValidations.some((validation) => !validation.valid)) {
@@ -582,7 +579,7 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
             return { valid: false, message: 'Invalid Pricing Threshold' };
         }
 
-        // validate unit
+        // validate unit (must be non-null / non-empty units)
         if (size) {
             const stringValidation = validateSizeUnit(size_unit);
             if (!stringValidation.valid) return { valid: false, message: 'Invalid Size Unit' };
@@ -592,7 +589,7 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
             if (!stringValidation.valid) return { valid: false, message: 'Invalid Quantity Unit' };
         }
     }
-    if (threshold && !quantity && !size) return { valid: false, message: 'Invalid Pricing Threshold for size or quantity' };
+    if (threshold && !size) return { valid: false, message: 'Invalid Pricing Threshold for size' };
     if (quantity_unit && !quantity) return { valid: false, message: "Invalid Pricing Quantity" };
     if (size_unit && !size) return { valid: false, message: "Invalid Pricing Size" };
     return { valid: true };
@@ -648,7 +645,7 @@ function validateSizeUnit(unit) {
             return ({ valid: false, message: 'Invalid Size Unit provided' });
         }
     }
-    return { valid: true };
+    return { valid: false, message: 'missing Size Unit provided' };
 }
 
 function validateDimensionUnit(unit){
@@ -663,7 +660,7 @@ function validateDimensionUnit(unit){
             return ({ valid: false, message: 'Invalid Dimension Unit provided' });
         }
     }
-    return { valid: true };
+    return { valid: false, message: 'missing Deimension Unit provided' };
 }
 
 /*

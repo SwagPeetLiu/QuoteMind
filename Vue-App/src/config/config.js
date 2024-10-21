@@ -43,8 +43,7 @@ const config = {
             "materials": { column : "ch_name", order: "ASC" },
             "products": { column : "ch_name", order: "ASC" },
             "employees": { column : "name", order: "ASC" },
-            "pricing_conditions": { column : "id", order: "ASC" },
-            "pricing_rules": { column : "price_per_unit", order: "DESC" },
+            "pricings": { column : "price_per_unit", order: "DESC" },
             "transactions": { column : "transaction_date", order: "DESC" }
         }
     },
@@ -80,8 +79,7 @@ const config = {
         "employees": ["id", "name", "phone", "wechat_contact", "qq_contact", "email", "position"],
         "materials": ["id", "ch_name", "en_name", "descriptions"],
         "positions": ["id", "name", "descriptions"],
-        "pricing_conditions": ["id", "product", "quantity", "materials", "size", "client", "company", "colour"],
-        "pricing_rules": ["id", "price_per_unit"],
+        "pricings": ["id", "product", "price_per_unit", "quantity", "materials", "size", "client", "company", "colour"],
         "products": ["id", "ch_name", "en_name", "descriptions"],
         "transactions": ["id", "name", "status", "transaction_date", "product", "materials", "client", "company", "quantity", "price_per_unit", "amount", "colour", "size", "length", "width", "height", "employee", "modified_date", "creation_date", "note"]
     },
@@ -97,8 +95,7 @@ const config = {
         "employees": ["target", "phone", "wechat_contact", "qq_contact", "position", "email"],
         "materials": ["target", "descriptions"],
         "positions": ["target", "descriptions"],
-        "pricing_conditions": ["id", "product", "category", "conditions"],
-        "pricing_rules": ["id", "price_per_unit", "listed_conditions"],
+        "pricings": ["id", "product", "price_per_unit", "category", "conditions"],
         "products": ["target", "descriptions"],
         "transactions": ["transaction details", "transaction_date", "product & materials", "quantity", "price_per_unit", "amount", "dimension", "colour", "employee", "note"]
     },

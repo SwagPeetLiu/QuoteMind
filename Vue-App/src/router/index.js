@@ -15,8 +15,7 @@ import Companies from "@/views/customers/Companies.vue";
 
 // pricings & transactions
 import Transactions from "@/views/Transactions.vue";
-import Pricing_Conditions from "@/views/pricings/Pricing_Conditions.vue";
-import Pricing_Rules from "@/views/pricings/Pricing_Rules.vue";
+import Pricings from "@/views/Pricings.vue";
 
 // user based views
 import Profile from "@/views/Profile.vue";
@@ -41,14 +40,8 @@ const routes = [
   {
     path: "/resources/",
     name: "Resources",
-    component: test,
-    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Test" }
-  },
-  {
-    path: "/resources/test",
-    name: "Test",
-    component: test,
-    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Test" }
+    component: Products,
+    meta: { requiresAuth: true, mainLink: "Resources", subLink: "Products" }
   },
   {
     path: "/resources/products",
@@ -99,20 +92,8 @@ const routes = [
   {
     path: "/pricings",
     name: "Pricings",
-    component: Pricing_Rules,
-    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Rules" }
-  },
-  {
-    path: "/pricings/pricing_rules",
-    name: "Pricing_Rules",
-    component: Pricing_Rules,
-    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Rules" }
-  },
-  {
-    path: "/pricings/pricing_conditions",
-    name: "Pricing_Conditions",
-    component: Pricing_Conditions,
-    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "Pricing_Conditions" }
+    component: Pricings,
+    meta: { requiresAuth: true, mainLink: "Pricings", subLink: "" }
   },
 
   // Transactions:

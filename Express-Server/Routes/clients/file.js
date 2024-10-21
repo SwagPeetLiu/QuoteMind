@@ -116,16 +116,7 @@ module.exports = (db) => {
 
                     // delete the related definitions of the pricings based on client (using unset to map all listed conditions in each rule to 
                     // individual element and check if they match to any related condition)
-                    const conditions = await transaction.any(`DELETE FROM public.pricing_conditions WHERE created_by = $1 AND client = $2
-                        RETURNING id;`, [owner, id]);
-                    const deletedIDs = conditions.map((condition) => condition.id);
-                    transaction.none(`DELETE FROM public.pricing_rules
-                                        WHERE created_by = $1
-                                        AND EXISTS (
-                                            SELECT 1
-                                            FROM unnest(conditions) AS condition_id
-                                            WHERE condition_id = ANY($2::UUID[])
-                                        );`, [owner, deletedIDs]);
+                    await transaction.none(`DELETE FROM public.pricings WHERE created_by = $1 AND client = $2;`, [owner, id]);
                     
                     // delete the client
                     transaction.none('DELETE FROM public.clients WHERE created_by = $1 AND id = $2', [owner, id]);

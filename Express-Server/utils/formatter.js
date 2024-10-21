@@ -110,10 +110,8 @@ function mapQueryPrefix(table) {
             return "e";
         case "addresses":
             return "a";
-        case "pricing_conditions":
-            return "cond";
-        case "pricing_rules":
-            return "r";
+        case "pricings":
+            return "pri";
         case "transactions":
             return "t";
         default:
@@ -241,9 +239,17 @@ function mapDefaultQueryColumns(table, detailed = false) {
                 ) END AS position
             `;
     }
-    else if (table === "pricing_conditions"){
+    else if (table === "pricings"){
         return `
                 ${mapQueryPrefix(table)}.id,
+                (SELECT jsonb_build_object(
+                    'id', ${mapQueryPrefix("products")}.id,
+                    'en_name', ${mapQueryPrefix("products")}.en_name,
+                    'ch_name', ${mapQueryPrefix("products")}.ch_name
+                )
+                FROM public.products ${mapQueryPrefix("products")}
+                WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix(table)}.product) as product,
+                ${mapQueryPrefix(table)}.price_per_unit,
                 ${mapQueryPrefix(table)}.quantity,
                 ${mapQueryPrefix(table)}.quantity_unit,
                 ${mapQueryPrefix(table)}.size,
@@ -276,66 +282,6 @@ function mapDefaultQueryColumns(table, detailed = false) {
                 )
                 FROM public.companies ${mapQueryPrefix("companies")}
                 WHERE ${mapQueryPrefix("companies")}.id = ${mapQueryPrefix(table)}.company) as company
-            `;
-    }
-    else if (table === "pricing_rules"){
-        return `
-                ${mapQueryPrefix(table)}.id,
-                (SELECT jsonb_build_object(
-                    'id', ${mapQueryPrefix("products")}.id,
-                    'en_name', ${mapQueryPrefix("products")}.en_name,
-                    'ch_name', ${mapQueryPrefix("products")}.ch_name
-                )
-                FROM public.products ${mapQueryPrefix("products")}
-                WHERE ${mapQueryPrefix("products")}.id = ${mapQueryPrefix(table)}.product) as product,
-                ${mapQueryPrefix(table)}.price_per_unit,
-                (
-                    SELECT json_agg(
-                        jsonb_build_object(
-                            'id', ${mapQueryPrefix("pricing_conditions")}.id,
-                            'quantity', ${mapQueryPrefix("pricing_conditions")}.quantity,
-                            'size', ${mapQueryPrefix("pricing_conditions")}.size,
-                            'size_unit', ${mapQueryPrefix("pricing_conditions")}.size_unit,
-                            'quantity_unit', ${mapQueryPrefix("pricing_conditions")}.quantity_unit,
-                            'colour', ${mapQueryPrefix("pricing_conditions")}.colour,
-                            'threshold', ${mapQueryPrefix("pricing_conditions")}.threshold,
-                            'materials', (
-                                CASE WHEN ${mapQueryPrefix("pricing_conditions")}.materials IS NULL THEN NULL
-                                ELSE (
-                                    SELECT json_agg(
-                                        jsonb_build_object(
-                                            'id', ${mapQueryPrefix("materials")}.id,
-                                            'en_name', ${mapQueryPrefix("materials")}.en_name,
-                                            'ch_name', ${mapQueryPrefix("materials")}.ch_name
-                                        )
-                                    )
-                                    FROM public.materials ${mapQueryPrefix("materials")}
-                                    WHERE ${mapQueryPrefix("materials")}.id = ANY(${mapQueryPrefix("pricing_conditions")}.materials)
-                                )
-                                END
-                            ),
-                            'client', (
-                                SELECT jsonb_build_object(
-                                    'id', ${mapQueryPrefix("clients")}.id,
-                                    'full_name', ${mapQueryPrefix("clients")}.full_name
-                                )
-                                FROM public.clients ${mapQueryPrefix("clients")}
-                                WHERE ${mapQueryPrefix("clients")}.id = ${mapQueryPrefix("pricing_conditions")}.client
-                            ),
-                            'company', (
-                                SELECT jsonb_build_object(
-                                    'id', ${mapQueryPrefix("companies")}.id,
-                                    'full_name', ${mapQueryPrefix("companies")}.full_name
-                                )
-                                FROM public.companies ${mapQueryPrefix("companies")}
-                                WHERE ${mapQueryPrefix("companies")}.id = ${mapQueryPrefix("pricing_conditions")}.company
-                            )
-                        )
-                        ORDER BY ${mapQueryPrefix("pricing_conditions")}.id ASC
-                    )
-                    FROM public.pricing_conditions ${mapQueryPrefix("pricing_conditions")}
-                    WHERE ${mapQueryPrefix("pricing_conditions")}.id = ANY(${mapQueryPrefix(table)}.conditions)
-                ) as conditions
             `;
     }
     else if (table === "transactions") {
@@ -665,10 +611,7 @@ function mapOrderByClause(table, query) {
         case "employees":
             return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.name ASC` : specifiedOrderBy}`;
 
-        case "pricing_conditions":
-            return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.id ASC` : specifiedOrderBy}`;
-
-        case "pricing_rules":
+        case "pricings":
             return `ORDER BY ${useDefault ? `${mapQueryPrefix(table)}.price_per_unit DESC` : specifiedOrderBy}`;
 
         case "transactions":
