@@ -9,6 +9,8 @@ const {
     validateInstances,
     validateString,
     validateInteger,
+    validateSizeUnit,
+    validateDimensionUnit
 } = require('../../utils/Validator');
 const { 
     mapDefaultQueryColumns,
@@ -138,9 +140,9 @@ module.exports = (db) => {
                 validateString(req.body.colour),
                 validateString(req.body.quantity_unit),
                 validateDescriptions(req.body.note),
-                validateString(req.body.en_unit),
-                validateString(req.body.ch_unit),
-                validateString(req.body.size_unit),
+                validateDimensionUnit(req.body.en_unit),
+                validateDimensionUnit(req.body.ch_unit),
+                validateSizeUnit(req.body.size_unit),
                 validateTransactionDate(req.body.transaction_date), // nullable transaction date
                 await validateInstances([req.body.product], owner, "products", db),
                 await validateInstances(req.body.materials, owner, "materials", db), // assume list input

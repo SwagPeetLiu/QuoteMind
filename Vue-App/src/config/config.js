@@ -43,7 +43,7 @@ const config = {
             "materials": { column : "ch_name", order: "ASC" },
             "products": { column : "ch_name", order: "ASC" },
             "employees": { column : "name", order: "ASC" },
-            "pricing_conditions": { column : "product", order: "ASC" },
+            "pricing_conditions": { column : "id", order: "ASC" },
             "pricing_rules": { column : "price_per_unit", order: "DESC" },
             "transactions": { column : "transaction_date", order: "DESC" }
         }
@@ -190,8 +190,8 @@ const config = {
         "defaultDiemsion": "mm",
         "defaultQuantityENUnit": "units",
         "defaultQuantityCHUnit": "个",
-        "diemsion": ["mm","cm","m"],
-        "size": ["mm²","cm²","m²"],
+        "diemsion": ["m","cm","mm"],
+        "size": ["m²","cm²","mm²","cun","inch"],
     }
 }
 
