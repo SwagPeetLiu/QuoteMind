@@ -118,9 +118,11 @@ const testObject = {
             descriptions: "Testing updates with descriptions"
         }
     },
-    pricing_condition: {
+    pricings: {
         validSearchObject: {
             id: "2ad7",
+            price_per_unit: "50.1",
+            product: "宣传",
             quantity: "250个", // allow searches by numbe & units
             size: "5", // allow searches by number
             colour: "red",
@@ -130,6 +132,8 @@ const testObject = {
         },
         invalidSearchObject: {
             id: "!@#$%^&*",
+            price_per_unit: "999",
+            product: "!@#$%^&*",
             quantity: "9999",
             size: "9999",
             colour: "!@#$%^&*",
@@ -138,10 +142,12 @@ const testObject = {
             company: "!@#$%^&*"
         },
         validTestingObject: {
+            price_per_unit: 95,
+            product: null, // to be attached
             quantity: 500,
             quantity_unit: "个",
             size: 5,
-            size_unit: "平米",
+            size_unit: "m²",
             colour: "red",
             material: null, // to be attached
             client: null, // to be attached
@@ -149,37 +155,17 @@ const testObject = {
             threshold: "gt"
         },
         updateTestingObject: {
+            price_per_unit: 70.5,
+            product: null, // to be attached
             quantity: 600,
             quantity_unit: "张",
             size: 10,
-            size_unit: "平",
+            size_unit: "m²",
             colour: "blue",
             material: null, // to be attached
             client: null, // to be attached
             company: null, // to be attached
             threshold: "lt"
-        }
-    },
-    pricing_rule: {
-        validSearchObject: {
-            id: "c7a7c",
-            price_per_unit: "50.1",
-            product: "宣传",
-        },
-        invalidSearchObject: {
-            id: "!@#$%^&*",
-            price_per_unit: "999",
-            product: "!@#$%^&*",
-        },
-        validTestingObject: {
-            price_per_unit: 95,
-            product: null, // to be attached
-            conditions: null // to be attached
-        },
-        updateTestingObject: {
-            price_per_unit: 70,
-            product: null, // to be attached
-            conditions: null // to be attached
         }
     },
     transaction: {
@@ -196,10 +182,10 @@ const testObject = {
             colour: "red",
             company: "glob",
             client: "two",
-            width: "5.2",
-            height: "3.8cm",
+            width: "1.4",
+            height: "20",
             length: "6.6",
-            size: "19.76square M"
+            size: "2.8㎡"
         },
         invalidSearchObject: {
             id: "!@#$%^&*",
@@ -879,8 +865,10 @@ function isSpecificProductValid(product) {
     }
     return false;
 }
-function isConditionValid(condition) {
+function isPricingValid(condition) {
     if ('id' in condition &&
+        'product' in condition &&
+        'price_per_unit' in condition &&
         'quantity' in condition &&
         'size' in condition &&
         'size_unit' in condition &&
@@ -892,11 +880,14 @@ function isConditionValid(condition) {
         'company' in condition
     ) {
         // validate asociations
+        const isPValid = condition.product ? isProductValid(condition.product) : true;
         const isMValid = condition.materials ? isMaterialValid(condition.materials[0]) : true;
         const isCValid = condition.client ? isAssociatedClientValid(condition.client) : true;
         const isCOValid = condition.company ? isAssociatedCompanyValid(condition.company) : true;
 
-        if (isMValid &&
+        if (
+            isPValid &&
+            isMValid &&
             isCValid &&
             isCOValid) {
             return true;
@@ -905,19 +896,8 @@ function isConditionValid(condition) {
     return false;
 }
 
-function isRuleValid(rule) {
-    if ('id' in rule &&
-        'product' in rule &&
-        'price_per_unit' in rule) {
-        const isValidCondition = isConditionValid(rule.conditions[0]);
-        const isPValid = isProductValid(condition.product);
-        if (isValidCondition & isPValid) return true;
-    }
-    return false;
-}
-
 // covers both general listing and specific listing of a company
-function isTransactionValid(transaction, granularity) {
+function isTransactionValid(transaction) {
     if ('transaction_date' in transaction &&
         'creation_date' in transaction &&
         'modified_date' in transaction &&
@@ -1059,7 +1039,7 @@ async function getTestSession(app) {
         email: process.env.TEST_EMAIL,
         password: process.env.TEST_PW
     });
-    return response.body.session;
+    return response.body.session_token;
 }
 async function getTestCompany(app, session) {
     const response = await request(app)
@@ -1109,16 +1089,9 @@ async function getTestProduct(app, session) {
         .send(testObject.search.defaultStructure);
     return response.body.results[0];
 }
-async function getTestPricingCondition(app, session) {
+async function getTestPricings(app, session) {
     const response = await request(app)
-        .post('/search/pricing_conditions')
-        .set('session-token', session)
-        .send(testObject.search.defaultStructure);
-    return response.body.results[0];
-}
-async function getTestPricingRule(app, session) {
-    const response = await request(app)
-        .post('/search/pricing_rules')
+        .post('/search/pricings')
         .set('session-token', session)
         .send(testObject.search.defaultStructure);
     return response.body.results[0];
@@ -1140,8 +1113,7 @@ module.exports = {
     getTestPosition,
     getTestMaterial,
     getTestProduct,
-    getTestPricingCondition,
-    getTestPricingRule,
+    getTestPricings,
     getTestTransaction,
     testObject,
     invalidTestingRange,
@@ -1158,8 +1130,7 @@ module.exports = {
     isSpecificMaterialValid,
     isProductValid,
     isSpecificProductValid,
-    isConditionValid,
-    isRuleValid,
+    isPricingValid,
     isTransactionValid,
     isSearchTargetValid,
     getTestAlias,

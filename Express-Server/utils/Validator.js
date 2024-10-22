@@ -573,23 +573,23 @@ function validatePricingThreshold(quantity, quantity_unit, size, size_unit, thre
         if (quantity && quantity <= 0) return { valid: false, message: "Invalid Pricing Quantity" };
         if (size && size <= 0) return { valid: false, message: "Invalid Pricing Size" };
 
-        // validate the threshold operator
-        if (!threshold || typeof threshold !== "string") return { valid: false, message: 'Invalid Pricing Threshold' };
-        if (threshold !== "eq" && threshold !== "gt" && threshold !== "ge" && threshold !== "lt" && threshold !== "le") {
-            return { valid: false, message: 'Invalid Pricing Threshold' };
-        }
-
         // validate unit (must be non-null / non-empty units)
         if (size) {
             const stringValidation = validateSizeUnit(size_unit);
             if (!stringValidation.valid) return { valid: false, message: 'Invalid Size Unit' };
+            
+            // validate the exsiting threshold operator (for size only)
+            if (!threshold || typeof threshold !== "string") return { valid: false, message: 'Invalid Pricing Threshold' };
+            if (threshold !== "eq" && threshold !== "gt" && threshold !== "ge" && threshold !== "lt" && threshold !== "le") {
+                return { valid: false, message: 'Invalid Pricing Threshold' };
+            }
         }
         if (quantity) {
             const stringValidation = validateName(quantity_unit);
             if (!stringValidation.valid) return { valid: false, message: 'Invalid Quantity Unit' };
         }
     }
-    if (threshold && !size) return { valid: false, message: 'Invalid Pricing Threshold for size' };
+    if (threshold && !size) return { valid: false, message: 'Uncessary threshold without Size' };
     if (quantity_unit && !quantity) return { valid: false, message: "Invalid Pricing Quantity" };
     if (size_unit && !size) return { valid: false, message: "Invalid Pricing Size" };
     return { valid: true };
@@ -644,6 +644,7 @@ function validateSizeUnit(unit) {
         ) {
             return ({ valid: false, message: 'Invalid Size Unit provided' });
         }
+        return { valid: true };
     }
     return { valid: false, message: 'missing Size Unit provided' };
 }
@@ -659,6 +660,7 @@ function validateDimensionUnit(unit){
         ) {
             return ({ valid: false, message: 'Invalid Dimension Unit provided' });
         }
+        return { valid: true };
     }
     return { valid: false, message: 'missing Deimension Unit provided' };
 }
