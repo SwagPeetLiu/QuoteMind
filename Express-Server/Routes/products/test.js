@@ -19,8 +19,7 @@ describe("Product Router", () => {
     let validSession;
     let testProductID;
     let testTransactionID;
-    let testPricingConditionID;
-    let testPricingRuleID;
+    let testPricingID;
     let exsitingProduct;
     let exsitingMaterial;
     let existingClient;
@@ -158,74 +157,27 @@ describe("Product Router", () => {
             });
         });
 
-        describe("Product Association in Pricing Conditions & Rules", () => {
-            it ("it should update material associations in pricing conditions & rules", async () => {
+        describe("Product Association in Pricing", () => {
+            it ("it should update material associations in pricings", async () => {
                 const conditionCreationResponse = await request(app)
-                    .post('/pricings/conditions/new')
+                    .post('/pricings/new')
                     .set('session-token', validSession)
                     .send({
                         product: testProductID, // testing for product association
+                        price_per_unit: testObject.pricings.validTestingObject.price_per_unit,
                         materials: [exsitingMaterial.id]
                     });
                 expect(conditionCreationResponse.statusCode).toBe(200);
                 expect(conditionCreationResponse.body.id).toBeTruthy();
-                testPricingConditionID = conditionCreationResponse.body.id;
+                testPricingID = conditionCreationResponse.body.id;
 
-                const ruleCreationResponse = await request(app)
-                    .post('/pricings/rules/new')
-                    .set('session-token', validSession)
-                    .send({
-                        conditions: [testPricingConditionID],
-                        price_per_unit: 10.5
-                    });
-                expect(ruleCreationResponse.statusCode).toBe(200);
-                expect(ruleCreationResponse.body.id).toBeTruthy();
-                testPricingRuleID = ruleCreationResponse.body.id;
-            });
-
-            it ("product details should appear in the pricing conditions & rules", async () => {
                 const conditionResponse = await request(app)
-                    .post('/search/pricing_conditions')
-                    .set('session-token', validSession)
-                    .send({
-                        ...testObject.search.defaultStructure,
-                        searchQuery: {
-                            ...testObject.search.defaultStructure.searchQuery,
-                            whereClause: {
-                                target: "id",
-                                operator: "eq",
-                                keyword: testPricingConditionID,
-                                specification: "default",
-                                transformType: null
-                            }
-                        }
-                    });
+                    .get(`/pricings/${testPricingID}`)
+                    .set('session-token', validSession);
                 expect(conditionResponse.statusCode).toBe(200);
-                expect(conditionResponse.body.results[0].product.id).toBe(testProductID);
-                expect(conditionResponse.body.results[0].product.en_name).toBe(updateTestingObject.en_name);
-                expect(conditionResponse.body.results[0].product.ch_name).toBe(updateTestingObject.ch_name);
-
-                const ruleResponse = await request(app)
-                    .post('/search/pricing_rules')
-                    .set('session-token', validSession)
-                    .send({
-                        ...testObject.search.defaultStructure,
-                        searchQuery: {
-                            ...testObject.search.defaultStructure.searchQuery,
-                            whereClause: {
-                                target: "id",
-                                operator: "eq",
-                                keyword: testPricingRuleID,
-                                specification: "default",
-                                transformType: null
-                            }
-                        }
-                    });
-                expect(ruleResponse.statusCode).toBe(200);
-                expect(ruleResponse.body.results[0].conditions.length).toBe(1);
-                expect(ruleResponse.body.results[0].conditions[0].product.id).toBe(testProductID);
-                expect(ruleResponse.body.results[0].conditions[0].product.en_name).toBe(updateTestingObject.en_name);
-                expect(ruleResponse.body.results[0].conditions[0].product.ch_name).toBe(updateTestingObject.ch_name);
+                expect(conditionResponse.body.pricing.product.id).toBe(testProductID);
+                expect(conditionResponse.body.pricing.product.en_name).toBe(updateTestingObject.en_name);
+                expect(conditionResponse.body.pricing.product.ch_name).toBe(updateTestingObject.ch_name);
             });
         });
 
@@ -261,7 +213,7 @@ describe("Product Router", () => {
 
                 // check if that related pricing condition is deleted 
                 const conditionResponse = await request(app)
-                    .post('/search/pricing_conditions')
+                    .post('/search/pricings')
                     .set('session-token', validSession)
                     .send({
                         ...testObject.search.defaultStructure,
@@ -270,7 +222,7 @@ describe("Product Router", () => {
                             whereClause: {
                                 target: "id",
                                 operator: "eq",
-                                keyword: testPricingConditionID,
+                                keyword: testPricingID,
                                 specification: "default",
                                 transformType: null
                             }
@@ -278,26 +230,6 @@ describe("Product Router", () => {
                     });
                 expect(conditionResponse.statusCode).toBe(200);
                 expect(conditionResponse.body.count).toBe(0);
-                
-                // check if that related pricing rule is deleted
-                const ruleResponse = await request(app)
-                    .post('/search/pricing_rules')
-                    .set('session-token', validSession)
-                    .send({
-                        ...testObject.search.defaultStructure,
-                        searchQuery: {
-                            ...testObject.search.defaultStructure.searchQuery,
-                            whereClause: {
-                                target: "id",
-                                operator: "eq",
-                                keyword: testPricingRuleID,
-                                specification: "default",
-                                transformType: null
-                            }
-                        }
-                    });
-                expect(ruleResponse.statusCode).toBe(200);
-                expect(ruleResponse.body.count).toBe(0);
             });
         });
     });

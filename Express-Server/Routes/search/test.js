@@ -12,8 +12,7 @@ const {
     invalidTestingRange,
     isSearchTargetValid,
     isClientValid,
-    isConditionValid,
-    isRuleValid,
+    isPricingValid,
     isProductValid,
     isTransactionValid,
     isEmployeeValid,
@@ -267,11 +266,8 @@ describe("Search Route", () => {
                 else if (table === "positions") {
                     expect(isPositionValid(response.body.results[0])).toBe(true);
                 }
-                else if (table === "pricing_conditions") {
-                    expect(isConditionValid(response.body.results[0])).toBe(true);
-                }
-                else if (table === "pricing_rules") {
-                    expect(isRuleValid(response.body.results[0])).toBe(true);
+                else if (table === "pricings") {
+                    expect(isPricingValid(response.body.results[0])).toBe(true);
                 }
                 else if (table === "products") {
                     expect(isProductValid(response.body.results[0])).toBe(true);

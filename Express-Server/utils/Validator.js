@@ -646,7 +646,7 @@ function validateSizeUnit(unit) {
         }
         return { valid: true };
     }
-    return { valid: false, message: 'missing Size Unit provided' };
+    return { valid: true, message: 'missing Size Unit provided' };
 }
 
 function validateDimensionUnit(unit){
@@ -662,7 +662,7 @@ function validateDimensionUnit(unit){
         }
         return { valid: true };
     }
-    return { valid: false, message: 'missing Deimension Unit provided' };
+    return { valid: true, message: 'missing Deimension Unit provided' };
 }
 
 /*

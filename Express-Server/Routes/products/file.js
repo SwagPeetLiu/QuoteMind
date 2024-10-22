@@ -73,16 +73,7 @@ module.exports = (db) => {
                     transaction.none('DELETE FROM public.transactions WHERE product = $1 AND created_by = $2', [id, owner]);
 
                     // delete the related pricings:
-                    const conditions = await transaction.any(`DELETE FROM public.pricing_conditions WHERE created_by = $1 AND product = $2
-                        RETURNING id;`, [owner, id]);
-                    const deletedIDs = conditions.map((condition) => condition.id);
-                    transaction.none(`DELETE FROM public.pricing_rules
-                                        WHERE created_by = $1
-                                        AND EXISTS (
-                                            SELECT 1
-                                            FROM unnest(conditions) AS condition_id
-                                            WHERE condition_id = ANY($2::UUID[])
-                                        );`, [owner, deletedIDs]);
+                    await transaction.none(`DELETE FROM public.pricings WHERE created_by = $1 AND product = $2;`, [owner, id]);
 
                     // deleting the product itself:
                     transaction.none('DELETE FROM public.products WHERE id = $1 AND created_by = $2', [id, owner]);
