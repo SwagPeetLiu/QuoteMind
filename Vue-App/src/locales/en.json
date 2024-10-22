@@ -135,10 +135,6 @@
     "clients": "Clients",
     "profile": "Profile",
     "pricings": "Pricings",
-    "conditions": "Conditions",
-    "rules": "Rules",
-    "pricing_rules": "Pricing Rules",
-    "pricing_conditions": "Pricing Conditions",
     "transactions": "Transactions",
     "address": "address"
   },

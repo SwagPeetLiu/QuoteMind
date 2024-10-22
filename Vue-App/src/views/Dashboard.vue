@@ -33,12 +33,12 @@
 
         <div class="row">
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('routes.rules')" type="sum" to="/pricings/pricing_rules" target="pricing_rules"
-              :icon="getIcon('pricing_rules')" />
+            <StatsCard :title="t('routes.employees')" type="sum" to="/resources/employees" target="employees"
+              :icon="getIcon('employees')" />
           </div>
           <div class="col-xl-6 col-md-6 col-sm-6 mb-md-0 mb-2">
-            <StatsCard :title="t('routes.pricing_conditions')" type="sum" to="/pricings/pricing_conditions" target="pricing_conditions"
-              :icon="getIcon('pricing_conditions')" />
+            <StatsCard :title="t('routes.pricings')" type="sum" to="/pricings" target="pricings"
+              :icon="getIcon('pricings')" />
           </div>
         </div>
       </div>

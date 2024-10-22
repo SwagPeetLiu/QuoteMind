@@ -255,7 +255,7 @@ export function useValidators() {
         if (column === 'price_per_unit' && column === 'amount'){
 
             // unprovided value in pricing rules
-            if (!providedValue && target === 'pricing_rules'){
+            if (!providedValue && target === 'pricings'){
                 return { valid: false, message: `${t('validation.missing')}` };
             }
             // unprovided value in quoted transactions:

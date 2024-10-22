@@ -95,13 +95,10 @@ function getIcon(target) {
             return "fa-solid fa-sliders";
 
         // tables
-        case "rules":
-        case "rule":
-        case "pricing_rules":
+        case "pricings":
             return "fa-solid fa-tags";
         case "conditions":
         case "condition":
-        case "pricing_conditions":
             return "fa-solid fa-pen-ruler";
 
         // stats:

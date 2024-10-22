@@ -46,12 +46,7 @@
 
       <!-- Pricing -->
       <li class="nav-item">
-        <sidenav-collapse 
-          :navText="t('routes.pricings')" 
-          :to="{ name: 'Pricings' }"
-          :hasChildren="true"
-          :nestedChildren="nestedPricings"
-        >
+        <sidenav-collapse :navText="t('routes.pricings')" :to="{ name: 'Pricings' }">
           <template #icon>
             <Pricing />
           </template>
@@ -150,12 +145,6 @@ export default {
       return {
         [this.t('routes.companies')]: 'Companies',
         [this.t('routes.clients')]: 'Clients'
-      };
-    },
-    nestedPricings(){
-      return {
-        [this.t('routes.rules')]: 'Pricing_Rules',
-        [this.t('routes.conditions')]: 'Pricing_Conditions'
       };
     },
     currentMainTheme(){

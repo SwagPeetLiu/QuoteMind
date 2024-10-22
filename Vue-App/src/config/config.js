@@ -122,15 +122,11 @@ const config = {
         "positions": {
             "general": ["name", "descriptions"]
         },
-        "pricing_conditions": {
-            "pricing product": ["product"],
+        "pricings": {
+            "pricing product": ["product", "price_per_unit"],
             "pricing materials": ["materials"],
-            "condition": ["numerical threshold", "colour"],
+            "condition": ["quantity requirement", "size treshold", "colour"],
             "individual specific": ["client condition"],
-        },
-        "pricing_rules": {
-            "general": ["product", "price_per_unit"],
-            "listed_conditions": ["listed_conditions"],
         },
         "products": {
             "general": ["ch_name", "en_name", "descriptions"]

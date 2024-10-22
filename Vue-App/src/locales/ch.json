@@ -137,10 +137,6 @@
     "clients": "客户",
     "profile": "个人中心",
     "pricings": "定价",
-    "conditions": "条件",
-    "rules": "金额规则",
-    "pricing_rules": "定价金额",
-    "pricing_conditions": "定价条件",
     "transactions": "交易",
     "address": "地址"
   },

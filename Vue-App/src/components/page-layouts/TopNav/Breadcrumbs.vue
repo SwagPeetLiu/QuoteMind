@@ -102,11 +102,8 @@ export default {
       else if (name == "Materials") {
         return this.t("routes.materials");
       }
-      else if (name == "Pricing_Conditions") {
-        return `${this.t("routes.pricings")}${isLanEnglish ? " " : ''}${this.t("routes.conditions")}`;
-      }
-      else if (name == "Pricing_Rules") {
-        return `${this.t("routes.pricings")}${isLanEnglish ? " " : ''}${this.t("routes.rules")}`;
+      else if (name == "Pricings") {
+        return `${this.t("routes.pricings")}`;
       }
       else if (name == "Transactions") {
         return this.t("routes.transactions");
