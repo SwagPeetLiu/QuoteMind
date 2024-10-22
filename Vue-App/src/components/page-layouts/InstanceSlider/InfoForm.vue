@@ -33,7 +33,7 @@
                         :icon="getIcon(attribute)"
                         :name="attribute"
                         :isDisabled="mapDisabled(attribute, $i18n.locale)"
-                        :isRequired="mapMandatory(attribute)"
+                        :isRequired="mapMandatory(attribute, target)"
                         :value="formData[attribute].value"
                         :type="mapFormSubmissionType(attribute) === 'text' ? 'text' : 'number'"
                         :formStatus="formStatus"
@@ -90,11 +90,17 @@
                         @scroll-down="scrollDown"
                     />
 
-                    <!-- Unit based numerical input field -->
-                    <EditableNumericalCondition
-                        v-if="mapFormSubmissionType(attribute) === 'numerical threshold'"
+                    <EditableQuantityCondition
+                        v-if="mapFormSubmissionType(attribute) === 'quantity requirement'"
                         :quantity="formData['quantity'].value? formData['quantity'].value : null"
                         :quantityUnit="formData[getRecordUnit('quantity', $i18n.locale)].value ? formData[getRecordUnit('quantity', $i18n.locale)].value : null"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                    />
+
+                    <!-- Unit based numerical input field -->
+                    <EditableSizeCondition
+                        v-if="mapFormSubmissionType(attribute) === 'size treshold'"
                         :size="formData['size'].value? formData['size'].value : null"
                         :sizeUnit="formData[getRecordUnit('size', $i18n.locale)].value ? formData[getRecordUnit('size', $i18n.locale)].value : null"
                         :threshold="formData['threshold'].value"
@@ -112,6 +118,7 @@
                         @scroll-down="scrollDown"
                     />
                 </div>
+                <hr v-if="index < sections.length - 1" class="horizontal dark my-2 w-100" />
             </div>
         </form>
     </FadeInElement>
@@ -174,9 +181,9 @@ import EditableDescriptions from "@/components/reuseable-components/forms/Editab
 import EditableReference from "@/components/reuseable-components/forms/EditableReference.vue";
 import EditableReferenceList from "@/components/reuseable-components/forms/EditableReferenceList.vue";
 import EditableAddresses from "@/components/reuseable-components/forms/EditableAddresses.vue";
-import EditableNumericalCondition from "@/components/reuseable-components/forms/EditableNumericalCondition.vue";
+import EditableSizeCondition from "@/components/reuseable-components/forms/EditableSizeCondition.vue";
 import EditableClientCondition from "@/components/reuseable-components/forms/EditableClientCondition.vue";
-
+import EditableQuantityCondition from "@/components/reuseable-components/forms/EditableQuantityCondition.vue";
 export default {
     name: "InfoForm",
     components: {
@@ -188,8 +195,9 @@ export default {
         EditableReference,
         EditableReferenceList,
         EditableAddresses,
-        EditableNumericalCondition,
-        EditableClientCondition
+        EditableSizeCondition,
+        EditableClientCondition,
+        EditableQuantityCondition
     },
     props: {
         target: {

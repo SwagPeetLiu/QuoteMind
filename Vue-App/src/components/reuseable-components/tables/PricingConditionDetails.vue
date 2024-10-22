@@ -6,18 +6,18 @@
         <!-- quantity -->
         <div 
             class="d-flex align-items-center text-gradient text-dark font-weight-bold my-1"
-            v-if="isQuantityAvailable && numericThreshold"
+            v-if="isQuantityAvailable"
         >
             <i :class="getIcon('quantity')"></i>
             <span class="ms-2 my-0">{{ t(`columns.quantity`) }}</span>
-            <span class="mx-2 font-weight-bolder my-0">{{ numericThreshold }}</span>
+            <span class="mx-2 font-weight-bolder my-0">{{ mapThresholdOperator('ge') }}</span>
             <span class="my-0">{{ `${quantity}${quantity_unit}` }}</span>
         </div>
 
         <!-- size -->
         <div
-            v-if="mappedSize"
-            class="d-flex align-items-center text-gradienttext-dark my-1 font-weight-bold"
+            v-if="mappedSize && numericThreshold"
+            class="d-flex align-items-center text-gradient text-dark my-1 font-weight-bold"
         >
             <i :class="getIcon('size')"></i>
             <span class="ms-2 my-0">{{ t(`columns.size`) }}</span>
@@ -154,7 +154,8 @@ export default{
     },
     methods:{
         getIcon,
-        getRecordName
+        getRecordName,
+        mapThresholdOperator
     }
 }
 </script>

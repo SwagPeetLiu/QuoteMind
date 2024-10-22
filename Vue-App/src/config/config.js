@@ -66,7 +66,7 @@ const config = {
 
     // UI Reactiveness
     UI:{
-        "textDebouce": 300,
+        "textDebouce": 400,
         "scrollDebounce": 400,
         "textIncrementalDuration": 500,
         "loadingDelay": 600
@@ -124,8 +124,8 @@ const config = {
         },
         "pricings": {
             "pricing product": ["product", "price_per_unit"],
-            "pricing materials": ["materials"],
             "condition": ["quantity requirement", "size treshold", "colour"],
+            "pricing materials": ["materials"],
             "individual specific": ["client condition"],
         },
         "products": {

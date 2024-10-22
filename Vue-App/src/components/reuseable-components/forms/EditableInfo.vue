@@ -24,7 +24,7 @@
                 <span v-if="!isEditing" class="ms-n1">:</span>
             </p>
         </div>
-
+        
         <!-- current value -->
         <LoadInText 
             v-if="!isEditing && value" 
@@ -44,7 +44,7 @@
             :disabled="isDisabled"
             @input="onInput"
         />
-
+        {{ isValid }}
         <!-- validation tooltip -->
         <div v-if="isEditing && validationTips" class="invalid-tooltip fs-7">
             {{ validationTips }}
@@ -143,10 +143,16 @@ export default {
             if (this.type == "number"){
                 try{
                     validateValue = Number(this.inputValue);
+                    if (isNaN(validateValue)){
+                        this.isValid = false;
+                        this.validationTips = this.t('validation.is invalid');
+                        return this.$emit("update-form", this.name, this.inputValue, this.isValid);
+                    }
                 }
                 catch(error){
-                    console.error(error, this.inputValue);
-                    validateValue = this.inputValue
+                    this.isValid = false;
+                    this.validationTips = this.t('validation.is invalid');
+                    return this.$emit("update-form", this.name, this.inputValue, this.isValid);
                 }
             }
             else{
@@ -161,7 +167,6 @@ export default {
             // map out the input validations
             const inputValidation = mapValidation(this.name, validateValue, this.isRequired);
             this.isValid = inputValidation.valid;
-            
             if (!this.isValid){
                 this.validationTips = inputValidation.message;
             }

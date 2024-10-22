@@ -9,6 +9,7 @@ const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u;
 export function useValidators() {
     // centralised validator on the client side:
     function mapValidation(target, value, required = true) {
+        console.log("mappingValidation,", target, value, required);
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
         if (target === 'password') {
@@ -51,7 +52,7 @@ export function useValidators() {
         if (target === "price_per_unit" || target === "amount" || target === "size"
             || target === "length" || target === "width" || target === "height"
         ){
-            return isNumberValid(value, false);
+            return isNumberValid(value, required);
         }
         else{
             return isTextInputValid(value, false, "input"); 
@@ -159,7 +160,7 @@ export function useValidators() {
         }
 
         // if text is required but no value is provided
-        if (required && !textInput.trim()) {
+        if (required && !textInput) {
             return {
                 valid: false,
                 message: `${t('validation.input value')}${t('validation.cannot be empty')}`
@@ -167,8 +168,8 @@ export function useValidators() {
         }
         
         // testing non-empty string
-        if (textInput.trim()){
-            if (!unicodeRegex.test(textInput)) {
+        if (textInput){
+            if (!unicodeRegex.test(textInput.trim())) {
                 return {
                     valid: false,
                     message: `${t('validation.input value')}${t('validation.is invalid')}`
@@ -428,6 +429,7 @@ export function useValidators() {
     }
 
     function isNumberValid(value, required = false){
+        console.log("triggered", value, required);
         if (value) {
             if (typeof value === 'number'){
                 if (value < config.limitations.MIN_NUMBER) {

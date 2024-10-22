@@ -222,6 +222,7 @@
     "descendingly": "Descendingly ",
     "ascendingly": "Ascendingly ",
     "by": "by ",
+    "more than": "More than",
     "time": {
       "starts from": "Starts From",
       "before": "Before",
@@ -260,7 +261,10 @@
     "select": "Please Select",
     "temporarily empty": "Currently Unprovided",
     "add": "Add",
-    "generated condition as follows": "Generated Condition as follows:"
+    "generated condition as follows": "Generated Condition as follows:",
+    "pricing applies for": "Pricing Applies for",
+    "any quantity": "any quantity",
+    "any size": "for any size"
   },
   "units":{
     "transactionUnit": ""
@@ -301,9 +305,9 @@
     "tax_number":"Tax Number",
     "addresses": "Addresses",
     "en_unit": "Unit",
-    "ch_unit": "Chinese Unit",
-    "quantity_unit": "Quantity Unit",
-    "size_unit": "Size Unit",
+    "ch_unit": "Unit",
+    "quantity_unit": "Unit",
+    "size_unit": "Unit",
     "threshold": "Threshold",
     "product & materials": "Product & Materials",
     "transaction details": "Transaction Details",

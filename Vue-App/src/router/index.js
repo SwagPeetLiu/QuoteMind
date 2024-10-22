@@ -3,7 +3,6 @@ import store from "../store";
 import Dashboard from "@/views/Dashboard.vue";
 
 // Company Resources
-import test from "@/views/resources/test.vue";
 import Employees from "@/views/resources/Employees.vue";
 import Materials from "@/views/resources/Materials.vue";
 import Positions from "@/views/resources/Positions.vue";

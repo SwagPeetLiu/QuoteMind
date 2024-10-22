@@ -392,7 +392,7 @@ function mapFormSubmissionType(column){
         return "monetary number";
     }
     // customised form input will be managed individually in different components
-    else if (column === "numerical threshold" || column === "client condition"){
+    else if (column === "quantity requirement" || column === "size treshold" || column === "client condition"){
         return column;
     }
     else if(column.includes("date")){
@@ -418,6 +418,9 @@ function mapMandatory(column, table = null){
     }
     if (column === 'size'){
         return table === "transactions" ? true : false;
+    }
+    if (column === "price_per_unit"){
+        return table === "pricings" ? true : false;
     }
     return false;
 }

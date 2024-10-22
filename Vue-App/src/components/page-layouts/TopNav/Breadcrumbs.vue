@@ -77,7 +77,6 @@ export default {
     },
     currentPage() {
       const name = this.$route.name;
-      const isLanEnglish = this.$store.getters.getLanguage == 'en';
       if (name == "/" || name == "Dashboard") {
         return this.t("routes.dashboard");
       }

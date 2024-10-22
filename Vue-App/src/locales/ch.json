@@ -224,6 +224,7 @@
     "descendingly": "降序",
     "ascendingly": "升序",
     "by": "按照",
+    "more than": "需大于",
     "time": {
       "starts from": "开始于",
       "before": "截止于",
@@ -263,7 +264,10 @@
     "select": "请选择",
     "temporarily empty": "暂未提供",
     "add": "添加",
-    "generated condition as follows": "生成条件如下:"
+    "generated condition as follows": "生成条件如下:",
+    "pricing applies for": "定价符合",
+    "any quantity": "任意数量",
+    "any size": "任意面积"
   },
   "units":{
     "transactionUnit": "笔"
@@ -303,10 +307,10 @@
     "descriptions":"详细描述",
     "tax_number":"税号",
     "addresses": "地址",
-    "en_unit": "英文单位",
+    "en_unit": "单位",
     "ch_unit": "单位",
-    "quantity_unit": "数量单位",
-    "size_unit": "尺寸单位",
+    "quantity_unit": "单位",
+    "size_unit": "单位",
     "threshold": "阈值",
     "product & materials": "产品和材质",
     "transaction details": "交易详情",
