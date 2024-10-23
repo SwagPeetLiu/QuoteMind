@@ -44,7 +44,6 @@
             :disabled="isDisabled"
             @input="onInput"
         />
-        {{ isValid }}
         <!-- validation tooltip -->
         <div v-if="isEditing && validationTips" class="invalid-tooltip fs-7">
             {{ validationTips }}
@@ -130,6 +129,14 @@ export default {
                 this.originalValue = this.value;
             }
         },
+        
+        // once the input requiredness changes, update the valdity correspondingly
+        isRequired(newValue, oldValue){
+            if (newValue !== oldValue){
+                this.inputValue = this.value;
+                this.updateValue();
+            }
+        }
     },
     computed:{
         isEditing(){
@@ -137,35 +144,9 @@ export default {
         }
     },
     methods:{
-        onInput: debounce(function(){
-            // validating value based on the type
-            let validateValue;
-            if (this.type == "number"){
-                try{
-                    validateValue = Number(this.inputValue);
-                    if (isNaN(validateValue)){
-                        this.isValid = false;
-                        this.validationTips = this.t('validation.is invalid');
-                        return this.$emit("update-form", this.name, this.inputValue, this.isValid);
-                    }
-                }
-                catch(error){
-                    this.isValid = false;
-                    this.validationTips = this.t('validation.is invalid');
-                    return this.$emit("update-form", this.name, this.inputValue, this.isValid);
-                }
-            }
-            else{
-                if (this.inputValue.trim() === ""){
-                    validateValue = null;
-                }
-                else{
-                    validateValue = this.inputValue.trim();
-                }
-            }
-
+        updateValue(){
             // map out the input validations
-            const inputValidation = mapValidation(this.name, validateValue, this.isRequired);
+            const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
             this.isValid = inputValidation.valid;
             if (!this.isValid){
                 this.validationTips = inputValidation.message;
@@ -173,7 +154,15 @@ export default {
             else{
                 this.validationTips = "";
             }
-            this.$emit("update-form", this.name, validateValue, this.isValid);
+            
+            // emits the updates to the parent:
+            if (this.inputValue === ""){
+                return this.$emit("update-form", this.name, null, this.isValid);
+            }
+            return this.$emit("update-form", this.name, this.inputValue, this.isValid);
+        },
+        onInput: debounce(function(){
+            this.updateValue();
         }, config.UI.textDebouce),
     },
     beforeMount(){

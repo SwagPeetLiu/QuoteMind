@@ -9,7 +9,6 @@ const unicodeRegex = /^[\p{L}\p{N}\p{P}\s]+$/u;
 export function useValidators() {
     // centralised validator on the client side:
     function mapValidation(target, value, required = true) {
-        console.log("mappingValidation,", target, value, required);
         if (target === 'username') return isUsernameValid(value);
         if (target === 'email') return isEmailValid(value);
         if (target === 'password') {
@@ -47,12 +46,12 @@ export function useValidators() {
             return isPostalValid(value);
         }
         if (target === "quantity"){
-            return isIntegerValid(value, true);
+            return isIntegerPositive(value, required);
         }
         if (target === "price_per_unit" || target === "amount" || target === "size"
             || target === "length" || target === "width" || target === "height"
         ){
-            return isNumberValid(value, required);
+            return isNumericPositive(value, required);
         }
         else{
             return isTextInputValid(value, false, "input"); 
@@ -284,25 +283,61 @@ export function useValidators() {
         return { valid: true };
     }
 
-    function isNumericPositive(input){
+    function isNumericPositive(input, required = false) {
+        
+        // Handle empty/null cases
+        if (input === null || input === '') {
+            return { 
+                valid: !required, 
+                message: required ? `${t('validation.cannot be empty')}` : ''
+            };
+        }
+    
         let valid = false;
-        if (typeof input === 'number' && !isNaN(input)) {
-            valid = input > 0;
-        }
-        if (typeof input === 'string'){
-            // Float validation
-            const parsed = parseFloat(input);
-            if (!isNaN(parsed) && isFinite(input)) {
-                valid =  parsed > 0;
-            }
 
-            //Integer validation
-            const parsedInt = parseInt(input, 10);
-            if (!isNaN(parsedInt) && isFinite(input)) {
-                valid = parsedInt > 0;
-            }
+        // Handle number type
+        if (typeof input === 'number') {
+            valid = !isNaN(input) && isFinite(input) && input > 0;
+            return { valid, message: valid ? '' : `${t('validation.number')}${t('validation.is invalid')}`};
         }
-        return { valid: valid, message: `${valid ? '' : t('validation.is invalid')}` };
+    
+        // Handle string type
+        if (typeof input === 'string') {
+            const parsed = parseFloat(input);
+            valid = !isNaN(parsed) && isFinite(input) && parsed > 0;
+            return { valid, message: valid ? '' : `${t('validation.number')}${t('validation.is invalid')}`};
+        }
+    
+        return { valid: false, message: `${t('validation.number')}${t('validation.is invalid')}`};
+    }
+
+    function isIntegerPositive(input, required = false) {
+        // Handle empty/null cases
+        if (input === null || input === '') {
+            return { valid: !required, message: required ? t('validation.cannot be empty') : ''};
+        }
+    
+        let valid = false;
+    
+        // Handle number type
+        if (typeof input === 'number') {
+            valid = !isNaN(input) && Number.isInteger(input) && input > 0;
+            return { valid, message: valid ? '' : `${t('validation.number')}${t('validation.is invalid')}`};
+        }
+    
+        // Handle string type (Check if it's a valid integer string (no decimals)
+        if (typeof input === 'string') {
+            const trimmed = input.trim();
+            const isIntegerString = /^\d+$/.test(trimmed);
+            
+            if (isIntegerString) {
+                const parsed = parseInt(trimmed, 10);
+                valid = !isNaN(parsed) && parsed > 0;
+            }
+            return { valid, message: valid ? '' : `${t('validation.number')}${t('validation.is invalid')}`};
+        }
+    
+        return { valid: false, message: `${t('validation.number')}${t('validation.is invalid')}`};
     }
 
     function isPhoneValid(phone, required) {
@@ -399,56 +434,6 @@ export function useValidators() {
             return { valid: true };
         }
         return { valid: false };
-    }
-
-    function isIntegerValid(value, required = false) {
-        if (value) {
-            if (typeof value === 'number'){
-                if (Number.isInteger(value)) {
-                    if (value < config.limitations.MIN_NUMBER) {
-                        return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too small')}`};
-                    }
-                    else if (value > config.limitations.MAX_NUMBER) {
-                        return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too large')}`};
-                    }
-                    else{
-                        return { valid: true };
-                    }
-                }
-                else{
-                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
-                }
-            }
-            else{
-                return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
-            }
-        }
-        else{
-            return { valid: required ? false : true, message: `${t('validation.cannot be empty')}`};
-        }
-    }
-
-    function isNumberValid(value, required = false){
-        console.log("triggered", value, required);
-        if (value) {
-            if (typeof value === 'number'){
-                if (value < config.limitations.MIN_NUMBER) {
-                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too small')}`};
-                }
-                else if (value > config.limitations.MAX_NUMBER) {
-                    return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.too large')}`};
-                }
-                else{
-                    return { valid: true };
-                }
-            }
-            else{
-                return { valid: false, message: `${t('validation.input value')}${t('others.space')}${t('validation.is invalid')}`};
-            }
-        }
-        else{
-            return { valid: required ? false : true, message: `${t('validation.cannot be empty')}`};
-        }
     }
     
     return {

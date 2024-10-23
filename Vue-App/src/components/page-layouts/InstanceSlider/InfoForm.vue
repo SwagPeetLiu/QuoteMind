@@ -7,6 +7,7 @@
             novalidate
             ref="sliderForm"
         >
+
             <!-- display by sections -->
             <div 
                 class="my-2 w-100 d-flex flex-wrap" 
@@ -316,7 +317,7 @@ export default {
 
         validateInputUpdate(name, value, isValid) {
             this.formData[name] = { value: value, isValidated: isValid };
-            console.log("validateInputUpdate", name, value, isValid);
+            console.log("FormUpdate", name, value, isValid);
         }
     },
     mounted() {

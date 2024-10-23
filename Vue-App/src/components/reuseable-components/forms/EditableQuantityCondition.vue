@@ -2,9 +2,8 @@
     <div class="w-100">
 
         <!-- Display mode -->
-        <SlideUpElement v-if="!isEditing">
+        <SlideUpElement v-if="!isEditing & isQuantityProvided">
             <div 
-                v-if="isQuantityProvided"
                 class="w-100 d-flex align-items-center text-lg"
             >
                 <i class="me-2 pe-1 my-0 text-gradient text-dark" :class="getIcon('quantity')"></i>
@@ -13,9 +12,9 @@
                 <span class="text-gradient text-dark font-weight-bold my-0">{{ quantity }}</span>
                 <span class="text-gradient text-dark font-weight-bold my-0">{{ quantityUnit }}</span>
             </div>
-
+        </SlideUpElement>
+        <SlideUpElement v-if="!isEditing && !isQuantityProvided">
             <div 
-                v-else
                 class="w-100 d-flex align-items-center text-lg"
             >
                 <i class="me-2 my-0 text-gradient text-dark font-weight-bold" :class="getIcon('quantity')"></i>
@@ -26,10 +25,10 @@
         </SlideUpElement>
 
         <!-- Editing Mode -->
-        <div class="w-100 h-100 d-flex align-items-center mb-3" v-else>
-            <!-- <p class="text-gradient text-dark my-0 text-nowrap">
+        <div class="w-100 h-100 d-flex align-items-center mb-3" v-if="isEditing">
+            <p class="text-gradient text-dark my-0 text-nowrap">
                 {{ t('stats.more than') }}:
-            </p> -->
+            </p>
             <div class="h-100 px-1 flex-grow-1">
                 <EditableInfo
                     :icon="getIcon('quantity')"
@@ -63,7 +62,7 @@ import { mapThresholdOperator } from "@/utils/helpers";
 import SlideUpElement from '@/components/reuseable-components/styler/SlideUpElement.vue';
 import { getIcon } from "@/utils/iconMapper.js";
 import EditableInfo from '@/components/reuseable-components/forms/EditableInfo.vue';
-// import { config } from "@/config/config";
+import { config } from "@/config/config";
 
 export default {
     name: "EditableQuantityCondition",
@@ -91,8 +90,6 @@ export default {
             t,
             originalQauntity: null,
             originalQuantityUnit: null,
-            quantityValidity: true,
-            unitValidity: true
         }
     },
     computed:{
@@ -126,41 +123,43 @@ export default {
         mapThresholdOperator,
         getIcon,
         updateCondition(target, value, isValid){
-            console.log("updateCondition", target, value, isValid);
-            // update the validity:
-            if (target === "quantity_unit"){
-                this.unitValidity = isValid;
-            }
-            else{
-                this.quantityValidity = isValid;
-            }
-            let validity = this.quantityValidity && this.unitValidity;
-            console.log("combined validity", validity);
 
-            // if we clearing the quantity based condition:
-            if (target === "quantity" && value === 0){
-                this.quantityValidity = true;
-                this.unitValidity = true;
-                this.$emit("update-form", "quantity", null, true);
-                this.$emit("update-form", "quantity_unit", null, true);
+            // Quantity updates
+            if (target === "quantity"){
+
+                // if user is clearing the input
+                if (value === null && this.quantityUnit){
+                    this.$emit("update-form", "quantity", null, true);
+                    this.$emit("update-form", "quantity_unit", null, true);
+                }
+                // if Initialise an input, then do so for the unit as well
+                else if (value && isValid && !this.quantityUnit){
+                    this.$emit("update-form", "quantity", value, true);
+                    this.$emit(
+                        "update-form",
+                        "quantity_unit", 
+                        this.$store.getters.getLanguage == 'ch' ? 
+                        config.units.defaultQuantityCHUnit : 
+                        config.units.defaultQuantityENUnit, 
+                        true
+                    );
+                }
+                // if the value is not null, but failed validation
+                else{
+                    if(isValid){
+                        this.$emit("update-form", "quantity", Number(value) > 0 ? value : null, isValid);
+                    }
+                    else{
+                        this.$emit("update-form", "quantity", value, isValid);
+                    }
+                }
             }
-            // // initialise a quantity unit
-            // else if (target === "quantity" && value && isValid && !this.quantityUnit){
-            //     this.quantityValidity = true;
-            //     this.unitValidity = true;
-            //     this.$emit("update-form", "quantity", value, true);
-            //     this.$emit(
-            //         "update-form",
-            //         "quantity_unit", 
-            //         this.$store.getters.getLanguage == 'ch' ? 
-            //         config.units.defaultQuantityCHUnit : 
-            //         config.units.defaultQuantityENUnit, 
-            //         true
-            //     );
-            // }
             else{
-                //normal updates
-                this.$emit("update-form", target, value, validity);
+                // if user is inputing the unit first, initialise a default quantity
+                if (value && isValid && !this.quantity){
+                    this.$emit("update-form", "quantity", config.defaultValue.quantity, true);
+                }
+                this.$emit("update-form", target, value, isValid);
             }
         }
     },
@@ -170,8 +169,6 @@ export default {
             if (newValue === "cancel"){
                 this.$emit("update-form", "quantity", this.originalQauntity, true);
                 this.$emit("update-form", "quantity_unit", this.originalQuantityUnit, true);
-                this.quantityValidity = true;
-                this.unitValidity = true;
                 return;
             }
             // upon successful udpates, update its original value
