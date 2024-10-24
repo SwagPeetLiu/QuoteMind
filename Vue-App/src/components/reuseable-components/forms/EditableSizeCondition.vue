@@ -2,20 +2,20 @@
     <div class="w-100">
 
         <!-- Display mode -->
-        <SlideUpElement v-if="!isEditing">
+        <SlideUpElement v-if="!isEditing & isSizeConditionProvided">
             <div 
-                v-if="isSizeConditionProvided"
-                class="w-100 d-flex align-items-center text-gradient text-dark text-lg"
+                class="w-100 d-flex align-items-center font-weight-bold text-gradient text-dark text-lg"
             >
                 <i class="me-2 my-0" :class="getIcon('size')"></i>
-                <span class="my-0 font-weight-bold">{{ t(`columns.size`) }}</span>
-                <span class="mx-2 font-weight-bold my-0">{{ currentThreshold }}</span>
+                <span class="my-0">{{ t(`columns.size`) }}</span>
+                <span class="mx-2 my-0">{{ currentThreshold }}</span>
                 <span class="my-0">{{ size }}</span>
                 <span class="my-0">{{ sizeUnit }}</span>
             </div>
+        </SlideUpElement>
 
+        <SlideUpElement v-if="!isEditing & !isSizeConditionProvided">
             <div 
-                v-else
                 class="w-100 d-flex align-items-center text-lg"
             >
                 <i class="me-2 my-0 font-weight-bolder text-gradient text-dark" :class="getIcon('size')"></i>
@@ -37,7 +37,7 @@
                     :selectableOptions="availableTresholdOptions"
                     :currentSelection="currentThreshold"
                     :isDisabled="false"
-                    :isRequired="true"
+                    :isRequired="isComplementRequired"
                     @update-selection="updateCondition"
                 />
             </div>
@@ -49,7 +49,7 @@
                     :name="'size'"
                     :value="size"
                     :formStatus="formStatus"
-                    :isRequired="true"
+                    :isRequired="isQuantityRequired"
                     :isDisabled="false"
                     type="number"
                     @update-form="updateCondition"
@@ -61,9 +61,9 @@
                 <GeneralDropdown
                     :target="getRecordUnit('size', $i18n.locale)"
                     :selectableOptions="availableUnitOptions"
-                    :currentSelection="currentSize"
+                    :currentSelection="currentSizeUnit"
                     :isDisabled="false"
-                    :isRequired="true"
+                    :isRequired="isComplementRequired"
                     @update-selection="updateCondition"
                 />
             </div>
@@ -116,7 +116,7 @@ export default {
     },
     props: {
         size:{
-            type: [Number, null],
+            type: [Number, String, null], // string if user inputted an invalid string that is not numerical
             required: true
         },
         sizeUnit: {
@@ -146,21 +146,21 @@ export default {
             return this.formStatus == "editing" || this.formStatus == "saving";
         },
         isSizeConditionProvided(){
-            if (this.size && this.sizeUnit && this.currentThreshold){
+            if (this.size && this.currentSizeUnit && this.currentThreshold){
                 return true;
             }
             return false;
         },
-        availableTresholdOptions(){
-            return config.multipleOptions.threshold;
-        },
         currentThreshold(){
             return mapThresholdOperator(this.threshold); // valid treshold will have non-null value
         },
-        availableUnitOptions(){
-            return config.units.size;
+        availableTresholdOptions(){
+            return config.multipleOptions.threshold; // =, <, <=, >, >= ...
         },
-        currentSize(){
+        availableUnitOptions(){
+            return config.units.size; // letter represetation
+        },
+        currentSizeUnit(){
             if (this.sizeUnit !== null){
                 if (this.availableUnitOptions.includes(this.sizeUnit)){
                     return this.sizeUnit;
@@ -172,18 +172,64 @@ export default {
             else{
                 return null;
             }
+        },
+        isQuantityRequired(){
+            if (this.currentSizeUnit !== null || this.currentThreshold !== null){
+                return true;
+            }
+            else{
+                return false;
+            }
+        },
+        isComplementRequired(){
+            if (this.size !== null && this.size){
+                return true;
+            }
+            else{
+                return false;
+            }
         }
     },
     methods:{
         getIcon,
         getRecordUnit,
         updateCondition(target, value, isValid){
-            if (target === "threshold"){
-                this.$emit("update-form", target, reverseThresholdOperator(value), true);
-            }
+            if (target === "size"){
+                // if the user is clearing the input
+                if (value === null && (this.currentThreshold || this.currentSizeUnit)){
+                    this.$emit("update-form", "size", null, true);
+                    this.$emit("update-form", "size_unit", null, true);
+                    this.$emit("update-form", "threshold", null, true);
+                }
 
+                // if Initialise an input, then do so for the unit & threshold as well
+                else if (value && isValid && (!this.currentSizeUnit || !this.currentThreshold)){
+                    this.$emit("update-form", "size", value, true);
+                    this.$emit("update-form", "size_unit", config.units.defaultSize, true); // needs to change this when app's config includeds Size Unit
+                    this.$emit("update-form", "threshold", reverseThresholdOperator(config.defaultValue.threshold), true);
+                }
+
+                // else update based on the validity
+                else{
+                    if (isValid){
+                        this.$emit("update-form", "size", Number(value) > 0 ? value : null, isValid);
+                    }
+                    else{
+                        this.$emit("update-form", "size", value, isValid);
+                    }
+                }
+            }
             else{
-                this.$emit("update-form", target, value, isValid);
+                // if user is inputting other information firtst, then initialise a default size
+                if (value && isValid && !this.size){
+                    this.$emit("update-form", "size", config.defaultValue.size, true);
+                }
+                this.$emit(
+                    "update-form", 
+                    target, 
+                    target === "threshold" ? reverseThresholdOperator(value) : value, 
+                    isValid
+                );
             }
         },
         revertoOriginal(){
@@ -199,13 +245,6 @@ export default {
             if (newValue === "cancel"){
                 this.revertoOriginal();
                 return;
-            }
-            // direct submission if the input is disabled
-            if (newValue === "saving" || newValue === "editing"){
-                if (this.isDisabled){
-                    this.revertoOriginal();
-                    return;
-                }
             }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){

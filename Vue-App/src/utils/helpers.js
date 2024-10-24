@@ -540,7 +540,7 @@ function reverseThresholdOperator(operator) {
     switch (operator) {
         case "=":
             return "eq";
-        case "!=":
+        case "≠":
             return "ne";
         case "<":
             return "lt";

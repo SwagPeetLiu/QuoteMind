@@ -4,13 +4,13 @@
         <!-- Display mode -->
         <SlideUpElement v-if="!isEditing & isQuantityProvided">
             <div 
-                class="w-100 d-flex align-items-center text-lg"
+                class="w-100 d-flex align-items-center font-weight-bold text-lg"
             >
                 <i class="me-2 pe-1 my-0 text-gradient text-dark" :class="getIcon('quantity')"></i>
-                <span class="my-0 font-weight-bold text-gradient text-dark">{{ t(`columns.quantity`) }}</span>
-                <span class="mx-2 font-weight-bold my-0 text-gradient text-dark">{{ mapThresholdOperator('ge') }}</span>
-                <span class="text-gradient text-dark font-weight-bold my-0">{{ quantity }}</span>
-                <span class="text-gradient text-dark font-weight-bold my-0">{{ quantityUnit }}</span>
+                <span class="my-0 text-gradient text-dark">{{ t(`columns.quantity`) }}</span>
+                <span class="mx-2 my-0 text-gradient text-dark">{{ mapThresholdOperator('ge') }}</span>
+                <span class="text-gradient text-dark my-0">{{ quantity }}</span>
+                <span class="text-gradient text-dark my-0">{{ quantityUnit }}</span>
             </div>
         </SlideUpElement>
         <SlideUpElement v-if="!isEditing && !isQuantityProvided">
@@ -72,7 +72,7 @@ export default {
     },
     props: {
         quantity: {
-            type: [Number, String, null],
+            type: [Number, String, null], // string if user inputted an invalid string that is not numerical
             required: true
         },
         quantityUnit: {

@@ -176,7 +176,8 @@ const config = {
     },
     defaultValue:{
         "size": 1,
-        "quantity": 100
+        "quantity": 100,
+        "threshold": ">="
     },
     units:{
         "defaultSize": "m²",
