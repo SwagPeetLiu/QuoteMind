@@ -392,7 +392,10 @@ function mapFormSubmissionType(column){
         return "monetary number";
     }
     // customised form input will be managed individually in different components
-    else if (column === "quantity requirement" || column === "size treshold" || column === "client condition"){
+    else if (
+        column === "quantity requirement" || column === "size treshold" || column === "client condition" ||
+        column === "product details"
+    ){
         return column;
     }
     else if(column.includes("date")){

@@ -132,6 +132,7 @@ const config = {
         },
         "transactions": {
             "time": ["transaction_date", "creation_date", "modified_date"],
+            "product details": ["product details"],
             "details": ["status", "name", "quantity", "quantity_unit", "price_per_unit", "amount"],
             "product details": ["product", "materials"],
             "dimensions": ["length", "width", "en_unit", "ch_unit", "size", "size_unit"],
@@ -183,8 +184,8 @@ const config = {
         "defaultDiemsion": "mm",
         "defaultQuantityENUnit": "units",
         "defaultQuantityCHUnit": "个",
-        "diemsion": ["m","cm","mm"],
-        "size": ["m²","cm²","mm²","cun","inch"],
+        "diemsion": ["m","cm","mm","cun","inch"],
+        "size": ["m²","cm²","mm²"],
     },
     date:{
         format: { en: 'yyyy-MM-dd', ch: 'yyyy年MM月dd日' },
