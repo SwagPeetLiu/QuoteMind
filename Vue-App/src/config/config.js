@@ -86,8 +86,7 @@ const config = {
     // dedfault displaying columns on table styling
     /*
         - target: mapped to id & name (full_name, ch_name, en_nane) & icon
-        - name: mapped to ch_name & en_name
-        - dimension: will be mapped & rendered with all dimensions (units, length, width, height)
+        - dimension: will be mapped & rendered with all dimensions (units, length, width, height....)
     */
     defaultListings:{
         "clients": ["target", "phone", "wechat_contact", "qq_contact", "company", "email"],
@@ -186,6 +185,10 @@ const config = {
         "defaultQuantityCHUnit": "个",
         "diemsion": ["m","cm","mm"],
         "size": ["m²","cm²","mm²","cun","inch"],
+    },
+    date:{
+        format: { en: 'yyyy-MM-dd', ch: 'yyyy年MM月dd日' },
+        locales: { en: "en-US", ch: "zh-CN" }
     }
 }
 

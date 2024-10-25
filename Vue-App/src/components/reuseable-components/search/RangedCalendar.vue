@@ -76,11 +76,8 @@ export default {
                 start: startDate,
                 end: endDate
             },
-            dateFormat: { en: 'yyyy-MM-dd', ch: 'yyyy年MM月dd日' },
-            locales: {
-                en: "en-US",
-                ch: "zh-CN"
-            }
+            dateFormat: config.date.format, // display format
+            locales: config.date.locales // locale on date calender pickers
         };
     },
     computed: {

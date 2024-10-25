@@ -404,13 +404,16 @@ function mapFormSubmissionType(column){
     else if (column === "addresses"){
         return "addresses";
     }
+    else if (column === "status"){
+        return "categorical";
+    }
     else return 'text';
 }
 
 // function used to determine if certain column is mandatory upon form submissions
 function mapMandatory(column, table = null){
     // if column is non-essential values:
-    if (column === "id" || column.includes("name")){
+    if (column === "id" || column.includes("name") || column.includes("date")){
         return true;
     }
     if (column === "quantity"){
@@ -421,6 +424,9 @@ function mapMandatory(column, table = null){
     }
     if (column === "price_per_unit"){
         return table === "pricings" ? true : false;
+    }
+    if (column === "product"){
+        return true;
     }
     return false;
 }
@@ -560,8 +566,9 @@ function reverseThresholdOperator(operator) {
 function mapFormData(data, isValidated = true) {
     const result = {};
     for (const [key, value] of Object.entries(data)) {
-        result[key] = { value, isValidated: isValidated };
+        result[key] = { value: value, isValidated: isValidated };
     }
+    console.log("mapFormData", result);
     return result;
 }
 

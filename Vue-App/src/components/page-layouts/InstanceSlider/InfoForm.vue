@@ -7,7 +7,6 @@
             novalidate
             ref="sliderForm"
         >
-
             <!-- display by sections -->
             <div 
                 class="my-2 w-100 d-flex flex-wrap" 
@@ -118,6 +117,17 @@
                         @update-form="validateInputUpdate"
                         @scroll-down="scrollDown"
                     />
+
+                    <!-- date based input field -->
+                    <EditableDate
+                        v-if="mapFormSubmissionType(attribute) === 'date'"
+                        :target="attribute"
+                        :date="formData[attribute].value"
+                        :formStatus="formStatus"
+                        :isRequired="mapMandatory(attribute)"
+                        :isDisabled="mapDisabled(attribute, $i18n.locale)"
+                        @update-form="validateInputUpdate"
+                    />
                 </div>
                 <hr v-if="index < sections.length - 1" class="horizontal dark my-2 w-100" />
             </div>
@@ -185,6 +195,8 @@ import EditableAddresses from "@/components/reuseable-components/forms/EditableA
 import EditableSizeCondition from "@/components/reuseable-components/forms/EditableSizeCondition.vue";
 import EditableClientCondition from "@/components/reuseable-components/forms/EditableClientCondition.vue";
 import EditableQuantityCondition from "@/components/reuseable-components/forms/EditableQuantityCondition.vue";
+import EditableDate from "@/components/reuseable-components/forms/EditableDate.vue";
+
 export default {
     name: "InfoForm",
     components: {
@@ -198,7 +210,8 @@ export default {
         EditableAddresses,
         EditableSizeCondition,
         EditableClientCondition,
-        EditableQuantityCondition
+        EditableQuantityCondition,
+        EditableDate
     },
     props: {
         target: {
