@@ -43,17 +43,17 @@ module.exports = (db) => {
             try{
                 await db.none(`UPDATE public.transactions SET modified_date = NOW(),
                     name = $1, status = $2, quantity = $3, price_per_unit = $4, amount = $5, note = $6,
-                    colour = $7, width = $8, height = $9, length = $10, size = $11, en_unit = $12,
-                    ch_unit = $13, product = $14::uuid, materials = $15::uuid[], company = $16::uuid,
-                    client = $17::uuid, employee = $18::uuid[], addresses = $19::uuid[], quantity_unit = $20,
-                    size_unit = $21, transaction_date = $22
-                    WHERE id = $23 AND created_by = $24`, 
+                    colour = $7, width = $8, height = $9, length = $10, size = $11, dimension_unit = $12, 
+                    product = $13::uuid, materials = $14::uuid[], company = $15::uuid,
+                    client = $16::uuid, employee = $17::uuid[], addresses = $18::uuid[], quantity_unit = $19,
+                    size_unit = $20, transaction_date = $21
+                    WHERE id = $22 AND created_by = $23`, 
                     [
                         req.body.name, req.body.status,req.body.quantity, req.body.price_per_unit,
                         req.body.amount, req.body.note, req.body.colour, req.body.width, req.body.height,
-                        req.body.length, req.body.size, req.body.en_unit, req.body.ch_unit,
-                        req.body.product, req.body.materials, req.body.company, req.body.client, req.body.employee,
-                        req.body.addresses, req.body.quantity_unit, req.body.size_unit, req.body.transaction_date,
+                        req.body.length, req.body.size, req.body.dimension_unit, req.body.product, req.body.materials, 
+                        req.body.company, req.body.client, req.body.employee, req.body.addresses, req.body.quantity_unit, 
+                        req.body.size_unit, req.body.transaction_date,
                         id,owner
                     ]);
                 return res.status(200).json({ message: "transaction updated successfully" });
@@ -67,17 +67,17 @@ module.exports = (db) => {
             try{
                 const newTransaction = await db.oneOrNone(`INSERT INTO public.transactions (
                     creation_date, created_by, modified_date, name, status, quantity, price_per_unit, amount,
-                    note, colour, width, height, length, size, en_unit, ch_unit, product, materials, company,
+                    note, colour, width, height, length, size, dimension_unit, product, materials, company,
                     client, employee, addresses, quantity_unit, size_unit, transaction_date
                     ) VALUES (
-                    NOW(), $1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-                    $15::uuid, $16::uuid[], $17::uuid, $18::uuid, $19::uuid[], $20::uuid[], $21, $22, $23
+                    NOW(), $1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+                    $14::uuid, $15::uuid[], $16::uuid, $17::uuid, $18::uuid[], $19::uuid[], $20, $21, $22
                     ) 
                     RETURNING id`, 
                     [
                         req.sessionEmail, req.body.name, req.body.status, req.body.quantity, req.body.price_per_unit,
                         req.body.amount, req.body.note, req.body.colour, req.body.width, req.body.height,
-                        req.body.length, req.body.size, req.body.en_unit, req.body.ch_unit, req.body.product,
+                        req.body.length, req.body.size, req.body.dimension_unit, req.body.product,
                         req.body.materials, req.body.company, req.body.client, req.body.employee, req.body.addresses,
                         req.body.quantity_unit, req.body.size_unit, req.body.transaction_date
                     ]);
@@ -118,8 +118,8 @@ module.exports = (db) => {
                 return res.status(400).json({ message: "Basic information are required" });
             }
             if (req.body.width || req.body.height || req.body.length) {
-                if (!req.body.en_unit || !req.body.ch_unit) {
-                    return res.status(400).json({ message: "units are required" });
+                if (!req.body.dimension_unit) {
+                    return res.status(400).json({ message: "dimensino units are required" });
                 }
             }
             if (!req.body.size_unit && req.body.size) return res.status(400).json({ message: "size unit is required" });
@@ -140,8 +140,7 @@ module.exports = (db) => {
                 validateString(req.body.colour),
                 validateString(req.body.quantity_unit),
                 validateDescriptions(req.body.note),
-                validateDimensionUnit(req.body.en_unit),
-                validateDimensionUnit(req.body.ch_unit),
+                validateDimensionUnit(req.body.dimension_unit),
                 validateSizeUnit(req.body.size_unit),
                 validateTransactionDate(req.body.transaction_date), // nullable transaction date
                 await validateInstances([req.body.product], owner, "products", db),

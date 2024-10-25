@@ -222,9 +222,8 @@ const testObject = {
             height: 5,
             length: 2,
             size: 60,
-            en_unit: "m",
-            ch_unit: "米",
-            size_unit: "平米",
+            dimension_unit: "m",
+            size_unit: "m²",
             quantity_unit: "个",
             addresses: null // to be attached
         },
@@ -245,9 +244,8 @@ const testObject = {
             height: 5,
             length: 4,
             size: 120,
-            en_unit: "m",
-            ch_unit: "米",
-            size_unit: "平米总和",
+            dimension_unit: "m",
+            size_unit: "m²",
             quantity_unit: "个总和",
             addresses: null // to be attached
         }
@@ -613,15 +611,10 @@ const invalidTestingRange = {
         "negative": -1,
         "large value": 123456789015.1256
     },
-    en_unit: {
+    dimension_unit: {
         "invalid type": 1,
         "invalid value": "!@#$%^&*",
         "too long": `${"t".repeat(config.limitations.Max_Name_Length + 1)}`,
-    },
-    ch_unit: {
-        "invalid type": 1,
-        "invalid value": "!@#$%^&*",
-        "too long": `${"测".repeat(config.limitations.Max_Name_Length + 1)}`,
     },
     size: {
         "invalid type": "x t4st",
@@ -909,8 +902,7 @@ function isTransactionValid(transaction) {
         'amount' in transaction &&
         'note' in transaction &&
         'colour' in transaction &&
-        'en_unit' in transaction &&
-        'ch_unit' in transaction &&
+        'dimension_unit' in transaction &&
         'width' in transaction &&
         'height' in transaction &&
         'length' in transaction &&

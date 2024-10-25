@@ -100,8 +100,7 @@ describe("/transactions Router", () => {
                 width: invalidTestingRange.width,
                 height: invalidTestingRange.height,
                 length: invalidTestingRange.length,
-                en_unit: invalidTestingRange.en_unit,
-                ch_unit: invalidTestingRange.ch_unit,
+                dimension_unit: invalidTestingRange.dimension_unit,
                 size: invalidTestingRange.size,
                 size_unit: invalidTestingRange.size_unit,
                 product: invalidTestingRange.product,
@@ -133,32 +132,25 @@ describe("/transactions Router", () => {
                     .send({ ...validTestingObject, client : null, company : null });
                 expect(response.statusCode).toBe(400);
             });
-            it ("it cannot post with both null en_unit & ch_unit while length is specified", async () => {
+            it ("it cannot post with null dimension_unit while length is specified", async () => {
                 const response = await request(app)
                     .post('/transactions/new')
                     .set('session-token', validSession)
-                    .send({ ...validTestingObject, en_unit : null, ch_unit : null, width : null, height : null });
+                    .send({ ...validTestingObject, dimension_unit : null, width : null, height : null });
                 expect(response.statusCode).toBe(400);
             });
-            it ("it cannot post with both null en_unit & ch_unit while width is specified", async () => {
+            it ("it cannot post with null dimension_unit while width is specified", async () => {
                 const response = await request(app)
                     .post('/transactions/new')
                     .set('session-token', validSession)
-                    .send({ ...validTestingObject, en_unit : null, ch_unit : null, length : null, height : null });
+                    .send({ ...validTestingObject, dimension_unit : null,  length : null, height : null });
                 expect(response.statusCode).toBe(400);
             });
-            it ("it cannot post with both null en_unit & ch_unit while height is specified", async () => {
+            it ("it cannot post with  null dimension_unit while height is specified", async () => {
                 const response = await request(app)
                     .post('/transactions/new')
                     .set('session-token', validSession)
-                    .send({ ...validTestingObject, en_unit : null, ch_unit : null, width : null, length : null });
-                expect(response.statusCode).toBe(400);
-            });
-            it ("it should not create properly even with a single unit specification for dimenions", async () => {
-                const response = await request(app)
-                    .post('/transactions/new')
-                    .set('session-token', validSession)
-                    .send({ ...validTestingObject, en_unit : null});
+                    .send({ ...validTestingObject, dimension_unit : null, width : null, length : null });
                 expect(response.statusCode).toBe(400);
             });
             it ("it should not create properly if size unit is not provided, but size is", async () => {

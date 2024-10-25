@@ -290,7 +290,7 @@ function mapDefaultQueryColumns(table, detailed = false) {
                 ${prefix}.transaction_date, ${prefix}.creation_date, ${prefix}.modified_date, 
                 ${prefix}.status, ${prefix}.id, ${prefix}.name, ${prefix}.quantity, 
                 ${prefix}.price_per_unit, ${prefix}.amount, ${prefix}.note, ${prefix}.colour, 
-                ${prefix}.en_unit, ${prefix}.ch_unit, ${prefix}.width, ${prefix}.height, ${prefix}.length, 
+                ${prefix}.dimension_unit, ${prefix}.width, ${prefix}.height, ${prefix}.length, 
                 ${prefix}.size, ${prefix}.quantity_unit, ${prefix}.size_unit,
                 CASE WHEN ${prefix}.materials IS NULL OR array_length(${prefix}.materials, 1) = 0 THEN NULL
                 ELSE (
@@ -498,9 +498,7 @@ function getWhereTerm(result, table, target, keyword, type, operator, specificat
             whereClause = `${searchTarget} ${numericOperator} $${result.parameters.length + 1}`;
             result.parameters.push(value);
             if (unit) {
-                whereClause += ` AND (LOWER(${mapQueryPrefix(table)}.en_unit) = $${result.parameters.length + 1} 
-                    OR LOWER(${mapQueryPrefix(table)}.ch_unit) = $${result.parameters.length + 1})`;
-                result.parameters.push(unit.toLowerCase());
+                whereClause += ` AND (LOWER(${mapQueryPrefix(table)}.dimension_unit) = $${result.parameters.length + 1})`;
                 result.parameters.push(unit.toLowerCase());
             }
         }
