@@ -59,7 +59,7 @@
             <!-- Dropdown Selection on units -->
             <div class="h-100" style="width: 30%;">
                 <GeneralDropdown
-                    :target="getRecordUnit('size', $i18n.locale)"
+                    :target="getRecordUnit('size')"
                     :selectableOptions="availableUnitOptions"
                     :currentSelection="currentSizeUnit"
                     :isDisabled="false"
@@ -204,7 +204,7 @@ export default {
 
                 // if Initialise an input, then do so for the unit & threshold as well
                 else if (value && isValid && (!this.currentSizeUnit || !this.currentThreshold)){
-                    this.$emit("update-form", "size", value, true);
+                    this.$emit("update-form", "size", Number(value) > 0 ? Number(value) : null, true);
                     this.$emit("update-form", "size_unit", config.units.defaultSize, true); // needs to change this when app's config includeds Size Unit
                     this.$emit("update-form", "threshold", reverseThresholdOperator(config.defaultValue.threshold), true);
                 }
@@ -212,7 +212,7 @@ export default {
                 // else update based on the validity
                 else{
                     if (isValid){
-                        this.$emit("update-form", "size", Number(value) > 0 ? value : null, isValid);
+                        this.$emit("update-form", "size", Number(value) > 0 ? Number(value) : null, isValid);
                     }
                     else{
                         this.$emit("update-form", "size", value, isValid);

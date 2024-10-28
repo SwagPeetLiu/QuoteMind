@@ -126,12 +126,6 @@ export default {
                 this.inputDate = this.originalDate ? new Date(this.originalDate) : null;
                 return this.$emit("update-form", this.target, this.originalDate, true);
             }
-            if (newValue === "saving" || newValue === "editing"){
-                // direct submission if the input is disabled
-                if (this.isDisabled){
-                    return this.$emit("update-form", this.target, this.originalDate, true);
-                }
-            }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
                 this.originalDate = this.date;

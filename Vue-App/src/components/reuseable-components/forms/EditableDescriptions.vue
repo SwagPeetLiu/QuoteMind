@@ -69,7 +69,7 @@ export default {
             required: true,
         },
         value: {
-            type: String,
+            type: [String, null],
             required: true,
         },
         formStatus: {
@@ -89,7 +89,7 @@ export default {
         const { t } = useI18n({});
         return {
             t,
-            inputValue: this.value,
+            inputValue: this.value ? this.value : "",
             originalValue: "",
             isValid: true,
             validationTips: ""

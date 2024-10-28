@@ -317,12 +317,12 @@ function getRecordName(target, locale){
 }
 
 // function used to map numerical records' unit attribute:
-function getRecordUnit(target, locale){
+function getRecordUnit(target){
     if (target === "quantity" || target === "size"){
         return `${target}_unit`;
     }
-    else if(target === "width" || target === "length" || target === "height"){
-        return `${locale}_unit`;
+    else if(target === "width" || target === "length" || target === "height" || target === "dimension"){
+        return `dimension_unit`;
     }
     else{
         return "unit";
@@ -416,7 +416,9 @@ function mapFormSubmissionType(column){
 // function used to determine if certain column is mandatory upon form submissions
 function mapMandatory(column, table = null){
     // if column is non-essential values:
-    if (column === "id" || column.includes("name") || column.includes("date")){
+    if (column === "id" || column.includes("name") || column.includes("date") ||
+        column === "width" || column === "length"
+    ){
         return true;
     }
     if (column === "quantity"){
@@ -519,11 +521,6 @@ function getSortImage(column, order, existingOrderBy){
     catch(err){
         console.error(err);
     }
-}
-
-// function used to map out the product dimension unit
-function getProductDimensionUnit(locale){
-    return `${locale}_unit`;
 }
 
 // function used to map the thresholod to the indicator:
@@ -630,7 +627,6 @@ module.exports = {
     mapColumnType,
     getTargetImage,
     getSortImage,
-    getProductDimensionUnit,
     mapDefaultDimensions,
     mapDimensionUnitToSizeUnit,
     mapThresholdOperator,

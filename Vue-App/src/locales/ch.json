@@ -332,6 +332,7 @@
     "assigned position": "岗位",
     "pricing product": "定价产品",
     "pricing materials": "应用材质",
+    "pricings": "定价",
     "condition": "定价条件",
     "individual specific": "个体定价",
     "listed_conditions": "所需条件",
@@ -359,7 +360,9 @@
     "dimension_unit":{
       "mm": "毫米",
       "cm": "厘米",
-      "m": "米"
+      "m": "米",
+      "cun": "寸",
+      "inch": "英寸"
     },
     "size_unit":{
       "mm²": "mm²",

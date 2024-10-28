@@ -155,7 +155,7 @@
                                         :width="record['width']"
                                         :size="record['size']"
                                         :size_unit="record['size_unit']"
-                                        :dimension_unit="record[`${$i18n.locale}_unit`]"
+                                        :dimension_unit="record[`dimension_unit`]"
                                         :themeColour="themeColour"
                                     />
 

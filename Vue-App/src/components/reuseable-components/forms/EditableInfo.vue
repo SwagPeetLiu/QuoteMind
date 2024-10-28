@@ -134,7 +134,15 @@ export default {
         isRequired(newValue, oldValue){
             if (newValue !== oldValue){
                 this.inputValue = this.value;
-                this.updateValue();
+                this.updateValidity();
+            }
+        },
+
+        // watch for the updates of the value inputs from the parents (i.e, automative calcualtions & add ons)
+        value(newValue){
+            const textValue = newValue !== null ? newValue.toString() : "";
+            if (this.isEditing && textValue !== this.inputValue){
+                this.inputValue = newValue;
             }
         }
     },
@@ -144,8 +152,8 @@ export default {
         }
     },
     methods:{
-        updateValue(){
-            // map out the input validations
+        //update the local validity:
+        updateValidity(){
             const inputValidation = mapValidation(this.name, this.inputValue, this.isRequired);
             this.isValid = inputValidation.valid;
             if (!this.isValid){
@@ -154,7 +162,11 @@ export default {
             else{
                 this.validationTips = "";
             }
-            
+        },
+        updateValue(){
+            // update local validity
+            this.updateValidity();
+
             // emits the updates to the parent:
             if (this.inputValue === ""){
                 return this.$emit("update-form", this.name, null, this.isValid);

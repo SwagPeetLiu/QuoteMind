@@ -7,6 +7,7 @@
             novalidate
             ref="sliderForm"
         >
+            
             <!-- display by sections -->
             <div 
                 class="my-2 w-100 d-flex flex-wrap" 
@@ -93,7 +94,7 @@
                     <EditableQuantityCondition
                         v-if="mapFormSubmissionType(attribute) === 'quantity requirement'"
                         :quantity="formData['quantity'].value? formData['quantity'].value : null"
-                        :quantityUnit="formData[getRecordUnit('quantity', $i18n.locale)].value ? formData[getRecordUnit('quantity', $i18n.locale)].value : null"
+                        :quantityUnit="formData[getRecordUnit('quantity')].value ? formData[getRecordUnit('quantity')].value : null"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
                     />
@@ -102,7 +103,7 @@
                     <EditableSizeCondition
                         v-if="mapFormSubmissionType(attribute) === 'size treshold'"
                         :size="formData['size'].value? formData['size'].value : null"
-                        :sizeUnit="formData[getRecordUnit('size', $i18n.locale)].value ? formData[getRecordUnit('size', $i18n.locale)].value : null"
+                        :sizeUnit="formData[getRecordUnit('size')].value ? formData[getRecordUnit('size')].value : null"
                         :threshold="formData['threshold'].value"
                         :formStatus="formStatus"
                         @update-form="validateInputUpdate"
@@ -127,6 +128,20 @@
                         :isRequired="mapMandatory(attribute)"
                         :isDisabled="mapDisabled(attribute, $i18n.locale)"
                         @update-form="validateInputUpdate"
+                    />
+
+                    <EditableProductDetails
+                        v-if="mapFormSubmissionType(attribute) === 'product details'"
+                        :product="formData['product'].value"
+                        :materials="formData['materials'].value"
+                        :length="formData['length'].value"
+                        :width="formData['width'].value"
+                        :dimensionUnit="formData[getRecordUnit('length')].value ? formData[getRecordUnit('length')].value : null"
+                        :size="formData['size'].value? formData['size'].value : null"
+                        :sizeUnit="formData[getRecordUnit('size')].value ? formData[getRecordUnit('size')].value : null"
+                        :formStatus="formStatus"
+                        @update-form="validateInputUpdate"
+                        @scroll-down="scrollDown"
                     />
                 </div>
                 <hr v-if="index < sections.length - 1" class="horizontal dark my-2 w-100" />
@@ -196,6 +211,7 @@ import EditableSizeCondition from "@/components/reuseable-components/forms/Edita
 import EditableClientCondition from "@/components/reuseable-components/forms/EditableClientCondition.vue";
 import EditableQuantityCondition from "@/components/reuseable-components/forms/EditableQuantityCondition.vue";
 import EditableDate from "@/components/reuseable-components/forms/EditableDate.vue";
+import EditableProductDetails from "@/components/reuseable-components/forms/EditableProductDetails.vue";
 
 export default {
     name: "InfoForm",
@@ -211,7 +227,8 @@ export default {
         EditableSizeCondition,
         EditableClientCondition,
         EditableQuantityCondition,
-        EditableDate
+        EditableDate,
+        EditableProductDetails
     },
     props: {
         target: {
@@ -329,6 +346,7 @@ export default {
         },
 
         validateInputUpdate(name, value, isValid) {
+            // updating various nested fields
             this.formData[name] = { value: value, isValidated: isValid };
             console.log("FormUpdate", name, value, isValid);
         }

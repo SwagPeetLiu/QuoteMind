@@ -329,6 +329,7 @@
     "assigned position": "Assigned Position",
     "pricing product": "Pricing Product",
     "pricing materials": "Applied Materials",
+    "pricings": "Pricings",
     "condition": "Pricing Condition",
     "individual specific": "Individuals",
     "listed_conditions": "Combinational Conditions",
@@ -356,7 +357,9 @@
     "dimension_unit":{
       "mm": "mili-meter",
       "cm": "centi-meter",
-      "m": "meter"
+      "m": "meter",
+      "cun": "cun",
+      "inch": "inch"
     },
     "size_unit":{
       "mm²": "mm²",

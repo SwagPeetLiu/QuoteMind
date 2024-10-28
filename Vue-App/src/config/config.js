@@ -131,11 +131,9 @@ const config = {
             "general": ["ch_name", "en_name", "descriptions"]
         },
         "transactions": {
-            "time": ["transaction_date", "creation_date", "modified_date"],
+            "details": ["name", "status", "transaction_date", "creation_date", "modified_date"],
             "product details": ["product details"],
-            "details": ["status", "name", "quantity", "quantity_unit", "price_per_unit", "amount"],
-            "product details": ["product", "materials"],
-            "dimensions": ["length", "width", "en_unit", "ch_unit", "size", "size_unit"],
+            "pricings": ["quantity", "quantity_unit", "price_per_unit", "amount"],
             "client details": ["client", "company", "addresses"],
             "others": ["colour", "note", "employee"],
         },
@@ -175,16 +173,17 @@ const config = {
         }
     },
     defaultValue:{
+        "minimumSize": 0.001,
         "size": 1,
         "quantity": 100,
         "threshold": ">="
     },
     units:{
         "defaultSize": "m²",
-        "defaultDiemsion": "mm",
+        "defaultDimension": "m",
         "defaultQuantityENUnit": "units",
         "defaultQuantityCHUnit": "个",
-        "diemsion": ["m","cm","mm","cun","inch"],
+        "dimension": ["m","cm","mm","cun","inch"],
         "size": ["m²","cm²","mm²"],
     },
     date:{

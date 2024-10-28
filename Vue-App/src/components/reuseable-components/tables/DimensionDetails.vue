@@ -98,6 +98,7 @@ export default {
                 const size = this.length * this.width;
                 const mappedSizeUnit = mapDimensionUnitToSizeUnit(this.dimension_unit);
                 mappedSize = mapDefaultDimensions(size, mappedSizeUnit, config.units.defaultSize);
+                mappedSize = mappedSize < config.defaultValue.minimumSize ? config.defaultValue.minimumSize : mappedSize;
             }
             return givenSize ? givenSize : mappedSize;
         },

@@ -116,7 +116,8 @@ function getIcon(target) {
             return "fa-solid fa-calendar-days";
         case "between":
             return "fa-solid fa-arrow-right-arrow-left";
-
+        case "map down":
+            return "fa-solid fa-angles-down";
         // routes:
         case "home":
             return "fa fa-home";
