@@ -134,7 +134,7 @@ export default {
                 }
                 // if Initialise an input, then do so for the unit as well
                 else if (value && isValid && !this.quantityUnit){
-                    this.$emit("update-form", "quantity", value, true);
+                    this.$emit("update-form", "quantity", Number(value) > 0 ? value : null, true);
                     this.$emit(
                         "update-form",
                         "quantity_unit", 

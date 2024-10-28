@@ -125,13 +125,6 @@ export default {
                 this.isValid = true;
                 return this.$emit("update-form", this.name, this.originalValue, true);
             }
-            // no need to clear it if this textarea is disabled
-            if (newValue === "saving" || newValue === "editing"){
-                if (this.isDisabled){
-                    this.isValid = true;
-                    return this.$emit("update-form", this.name, this.originalValue, true);
-                }
-            }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
                 this.originalValue = this.value;

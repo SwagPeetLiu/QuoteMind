@@ -138,14 +138,6 @@ export default {
                 this.$emit("update-form", "addresses", this.originalList, true);
                 return;
             }
-            if (newValue === "saving" || newValue === "editing"){
-                // direct submission if the input is disabled
-                if (this.isDisabled){
-                    this.isValid = true;
-                    this.$emit("update-form", "addresses", this.originalList, true);
-                    return;
-                }
-            }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
                 this.originalList = this.list;

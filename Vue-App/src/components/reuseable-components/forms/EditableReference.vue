@@ -115,14 +115,6 @@ export default {
                 this.$emit("update-form", this.target, {id: this.originalID, [this.targetName]: this.originalName}, true);
                 return;
             }
-            if (newValue === "saving" || newValue === "editing"){
-                // direct submission if the input is disabled
-                if (this.isDisabled){
-                    this.isValid = true;
-                    this.$emit("update-form", this.target, {id: this.originalID, [this.targetName]: this.originalName}, true);
-                    return;
-                }
-            }
             // upon successful udpates, update its original value
             if (newValue === "display" &&  oldValue === "saving"){
                 this.originalID = this.id;
